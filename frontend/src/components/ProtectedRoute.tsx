@@ -26,8 +26,8 @@ export function ProtectedRoute({ children, requireCompany = false }: ProtectedRo
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Redirect to company selection if company is required but not selected
-  if (requireCompany && !currentCompany) {
+  // Redirect to company selection if authenticated but no company is selected
+  if (!currentCompany) {
     return <Navigate to="/companies" replace />;
   }
 

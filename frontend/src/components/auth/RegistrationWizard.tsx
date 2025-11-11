@@ -24,11 +24,20 @@ export function RegistrationWizard() {
   const onFinish = async (values: RegistrationData) => {
     setLoading(true);
     try {
-      // Simulate API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Determine if emailOrPhone is email or phone and structure data correctly
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const registrationData = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        password: values.password,
+        ...(emailRegex.test(values.emailOrPhone || '') 
+          ? { email: values.emailOrPhone } 
+          : { phone: values.emailOrPhone }
+        )
+      };
       
-      // Call register function with the values
-      await register(values);
+      // Call register function with the structured values
+      await register(registrationData);
       
       message.success('Registration successful! Please check your email to verify your account.');
       navigate('/login');

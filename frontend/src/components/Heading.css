@@ -1,0 +1,24 @@
+.app-heading {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: #232323;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+.app-heading-h1 {
+  font-size: 2.1rem;
+}
+.app-heading-h2 {
+  font-size: 1.45rem;
+}
+.app-heading-h3 {
+  font-size: 1.15rem;
+}
+.app-heading-h4 {
+  font-size: 1rem;
+}
+.app-heading-h5 {
+  font-size: 0.95rem;
+}
+.app-heading-h6 {
+  font-size: 0.85rem;
+}

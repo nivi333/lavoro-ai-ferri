@@ -5,9 +5,9 @@ import {
   LoginPage, 
   RegisterPage, 
   ForgotPasswordPage, 
-  CompaniesPage, 
   DashboardPage 
 } from '../pages';
+import { CompaniesListPage } from '../pages/CompaniesListPage';
 import { GoogleAuthCallback } from '../components/auth/GoogleAuthCallback';
 
 // Main application router component
@@ -54,7 +54,7 @@ export function AppRouter() {
             path="/companies"
             element={
               <ProtectedRoute>
-                <CompaniesPage />
+                <CompaniesListPage />
               </ProtectedRoute>
             }
           />

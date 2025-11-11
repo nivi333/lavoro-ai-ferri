@@ -10,7 +10,15 @@ type AuthAction =
   | { type: 'LOGOUT' }
   | { type: 'SET_CURRENT_COMPANY'; payload: Company }
   | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
-  | { type: 'INITIALIZE_AUTH'; payload: { user: User | null; tokens: AuthTokens | null; companies: Company[]; currentCompany: Company | null } };
+  | {
+      type: 'INITIALIZE_AUTH';
+      payload: {
+        user: User | null;
+        tokens: AuthTokens | null;
+        companies: Company[];
+        currentCompany: Company | null;
+      };
+    };
 
 // Initial state
 const initialState: AuthState = {
@@ -28,10 +36,10 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload, isLoading: false };
-    
+
     case 'LOGIN_SUCCESS':
       return {
         ...state,
@@ -42,25 +50,25 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isLoading: false,
         error: null,
       };
-    
+
     case 'LOGOUT':
       return {
         ...initialState,
         isLoading: false,
       };
-    
+
     case 'SET_CURRENT_COMPANY':
       return {
         ...state,
         currentCompany: action.payload,
       };
-    
+
     case 'REFRESH_TOKEN_SUCCESS':
       return {
         ...state,
         tokens: action.payload,
       };
-    
+
     case 'INITIALIZE_AUTH':
       return {
         ...state,
@@ -71,7 +79,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isAuthenticated: !!(action.payload.user && action.payload.tokens),
         isLoading: false,
       };
-    
+
     default:
       return state;
   }
@@ -113,80 +121,91 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  // Mock login function (replace with actual API call)
+  // Login function (must call backend API)
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock response data
-      const mockUser: User = {
-        id: '1',
-        email: credentials.emailOrPhone,
-        firstName: 'John',
-        lastName: 'Doe',
-        role: 'ADMIN',
-      };
-
-      const mockTokens: AuthTokens = {
-        accessToken: 'mock_access_token',
-        refreshToken: 'mock_refresh_token',
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-      };
-
-      const mockCompanies: Company[] = [
-        {
-          id: '1',
-          name: 'Textile Corp',
-          slug: 'textile-corp',
-          industry: 'Textile Manufacturing',
-          role: 'OWNER',
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          emailOrPhone: credentials.emailOrPhone,
+          password: credentials.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed. Please try again.');
+      }
+
+      const data = await response.json();
+      const { user, tokens } = data;
+
+      // Fetch companies after login (separate endpoint)
+      const companiesRes = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`,
         {
-          id: '2',
-          name: 'Garment Ltd',
-          slug: 'garment-ltd',
-          industry: 'Garment Manufacturing',
-          role: 'ADMIN',
-        },
-      ];
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        }
+      );
+      if (!companiesRes.ok) {
+        throw new Error('Failed to fetch companies');
+      }
+      const companies = await companiesRes.json();
 
-      // Store in storage
-      AuthStorage.setUser(mockUser);
-      AuthStorage.setTokens(mockTokens);
-      AuthStorage.setCompanies(mockCompanies);
-      AuthStorage.setCurrentCompany(mockCompanies[0]);
+      AuthStorage.setUser(user);
+      AuthStorage.setTokens(tokens);
+      AuthStorage.setCompanies(companies);
+      // Optionally, set current company if there's only one
+      if (companies.length === 1) {
+        AuthStorage.setCurrentCompany(companies[0]);
+      }
 
-      // Update state
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: { user: mockUser, tokens: mockTokens, companies: mockCompanies },
+        payload: { user, tokens, companies },
       });
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Login failed. Please try again.' });
+    } catch (error: any) {
+      dispatch({ type: 'SET_ERROR', payload: error.message || 'Login failed. Please try again.' });
+      throw error;
     }
   };
 
-  // Mock register function (replace with actual API call)
+  // Register function (must call backend API)
   const register = async (userData: any) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        }
+      );
 
-      // Simulate successful registration
-      // In a real app, this would call your backend API
-      console.log('Registration data:', userData);
-      
-      // No need to store user data since they'll need to verify email first
-      // Just return success for now
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Registration failed. Please try again.' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed. Please try again.');
+      }
+
+      // No need to handle tokens or user here, just let the UI show success
+    } catch (error: any) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: error.message || 'Registration failed. Please try again.',
+      });
       throw error;
     }
   };
@@ -203,15 +222,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshToken = async () => {
     try {
-      // Mock refresh token API call
-      const newTokens: AuthTokens = {
-        accessToken: 'new_mock_access_token',
-        refreshToken: 'new_mock_refresh_token',
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000),
-      };
-
-      AuthStorage.setTokens(newTokens);
-      dispatch({ type: 'REFRESH_TOKEN_SUCCESS', payload: newTokens });
+      // TODO: Implement real refresh token API call here
+      throw new Error('refreshToken API not implemented');
     } catch {
       logout();
     }
