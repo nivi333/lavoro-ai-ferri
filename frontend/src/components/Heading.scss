@@ -1,0 +1,32 @@
+@import '../index.scss';
+
+.app-heading {
+  font-family: $font-family-body;
+  color: $primary-text-color;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+
+  &-h1 {
+    font-size: 2.1rem;
+  }
+
+  &-h2 {
+    font-size: 1.45rem;
+  }
+
+  &-h3 {
+    font-size: 1.15rem;
+  }
+
+  &-h4 {
+    font-size: 1rem;
+  }
+
+  &-h5 {
+    font-size: 0.95rem;
+  }
+
+  &-h6 {
+    font-size: 0.85rem;
+  }
+}

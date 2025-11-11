@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Button, Tabs, message } from 'antd';
-import { TeamOutlined, HomeOutlined } from '@ant-design/icons';
+import { TeamOutlined, BankOutlined } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Company } from '../types/auth';
 import { BrandLogo } from '../components/BrandLogo';
-import { Heading } from '../components/Heading';
-import './CompaniesListPage.css';
+import { HeadingText } from '../components/ui';
+import './CompaniesListPage.scss';
 
 // Companies selection page component
 import { Spin } from 'antd';
@@ -23,7 +23,7 @@ export function CompaniesListPage() {
 
   if (isLoading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='companies-loading'>
         <Spin size='large' tip='Loading...' />
       </div>
     );
@@ -47,8 +47,8 @@ export function CompaniesListPage() {
   return (
     <div className='companies-root'>
       <div className='companies-top-bar'>
-        <BrandLogo width={140} height={36} />
-        <div style={{ display: 'flex', gap: 12 }}>
+        <BrandLogo width={150} height={36} />
+        <div className='companies-top-bar-actions'>
           <Button
             type='primary'
             className='companies-add-btn'
@@ -70,9 +70,7 @@ export function CompaniesListPage() {
       </div>
       <div className='companies-content'>
         <div className='companies-inner-wrapper'>
-          <Heading level={2} className='companies-title'>
-            Select Company / Role
-          </Heading>
+          <HeadingText>Select Company / Role</HeadingText>
           {companies && companies.length > 0 ? (
             <>
               <div className='companies-tabs'>
@@ -101,13 +99,13 @@ export function CompaniesListPage() {
                         onClick={() => handleCompanySelect(company)}
                       >
                         <div className='companies-card-left'>
-                          <HomeOutlined className='companies-card-icon' />
                           <div>
                             <div className='companies-card-title'>{company.name}</div>
                           </div>
                         </div>
-                        <div className='companies-card-desc' style={{ marginLeft: 'auto', marginRight: 16 }}>
-                          {company.industry} <span style={{ color: '#c7c7c7' }}>•</span> {company.role}
+                        <div className='companies-card-desc companies-card-desc-wrapper'>
+                          {company.industry}{' '}
+                          <span className='companies-card-desc-separator'>•</span> {company.role}
                         </div>
                         <TeamOutlined className='companies-card-team' />
                       </li>
@@ -117,9 +115,9 @@ export function CompaniesListPage() {
               </div>
             </>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 64 }}>
-              <HomeOutlined style={{ fontSize: 64, color: '#d9d9d9' }} />
-              <div style={{ fontSize: 20, color: '#888', marginTop: 16 }}>No company created</div>
+            <div className='companies-empty-state'>
+              <BankOutlined className='companies-empty-icon' />
+              <div className='companies-empty-text'>No company created</div>
             </div>
           )}
         </div>

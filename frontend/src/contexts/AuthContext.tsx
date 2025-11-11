@@ -158,7 +158,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!companiesRes.ok) {
         throw new Error('Failed to fetch companies');
       }
-      const companies = await companiesRes.json();
+      const companiesResponse = await companiesRes.json();
+      const companies = companiesResponse.data || [];
 
       AuthStorage.setUser(user);
       AuthStorage.setTokens(tokens);

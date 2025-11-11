@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Card } from 'antd';
+import { HeadingText } from './HeadingText';
 
 interface AuthCardProps {
   children: ReactNode;
@@ -20,19 +21,7 @@ export function AuthCard({ children, heading }: AuthCardProps) {
         {/* Page heading inside card */}
         {heading && (
           <div style={{ marginBottom: '24px' }}>
-            <h3
-              style={{
-                color: '#1f2937',
-                fontWeight: 400,
-                margin: 0,
-                fontSize: '20px',
-                textAlign: 'center',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {heading}
-            </h3>
+            <HeadingText>{heading}</HeadingText>
           </div>
         )}
 

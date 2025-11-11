@@ -1,0 +1,11 @@
+@import '../../index.scss';
+
+.headingText {
+  color: $primary-text-color;
+  font-weight: 500;
+  margin: 0;
+  font-size: 22px;
+  text-align: center;
+  font-family: $font-family-body;
+  letter-spacing: -0.02em;
+}

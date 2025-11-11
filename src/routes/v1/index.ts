@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
 import healthRoutes from './healthRoutes';
+import companyRoutes from './companyRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { userRateLimit } from '../../middleware/rateLimiter';
 
@@ -17,7 +18,7 @@ router.get('/', (req, res) => {
       auth: '/auth',
       health: '/health',
       // Future endpoints will be added here
-      companies: '/companies (coming soon)',
+      companies: '/companies',
       locations: '/locations (coming soon)',
       inventory: '/inventory (coming soon)',
       production: '/production (coming soon)',
@@ -37,8 +38,8 @@ router.use('/health', healthRoutes);
 router.use(tenantIsolationMiddleware);
 router.use(userRateLimit);
 
-// Future protected routes will be added here
-// router.use('/companies', companyRoutes);
+// Protected routes
+router.use('/companies', companyRoutes);
 // router.use('/locations', locationRoutes);
 // router.use('/inventory', inventoryRoutes);
 // router.use('/production', productionRoutes);

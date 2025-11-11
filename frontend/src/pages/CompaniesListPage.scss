@@ -1,0 +1,158 @@
+@import '../index.scss';
+
+body {
+  margin: 15px;
+}
+
+.companies-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.companies-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0;
+}
+
+.companies-inner-wrapper {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.companies-list {
+  width: 100%;
+}
+
+.companies-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.companies-empty {
+  text-align: center;
+  color: $tertiary-text-color;
+  font-size: 16px;
+  padding: 40px 0;
+}
+
+.companies-add-btn {
+  min-width: 180px;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.companies-tabs {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 14px 0 10px 0;
+  border-bottom: 1px solid $border-color;
+}
+
+.companies-tab {
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 24px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s, color 0.2s;
+
+  &.active {
+    border-bottom: 2.5px solid $warning-color;
+    color: $warning-text-color;
+  }
+}
+
+.companies-card {
+  width: 100%;
+  background: $bg-primary;
+  margin-bottom: 18px;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-base;
+  padding: $spacing-md;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: $primary-color;
+  }
+}
+
+.companies-card-left {
+  display: flex;
+  align-items: center;
+}
+
+.companies-card-title,
+.companies-card-desc {
+  display: inline;
+  margin-right: 18px;
+}
+
+.companies-card-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.companies-card-desc {
+  font-size: 13px;
+  color: $tertiary-text-color;
+}
+
+.companies-card-team {
+  font-size: 16px;
+  color: $tertiary-text-color;
+}
+
+.companies-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.companies-top-bar-actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.companies-card-desc-wrapper {
+  margin-left: auto;
+  margin-right: $spacing-md;
+}
+
+.companies-card-desc-separator {
+  color: $muted-text-color;
+}
+
+.companies-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 64px;
+}
+
+.companies-empty-icon {
+  font-size: 64px;
+  color: $border-dark;
+  margin-bottom: $spacing-md;
+}
+
+.companies-empty-text {
+  font-size: 16px;
+  color: $tertiary-text-color;
+}

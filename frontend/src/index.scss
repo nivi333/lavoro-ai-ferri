@@ -1,15 +1,78 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap');
 
-// SCSS Variables for the design system
+// ============================================================================
+// COLOR VARIABLES
+// ============================================================================
+
+// Light mode colors
 $primary-color: #7b5fc9;
 $secondary-color: #a2d8e5;
 $success-color: #52c41a;
 $error-color: #ff4d4f;
 $warning-color: #faad14;
+$info-color: #1890ff;
+
+// Light mode text colors
+$primary-text-color: #213547;
+$secondary-text-color: #64748b;
+$tertiary-text-color: #94a3b8;
+$muted-text-color: #cbd5e1;
+$disabled-text-color: #e2e8f0;
+
+// Light mode background colors
+$bg-primary: #ffffff;
+$bg-secondary: #f8fafc;
+$bg-tertiary: #f1f5f9;
+$bg-muted: #e2e8f0;
+
+// Light mode border colors
+$border-color: #e2e8f0;
+$border-light: #f1f5f9;
+$border-dark: #cbd5e1;
+
+// Light mode state colors
+$success-text-color: #166534;
+$success-bg-color: #dcfce7;
+$error-text-color: #dc2626;
+$error-bg-color: #fef2f2;
+$warning-text-color: #d97706;
+$warning-bg-color: #fef3c7;
+$info-text-color: #0369a1;
+$info-bg-color: #dbeafe;
+
+// Dark mode colors
+$dark-bg-primary: #1f1f1f;
+$dark-bg-secondary: #2d2d2d;
+$dark-bg-tertiary: #3d3d3d;
+$dark-text-primary: #ffffff;
+$dark-text-secondary: #b3b3b3;
+$dark-text-tertiary: #808080;
+$dark-border: #404040;
+
+// Dark mode state colors
+$dark-success-color: #22c55e;
+$dark-error-color: #ef4444;
+$dark-warning-color: #f59e0b;
+$dark-info-color: #3b82f6;
+
+// ============================================================================
+// OTHER DESIGN SYSTEM VARIABLES
+// ============================================================================
 
 $font-family-heading: 'Poppins', 'Inter', system-ui, sans-serif;
-$font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+$font-family-body:
+  'Inter',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  'Roboto',
+  'Oxygen',
+  'Ubuntu',
+  'Cantarell',
+  'Fira Sans',
+  'Droid Sans',
+  'Helvetica Neue',
+  sans-serif;
 
 $border-radius-base: 8px;
 $border-radius-lg: 12px;
@@ -23,9 +86,15 @@ $spacing-xl: 32px;
 $spacing-2xl: 48px;
 
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
 .no-border-link:hover,
 .no-border-link:focus {
@@ -45,7 +114,7 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
 
 /* Auth form field styles */
 .auth-form-label {
-  color: #374151 !important;
+  color: $secondary-text-color !important;
   font-weight: 500 !important;
   font-size: 14px !important;
 }
@@ -53,8 +122,8 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
 .auth-form-input {
   height: 40px !important;
   border-radius: 6px !important;
-  border: 1px solid #d1d5db !important;
-  background-color: #f9fafb !important;
+  border: 1px solid $border-color !important;
+  background-color: $bg-secondary !important;
   font-size: 14px !important;
 }
 
@@ -68,10 +137,10 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
 
 /* Animated gradient primary button */
 .gradient-primary-btn {
-  background: linear-gradient(135deg, #7b5fc9 0%, #6b4fc9 50%, #5b3fc9 100%) !important;
+  background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 10%) 50%, darken($primary-color, 20%) 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 6px -1px rgba(123, 95, 201, 0.3) !important;
-  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba($primary-color, 0.3) !important;
+  color: $bg-primary !important;
   font-weight: 600 !important;
   transition: all 0.3s ease !important;
   position: relative !important;
@@ -85,13 +154,13 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  background: linear-gradient(90deg, transparent, rgba($bg-primary, 0.2), transparent) !important;
   transition: left 0.5s ease !important;
 }
 
 .gradient-primary-btn:hover {
-  background: linear-gradient(135deg, #8b6fd9 0%, #7b5fd9 50%, #6b4fc9 100%) !important;
-  box-shadow: 0 6px 8px -1px rgba(123, 95, 201, 0.4) !important;
+  background: linear-gradient(135deg, lighten($primary-color, 10%) 0%, $primary-color 50%, darken($primary-color, 10%) 100%) !important;
+  box-shadow: 0 6px 8px -1px rgba($primary-color, 0.4) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -101,20 +170,20 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
 
 .gradient-primary-btn:active {
   transform: translateY(0) !important;
-  box-shadow: 0 3px 4px -1px rgba(123, 95, 201, 0.3) !important;
+  box-shadow: 0 3px 4px -1px rgba($primary-color, 0.3) !important;
 }
 
 .gradient-primary-btn:focus {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(123, 95, 201, 0.3) !important;
+  box-shadow: 0 0 0 3px rgba($primary-color, 0.3) !important;
 }
 
 /* Animated gradient secondary button */
 .gradient-secondary-btn {
-  background: linear-gradient(135deg, #fb923c 0%, #f59e0b 50%, #f59e0b 100%) !important;
+  background: linear-gradient(135deg, lighten($warning-color, 10%) 0%, $warning-color 50%, $warning-color 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 6px -1px rgba(251, 146, 60, 0.3) !important;
-  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba($warning-color, 0.3) !important;
+  color: $bg-primary !important;
   font-weight: 600 !important;
   transition: all 0.3s ease !important;
   position: relative !important;
@@ -128,13 +197,13 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  background: linear-gradient(90deg, transparent, rgba($bg-primary, 0.2), transparent) !important;
   transition: left 0.5s ease !important;
 }
 
 .gradient-secondary-btn:hover {
-  background: linear-gradient(135deg, #fba24c 0%, #f6ae1b 50%, #f6ae1b 100%) !important;
-  box-shadow: 0 6px 8px -1px rgba(251, 146, 60, 0.4) !important;
+  background: linear-gradient(135deg, lighten($warning-color, 15%) 0%, lighten($warning-color, 5%) 50%, lighten($warning-color, 5%) 100%) !important;
+  box-shadow: 0 6px 8px -1px rgba($warning-color, 0.4) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -144,89 +213,81 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 
 
 .gradient-secondary-btn:active {
   transform: translateY(0) !important;
-  box-shadow: 0 3px 4px -1px rgba(251, 146, 60, 0.3) !important;
+  box-shadow: 0 3px 4px -1px rgba($warning-color, 0.3) !important;
 }
 
 .gradient-secondary-btn:focus {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3) !important;
+  box-shadow: 0 0 0 3px rgba($warning-color, 0.3) !important;
 }
 
 /* Auth heading improvements */
 [data-theme='dark'] {
   .ant-card h3 {
-    color: #f9fafb !important;
+    color: $dark-text-primary !important;
   }
 }
 
 [data-theme='dark'] {
   .ant-input {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    color: #f9fafb !important;
-    
+    background-color: $dark-bg-primary !important;
+    border-color: $dark-border !important;
+    color: $dark-text-primary !important;
+
     &::placeholder {
-      color: #9ca3af !important;
+      color: $dark-text-tertiary !important;
     }
-    
+
     &:hover {
-      border-color: #4b5563 !important;
+      border-color: lighten($dark-border, 15%) !important;
     }
-    
+
     &:focus,
     &.ant-input-focused {
-      border-color: #7b5fc9 !important;
-      box-shadow: 0 0 0 2px rgba(123, 95, 201, 0.2) !important;
+      border-color: $primary-color !important;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
     }
   }
-  
+
   .ant-input-password {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    
+    background-color: $dark-bg-primary !important;
+    border-color: $dark-border !important;
+
     .ant-input {
       background-color: transparent !important;
       border-color: transparent !important;
     }
-    
+
     &:hover {
-      border-color: #4b5563 !important;
+      border-color: lighten($dark-border, 15%) !important;
     }
-    
+
     &:focus,
     &.ant-input-password-focused {
-      border-color: #7b5fc9 !important;
-      box-shadow: 0 0 0 2px rgba(123, 95, 201, 0.2) !important;
+      border-color: $primary-color !important;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
     }
   }
-  
+
   .ant-form-item-label > label {
-    color: #d1d5db !important;
+    color: $dark-text-secondary !important;
   }
-  
+
   .ant-typography {
-    color: #e5e7eb !important;
+    color: $dark-text-secondary !important;
   }
-  
+
   .ant-card {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
+    background-color: $dark-bg-primary !important;
+    border-color: $dark-border !important;
   }
-  
+
   body {
-    background-color: #111827 !important;
-    color: #e5e7eb !important;
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-secondary !important;
   }
 }
 
-// Dark mode variables
-$dark-bg-primary: #1f1f1f;
-$dark-bg-secondary: #2d2d2d;
-$dark-bg-tertiary: #3d3d3d;
-$dark-text-primary: #ffffff;
-$dark-text-secondary: #b3b3b3;
-$dark-text-tertiary: #808080;
-$dark-border: #404040;
 
 // Reset and base styles
 * {
@@ -240,14 +301,19 @@ body {
   font-family: $font-family-body;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #ffffff;
-  color: #213547;
+  background-color: $bg-primary;
+  color: $primary-text-color;
   line-height: 1.5;
   font-weight: 400;
 }
 
 // Typography
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: $font-family-heading;
   font-weight: 600;
   line-height: 1.1;
@@ -297,7 +363,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9;
+  background-color: $bg-secondary;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -483,15 +549,15 @@ button {
 // Gradient backgrounds
 .bg-gradient-to-br {
   &.from-purple-50 {
-    background: linear-gradient(to bottom right, #faf5ff, #ffffff);
+    background: linear-gradient(to bottom right, lighten($primary-color, 45%), $bg-primary);
   }
 
   &.from-blue-50 {
-    background: linear-gradient(to bottom right, #f0f9ff, #ffffff);
+    background: linear-gradient(to bottom right, lighten($secondary-color, 35%), $bg-primary);
   }
 
   &.from-orange-50 {
-    background: linear-gradient(to bottom right, #fff7ed, #ffffff);
+    background: linear-gradient(to bottom right, lighten($warning-color, 35%), $bg-primary);
   }
 }
 
@@ -507,11 +573,15 @@ button {
     }
 
     &.to-blue-900 {
-      background: linear-gradient(to bottom right, $dark-bg-secondary, darken($secondary-color, 20%));
+      background: linear-gradient(
+        to bottom right,
+        $dark-bg-secondary,
+        darken($secondary-color, 20%)
+      );
     }
 
     &.to-orange-900 {
-      background: linear-gradient(to bottom right, $dark-bg-secondary, #7c2d12);
+      background: linear-gradient(to bottom right, $dark-bg-secondary, darken($warning-color, 30%));
     }
   }
 }
@@ -520,8 +590,8 @@ button {
 .form-input {
   height: 48px;
   border-radius: $border-radius-lg;
-  border: 1px solid #e5e7eb;
-  background-color: #f9fafb;
+  border: 1px solid $border-color;
+  background-color: $bg-secondary;
   padding: 0 $spacing-md;
   font-size: 16px;
   transition: all 0.2s ease;
@@ -546,10 +616,10 @@ button {
 
 // Card styles
 .card {
-  background: white;
+  background: $bg-primary;
   border-radius: $border-radius-xl;
   box-shadow: $shadow-lg;
-  border: 1px solid #f3f4f6;
+  border: 1px solid $border-light;
   padding: $spacing-xl;
 
   @media (prefers-color-scheme: dark) {
@@ -560,7 +630,7 @@ button {
 
 .card-elevated {
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
