@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Dropdown, Avatar, Space } from 'antd';
+import { Layout, Menu, Dropdown, Avatar } from 'antd';
 import {
   DashboardOutlined,
   InboxOutlined,
@@ -123,8 +123,14 @@ export default function Sidebar() {
     {
       key: 'company-settings',
       icon: <SettingOutlined />,
-      label: 'Company / Location',
+      label: 'Company Details',
       onClick: () => navigate('/companies'),
+    },
+    {
+      key: 'location',
+      icon: <BankOutlined />,
+      label: 'Location',
+      onClick: () => navigate('/locations'),
     },
     {
       key: 'switch-company',

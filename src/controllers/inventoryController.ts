@@ -1,7 +1,20 @@
 import { Request, Response } from 'express';
 import { inventoryService } from '../services/inventoryService';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger';
 import { CreateInventoryItemData, UpdateInventoryItemData, StockMovementData } from '../services/inventoryService';
+
+// Extend Request interface to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
+}
 
 export class InventoryController {
   // Create inventory item

@@ -1,0 +1,303 @@
+@import '../../index.scss';
+
+.location-drawer {
+  .ant-drawer-header {
+    background: $bg-surface;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-lg $spacing-xl;
+
+    .ant-drawer-title {
+      color: $text-primary;
+      font-size: $font-size-xl;
+      font-weight: 600;
+      font-family: $font-family-heading;
+    }
+  }
+
+  .ant-drawer-body {
+    background: $bg-primary;
+    padding: $spacing-xl;
+  }
+
+  .ant-drawer-footer {
+    background: $bg-surface;
+    border-top: 1px solid $border-light;
+    padding: $spacing-lg $spacing-xl;
+  }
+
+  .drawer-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    color: $text-primary;
+
+    .anticon {
+      color: $primary-color;
+      font-size: $font-size-xl;
+    }
+  }
+
+  .location-form {
+    .form-section {
+      margin-bottom: $spacing-2xl;
+
+      .section-title {
+        color: $text-primary;
+        font-size: $font-size-base;
+        font-weight: 600;
+        margin-bottom: $spacing-lg;
+        font-family: $font-family-heading;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $spacing-lg;
+        margin-bottom: $spacing-lg;
+      }
+
+      .form-field {
+        margin-bottom: $spacing-lg;
+
+        .field-label {
+          display: block;
+          margin-bottom: $spacing-sm;
+          color: $text-primary;
+          font-size: $font-size-sm;
+          font-weight: 500;
+          font-family: $font-family-body;
+
+          &.required::after {
+            content: ' *';
+            color: $error-color;
+          }
+        }
+
+        .field-help {
+          display: block;
+          margin-top: $spacing-sm;
+          color: $text-secondary;
+          font-size: $font-size-xs;
+          font-family: $font-family-body;
+        }
+
+        .field-error {
+          display: block;
+          margin-top: $spacing-sm;
+          color: $error-color;
+          font-size: $font-size-xs;
+          font-family: $font-family-body;
+        }
+
+        .ant-input,
+        .ant-select-selector {
+          background: $bg-surface;
+          border-color: $border-light;
+          color: $text-primary;
+          border-radius: $border-radius-base;
+
+          &:hover,
+          &:focus {
+            border-color: $primary-color;
+            box-shadow: 0 0 0 2px rgba(123, 95, 201, 0.1);
+          }
+        }
+
+        .ant-input::placeholder {
+          color: $text-placeholder;
+        }
+
+        .ant-select {
+          .ant-select-selection-placeholder {
+            color: $text-placeholder;
+          }
+        }
+      }
+    }
+
+    .avatar-uploader {
+      .ant-upload {
+        background: $bg-surface;
+        border: 2px dashed $border-light;
+        border-radius: $border-radius-base;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: $primary-color;
+          background: $bg-primary;
+        }
+
+        .upload-placeholder {
+          text-align: center;
+          color: $text-secondary;
+
+          .anticon {
+            font-size: $font-size-xl;
+            color: $primary-color;
+            margin-bottom: $spacing-sm;
+          }
+        }
+      }
+    }
+
+    .type-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .switch-field {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-lg;
+      padding: $spacing-lg;
+      background: $bg-surface;
+      border-radius: $border-radius-base;
+      border: 1px solid $border-light;
+
+      .ant-switch {
+        margin-top: 2px;
+      }
+
+      .switch-label {
+        flex: 1;
+
+        .ant-typography {
+          margin-bottom: $spacing-sm;
+        }
+
+        .switch-description {
+          display: block;
+          margin-top: $spacing-sm;
+          color: $text-secondary;
+          font-size: $font-size-sm;
+          font-family: $font-family-body;
+          line-height: 1.4;
+        }
+      }
+    }
+
+    .info-alert {
+      margin-top: $spacing-lg;
+      border-radius: $border-radius-base;
+
+      .ant-alert-icon {
+        color: $primary-color;
+      }
+
+      .ant-alert-message {
+        color: $text-primary;
+        font-weight: 500;
+      }
+
+      .ant-alert-description {
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .drawer-footer {
+    .ant-btn {
+      border-radius: $border-radius-base;
+      font-weight: 500;
+      height: auto;
+      padding: $spacing-md $spacing-lg;
+
+      &.ant-btn-primary {
+        background: $primary-color;
+        border-color: $primary-color;
+
+        &:hover {
+          background: darken($primary-color, 10%);
+          border-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .ant-drawer {
+      .ant-drawer-content {
+        width: 100% !important;
+      }
+    }
+
+    .location-form {
+      .form-section {
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: $spacing-md;
+        }
+
+        .form-field {
+          margin-bottom: $spacing-md;
+        }
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+[data-theme='dark'] .location-drawer {
+  .ant-drawer-header {
+    background: $dark-bg-secondary;
+    border-bottom-color: $dark-border;
+  }
+
+  .ant-drawer-body {
+    background: $dark-bg-primary;
+  }
+
+  .ant-drawer-footer {
+    background: $dark-bg-secondary;
+    border-top-color: $dark-border;
+  }
+
+  .location-form {
+    .form-section {
+      .form-field {
+        .ant-input,
+        .ant-select-selector {
+          background: $dark-bg-secondary;
+          border-color: $dark-border;
+          color: $dark-text-primary;
+
+          &:hover,
+          &:focus {
+            border-color: $primary-color;
+          }
+        }
+
+        .switch-field {
+          background: $dark-bg-secondary;
+          border-color: $dark-border;
+        }
+      }
+    }
+
+    .avatar-uploader {
+      .ant-upload {
+        background: $dark-bg-secondary;
+        border-color: $dark-border;
+
+        &:hover {
+          border-color: $primary-color;
+          background: $dark-bg-primary;
+        }
+      }
+    }
+
+    .info-alert {
+      background: $dark-bg-secondary;
+      border-color: $dark-border;
+    }
+  }
+}

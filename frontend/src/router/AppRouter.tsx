@@ -8,6 +8,7 @@ import {
   ForgotPasswordPage,
   DashboardPage,
   InventoryPage,
+  LocationListPage,
 } from '../pages';
 import CompaniesListPage from '../pages/CompaniesListPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
@@ -73,6 +74,15 @@ export default function AppRouter() {
             element={
               <ProtectedRoute requireCompany={true}>
                 <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/locations'
+            element={
+              <ProtectedRoute requireCompany={true}>
+                <LocationListPage />
               </ProtectedRoute>
             }
           />
