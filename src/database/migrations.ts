@@ -64,7 +64,9 @@ export class MigrationManager {
         slug VARCHAR(255) UNIQUE NOT NULL,
         industry VARCHAR(100),
         description TEXT,
+        default_location TEXT,
         country VARCHAR(100),
+        logo_url TEXT,
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()

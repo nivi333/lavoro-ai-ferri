@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Drawer,
   Form,
@@ -11,8 +11,9 @@ import {
   Row,
   Col,
   DatePicker,
+  Space,
 } from 'antd';
-import { BankOutlined } from '@ant-design/icons';
+import { BankOutlined, DeleteOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { companyService, CreateCompanyRequest } from '../services/companyService';
 import { EmailPhoneInput } from './ui/EmailPhoneInput';
@@ -37,6 +38,24 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
   const [uploading, setUploading] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
+
+  const resetFormState = useCallback(() => {
+    form.resetFields();
+    setLogoFile(null);
+    setSlugChecking(false);
+    setSlugUnique(true);
+  }, [form]);
+
+  const handleRemoveLogo = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setLogoFile(null);
+  };
+
+  const handleDrawerClose = () => {
+    resetFormState();
+    onClose();
+  };
 
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +179,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
       await companyService.createCompany(companyData);
 
       message.success('Company created successfully!');
-      onClose();
+      handleDrawerClose();
       onCompanyCreated();
       form.resetFields();
       setLogoFile(null);
@@ -175,10 +194,10 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
     <Drawer
       title={<span className='ccd-title'>Create Company</span>}
       width={720}
-      onClose={onClose}
+      onClose={handleDrawerClose}
       open={open}
       className='company-creation-drawer'
-      bodyStyle={{ padding: 0 }}
+      styles={{ body: { padding: 0 } }}
       footer={null}
     >
       <div className='ccd-content'>
@@ -204,16 +223,17 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                   className='ccd-logo-upload'
                 >
                   {logoFile && logoFile.url ? (
-                    <img
-                      src={logoFile.url}
-                      alt='Company Logo'
-                      style={{
-                        width: '65px',
-                        height: '65px',
-
-                        objectFit: 'cover',
-                      }}
-                    />
+                    <div className='ccd-logo-preview'>
+                      <img src={logoFile.url} alt='Company Logo' />
+                      <button
+                        type='button'
+                        className='ccd-logo-delete-btn'
+                        onClick={handleRemoveLogo}
+                        aria-label='Remove company logo'
+                      >
+                        <DeleteOutlined />
+                      </button>
+                    </div>
                   ) : (
                     <span className='ccd-upload-icon'>
                       <BankOutlined />
@@ -262,17 +282,21 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                     }),
                   ]}
                 >
-                  <Input
-                    maxLength={32}
-                    autoComplete='off'
-                    placeholder='Enter company slug'
-                    className='ccd-input'
-                    addonBefore='lavoro.ai/'
-                    onChange={e => {
-                      form.setFieldsValue({ slugAuto: false });
-                      checkSlugUnique(e.target.value);
-                    }}
-                  />
+                  <Space.Compact block className='ccd-slug-compact'>
+                    <span className='ccd-slug-prefix' aria-hidden='true'>lavoro.ai/</span>
+                    <Input
+                      value={form.getFieldValue('slug') || ''}
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter company slug'
+                      className='ccd-input'
+                      onChange={e => {
+                        const rawValue = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+                        form.setFieldsValue({ slug: rawValue, slugAuto: false });
+                        checkSlugUnique(rawValue);
+                      }}
+                    />
+                  </Space.Compact>
                 </Form.Item>
                 <Form.Item name='slugAuto' hidden>
                   <Input type='hidden' />
