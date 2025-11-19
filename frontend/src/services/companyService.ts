@@ -9,9 +9,9 @@ export interface CreateCompanyRequest {
   description?: string;
   logoUrl?: string;
   country: string;
-  locationName: string;
-  address1: string;
-  address2?: string;
+  defaultLocation: string;
+  addressLine1: string;
+  addressLine2?: string;
   city: string;
   state: string;
   pincode: string;
@@ -33,8 +33,8 @@ export interface CompanyResponse {
   logoUrl?: string;
   country?: string;
   defaultLocation?: string;
-  address1?: string;
-  address2?: string;
+  addressLine1?: string;
+  addressLine2?: string;
   city?: string;
   state?: string;
   pincode?: string;

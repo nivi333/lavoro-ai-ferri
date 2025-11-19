@@ -40,9 +40,9 @@ interface ExtendedCompany {
   role?: string;
   country?: string;
   description?: string;
-  locationName?: string;
-  address1?: string;
-  address2?: string;
+  defaultLocation?: string;
+  addressLine1?: string;
+  addressLine2?: string;
   city?: string;
   state?: string;
   pincode?: string;
@@ -193,7 +193,7 @@ export default function CompanyDetailPage() {
   ) : undefined;
 
   const locationParts = [
-    extendedCompany.locationName,
+    extendedCompany.defaultLocation,
     extendedCompany.city,
     extendedCompany.state,
     extendedCompany.country,
@@ -232,7 +232,7 @@ export default function CompanyDetailPage() {
       key: 'general',
       title: 'General',
       items: [
-        { label: 'Location Name', value: extendedCompany.locationName },
+        { label: 'Default Location Name', value: extendedCompany.defaultLocation },
         { label: 'Business Type', value: extendedCompany.businessType },
         { label: 'Time Zone', value: extendedCompany.timeZone },
         { label: 'Documents Email Recipient', value: extendedCompany.documentsEmailRecipient },

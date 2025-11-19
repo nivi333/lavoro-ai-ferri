@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 import Joi from 'joi';
 import { CreateLocationData, UpdateLocationData } from '../types';
 
@@ -7,10 +8,10 @@ const globalPrisma = new PrismaClient();
 // Generate unique location ID (L001, L002, etc.)
 export async function generateLocationId(companyId: string): Promise<string> {
   try {
-    const lastLocation = await globalPrisma.companyLocation.findFirst({
-      where: { companyId },
-      orderBy: { locationId: 'desc' },
-      select: { locationId: true }
+    const lastLocation = await globalPrisma.company_locations.findFirst({
+      where: { company_id: companyId },
+      orderBy: { location_id: 'desc' },
+      select: { location_id: true }
     });
 
     if (!lastLocation) {
@@ -18,7 +19,7 @@ export async function generateLocationId(companyId: string): Promise<string> {
     }
 
     // Extract numeric part and increment
-    const lastNumber = parseInt(lastLocation.locationId.substring(1));
+    const lastNumber = parseInt(lastLocation.location_id.substring(1));
     const nextNumber = lastNumber + 1;
     return `L${nextNumber.toString().padStart(3, '0')}`;
   } catch (error) {
@@ -69,8 +70,8 @@ export class LocationService {
       const locationId = await generateLocationId(companyId);
 
       // If this is the first location, make it default
-      const existingLocations = await this.prisma.companyLocation.findMany({
-        where: { companyId },
+      const existingLocations = await this.prisma.company_locations.findMany({
+        where: { company_id: companyId },
         select: { id: true }
       });
 
@@ -78,42 +79,46 @@ export class LocationService {
 
       // If marking as headquarters, ensure no other headquarters exists
       if (data.isHeadquarters) {
-        await this.prisma.companyLocation.updateMany({
+        await this.prisma.company_locations.updateMany({
           where: { 
-            companyId, 
-            isHeadquarters: true 
+            company_id: companyId, 
+            is_headquarters: true 
           },
-          data: { isHeadquarters: false }
+          data: { is_headquarters: false }
         });
       }
 
-      const newLocation = await this.prisma.companyLocation.create({
+      const newLocation = await this.prisma.company_locations.create({
         data: {
-          locationId,
-          companyId,
+          id: uuidv4(),
+          location_id: locationId,
           name: data.name,
           email: data.email,
           phone: data.phone,
-          addressLine1: data.addressLine1,
-          addressLine2: data.addressLine2,
+          address_line_1: data.addressLine1,
+          address_line_2: data.addressLine2,
           city: data.city,
           state: data.state,
           country: data.country,
           pincode: data.pincode,
-          locationType: data.locationType || 'BRANCH',
-          isHeadquarters: data.isHeadquarters || false,
-          isDefault,
-          isActive: true,
+          location_type: data.locationType || 'BRANCH',
+          is_headquarters: data.isHeadquarters || false,
+          is_default: isDefault,
+          is_active: true,
+          updated_at: new Date(),
+          companies: {
+            connect: { id: companyId },
+          },
         },
         include: {
-          company: {
+          companies: {
             select: {
               id: true,
-              companyId: true,
+              company_id: true,
               name: true,
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       return newLocation;
@@ -125,30 +130,30 @@ export class LocationService {
 
   async getLocations(companyId: string) {
     try {
-      const locations = await this.prisma.companyLocation.findMany({
+      const locations = await this.prisma.company_locations.findMany({
         where: { 
-          companyId,
-          isActive: true 
+          company_id: companyId,
+          is_active: true 
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { created_at: 'asc' },
         select: {
           id: true,
-          locationId: true,
+          location_id: true,
           name: true,
           email: true,
           phone: true,
-          addressLine1: true,
-          addressLine2: true,
+          address_line_1: true,
+          address_line_2: true,
           city: true,
           state: true,
           country: true,
           pincode: true,
-          isDefault: true,
-          isHeadquarters: true,
-          locationType: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
+          is_default: true,
+          is_headquarters: true,
+          location_type: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
         }
       });
 
@@ -161,30 +166,30 @@ export class LocationService {
 
   async getLocationById(locationId: string, companyId: string) {
     try {
-      const location = await this.prisma.companyLocation.findFirst({
+      const location = await this.prisma.company_locations.findFirst({
         where: { 
           id: locationId,
-          companyId,
-          isActive: true 
+          company_id: companyId,
+          is_active: true 
         },
         select: {
           id: true,
-          locationId: true,
+          location_id: true,
           name: true,
           email: true,
           phone: true,
-          addressLine1: true,
-          addressLine2: true,
+          address_line_1: true,
+          address_line_2: true,
           city: true,
           state: true,
           country: true,
           pincode: true,
-          isDefault: true,
-          isHeadquarters: true,
-          locationType: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
+          is_default: true,
+          is_headquarters: true,
+          location_type: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
         }
       });
 
@@ -202,10 +207,10 @@ export class LocationService {
   async updateLocation(locationId: string, companyId: string, data: UpdateLocationData) {
     try {
       // Check if location exists and belongs to company
-      const existingLocation = await this.prisma.companyLocation.findFirst({
+      const existingLocation = await this.prisma.company_locations.findFirst({
         where: { 
           id: locationId,
-          companyId 
+          company_id: companyId, 
         }
       });
 
@@ -214,60 +219,60 @@ export class LocationService {
       }
 
       // Prevent deactivating default location
-      if (data.isActive === false && existingLocation.isDefault) {
+      if (data.isActive === false && existingLocation.is_default) {
         throw new Error('Cannot deactivate default location');
       }
 
       // Prevent deactivating headquarters location
-      if (data.isActive === false && existingLocation.isHeadquarters) {
+      if (data.isActive === false && existingLocation.is_headquarters) {
         throw new Error('Cannot deactivate headquarters location');
       }
 
       // If updating to headquarters, ensure no other headquarters exists
-      if (data.isHeadquarters && !existingLocation.isHeadquarters) {
-        await this.prisma.companyLocation.updateMany({
+      if (data.isHeadquarters && !existingLocation.is_headquarters) {
+        await this.prisma.company_locations.updateMany({
           where: { 
-            companyId, 
-            isHeadquarters: true 
+            company_id: companyId, 
+            is_headquarters: true 
           },
-          data: { isHeadquarters: false }
+          data: { is_headquarters: false }
         });
       }
 
-      const updatedLocation = await this.prisma.companyLocation.update({
+      const updatedLocation = await this.prisma.company_locations.update({
         where: { id: locationId },
         data: {
           ...(data.name && { name: data.name }),
           ...(data.email !== undefined && { email: data.email }),
           ...(data.phone !== undefined && { phone: data.phone }),
-          ...(data.addressLine1 !== undefined && { addressLine1: data.addressLine1 }),
-          ...(data.addressLine2 !== undefined && { addressLine2: data.addressLine2 }),
+          ...(data.addressLine1 !== undefined && { address_line_1: data.addressLine1 }),
+          ...(data.addressLine2 !== undefined && { address_line_2: data.addressLine2 }),
           ...(data.city !== undefined && { city: data.city }),
           ...(data.state !== undefined && { state: data.state }),
           ...(data.country !== undefined && { country: data.country }),
           ...(data.pincode !== undefined && { pincode: data.pincode }),
-          ...(data.locationType && { locationType: data.locationType }),
-          ...(data.isHeadquarters !== undefined && { isHeadquarters: data.isHeadquarters }),
-          ...(data.isActive !== undefined && { isActive: data.isActive }),
+          ...(data.locationType && { location_type: data.locationType }),
+          ...(data.isHeadquarters !== undefined && { is_headquarters: data.isHeadquarters }),
+          ...(data.isActive !== undefined && { is_active: data.isActive }),
         },
         select: {
           id: true,
-          locationId: true,
+          location_id: true,
           name: true,
           email: true,
           phone: true,
-          addressLine1: true,
-          addressLine2: true,
+          address_line_1: true,
+          address_line_2: true,
           city: true,
           state: true,
           country: true,
           pincode: true,
-          isDefault: true,
-          isHeadquarters: true,
-          locationType: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
+          is_default: true,
+          is_headquarters: true,
+          location_type: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
         }
       });
 
@@ -281,10 +286,10 @@ export class LocationService {
   async deleteLocation(locationId: string, companyId: string) {
     try {
       // Check if location exists and belongs to company
-      const existingLocation = await this.prisma.companyLocation.findFirst({
+      const existingLocation = await this.prisma.company_locations.findFirst({
         where: { 
           id: locationId,
-          companyId 
+          company_id: companyId, 
         }
       });
 
@@ -293,16 +298,16 @@ export class LocationService {
       }
 
       // Prevent deleting default location
-      if (existingLocation.isDefault) {
+      if (existingLocation.is_default) {
         throw new Error('Cannot delete default location');
       }
 
       // Prevent deleting headquarters location
-      if (existingLocation.isHeadquarters) {
+      if (existingLocation.is_headquarters) {
         throw new Error('Cannot delete headquarters location');
       }
 
-      await this.prisma.companyLocation.delete({
+      await this.prisma.company_locations.delete({
         where: { id: locationId }
       });
 
@@ -316,11 +321,11 @@ export class LocationService {
   async setDefaultLocation(locationId: string, companyId: string) {
     try {
       // Check if location exists and belongs to company
-      const location = await this.prisma.companyLocation.findFirst({
+      const location = await this.prisma.company_locations.findFirst({
         where: { 
           id: locationId,
-          companyId,
-          isActive: true 
+          company_id: companyId,
+          is_active: true 
         }
       });
 
@@ -329,28 +334,28 @@ export class LocationService {
       }
 
       // Remove default status from all other locations
-      await this.prisma.companyLocation.updateMany({
+      await this.prisma.company_locations.updateMany({
         where: { 
-          companyId,
-          isDefault: true 
+          company_id: companyId,
+          is_default: true 
         },
-        data: { isDefault: false }
+        data: { is_default: false }
       });
 
       // Set new default location
-      const updatedLocation = await this.prisma.companyLocation.update({
+      const updatedLocation = await this.prisma.company_locations.update({
         where: { id: locationId },
-        data: { isDefault: true },
+        data: { is_default: true },
         select: {
           id: true,
-          locationId: true,
+          location_id: true,
           name: true,
-          isDefault: true,
-          isHeadquarters: true,
-          locationType: true,
-          isActive: true,
-          createdAt: true,
-          updatedAt: true,
+          is_default: true,
+          is_headquarters: true,
+          location_type: true,
+          is_active: true,
+          created_at: true,
+          updated_at: true,
         }
       });
 

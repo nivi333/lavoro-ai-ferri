@@ -30,7 +30,7 @@ const { Option } = Select;
 
 type CompanyFormInitialData = Partial<CreateCompanyRequest & CompanyDetails> & {
   id?: string;
-  locationName?: string;
+  defaultLocation?: string;
   contactInfo?: string;
   address1?: string;
   address2?: string;
@@ -188,7 +188,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           description: values.description,
           ...(logoUrl ? { logoUrl } : {}),
           country: values.country,
-          defaultLocation: values.locationName,
+          defaultLocation: values.defaultLocation,
           address1: values.address1,
           address2: values.address2,
           city: values.city,
@@ -214,7 +214,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           slug: values.slug,
           industry: values.industry,
           country: values.country,
-          locationName: values.locationName,
+          defaultLocation: values.defaultLocation,
           address1: values.address1,
           city: values.city,
           state: values.state,
@@ -265,7 +265,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           industry: initialData.industry,
           description: initialData.description,
           country: initialData.country,
-          locationName: initialData.locationName ?? initialData.defaultLocation,
+          defaultLocation: initialData.defaultLocation,
           address1: initialData.address1,
           address2: initialData.address2,
           city: initialData.city,
@@ -482,7 +482,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
               <Col span={12}>
                 <Form.Item
                   label='Default Location Name'
-                  name='locationName'
+                  name='defaultLocation'
                   rules={[{ required: true, message: 'Please enter location name' }]}
                 >
                   <Input
@@ -505,7 +505,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
               <Col span={12}>
                 <Form.Item
                   label='Address Line 1'
-                  name='address1'
+                  name='addressLine1'
                   rules={[{ required: true, message: 'Please enter address' }]}
                 >
                   <Input
@@ -517,7 +517,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label='Address Line 2' name='address2'>
+                <Form.Item label='Address Line 2' name='addressLine2'>
                   <Input
                     maxLength={64}
                     autoComplete='off'

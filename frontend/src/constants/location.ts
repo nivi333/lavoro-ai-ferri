@@ -1,24 +1,24 @@
 // Location Management Constants
 
 export const LOCATION_TYPES = {
-  HEADQUARTERS: 'HEADQUARTERS',
   BRANCH: 'BRANCH',
   WAREHOUSE: 'WAREHOUSE',
   FACTORY: 'FACTORY',
+  STORE: 'STORE',
 } as const;
 
 export const LOCATION_TYPE_LABELS = {
-  HEADQUARTERS: 'Headquarters',
   BRANCH: 'Branch',
   WAREHOUSE: 'Warehouse',
   FACTORY: 'Factory',
+  STORE: 'Store',
 } as const;
 
 export const LOCATION_TYPE_COLORS = {
-  HEADQUARTERS: '#7b5fc9', // Primary purple
   BRANCH: '#52c41a', // Success green
   WAREHOUSE: '#faad14', // Warning orange
   FACTORY: '#1890ff', // Info blue
+  STORE: '#7b5fc9', // Store purple
 } as const;
 
 export const LOCATION_STATUS = {

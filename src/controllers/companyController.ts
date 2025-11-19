@@ -19,7 +19,7 @@ const createCompanySchema = Joi.object({
   contactInfo: Joi.string().min(1).max(100).required(),
   establishedDate: Joi.date().required(),
   businessType: Joi.string().max(100).required(),
-  defaultLocationName: Joi.string().min(1).max(255).required(),
+  defaultLocation: Joi.string().min(1).max(255).required(),
   description: Joi.string().max(500).optional(),
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
   website: Joi.string().max(300).optional(),
@@ -27,6 +27,7 @@ const createCompanySchema = Joi.object({
   email: Joi.string().email().optional(),
   phone: Joi.string().max(20).optional(),
   addressLine1: Joi.string().max(255).optional(),
+  address1: Joi.string().max(255).optional(),
   addressLine2: Joi.string().max(255).allow('').optional(),
   city: Joi.string().max(100).optional(),
   state: Joi.string().max(100).optional(),
@@ -83,7 +84,16 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      const company = await companyService.createCompany(userId, value);
+      
+      // Normalize address fields
+      const companyData = {
+        ...value,
+        addressLine1: value.address1 || value.addressLine1,
+        // Remove address1 since we've normalized it
+        address1: undefined,
+      };
+      
+      const company = await companyService.createCompany(userId, companyData);
 
       res.status(201).json({
         success: true,

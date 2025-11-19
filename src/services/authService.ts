@@ -103,7 +103,7 @@ export class AuthService {
       userData.phone && { phone: userData.phone },
     ].filter(Boolean);
 
-    const existingUser = await globalPrisma.user.findFirst({
+    const existingUser = await globalPrisma.users.findFirst({
       where: { OR: whereConditions },
     });
 
@@ -113,22 +113,24 @@ export class AuthService {
 
     const hashedPassword = await this.hashPassword(userData.password);
 
-    const user = await globalPrisma.user.create({
+    const user = await globalPrisma.users.create({
       data: {
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        id: uuidv4(),
+        first_name: userData.firstName,
+        last_name: userData.lastName,
         email: userData.email,
         phone: userData.phone,
         password: hashedPassword,
+        updated_at: new Date(),
       },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
+        first_name: true,
+        last_name: true,
         email: true,
         phone: true,
-        isActive: true,
-        createdAt: true,
+        is_active: true,
+        created_at: true,
       },
     });
 
@@ -149,13 +151,13 @@ export class AuthService {
    * Login user
    */
   static async login(credentials: LoginCredentials): Promise<{ user: any; tokens: AuthTokens }> {
-    const user = await globalPrisma.user.findFirst({
+    const user = await globalPrisma.users.findFirst({
       where: {
         OR: [
           { email: credentials.emailOrPhone },
           { phone: credentials.emailOrPhone },
         ],
-        isActive: true,
+        is_active: true,
       },
     });
 
@@ -178,12 +180,12 @@ export class AuthService {
 
     const userResponse = {
       id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.first_name,
+      lastName: user.last_name,
       email: user.email,
       phone: user.phone,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
+      isActive: user.is_active,
+      createdAt: user.created_at,
     };
 
     logger.info(`User logged in: ${user.id}`);
@@ -210,13 +212,14 @@ export class AuthService {
     const refreshExpMs = this.parseExpirationTime(config.jwt.refreshExpiresIn);
     const expiresAt = new Date(Date.now() + refreshExpMs);
 
-    await globalPrisma.session.create({
+    await globalPrisma.sessions.create({
       data: {
         id: sessionId,
-        userId,
-        companyId: tenantId,
+        user_id: userId,
+        company_id: tenantId,
         token: refreshToken,
-        expiresAt,
+        expires_at: expiresAt,
+        updated_at: new Date(),
       },
     });
 

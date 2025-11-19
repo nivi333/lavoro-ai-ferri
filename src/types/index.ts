@@ -14,7 +14,7 @@ export interface CreateCompanyData {
   contactInfo: string; // emailOrPhone format
   establishedDate: Date;
   businessType: string;
-  defaultLocationName: string;
+  defaultLocation: string;
   description?: string;
   logoUrl?: string;
   website?: string;
