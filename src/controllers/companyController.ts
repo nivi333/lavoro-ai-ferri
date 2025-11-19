@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { companyService } from '../services/companyService';
+import companyService from '../services/companyService';
 import { AuthService } from '../services/authService';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../utils/logger';
@@ -14,23 +14,24 @@ const createCompanySchema = Joi.object({
     .max(50)
     .pattern(/^[a-z0-9-]+$/)
     .optional(),
-  industry: Joi.string().max(100).optional(),
+  industry: Joi.string().max(100).required(),
+  country: Joi.string().max(100).required(),
+  contactInfo: Joi.string().min(1).max(100).required(),
+  establishedDate: Joi.date().required(),
+  businessType: Joi.string().max(100).required(),
+  defaultLocationName: Joi.string().min(1).max(255).required(),
   description: Joi.string().max(500).optional(),
   logoUrl: Joi.string().max(3000000).optional(), // Allow up to ~3MB for base64 encoded 2MB images
-  country: Joi.string().max(100).optional(),
-  locationName: Joi.string().min(1).max(255).required(),
-  address1: Joi.string().min(1).max(255).required(),
-  address2: Joi.string().max(255).allow('').optional(),
-  city: Joi.string().min(1).max(100).required(),
-  state: Joi.string().min(1).max(100).required(),
-  pincode: Joi.string().min(1).max(20).required(),
-  establishedDate: Joi.date().optional(),
-  businessType: Joi.string().max(100).required(),
-  certifications: Joi.string().max(500).optional(),
-  contactInfo: Joi.string().min(1).max(100).required(),
-  website: Joi.string().max(255).optional(),
+  website: Joi.string().max(300).optional(),
   taxId: Joi.string().max(50).optional(),
-  isActive: Joi.boolean().optional().default(true),
+  email: Joi.string().email().optional(),
+  phone: Joi.string().max(20).optional(),
+  addressLine1: Joi.string().max(255).optional(),
+  addressLine2: Joi.string().max(255).allow('').optional(),
+  city: Joi.string().max(100).optional(),
+  state: Joi.string().max(100).optional(),
+  pincode: Joi.string().max(20).optional(),
+  certifications: Joi.array().items(Joi.string()).optional(),
 });
 
 const updateCompanySchema = Joi.object({
@@ -82,22 +83,7 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      const { locationName, ...companyPayload } = value;
-
-      // Map frontend field names to backend expected names
-      const mappedPayload = {
-        ...companyPayload,
-        addressLine1: companyPayload.address1,
-        addressLine2: companyPayload.address2,
-      };
-      // Remove the original field names
-      delete mappedPayload.address1;
-      delete mappedPayload.address2;
-
-      const company = await companyService.createCompany(userId, {
-        ...mappedPayload,
-        defaultLocationName: locationName,
-      });
+      const company = await companyService.createCompany(userId, value);
 
       res.status(201).json({
         success: true,
@@ -141,9 +127,15 @@ export class CompanyController {
       const userId = req.userId!;
       const companies = await companyService.getUserCompanies(userId);
 
+      // Minimize response size by excluding logoUrl from list
+      const sanitizedCompanies = companies.map(company => ({
+        ...company,
+        logoUrl: null,
+      }));
+
       res.json({
         success: true,
-        data: companies,
+        data: sanitizedCompanies,
       });
     } catch (error: any) {
       logger.error('Error fetching user companies:', error);
@@ -167,7 +159,10 @@ export class CompanyController {
 
       res.json({
         success: true,
-        data: company,
+        data: {
+          ...company,
+          logoUrl: null,
+        },
       });
     } catch (error: any) {
       logger.error('Error fetching company details:', error);
@@ -204,7 +199,10 @@ export class CompanyController {
         success: true,
         message: 'Company context switched successfully',
         data: {
-          company: result.tenant,
+          company: {
+            ...result,
+            logoUrl: null,
+          },
           role: result.role,
           tokens,
         },
@@ -243,7 +241,10 @@ export class CompanyController {
       res.json({
         success: true,
         message: 'Company updated successfully',
-        data: company,
+        data: {
+          ...company,
+          logoUrl: null,
+        },
       });
     } catch (error: any) {
       logger.error('Error updating company:', error);
@@ -331,6 +332,41 @@ export class CompanyController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to check slug availability',
+      });
+    }
+  }
+
+  /**
+   * Get company logo by ID
+   * GET /api/v1/companies/:tenantId/logo
+   */
+  async getCompanyLogo(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.userId!;
+      const { tenantId } = req.params;
+
+      const company = await companyService.getCompanyById(userId, tenantId);
+
+      if (!company.logoUrl) {
+        res.status(404).json({
+          success: false,
+          message: 'Logo not found',
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: {
+          logoUrl: company.logoUrl,
+        },
+      });
+    } catch (error: any) {
+      logger.error('Error fetching company logo:', error);
+      const statusCode = error.message === 'Access denied to company' ? 403 : 500;
+      res.status(statusCode).json({
+        success: false,
+        message: error.message || 'Failed to fetch company logo',
       });
     }
   }

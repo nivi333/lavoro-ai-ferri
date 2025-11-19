@@ -531,5 +531,3 @@ export const setupSwagger = (app: Express): void => {
   
   console.log(`📚 API Documentation available at: http://${config.host}:${config.port}/docs`);
 };
-
-export { swaggerSpec };

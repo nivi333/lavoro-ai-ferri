@@ -32,5 +32,3 @@ async function initializeDatabase(): Promise<void> {
 if (require.main === module) {
   initializeDatabase();
 }
-
-export { initializeDatabase };

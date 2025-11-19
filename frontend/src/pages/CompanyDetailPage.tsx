@@ -96,6 +96,26 @@ export default function CompanyDetailPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<CompanyDetails | null>(null);
   const [loadingCompany, setLoadingCompany] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [loadingLogo, setLoadingLogo] = useState(false);
+
+  // Fetch logo when component mounts or tenantId changes
+  useEffect(() => {
+    if (tenantId) {
+      const fetchLogo = async () => {
+        setLoadingLogo(true);
+        try {
+          const logo = await companyService.getCompanyLogo(tenantId);
+          setLogoUrl(logo);
+        } catch (error) {
+          console.error('Failed to load company logo:', error);
+        } finally {
+          setLoadingLogo(false);
+        }
+      };
+      fetchLogo();
+    }
+  }, [tenantId]);
 
   // Find the company details
   const company = useMemo(() => {
@@ -288,7 +308,7 @@ export default function CompanyDetailPage() {
             <Space size={20} align='start'>
               <Avatar
                 size={96}
-                src={extendedCompany.logoUrl}
+                src={logoUrl}
                 className='company-profile-avatar'
                 icon={<BankOutlined />}
               >

@@ -214,11 +214,8 @@ export class AuthService {
       data: {
         id: sessionId,
         userId,
-        tenantId,
-        refreshToken,
-        deviceInfo,
-        ipAddress,
-        userAgent,
+        companyId: tenantId,
+        token: refreshToken,
         expiresAt,
       },
     });

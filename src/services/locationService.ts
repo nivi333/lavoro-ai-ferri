@@ -1,360 +1,362 @@
-import { databaseManager, globalPrisma } from '../database/connection';
-import { logger } from '../utils/logger';
+import { PrismaClient } from '@prisma/client';
+import Joi from 'joi';
+import { CreateLocationData, UpdateLocationData } from '../types';
 
-interface LocationData {
-  name: string;
-  email?: string;
-  phone?: string;
-  country: string;
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  pincode: string;
-  locationType?: string;
-  isDefault?: boolean;
-  isHeadquarters?: boolean;
+const globalPrisma = new PrismaClient();
+
+// Generate unique location ID (L001, L002, etc.)
+export async function generateLocationId(companyId: string): Promise<string> {
+  try {
+    const lastLocation = await globalPrisma.companyLocation.findFirst({
+      where: { companyId },
+      orderBy: { locationId: 'desc' },
+      select: { locationId: true }
+    });
+
+    if (!lastLocation) {
+      return 'L001';
+    }
+
+    // Extract numeric part and increment
+    const lastNumber = parseInt(lastLocation.locationId.substring(1));
+    const nextNumber = lastNumber + 1;
+    return `L${nextNumber.toString().padStart(3, '0')}`;
+  } catch (error) {
+    console.error('Error generating location ID:', error);
+    return `L${Date.now().toString().slice(-3)}`;
+  }
 }
 
-interface LocationWithDetails {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  country: string;
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  pincode: string;
-  locationType: string;
-  isDefault: boolean;
-  isHeadquarters: boolean;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Validation schemas
+export const createLocationSchema = Joi.object({
+  name: Joi.string().min(1).max(255).required(),
+  email: Joi.string().email().optional(),
+  phone: Joi.string().max(20).optional(),
+  addressLine1: Joi.string().max(255).optional(),
+  addressLine2: Joi.string().max(255).allow('').optional(),
+  city: Joi.string().max(100).optional(),
+  state: Joi.string().max(100).optional(),
+  country: Joi.string().max(100).optional(),
+  pincode: Joi.string().max(20).optional(),
+  locationType: Joi.string().valid('BRANCH', 'WAREHOUSE', 'FACTORY', 'STORE').default('BRANCH'),
+  isHeadquarters: Joi.boolean().default(false),
+});
+
+export const updateLocationSchema = Joi.object({
+  name: Joi.string().min(1).max(255).optional(),
+  email: Joi.string().email().optional(),
+  phone: Joi.string().max(20).optional(),
+  addressLine1: Joi.string().max(255).optional(),
+  addressLine2: Joi.string().max(255).allow('').optional(),
+  city: Joi.string().max(100).optional(),
+  state: Joi.string().max(100).optional(),
+  country: Joi.string().max(100).optional(),
+  pincode: Joi.string().max(20).optional(),
+  locationType: Joi.string().valid('BRANCH', 'WAREHOUSE', 'FACTORY', 'STORE').optional(),
+  isHeadquarters: Joi.boolean().optional(),
+  isActive: Joi.boolean().optional(),
+});
 
 export class LocationService {
-  /**
-   * Get all locations for a user's active company
-   */
-  async getUserLocations(userId: string): Promise<LocationWithDetails[]> {
-    try {
-      // Get user's active company
-      const userTenant = await globalPrisma.userTenant.findFirst({
-        where: {
-          userId,
-          isActive: true
-        },
-        include: {
-          tenant: true
-        }
-      });
+  private prisma: PrismaClient;
 
-      if (!userTenant) {
-        throw new Error('User not associated with any active company');
-      }
-
-      // Get locations from tenant schema
-      const pool = databaseManager.getTenantPool(userTenant.tenantId);
-      const schemaName = databaseManager.getSchemaName(userTenant.tenantId);
-
-      const query = `
-        SELECT
-          id, name, email, phone, country, address_line_1 as "addressLine1",
-          address_line_2 as "addressLine2", city, state, pincode,
-          location_type as "locationType", is_default as "isDefault",
-          is_headquarters as "isHeadquarters", is_active as "isActive",
-          created_at as "createdAt", updated_at as "updatedAt"
-        FROM ${schemaName}.tenant_locations
-        WHERE is_active = true
-        ORDER BY is_default DESC, is_headquarters DESC, created_at DESC
-      `;
-
-      const result = await pool.query(query);
-      return result.rows;
-    } catch (error) {
-      logger.error('Error fetching user locations:', error);
-      throw error;
-    }
+  constructor(prisma: PrismaClient = globalPrisma) {
+    this.prisma = prisma;
   }
 
-  /**
-   * Create a new location for a user's active company
-   */
-  async createLocation(userId: string, locationData: LocationData): Promise<LocationWithDetails> {
+  async createLocation(companyId: string, data: CreateLocationData) {
     try {
-      // Get user's active company
-      const userTenant = await globalPrisma.userTenant.findFirst({
-        where: {
-          userId,
-          isActive: true
-        },
-        include: {
-          tenant: true
-        }
+      const locationId = await generateLocationId(companyId);
+
+      // If this is the first location, make it default
+      const existingLocations = await this.prisma.companyLocation.findMany({
+        where: { companyId },
+        select: { id: true }
       });
 
-      if (!userTenant) {
-        throw new Error('User not associated with any active company');
-      }
+      const isDefault = existingLocations.length === 0;
 
-      // Insert location into tenant schema
-      const pool = databaseManager.getTenantPool(userTenant.tenantId);
-      const schemaName = databaseManager.getSchemaName(userTenant.tenantId);
-
-      const query = `
-        INSERT INTO ${schemaName}.tenant_locations
-          (tenant_id, name, email, phone, country, address_line_1, address_line_2, city, state, pincode, is_default, is_headquarters, location_type, is_active)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, true)
-        RETURNING
-          id, name, email, phone, country, address_line_1 as "addressLine1",
-          address_line_2 as "addressLine2", city, state, pincode,
-          location_type as "locationType", is_default as "isDefault",
-          is_headquarters as "isHeadquarters", is_active as "isActive",
-          created_at as "createdAt", updated_at as "updatedAt"
-      `;
-
-      const values = [
-        userTenant.tenantId,
-        locationData.name,
-        locationData.email || null,
-        locationData.phone || null,
-        locationData.country,
-        locationData.addressLine1,
-        locationData.addressLine2 || null,
-        locationData.city,
-        locationData.state,
-        locationData.pincode,
-        locationData.isDefault || false,
-        locationData.isHeadquarters || false,
-        locationData.locationType || 'BRANCH'
-      ];
-
-      const result = await pool.query(query, values);
-
-      // Handle exclusive flags: only one default and one headquarters per company
-      if (locationData.isDefault) {
-        // Unset default flag on all other locations
-        await pool.query(
-          `UPDATE ${schemaName}.tenant_locations 
-           SET is_default = false, updated_at = NOW() 
-           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
-          [userTenant.tenantId, result.rows[0].id]
-        );
-      }
-
-      if (locationData.isHeadquarters) {
-        // Unset headquarters flag on all other locations
-        await pool.query(
-          `UPDATE ${schemaName}.tenant_locations 
-           SET is_headquarters = false, updated_at = NOW() 
-           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
-          [userTenant.tenantId, result.rows[0].id]
-        );
-      }
-
-      // If this location is set as default, update the tenant's default location
-      if (locationData.isDefault) {
-        await globalPrisma.tenant.update({
-          where: { id: userTenant.tenantId },
-          data: { defaultLocation: locationData.name }
+      // If marking as headquarters, ensure no other headquarters exists
+      if (data.isHeadquarters) {
+        await this.prisma.companyLocation.updateMany({
+          where: { 
+            companyId, 
+            isHeadquarters: true 
+          },
+          data: { isHeadquarters: false }
         });
       }
 
-      logger.info(`Location created: ${locationData.name} for tenant ${userTenant.tenantId}`);
-      return result.rows[0];
-    } catch (error) {
-      logger.error('Error creating location:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update a location
-   */
-  async updateLocation(userId: string, locationId: string, updateData: Partial<LocationData>): Promise<LocationWithDetails> {
-    try {
-      // Get user's active company
-      const userTenant = await globalPrisma.userTenant.findFirst({
-        where: {
-          userId,
-          isActive: true
-        }
-      });
-
-      if (!userTenant) {
-        throw new Error('User not associated with any active company');
-      }
-
-      // Update location in tenant schema
-      const pool = databaseManager.getTenantPool(userTenant.tenantId);
-      const schemaName = databaseManager.getSchemaName(userTenant.tenantId);
-
-      const setClause = [];
-      const values = [];
-      let paramIndex = 1;
-
-      Object.entries(updateData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          const columnName = key === 'addressLine1' ? 'address_line_1' :
-                           key === 'addressLine2' ? 'address_line_2' :
-                           key === 'locationType' ? 'location_type' :
-                           key === 'isDefault' ? 'is_default' :
-                           key === 'isHeadquarters' ? 'is_headquarters' : key;
-          setClause.push(`${columnName} = $${paramIndex++}`);
-          values.push(value);
-        }
-      });
-
-      if (setClause.length === 0) {
-        throw new Error('No fields to update');
-      }
-
-      const query = `
-        UPDATE ${schemaName}.tenant_locations
-        SET ${setClause.join(', ')}, updated_at = NOW()
-        WHERE id = $${paramIndex} AND tenant_id = $${paramIndex + 1}
-        RETURNING
-          id, name, email, phone, country, address_line_1 as "addressLine1",
-          address_line_2 as "addressLine2", city, state, pincode,
-          location_type as "locationType", is_default as "isDefault",
-          is_headquarters as "isHeadquarters", is_active as "isActive",
-          created_at as "createdAt", updated_at as "updatedAt"
-      `;
-
-      values.push(locationId, userTenant.tenantId);
-      const result = await pool.query(query, values);
-
-      if (result.rows.length === 0) {
-        throw new Error('Location not found or access denied');
-      }
-
-      const updatedLocation = result.rows[0];
-
-      // Handle exclusive flags: only one default and one headquarters per company
-      if (updateData.isDefault === true) {
-        // Unset default flag on all other locations
-        await pool.query(
-          `UPDATE ${schemaName}.tenant_locations 
-           SET is_default = false, updated_at = NOW() 
-           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
-          [userTenant.tenantId, locationId]
-        );
-      }
-
-      if (updateData.isHeadquarters === true) {
-        // Unset headquarters flag on all other locations
-        await pool.query(
-          `UPDATE ${schemaName}.tenant_locations 
-           SET is_headquarters = false, updated_at = NOW() 
-           WHERE tenant_id = $1 AND id != $2 AND is_active = true`,
-          [userTenant.tenantId, locationId]
-        );
-      }
-
-      // Handle default location changes
-      if (updateData.isDefault !== undefined) {
-        if (updateData.isDefault) {
-          // Setting this location as default - update tenant
-          await globalPrisma.tenant.update({
-            where: { id: userTenant.tenantId },
-            data: { defaultLocation: updatedLocation.name }
-          });
-        } else {
-          // Unsetting this location as default - check if there are other default locations
-          const defaultCheckQuery = `
-            SELECT COUNT(*) as default_count 
-            FROM ${schemaName}.tenant_locations 
-            WHERE is_default = true AND is_active = true AND id != $1
-          `;
-          const defaultCheckResult = await pool.query(defaultCheckQuery, [locationId]);
-          const defaultCount = parseInt(defaultCheckResult.rows[0].default_count);
-
-          // If no other default locations, clear the tenant's default location
-          if (defaultCount === 0) {
-            await globalPrisma.tenant.update({
-              where: { id: userTenant.tenantId },
-              data: { defaultLocation: null }
-            });
+      const newLocation = await this.prisma.companyLocation.create({
+        data: {
+          locationId,
+          companyId,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          addressLine1: data.addressLine1,
+          addressLine2: data.addressLine2,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+          pincode: data.pincode,
+          locationType: data.locationType || 'BRANCH',
+          isHeadquarters: data.isHeadquarters || false,
+          isDefault,
+          isActive: true,
+        },
+        include: {
+          company: {
+            select: {
+              id: true,
+              companyId: true,
+              name: true,
+            }
           }
         }
+      });
+
+      return newLocation;
+    } catch (error) {
+      console.error('Error creating location:', error);
+      throw new Error('Failed to create location');
+    }
+  }
+
+  async getLocations(companyId: string) {
+    try {
+      const locations = await this.prisma.companyLocation.findMany({
+        where: { 
+          companyId,
+          isActive: true 
+        },
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          locationId: true,
+          name: true,
+          email: true,
+          phone: true,
+          addressLine1: true,
+          addressLine2: true,
+          city: true,
+          state: true,
+          country: true,
+          pincode: true,
+          isDefault: true,
+          isHeadquarters: true,
+          locationType: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      });
+
+      return locations;
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      throw new Error('Failed to fetch locations');
+    }
+  }
+
+  async getLocationById(locationId: string, companyId: string) {
+    try {
+      const location = await this.prisma.companyLocation.findFirst({
+        where: { 
+          id: locationId,
+          companyId,
+          isActive: true 
+        },
+        select: {
+          id: true,
+          locationId: true,
+          name: true,
+          email: true,
+          phone: true,
+          addressLine1: true,
+          addressLine2: true,
+          city: true,
+          state: true,
+          country: true,
+          pincode: true,
+          isDefault: true,
+          isHeadquarters: true,
+          locationType: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      });
+
+      if (!location) {
+        throw new Error('Location not found');
       }
 
-      logger.info(`Location updated: ${locationId} for tenant ${userTenant.tenantId}`);
-      return updatedLocation;
+      return location;
     } catch (error) {
-      logger.error('Error updating location:', error);
+      console.error('Error fetching location:', error);
       throw error;
     }
   }
 
-  /**
-   * Delete (deactivate) a location
-   */
-  async deleteLocation(userId: string, locationId: string): Promise<void> {
+  async updateLocation(locationId: string, companyId: string, data: UpdateLocationData) {
     try {
-      // Get user's active company
-      const userTenant = await globalPrisma.userTenant.findFirst({
-        where: {
-          userId,
-          isActive: true
+      // Check if location exists and belongs to company
+      const existingLocation = await this.prisma.companyLocation.findFirst({
+        where: { 
+          id: locationId,
+          companyId 
         }
       });
 
-      if (!userTenant) {
-        throw new Error('User not associated with any active company');
+      if (!existingLocation) {
+        throw new Error('Location not found');
       }
 
-      // Get tenant pool and schema
-      const pool = databaseManager.getTenantPool(userTenant.tenantId);
-      const schemaName = databaseManager.getSchemaName(userTenant.tenantId);
-
-      // Check if this location was the default location before deleting
-      const defaultCheckQuery = `
-        SELECT is_default FROM ${schemaName}.tenant_locations 
-        WHERE id = $1 AND is_active = true
-      `;
-      const defaultCheckResult = await pool.query(defaultCheckQuery, [locationId]);
-      const wasDefault = defaultCheckResult.rows[0]?.is_default;
-
-      // Soft delete location in tenant schema
-      const query = `
-        UPDATE ${schemaName}.tenant_locations
-        SET is_active = false, updated_at = NOW()
-        WHERE id = $1 AND tenant_id = $2
-      `;
-
-      const result = await pool.query(query, [locationId, userTenant.tenantId]);
-
-      if (result.rowCount === 0) {
-        throw new Error('Location not found or access denied');
+      // Prevent deactivating default location
+      if (data.isActive === false && existingLocation.isDefault) {
+        throw new Error('Cannot deactivate default location');
       }
 
-      // If this was the default location, handle tenant default location update
-      if (wasDefault) {
-        // Check if there are other default locations
-        const remainingDefaultQuery = `
-          SELECT COUNT(*) as default_count 
-          FROM ${schemaName}.tenant_locations 
-          WHERE is_default = true AND is_active = true
-        `;
-        const remainingDefaultResult = await pool.query(remainingDefaultQuery);
-        const remainingDefaultCount = parseInt(remainingDefaultResult.rows[0].default_count);
+      // Prevent deactivating headquarters location
+      if (data.isActive === false && existingLocation.isHeadquarters) {
+        throw new Error('Cannot deactivate headquarters location');
+      }
 
-        if (remainingDefaultCount === 0) {
-          // No more default locations, clear tenant default location
-          await globalPrisma.tenant.update({
-            where: { id: userTenant.tenantId },
-            data: { defaultLocation: null }
-          });
+      // If updating to headquarters, ensure no other headquarters exists
+      if (data.isHeadquarters && !existingLocation.isHeadquarters) {
+        await this.prisma.companyLocation.updateMany({
+          where: { 
+            companyId, 
+            isHeadquarters: true 
+          },
+          data: { isHeadquarters: false }
+        });
+      }
+
+      const updatedLocation = await this.prisma.companyLocation.update({
+        where: { id: locationId },
+        data: {
+          ...(data.name && { name: data.name }),
+          ...(data.email !== undefined && { email: data.email }),
+          ...(data.phone !== undefined && { phone: data.phone }),
+          ...(data.addressLine1 !== undefined && { addressLine1: data.addressLine1 }),
+          ...(data.addressLine2 !== undefined && { addressLine2: data.addressLine2 }),
+          ...(data.city !== undefined && { city: data.city }),
+          ...(data.state !== undefined && { state: data.state }),
+          ...(data.country !== undefined && { country: data.country }),
+          ...(data.pincode !== undefined && { pincode: data.pincode }),
+          ...(data.locationType && { locationType: data.locationType }),
+          ...(data.isHeadquarters !== undefined && { isHeadquarters: data.isHeadquarters }),
+          ...(data.isActive !== undefined && { isActive: data.isActive }),
+        },
+        select: {
+          id: true,
+          locationId: true,
+          name: true,
+          email: true,
+          phone: true,
+          addressLine1: true,
+          addressLine2: true,
+          city: true,
+          state: true,
+          country: true,
+          pincode: true,
+          isDefault: true,
+          isHeadquarters: true,
+          locationType: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
         }
+      });
+
+      return updatedLocation;
+    } catch (error) {
+      console.error('Error updating location:', error);
+      throw error;
+    }
+  }
+
+  async deleteLocation(locationId: string, companyId: string) {
+    try {
+      // Check if location exists and belongs to company
+      const existingLocation = await this.prisma.companyLocation.findFirst({
+        where: { 
+          id: locationId,
+          companyId 
+        }
+      });
+
+      if (!existingLocation) {
+        throw new Error('Location not found');
       }
 
-      logger.info(`Location deleted: ${locationId} for tenant ${userTenant.tenantId}`);
+      // Prevent deleting default location
+      if (existingLocation.isDefault) {
+        throw new Error('Cannot delete default location');
+      }
+
+      // Prevent deleting headquarters location
+      if (existingLocation.isHeadquarters) {
+        throw new Error('Cannot delete headquarters location');
+      }
+
+      await this.prisma.companyLocation.delete({
+        where: { id: locationId }
+      });
+
+      return { success: true, message: 'Location deleted successfully' };
     } catch (error) {
-      logger.error('Error deleting location:', error);
+      console.error('Error deleting location:', error);
+      throw error;
+    }
+  }
+
+  async setDefaultLocation(locationId: string, companyId: string) {
+    try {
+      // Check if location exists and belongs to company
+      const location = await this.prisma.companyLocation.findFirst({
+        where: { 
+          id: locationId,
+          companyId,
+          isActive: true 
+        }
+      });
+
+      if (!location) {
+        throw new Error('Location not found');
+      }
+
+      // Remove default status from all other locations
+      await this.prisma.companyLocation.updateMany({
+        where: { 
+          companyId,
+          isDefault: true 
+        },
+        data: { isDefault: false }
+      });
+
+      // Set new default location
+      const updatedLocation = await this.prisma.companyLocation.update({
+        where: { id: locationId },
+        data: { isDefault: true },
+        select: {
+          id: true,
+          locationId: true,
+          name: true,
+          isDefault: true,
+          isHeadquarters: true,
+          locationType: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      });
+
+      return updatedLocation;
+    } catch (error) {
+      console.error('Error setting default location:', error);
       throw error;
     }
   }

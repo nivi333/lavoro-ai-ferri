@@ -21,6 +21,9 @@ router.post('/', companyController.createCompany.bind(companyController));
 // Get company details by ID
 router.get('/:tenantId', companyController.getCompanyById.bind(companyController));
 
+// Get company logo by ID
+router.get('/:tenantId/logo', companyController.getCompanyLogo.bind(companyController));
+
 // Switch company context
 router.post('/:tenantId/switch', companyController.switchCompany.bind(companyController));
 

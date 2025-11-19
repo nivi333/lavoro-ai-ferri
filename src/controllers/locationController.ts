@@ -1,92 +1,26 @@
 import { Request, Response } from 'express';
-import { locationService } from '../services/locationService';
-import Joi from 'joi';
-import { logger } from '../utils/logger';
-
-// Validation schemas
-const createLocationSchema = Joi.object({
-  name: Joi.string().min(2).max(100).required(),
-  email: Joi.string().email().optional(),
-  phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
-  country: Joi.string().max(100).required(),
-  addressLine1: Joi.string().min(1).max(255).required(),
-  addressLine2: Joi.string().max(255).optional(),
-  city: Joi.string().min(1).max(100).required(),
-  state: Joi.string().min(1).max(100).required(),
-  pincode: Joi.string().min(1).max(20).required(),
-  locationType: Joi.string().valid('HEADQUARTERS', 'BRANCH', 'WAREHOUSE', 'FACTORY').optional(),
-  isDefault: Joi.boolean().optional(),
-  isHeadquarters: Joi.boolean().optional(),
-  isActive: Joi.boolean().optional(),
-});
-
-const updateLocationSchema = Joi.object({
-  name: Joi.string().min(2).max(100).optional(),
-  email: Joi.string().email().optional(),
-  phone: Joi.string().pattern(/^\+?[1-9]\d{1,14}$/).optional(),
-  country: Joi.string().max(100).optional(),
-  addressLine1: Joi.string().min(1).max(255).optional(),
-  addressLine2: Joi.string().max(255).optional(),
-  city: Joi.string().min(1).max(100).optional(),
-  state: Joi.string().min(1).max(100).optional(),
-  pincode: Joi.string().min(1).max(20).optional(),
-  locationType: Joi.string().valid('HEADQUARTERS', 'BRANCH', 'WAREHOUSE', 'FACTORY').optional(),
-  isDefault: Joi.boolean().optional(),
-  isHeadquarters: Joi.boolean().optional(),
-  isActive: Joi.boolean().optional(),
-});
-
-// Helper function to validate request
-function validateRequest(schema: Joi.ObjectSchema, data: any, res: Response): any {
-  const { error, value } = schema.validate(data);
-  if (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Validation error',
-      errors: error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message,
-      })),
-    });
-    return null;
-  }
-  return value;
-}
+import { locationService, createLocationSchema, updateLocationSchema } from '../services/locationService';
 
 export class LocationController {
-  /**
-   * Get all locations for the authenticated user
-   * GET /api/v1/locations
-   */
-  async getUserLocations(req: Request, res: Response): Promise<void> {
+  async createLocation(req: Request, res: Response) {
     try {
+      const { error, value } = createLocationSchema.validate(req.body);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const { tenantId } = req;
       const userId = req.userId!;
-      const locations = await locationService.getUserLocations(userId);
 
-      res.json({
-        success: true,
-        data: locations,
-      });
-    } catch (error: any) {
-      logger.error('Error fetching user locations:', error);
-      res.status(500).json({
-        success: false,
-        message: error.message || 'Failed to fetch locations',
-      });
-    }
-  }
+      // Check if user has permission to create locations (OWNER, ADMIN, MANAGER)
+      // This would be implemented based on your auth system
 
-  /**
-   * Create a new location
-   * POST /api/v1/locations
-   */
-  async createLocation(req: Request, res: Response): Promise<void> {
-    try {
-      const value = validateRequest(createLocationSchema, req.body, res);
-      if (!value) return;
-
-      const userId = req.userId!;
-      const location = await locationService.createLocation(userId, value);
+      const location = await locationService.createLocation(tenantId, value);
 
       res.status(201).json({
         success: true,
@@ -94,64 +28,166 @@ export class LocationController {
         data: location,
       });
     } catch (error: any) {
-      logger.error('Error creating location:', error);
-      res.status(400).json({
+      console.error('Error creating location:', error);
+      res.status(500).json({
         success: false,
         message: error.message || 'Failed to create location',
       });
     }
   }
 
-  /**
-   * Update a location
-   * PUT /api/v1/locations/:locationId
-   */
-  async updateLocation(req: Request, res: Response): Promise<void> {
+  async getLocations(req: Request, res: Response) {
     try {
-      const value = validateRequest(updateLocationSchema, req.body, res);
-      if (!value) return;
+      const { tenantId } = req;
 
-      const userId = req.userId!;
+      const locations = await locationService.getLocations(tenantId);
+
+      res.status(200).json({
+        success: true,
+        data: locations,
+      });
+    } catch (error: any) {
+      console.error('Error fetching locations:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to fetch locations',
+      });
+    }
+  }
+
+  async getLocationById(req: Request, res: Response) {
+    try {
+      const { tenantId } = req;
       const { locationId } = req.params;
 
-      const location = await locationService.updateLocation(userId, locationId, value);
+      const location = await locationService.getLocationById(locationId, tenantId);
 
-      res.json({
+      res.status(200).json({
+        success: true,
+        data: location,
+      });
+    } catch (error: any) {
+      console.error('Error fetching location:', error);
+      
+      if (error.message === 'Location not found') {
+        res.status(404).json({
+          success: false,
+          message: 'Location not found',
+        });
+        return;
+      }
+
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to fetch location',
+      });
+    }
+  }
+
+  async updateLocation(req: Request, res: Response) {
+    try {
+      const { error, value } = updateLocationSchema.validate(req.body);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          errors: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const { tenantId } = req;
+      const { locationId } = req.params;
+
+      // Check if user has permission to update locations (OWNER, ADMIN)
+      // This would be implemented based on your auth system
+
+      const location = await locationService.updateLocation(locationId, tenantId, value);
+
+      res.status(200).json({
         success: true,
         message: 'Location updated successfully',
         data: location,
       });
     } catch (error: any) {
-      logger.error('Error updating location:', error);
-      const statusCode = error.message === 'Location not found or access denied' ? 404 : 500;
-      res.status(statusCode).json({
+      console.error('Error updating location:', error);
+      
+      if (error.message === 'Location not found') {
+        res.status(404).json({
+          success: false,
+          message: 'Location not found',
+        });
+        return;
+      }
+
+      res.status(500).json({
         success: false,
         message: error.message || 'Failed to update location',
       });
     }
   }
 
-  /**
-   * Delete a location
-   * DELETE /api/v1/locations/:locationId
-   */
-  async deleteLocation(req: Request, res: Response): Promise<void> {
+  async deleteLocation(req: Request, res: Response) {
     try {
-      const userId = req.userId!;
+      const { tenantId } = req;
       const { locationId } = req.params;
 
-      await locationService.deleteLocation(userId, locationId);
+      // Check if user has permission to delete locations (OWNER, ADMIN)
+      // This would be implemented based on your auth system
 
-      res.json({
+      const result = await locationService.deleteLocation(locationId, tenantId);
+
+      res.status(200).json({
         success: true,
-        message: 'Location deleted successfully',
+        ...result,
       });
     } catch (error: any) {
-      logger.error('Error deleting location:', error);
-      const statusCode = error.message === 'Location not found or access denied' ? 404 : 500;
-      res.status(statusCode).json({
+      console.error('Error deleting location:', error);
+      
+      if (error.message === 'Location not found') {
+        res.status(404).json({
+          success: false,
+          message: 'Location not found',
+        });
+        return;
+      }
+
+      res.status(500).json({
         success: false,
         message: error.message || 'Failed to delete location',
+      });
+    }
+  }
+
+  async setDefaultLocation(req: Request, res: Response) {
+    try {
+      const { tenantId } = req;
+      const { locationId } = req.params;
+
+      // Check if user has permission to set default location (OWNER, ADMIN)
+      // This would be implemented based on your auth system
+
+      const location = await locationService.setDefaultLocation(locationId, tenantId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Default location updated successfully',
+        data: location,
+      });
+    } catch (error: any) {
+      console.error('Error setting default location:', error);
+      
+      if (error.message === 'Location not found') {
+        res.status(404).json({
+          success: false,
+          message: 'Location not found',
+        });
+        return;
+      }
+
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to set default location',
       });
     }
   }

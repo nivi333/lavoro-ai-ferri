@@ -176,6 +176,24 @@ class CompanyService {
       throw error;
     }
   }
+
+  async getCompanyLogo(tenantId: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/companies/${tenantId}/logo`, {
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch logo: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data?.logoUrl || null;
+    } catch (error) {
+      console.error('Error fetching company logo:', error);
+      return null; // Return null on error to avoid breaking UI
+    }
+  }
 }
 
 export const companyService = new CompanyService();

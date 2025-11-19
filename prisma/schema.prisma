@@ -27,74 +27,81 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relationships
-  userTenants UserTenant[]
-  sessions    Session[]
+  userCompanies UserCompany[]
+  sessions      Session[]
 
   @@map("users")
 }
 
-model Tenant {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  industry    String?
-  description String?
-  logoUrl     String?  @map("logo_url")
-  country     String?
-  defaultLocation String? @map("default_location")
-  addressLine1 String?  @map("address_line_1")
-  addressLine2 String?  @map("address_line_2")
-  city        String?
-  state       String?
-  pincode     String?
-  establishedDate DateTime? @map("established_date")
-  businessType String? @map("business_type")
-  certifications String? @map("certifications")
-  website     String?
-  taxId       String?  @map("tax_id")
-  contactInfo String? @map("contact_info")
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  userTenants UserTenant[]
-
-  @@map("tenants")
-}
-
-model UserTenant {
-  id       String @id @default(uuid())
-  userId   String @map("user_id")
-  tenantId String @map("tenant_id")
-  role     Role   @default(EMPLOYEE)
-  isActive Boolean @default(true) @map("is_active")
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  companyId String?  @map("company_id")
+  token     String   @unique
+  isActive  Boolean  @default(true) @map("is_active")
+  expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, tenantId])
-  @@map("user_tenants")
-}
-
-model Session {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
-  tenantId     String?  @map("tenant_id")
-  refreshToken String   @unique @map("refresh_token")
-  deviceInfo   String?  @map("device_info")
-  ipAddress    String?  @map("ip_address")
-  userAgent    String?  @map("user_agent")
-  expiresAt    DateTime @map("expires_at")
-  createdAt    DateTime @default(now()) @map("created_at")
 
   // Relationships
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+// ============================================================================
+// COMPANY MANAGEMENT TABLES
+// ============================================================================
+
+model Company {
+  id             String   @id @default(uuid())
+  companyId      String   @unique @map("company_id")
+  name           String
+  slug           String   @unique
+  industry       String?
+  description    String?
+  logoUrl        String?  @map("logo_url")
+  website        String?
+  taxId          String?  @map("tax_id")
+  email          String?
+  phone          String?
+  addressLine1   String?  @map("address_line_1")
+  addressLine2   String?  @map("address_line_2")
+  city           String?
+  state          String?
+  country        String?
+  pincode        String?
+  contactInfo    Json?    @map("contact_info")
+  establishedDate DateTime? @map("established_date") @db.Timestamp(3)
+  businessType   String?  @map("business_type")
+  certifications String[]
+  defaultLocation String?  @map("default_location")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  userCompanies UserCompany[]
+  locations      CompanyLocation[]
+
+  @@map("companies")
+}
+
+model UserCompany {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  companyId String   @map("company_id")
+  role      Role     @default(EMPLOYEE)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@map("user_companies")
 }
 
 // ============================================================================
@@ -109,286 +116,35 @@ enum Role {
 }
 
 enum LocationType {
-  HEADQUARTERS
   BRANCH
   WAREHOUSE
   FACTORY
+  STORE
 }
 
-enum BusinessType {
-  MANUFACTURING
-  TRADING
-  BOTH
-}
-
-enum InventoryCategory {
-  RAW_MATERIAL
-  WORK_IN_PROGRESS
-  FINISHED_GOODS
-  CONSUMABLES
-  PACKAGING
-}
-
-enum StockMovementType {
-  RECEIPT
-  ISSUE
-  TRANSFER
-  ADJUSTMENT
-  RETURN
-}
-
-enum OrderStatus {
-  DRAFT
-  CONFIRMED
-  IN_PRODUCTION
-  QUALITY_CHECK
-  READY
-  SHIPPED
-  DELIVERED
-  CANCELLED
-}
-
-enum QualityStatus {
-  PENDING
-  PASSED
-  FAILED
-  REJECTED
-}
-
-// ============================================================================
-// TENANT-SPECIFIC TABLES (Schema per tenant approach)
-// Note: These will be created dynamically for each tenant
-// This is just the template structure - actual tables created via migrations
-// ============================================================================
-
-// Template for tenant-specific location table
-// Actual table name will be: tenant_{tenantId}_locations
-model TenantLocation {
-  id            String      @id @default(uuid())
-  tenantId      String      @map("tenant_id")
-  name          String
-  email         String?
-  phone         String?
-  country       String?
-  addressLine1  String?     @map("address_line_1")
-  addressLine2  String?     @map("address_line_2")
-  city          String?
-  state         String?
-  pincode       String?
-  isDefault     Boolean     @default(false) @map("is_default")
+model CompanyLocation {
+  id             String     @id @default(cuid())
+  locationId     String     @map("location_id")
+  companyId      String     @map("company_id")
+  name           String
+  email          String?
+  phone          String?
+  addressLine1   String?    @map("address_line_1")
+  addressLine2   String?    @map("address_line_2")
+  city           String?
+  state          String?
+  country        String?
+  pincode        String?
+  isDefault      Boolean    @default(false) @map("is_default")
   isHeadquarters Boolean    @default(false) @map("is_headquarters")
-  locationType  LocationType @default(BRANCH) @map("location_type")
-  imageUrl      String?     @map("image_url")
-  isActive      Boolean     @default(true) @map("is_active")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  locationType   LocationType @default(BRANCH) @map("location_type")
+  isActive       Boolean    @default(true) @map("is_active")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
   // Relationships
-  inventoryItems   TenantInventoryItem[]
-  stockMovementsFrom TenantStockMovement[] @relation("StockMovementFromLocation")
-  stockMovementsTo   TenantStockMovement[] @relation("StockMovementToLocation")
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@map("tenant_locations")
-}
-
-// Template for tenant-specific suppliers
-model TenantSupplier {
-  id           String   @id @default(uuid())
-  tenantId     String   @map("tenant_id")
-  name         String
-  contactPerson String? @map("contact_person")
-  email        String?
-  phone        String?
-  address      String?
-  city         String?
-  state        String?
-  country      String?
-  pincode      String?
-  taxId        String?  @map("tax_id")
-  paymentTerms String?  @map("payment_terms")
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  inventoryItems TenantInventoryItem[]
-
-  @@map("tenant_suppliers")
-}
-
-// Template for tenant-specific inventory items
-model TenantInventoryItem {
-  id              String   @id @default(uuid())
-  tenantId        String   @map("tenant_id")
-  locationId      String   @map("location_id")
-  name            String   @map("name")
-  sku             String   @map("sku")
-  description     String?  @map("description")
-  category        InventoryCategory @map("category")
-  subCategory     String?  @map("sub_category")
-  fiberType       String?  @map("fiber_type")
-  yarnCount       String?  @map("yarn_count")
-  gsm             Decimal? @map("gsm")
-  fabricType      String?  @map("fabric_type")
-  color           String?  @map("color")
-  width           Decimal? @map("width")
-  weight          Decimal? @map("weight")
-  uom             String   @default("METER") @map("uom")
-  currentStock    Decimal  @default(0) @map("current_stock")
-  reservedStock   Decimal  @default(0) @map("reserved_stock")
-  availableStock  Decimal  @default(0) @map("available_stock")
-  minStockLevel   Decimal  @default(0) @map("min_stock_level")
-  maxStockLevel   Decimal? @map("max_stock_level")
-  reorderPoint    Decimal  @default(0) @map("reorder_point")
-  unitCost        Decimal  @map("unit_cost")
-  averageCost     Decimal  @default(0) @map("average_cost")
-  lastPurchasePrice Decimal? @map("last_purchase_price")
-  lastPurchaseDate  DateTime? @map("last_purchase_date")
-  primarySupplierId String? @map("primary_supplier_id")
-  supplierSku     String?  @map("supplier_sku")
-  batchNumber     String?  @map("batch_number")
-  lotNumber       String?  @map("lot_number")
-  expiryDate      DateTime? @map("expiry_date")
-  qualityStatus   QualityStatus @default(PENDING) @map("quality_status")
-  isActive        Boolean  @default(true) @map("is_active")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  location        TenantLocation @relation(fields: [locationId], references: [id])
-  primarySupplier TenantSupplier? @relation(fields: [primarySupplierId], references: [id])
-  stockMovements  TenantStockMovement[]
-
-  @@unique([tenantId, sku])
-  @@map("tenant_inventory_items")
-}
-
-// Template for tenant-specific stock movements
-model TenantStockMovement {
-  id            String   @id @default(uuid())
-  tenantId      String   @map("tenant_id")
-  itemId        String   @map("item_id")
-  fromLocationId String? @map("from_location_id")
-  toLocationId  String? @map("to_location_id")
-  movementType  StockMovementType @map("movement_type")
-  quantity      Decimal
-  unitCost      Decimal? @map("unit_cost")
-  referenceType String?  @map("reference_type")
-  referenceId   String?  @map("reference_id")
-  batchNumber   String?  @map("batch_number")
-  lotNumber     String?  @map("lot_number")
-  notes         String?
-  performedBy   String   @map("performed_by")
-  isActive      Boolean  @default(true) @map("is_active")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  item          TenantInventoryItem @relation(fields: [itemId], references: [id])
-  fromLocation  TenantLocation? @relation("StockMovementFromLocation", fields: [fromLocationId], references: [id])
-  toLocation    TenantLocation? @relation("StockMovementToLocation", fields: [toLocationId], references: [id])
-
-  @@map("tenant_stock_movements")
-}
-
-// Template for tenant-specific production orders
-model TenantProductionOrder {
-  id                String   @id @default(uuid())
-  tenantId          String   @map("tenant_id")
-  locationId        String   @map("location_id")
-  orderNumber       String   @map("order_number")
-
-  // Product specifications
-  productName       String   @map("product_name")
-  productSku        String   @map("product_sku")
-  category          InventoryCategory
-  fiberType         String?  @map("fiber_type")
-  yarnCount         String?  @map("yarn_count")
-  gsm               Decimal? @map("gsm")
-  fabricType        String?  @map("fabric_type")
-  color             String?
-  width             Decimal? @map("width")
-  designPattern     String?  @map("design_pattern")
-
-  // Order details
-  orderedQuantity   Decimal  @map("ordered_quantity")
-  producedQuantity  Decimal  @default(0) @map("produced_quantity")
-  rejectedQuantity  Decimal  @default(0) @map("rejected_quantity")
-  unitOfMeasure     String   @default("METER") @map("unit_of_measure")
-
-  // Status and scheduling
-  status            OrderStatus @default(DRAFT)
-  priority          String   @default("MEDIUM")
-  plannedStartDate  DateTime? @map("planned_start_date")
-  plannedEndDate    DateTime? @map("planned_end_date")
-  actualStartDate   DateTime? @map("actual_start_date")
-  actualEndDate     DateTime? @map("actual_end_date")
-
-  // Costing
-  estimatedCost     Decimal? @map("estimated_cost")
-  actualCost        Decimal? @map("actual_cost")
-
-  // Quality and tracking
-  qualityStatus     QualityStatus @default(PENDING) @map("quality_status")
-  batchNumber       String?  @map("batch_number")
-  lotNumber         String?  @map("lot_number")
-
-  // References
-  salesOrderId      String?  @map("sales_order_id")
-  customerId        String?  @map("customer_id")
-
-  // Workflow
-  assignedTo        String?  @map("assigned_to")    // User ID
-  approvedBy        String?  @map("approved_by")    // User ID
-  approvedAt        DateTime? @map("approved_at")
-  notes             String?
-
-  // Status tracking
-  isActive          Boolean  @default(true) @map("is_active")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  @@unique([tenantId, orderNumber])
-  @@map("tenant_production_orders")
-}
-
-// Template for tenant-specific work orders (shop floor execution)
-model TenantWorkOrder {
-  id                String   @id @default(uuid())
-  tenantId          String   @map("tenant_id")
-  productionOrderId String   @map("production_order_id")
-  locationId        String   @map("location_id")
-  workOrderNumber   String   @map("work_order_number")
-
-  // Work details
-  operationName     String   @map("operation_name")   // Spinning, Weaving, Dyeing, etc.
-  operationType     String   @map("operation_type")   // MANUAL, MACHINE, QUALITY_CHECK
-  machineId         String?  @map("machine_id")
-  operatorId        String?  @map("operator_id")      // User ID
-
-  // Quantities
-  plannedQuantity   Decimal  @map("planned_quantity")
-  completedQuantity Decimal  @default(0) @map("completed_quantity")
-  rejectedQuantity  Decimal  @default(0) @map("rejected_quantity")
-  unitOfMeasure     String   @default("METER") @map("unit_of_measure")
-
-  // Time tracking
-  plannedStartTime  DateTime? @map("planned_start_time")
-  actualStartTime   DateTime? @map("actual_start_time")
-  plannedEndTime    DateTime? @map("planned_end_time")
-  actualEndTime     DateTime? @map("actual_end_time")
-
-  // Status and workflow
-  status            String   @default("PENDING")
-  priority          String   @default("MEDIUM")
-  qualityCheckRequired Boolean @default(false) @map("quality_check_required")
-  notes             String?
-
-  // Tracking
-  isActive          Boolean  @default(true) @map("is_active")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  @@unique([tenantId, workOrderNumber])
-  @@map("tenant_work_orders")
+  @@unique([locationId])
+  @@map("company_locations")
 }

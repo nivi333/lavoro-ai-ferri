@@ -3,8 +3,8 @@ import authRoutes from './authRoutes';
 import healthRoutes from './healthRoutes';
 import companyRoutes from './companyRoutes';
 import locationRoutes from './locationRoutes';
-import inventoryRoutes from './inventoryRoutes';
-import productionRoutes from './productionRoutes';
+// import inventoryRoutes from './inventoryRoutes';
+// import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { userRateLimit } from '../../middleware/rateLimiter';
 
@@ -44,8 +44,8 @@ router.use(userRateLimit);
 // Protected routes
 router.use('/companies', companyRoutes);
 router.use('/locations', locationRoutes);
-router.use('/inventory', inventoryRoutes);
-router.use('/production', productionRoutes);
+// router.use('/inventory', inventoryRoutes);
+// router.use('/production', productionRoutes);
 // router.use('/quality', qualityRoutes);
 // router.use('/reports', reportRoutes);
 
