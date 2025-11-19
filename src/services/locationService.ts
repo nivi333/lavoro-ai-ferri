@@ -121,7 +121,26 @@ export class LocationService {
         },
       });
 
-      return newLocation;
+      // Transform snake_case to camelCase for frontend
+      return {
+        id: newLocation.id,
+        locationId: newLocation.location_id,
+        name: newLocation.name,
+        email: newLocation.email,
+        phone: newLocation.phone,
+        addressLine1: newLocation.address_line_1,
+        addressLine2: newLocation.address_line_2,
+        city: newLocation.city,
+        state: newLocation.state,
+        country: newLocation.country,
+        pincode: newLocation.pincode,
+        isDefault: newLocation.is_default,
+        isHeadquarters: newLocation.is_headquarters,
+        locationType: newLocation.location_type,
+        isActive: newLocation.is_active,
+        createdAt: newLocation.created_at,
+        updatedAt: newLocation.updated_at,
+      };
     } catch (error) {
       console.error('Error creating location:', error);
       throw new Error('Failed to create location');
@@ -157,7 +176,26 @@ export class LocationService {
         }
       });
 
-      return locations;
+      // Transform snake_case to camelCase for frontend
+      return locations.map(location => ({
+        id: location.id,
+        locationId: location.location_id,
+        name: location.name,
+        email: location.email,
+        phone: location.phone,
+        addressLine1: location.address_line_1,
+        addressLine2: location.address_line_2,
+        city: location.city,
+        state: location.state,
+        country: location.country,
+        pincode: location.pincode,
+        isDefault: location.is_default,
+        isHeadquarters: location.is_headquarters,
+        locationType: location.location_type,
+        isActive: location.is_active,
+        createdAt: location.created_at,
+        updatedAt: location.updated_at,
+      }));
     } catch (error) {
       console.error('Error fetching locations:', error);
       throw new Error('Failed to fetch locations');
@@ -197,7 +235,26 @@ export class LocationService {
         throw new Error('Location not found');
       }
 
-      return location;
+      // Transform snake_case to camelCase for frontend
+      return {
+        id: location.id,
+        locationId: location.location_id,
+        name: location.name,
+        email: location.email,
+        phone: location.phone,
+        addressLine1: location.address_line_1,
+        addressLine2: location.address_line_2,
+        city: location.city,
+        state: location.state,
+        country: location.country,
+        pincode: location.pincode,
+        isDefault: location.is_default,
+        isHeadquarters: location.is_headquarters,
+        locationType: location.location_type,
+        isActive: location.is_active,
+        createdAt: location.created_at,
+        updatedAt: location.updated_at,
+      };
     } catch (error) {
       console.error('Error fetching location:', error);
       throw error;
@@ -276,7 +333,26 @@ export class LocationService {
         }
       });
 
-      return updatedLocation;
+      // Transform snake_case to camelCase for frontend
+      return {
+        id: updatedLocation.id,
+        locationId: updatedLocation.location_id,
+        name: updatedLocation.name,
+        email: updatedLocation.email,
+        phone: updatedLocation.phone,
+        addressLine1: updatedLocation.address_line_1,
+        addressLine2: updatedLocation.address_line_2,
+        city: updatedLocation.city,
+        state: updatedLocation.state,
+        country: updatedLocation.country,
+        pincode: updatedLocation.pincode,
+        isDefault: updatedLocation.is_default,
+        isHeadquarters: updatedLocation.is_headquarters,
+        locationType: updatedLocation.location_type,
+        isActive: updatedLocation.is_active,
+        createdAt: updatedLocation.created_at,
+        updatedAt: updatedLocation.updated_at,
+      };
     } catch (error) {
       console.error('Error updating location:', error);
       throw error;

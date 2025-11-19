@@ -97,7 +97,7 @@ export default function CompanyDetailPage() {
   const [editingCompany, setEditingCompany] = useState<CompanyDetails | null>(null);
   const [loadingCompany, setLoadingCompany] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [loadingLogo, setLoadingLogo] = useState(false);
+  const [, setLoadingLogo] = useState(false);
 
   // Fetch logo when component mounts or tenantId changes
   useEffect(() => {

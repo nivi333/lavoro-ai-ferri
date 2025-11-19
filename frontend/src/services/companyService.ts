@@ -17,11 +17,11 @@ export interface CreateCompanyRequest {
   pincode: string;
   establishedDate?: string;
   businessType: string;
-  certifications?: string;
+  certifications?: string[];
   contactInfo: string;
   website?: string;
   taxId?: string;
-  isActive?: boolean;
+  isActive?: boolean; // Always true for company creation
 }
 
 export interface CompanyResponse {

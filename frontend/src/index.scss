@@ -663,3 +663,17 @@ button {
 .ant-select-selection-item {
   display: flex !important;
 }
+
+// Avatar styles for company and location screens
+.ant-avatar > img {
+  display: block;
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+}
+
+.ant-avatar.ant-avatar-circle {
+  width: 70px;
+  height: 70px;
+  font-size: 18px;
+}

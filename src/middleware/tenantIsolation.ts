@@ -100,14 +100,14 @@ export const requireRole = (allowedRoles: string[]) => {
 async function validateTenantAccess(userId: string, tenantId: string): Promise<boolean> {
   try {
     logger.debug(`Validating tenant access: user ${userId} -> tenant ${tenantId}`);
-    const access = await globalPrisma.userCompany.findFirst({
+    const access = await globalPrisma.user_companies.findFirst({
       where: {
-        userId,
-        companyId: tenantId,
-        isActive: true,
-        company: { isActive: true }
+        user_id: userId,
+        company_id: tenantId,
+        is_active: true,
+        companies: { is_active: true }
       },
-      include: { company: true }
+      include: { companies: true }
     });
     return !!access;
   } catch (error) {

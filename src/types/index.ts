@@ -27,6 +27,7 @@ export interface CreateCompanyData {
   state?: string;
   pincode?: string;
   certifications?: string[];
+  isActive: boolean; // Always true for company creation (default: true)
 }
 
 export interface CreateLocationData {

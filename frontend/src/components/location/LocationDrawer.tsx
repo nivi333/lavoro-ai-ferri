@@ -46,15 +46,15 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
         email: editingLocation.email || '',
         phone: editingLocation.phone || '',
         country: editingLocation.country,
-        addressLine1: editingLocation.address_line_1,
+        addressLine1: editingLocation.addressLine1 || '',
         addressLine2: editingLocation.addressLine2 || '',
         city: editingLocation.city,
         state: editingLocation.state,
         pincode: editingLocation.pincode,
         locationType: editingLocation.locationType,
-        isDefault: editingLocation.isDefault,
-        isHeadquarters: editingLocation.isHeadquarters,
-        isActive: editingLocation.isActive,
+        isDefault: editingLocation.isDefault || false,
+        isHeadquarters: editingLocation.isHeadquarters || false,
+        isActive: editingLocation.isActive !== undefined ? editingLocation.isActive : true,
       });
       if (editingLocation.imageUrl) {
         setImageUrl(editingLocation.imageUrl);
@@ -421,20 +421,30 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
             <div className='ccd-section-title'>Location Settings</div>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label='Default Location' name='isDefault' valuePropName='checked'>
-                  <div className='switch-field'>
+                <div className='switch-field'>
+                  <Form.Item
+                    label='Default Location'
+                    name='isDefault'
+                    valuePropName='checked'
+                    className='switch-form-item'
+                  >
                     <Switch />
-                    <div className='switch-label'></div>
-                  </div>
-                </Form.Item>
+                  </Form.Item>
+                  <div className='switch-label'></div>
+                </div>
               </Col>
               <Col span={12}>
-                <Form.Item label='Headquarters' name='isHeadquarters' valuePropName='checked'>
-                  <div className='switch-field'>
+                <div className='switch-field'>
+                  <Form.Item
+                    label='Headquarters'
+                    name='isHeadquarters'
+                    valuePropName='checked'
+                    className='switch-form-item'
+                  >
                     <Switch />
-                    <div className='switch-label'></div>
-                  </div>
-                </Form.Item>
+                  </Form.Item>
+                  <div className='switch-label'></div>
+                </div>
               </Col>
             </Row>
           </div>

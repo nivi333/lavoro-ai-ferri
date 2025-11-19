@@ -28,7 +28,7 @@ import './CompanyCreationDrawer.scss';
 
 const { Option } = Select;
 
-type CompanyFormInitialData = Partial<CreateCompanyRequest & CompanyDetails> & {
+type CompanyFormInitialData = Partial<Omit<CreateCompanyRequest, 'certifications'> & Omit<CompanyDetails, 'certifications'>> & {
   id?: string;
   defaultLocation?: string;
   contactInfo?: string;
@@ -37,6 +37,7 @@ type CompanyFormInitialData = Partial<CreateCompanyRequest & CompanyDetails> & {
   city?: string;
   state?: string;
   pincode?: string;
+  certifications?: string | string[];
 };
 
 interface CompanyCreationDrawerProps {
@@ -181,6 +182,11 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
       // Prepare the data for API call
       if (isEditing && companyId) {
+        // Convert certifications string to array
+        const certificationsArray = values.certifications
+          ? values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean)
+          : [];
+
         const updatePayload: UpdateCompanyRequest = {
           name: values.name,
           slug: values.slug,
@@ -189,14 +195,14 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           ...(logoUrl ? { logoUrl } : {}),
           country: values.country,
           defaultLocation: values.defaultLocation,
-          address1: values.address1,
-          address2: values.address2,
+          address1: values.addressLine1,
+          address2: values.addressLine2,
           city: values.city,
           state: values.state,
           pincode: values.pincode,
           establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
           businessType: values.businessType,
-          certifications: values.certifications,
+          certifications: certificationsArray.length > 0 ? certificationsArray.join(',') : undefined,
           contactInfo: values.contactInfo,
           website: values.website,
           taxId: values.taxId,
@@ -209,25 +215,30 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
         onCompanyUpdated?.(updatedCompany);
         handleDrawerClose();
       } else {
+        // Convert certifications string to array
+        const certificationsArray = values.certifications
+          ? values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean)
+          : [];
+
         const companyData: CreateCompanyRequest = {
           name: values.name,
           slug: values.slug,
           industry: values.industry,
           country: values.country,
           defaultLocation: values.defaultLocation,
-          address1: values.address1,
+          addressLine1: values.addressLine1,
           city: values.city,
           state: values.state,
           pincode: values.pincode,
           establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
           businessType: values.businessType,
           contactInfo: values.contactInfo,
-          isActive: values.isActive,
+          isActive: true, // Always true for new companies
           // Optional fields - only include if they have values
           ...(values.description && { description: values.description }),
           ...(logoUrl && { logoUrl }),
-          ...(values.address2 && { address2: values.address2 }),
-          ...(values.certifications && { certifications: values.certifications }),
+          ...(values.addressLine2 && { addressLine2: values.addressLine2 }),
+          ...(certificationsArray.length > 0 && { certifications: certificationsArray }),
           ...(values.website && { website: values.website }),
           ...(values.taxId && { taxId: values.taxId }),
         };

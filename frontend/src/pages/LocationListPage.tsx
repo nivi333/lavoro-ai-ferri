@@ -12,12 +12,7 @@ import {
   Spin,
   Checkbox,
 } from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EnvironmentOutlined,
-  MoreOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EnvironmentOutlined, MoreOutlined } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
 import { useHeader } from '../contexts/HeaderContext';
 import { locationService, Location } from '../services/locationService';
@@ -25,8 +20,6 @@ import { MainLayout } from '../components/layout';
 import { Heading } from '../components/Heading';
 import { GradientButton } from '../components/ui';
 import {
-  LOCATION_TYPE_LABELS,
-  LOCATION_TYPE_COLORS,
   LOCATION_STATUS_COLORS,
   LOCATION_TABLE_CONFIG,
   LOCATION_EMPTY_STATE,
@@ -152,18 +145,13 @@ export default function LocationListPage() {
       key: 'location',
       render: (record: Location) => (
         <Space>
-          <Avatar
-            size={40}
-            src={record.imageUrl}
-            icon={<EnvironmentOutlined />}
-            style={{ backgroundColor: LOCATION_TYPE_COLORS[record.locationType] }}
-          >
+          <Avatar size={70} src={record.imageUrl} icon={<EnvironmentOutlined />}>
             {record.name.charAt(0)}
           </Avatar>
           <div>
             <div className='location-name'>{record.name}</div>
             <div className='location-address'>
-              {record.addressLine1}, {record.city}, {record.state}
+              {record.addressLine1}, {record.addressLine2},{record.city}, {record.state}
             </div>
           </div>
         </Space>
@@ -173,11 +161,7 @@ export default function LocationListPage() {
       title: 'Type',
       dataIndex: 'locationType',
       key: 'locationType',
-      render: (type: string) => (
-        <Tag color={LOCATION_TYPE_COLORS[type as keyof typeof LOCATION_TYPE_COLORS]}>
-          {LOCATION_TYPE_LABELS[type as keyof typeof LOCATION_TYPE_LABELS]}
-        </Tag>
-      ),
+      render: (_: string, record: Location) => record.locationType,
     },
     {
       title: 'Contact',

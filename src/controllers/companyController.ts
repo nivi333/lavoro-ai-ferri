@@ -33,6 +33,7 @@ const createCompanySchema = Joi.object({
   state: Joi.string().max(100).optional(),
   pincode: Joi.string().max(20).optional(),
   certifications: Joi.array().items(Joi.string()).optional(),
+  isActive: Joi.boolean().optional().default(true), // Always true for new companies
 });
 
 const updateCompanySchema = Joi.object({
@@ -137,15 +138,9 @@ export class CompanyController {
       const userId = req.userId!;
       const companies = await companyService.getUserCompanies(userId);
 
-      // Minimize response size by excluding logoUrl from list
-      const sanitizedCompanies = companies.map(company => ({
-        ...company,
-        logoUrl: null,
-      }));
-
       res.json({
         success: true,
-        data: sanitizedCompanies,
+        data: companies,
       });
     } catch (error: any) {
       logger.error('Error fetching user companies:', error);

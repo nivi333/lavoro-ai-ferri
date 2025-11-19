@@ -49,14 +49,15 @@ model company_locations {
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
   updated_at      DateTime
-  address_line_1  String?
+  address_line_1  String
   address_line_2  String?
-  city            String?
-  country         String?
+  city            String
+  state           String
+  country         String
+  contact_info    Json?
   email           String?
   phone           String?
   pincode         String?
-  state           String?
   companies       companies    @relation(fields: [company_id], references: [id], onDelete: Cascade)
 }
 

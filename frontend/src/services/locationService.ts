@@ -3,28 +3,23 @@ import { AuthStorage } from '../utils/storage';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export interface Location {
-  addressLine2: string;
-  locationType: any;
-  isDefault: any;
-  isHeadquarters: any;
-  isActive: any;
   id: string;
-  location_id: string;
+  locationId: string;
   name: string;
   email?: string;
   phone?: string;
-  address_line_1?: string;
-  address_line_2?: string;
-  city?: string;
-  state?: string;
-  country?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  country: string;
   pincode?: string;
-  is_default: boolean;
-  is_headquarters: boolean;
-  location_type: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  isDefault: boolean;
+  isHeadquarters: boolean;
+  locationType: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
   // Frontend-only optional field for uploaded image preview
   imageUrl?: string;
 }
