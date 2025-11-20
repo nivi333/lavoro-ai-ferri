@@ -607,6 +607,422 @@ enum DesignStatus {
 
 ---
 
+## 📋 Sprint 3.6: Product Master & Inventory Management
+
+### Overview
+**Purpose**: Centralized product catalog for managing all company items/products with complete specifications, pricing, and inventory tracking. Products can be selected from dropdown in Orders, Purchase Orders, and Invoices instead of manual entry.
+
+**Benefits**:
+- ✅ Eliminate manual item entry errors
+- ✅ Consistent pricing across all transactions
+- ✅ Real-time stock tracking
+- ✅ Product history and analytics
+- ✅ Faster order creation workflow
+- ✅ Multi-location inventory support
+
+### Database Schema (Prisma)
+
+```prisma
+// products table (Master Product Catalog)
+model products {
+  id                String   @id @default(uuid())
+  product_id        String   @unique // PROD001
+  company_id        String
+  product_code      String   // SKU or internal code
+  product_name      String
+  description       String?
+  category          ProductCategory
+  sub_category      String?
+  
+  // Pricing
+  unit_price        Decimal @db.Decimal(12,2)
+  cost_price        Decimal? @db.Decimal(12,2)
+  currency          String @default("INR")
+  tax_rate          Decimal? @db.Decimal(5,2)
+  
+  // Inventory
+  unit_of_measure   String // PCS, MTR, KG, etc.
+  current_stock     Decimal @db.Decimal(12,3) @default(0)
+  min_stock_level   Decimal? @db.Decimal(12,3)
+  max_stock_level   Decimal? @db.Decimal(12,3)
+  reorder_point     Decimal? @db.Decimal(12,3)
+  
+  // Product Details
+  barcode           String?
+  hsn_code          String? // For GST/tax compliance
+  manufacturer      String?
+  brand             String?
+  model_number      String?
+  
+  // Textile-Specific Fields
+  fabric_type       String?
+  color             String?
+  size              String?
+  weight_gsm        Decimal? @db.Decimal(8,2)
+  composition       String?
+  
+  // Media & Documentation
+  image_url         String?
+  additional_images String[] // Array of image URLs
+  specification_url String? // PDF/document URL
+  
+  // Status & Tracking
+  is_active         Boolean @default(true)
+  is_featured       Boolean @default(false)
+  notes             String?
+  tags              String[] // For search and filtering
+  
+  // Timestamps
+  created_at        DateTime @default(now())
+  updated_at        DateTime
+  created_by        String?
+  updated_by        String?
+  
+  // Relations
+  company           companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  stock_movements   product_stock_movements[]
+  location_stock    product_location_stock[]
+  
+  @@unique([company_id, product_code])
+  @@index([company_id, is_active])
+  @@index([company_id, category])
+}
+
+enum ProductCategory {
+  RAW_MATERIAL
+  FABRIC
+  YARN
+  GARMENT
+  ACCESSORY
+  PACKAGING
+  FINISHED_GOODS
+  CONSUMABLE
+  MACHINERY_PARTS
+  OTHER
+}
+
+// product_location_stock table (Multi-location inventory)
+model product_location_stock {
+  id              String   @id @default(uuid())
+  product_id      String
+  location_id     String
+  company_id      String
+  quantity        Decimal @db.Decimal(12,3)
+  reserved_qty    Decimal @db.Decimal(12,3) @default(0) // For pending orders
+  available_qty   Decimal @db.Decimal(12,3) @default(0) // quantity - reserved_qty
+  last_updated    DateTime
+  
+  product         products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  location        company_locations @relation(fields: [location_id], references: [id])
+  company         companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  
+  @@unique([product_id, location_id])
+  @@index([company_id, location_id])
+}
+
+// product_stock_movements table (Stock transaction history)
+model product_stock_movements {
+  id                String   @id @default(uuid())
+  movement_id       String   @unique // STK001
+  company_id        String
+  product_id        String
+  location_id       String?
+  movement_type     StockMovementType
+  quantity          Decimal @db.Decimal(12,3)
+  unit_price        Decimal? @db.Decimal(12,2)
+  reference_type    String? // ORDER, PURCHASE_ORDER, ADJUSTMENT, etc.
+  reference_id      String? // Related document ID
+  notes             String?
+  movement_date     DateTime
+  created_by        String?
+  created_at        DateTime @default(now())
+  
+  product           products @relation(fields: [product_id], references: [id])
+  location          company_locations? @relation(fields: [location_id], references: [id])
+  company           companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  
+  @@index([company_id, product_id])
+  @@index([company_id, movement_date])
+}
+
+enum StockMovementType {
+  PURCHASE
+  SALE
+  TRANSFER
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+  RETURN
+  PRODUCTION
+  WASTAGE
+  DAMAGED
+}
+```
+
+### Backend APIs
+
+**Product Management:**
+- POST /api/v1/products - Create product
+- GET /api/v1/products - List with filters (category, active, search, location)
+- GET /api/v1/products/:id - Get product details with stock info
+- PUT /api/v1/products/:id - Update product
+- PATCH /api/v1/products/:id/status - Activate/deactivate
+- DELETE /api/v1/products/:id - Delete product
+- GET /api/v1/products/search - Quick search for dropdowns (returns: id, code, name, price, stock)
+- POST /api/v1/products/:id/upload-image - Upload product image
+- GET /api/v1/products/:id/stock-history - Get stock movement history
+
+**Stock Management:**
+- POST /api/v1/products/:id/stock/adjust - Manual stock adjustment
+- POST /api/v1/products/:id/stock/transfer - Transfer between locations
+- GET /api/v1/products/:id/stock/locations - Get stock by location
+- POST /api/v1/products/stock/bulk-update - Bulk stock update (CSV import)
+- GET /api/v1/products/stock/low-stock - Get products below reorder point
+- GET /api/v1/products/stock/movements - List all stock movements with filters
+
+**Integration Endpoints:**
+- GET /api/v1/products/dropdown - Lightweight list for Order/PO/Invoice dropdowns
+  - Returns: { id, productCode, productName, unitPrice, currentStock, uom }
+- POST /api/v1/products/reserve - Reserve stock for order (reduces available_qty)
+- POST /api/v1/products/release - Release reserved stock (cancelled order)
+
+### Frontend Components
+
+**1. ProductsListPage** (`frontend/src/pages/ProductsListPage.tsx`)
+- **Header**: "Product Master" + "Add Product" (GradientButton)
+- **Filters**: 
+  - Category dropdown (all categories)
+  - Active/Inactive toggle
+  - Search bar (product code, name)
+  - Location filter (show stock for specific location)
+- **Table Columns**:
+  - Image (thumbnail)
+  - Product Code
+  - Product Name
+  - Category (Tag with color)
+  - Unit Price (formatted with currency)
+  - Current Stock (with color: red if below min, green if normal)
+  - UOM
+  - Status (Active/Inactive badge)
+  - Actions (More dropdown: Edit, View Stock, Deactivate, Delete)
+- **Features**:
+  - Pagination (20 items per page)
+  - Export to CSV
+  - Bulk actions (activate/deactivate multiple)
+  - Quick view modal for product details
+
+**2. ProductFormDrawer** (`frontend/src/components/products/ProductFormDrawer.tsx`)
+- **Width**: 720px
+- **Sections**:
+
+**Section 1: Basic Information**
+- Row 1: Product Code (auto-generated, readonly for edit), Product Name (required)
+- Row 2: Category (dropdown, required), Sub-Category (text)
+- Row 3: Manufacturer, Brand
+- Row 4: Model Number, Barcode
+- Row 5: HSN Code (for tax), Tags (multi-select)
+- Active Status Toggle (top-right)
+
+**Section 2: Pricing & Inventory**
+- Row 1: Unit Price (required, decimal), Cost Price (decimal)
+- Row 2: Currency (dropdown, default INR), Tax Rate (%)
+- Row 3: Unit of Measure (UOM dropdown with textile units)
+- Row 4: Current Stock (readonly, shows total), Min Stock Level, Max Stock Level
+- Row 5: Reorder Point (alert threshold)
+
+**Section 3: Textile-Specific Details** (Collapsible)
+- Row 1: Fabric Type (dropdown), Color
+- Row 2: Size, Weight (GSM)
+- Row 3: Composition (e.g., "100% Cotton", "65% Polyester 35% Cotton")
+
+**Section 4: Description & Media**
+- Description (textarea, 500 chars)
+- Notes (textarea, 1000 chars)
+- Image Upload:
+  - Main Image (picture-circle with camera icon)
+  - Additional Images (up to 4 images, picture-card)
+  - Specification Document (PDF upload)
+
+**Section 5: Stock by Location** (Edit mode only, readonly)
+- Table showing stock at each location:
+  - Location Name
+  - Quantity
+  - Reserved
+  - Available
+  - Last Updated
+- "Adjust Stock" button opens StockAdjustmentModal
+
+**Buttons**: Cancel (left), Save Product (right, GradientButton)
+
+**3. StockAdjustmentModal** (`frontend/src/components/products/StockAdjustmentModal.tsx`)
+- **Trigger**: From ProductFormDrawer or ProductsListPage
+- **Fields**:
+  - Product (readonly, shows name + code)
+  - Location (dropdown, required)
+  - Movement Type (dropdown: ADJUSTMENT_IN, ADJUSTMENT_OUT, TRANSFER, etc.)
+  - Quantity (number, required)
+  - Unit Price (if purchase/sale)
+  - Reference Type (optional: ORDER, PURCHASE_ORDER, etc.)
+  - Reference ID (optional)
+  - Notes (textarea)
+  - Movement Date (date picker, default today)
+- **Buttons**: Cancel, Save Movement (GradientButton)
+
+**4. StockMovementHistoryPage** (`frontend/src/pages/StockMovementHistoryPage.tsx`)
+- **Header**: "Stock Movement History"
+- **Filters**:
+  - Date Range
+  - Product (searchable dropdown)
+  - Location
+  - Movement Type
+- **Table**:
+  - Movement ID
+  - Date
+  - Product Code + Name
+  - Location
+  - Movement Type (Tag with color)
+  - Quantity (+ for in, - for out)
+  - Reference (type + ID link)
+  - Created By
+  - Notes
+- **Export**: CSV export with filters
+
+**5. LowStockAlertsPage** (`frontend/src/pages/LowStockAlertsPage.tsx`)
+- **Header**: "Low Stock Alerts"
+- **Table**:
+  - Product Code
+  - Product Name
+  - Current Stock (red text)
+  - Reorder Point
+  - Shortage (calculated)
+  - Location
+  - Actions (Create PO button)
+- **Auto-refresh**: Every 5 minutes
+- **Notification**: Badge count in sidebar
+
+**6. ProductDropdownSelector** (`frontend/src/components/products/ProductDropdownSelector.tsx`)
+- **Reusable Component** for Order/PO/Invoice forms
+- **Features**:
+  - Searchable dropdown (by code or name)
+  - Shows: Product Code - Product Name (Stock: X UOM) - Price
+  - Auto-fills: unitPrice, uom when selected
+  - Shows stock availability warning if low
+  - Option to "Add New Product" (opens ProductFormDrawer)
+
+### Integration with Existing Modules
+
+**Orders (OrderFormDrawer):**
+- Replace manual "Item Code" input with ProductDropdownSelector
+- Auto-fill: description, unitOfMeasure, unitPrice from product
+- Show current stock availability
+- Reserve stock on order creation
+- Release stock on order cancellation
+
+**Purchase Orders:**
+- Use ProductDropdownSelector for item selection
+- Auto-fill product details
+- Update stock on PO receipt
+
+**Invoices:**
+- Use ProductDropdownSelector
+- Pull latest unit price from product master
+- Deduct stock on invoice generation
+
+### Service Layer (Backend)
+
+**ProductService** (`src/services/productService.ts`)
+- `createProduct(tenantId, data)` - Validate, generate PROD001, create product + initial stock entry
+- `getProducts(tenantId, filters)` - List with pagination, search, filters
+- `getProductById(tenantId, productId)` - Get with stock info from all locations
+- `updateProduct(tenantId, productId, data)` - Update product details
+- `deleteProduct(tenantId, productId)` - Soft delete (set is_active = false)
+- `adjustStock(tenantId, productId, movement)` - Create stock movement, update quantities
+- `transferStock(tenantId, productId, fromLocation, toLocation, quantity)` - Transfer between locations
+- `reserveStock(tenantId, productId, locationId, quantity)` - Reserve for order
+- `releaseStock(tenantId, productId, locationId, quantity)` - Release reservation
+- `getLowStockProducts(tenantId)` - Get products below reorder point
+- `getStockHistory(tenantId, productId, filters)` - Get movement history
+- `searchProducts(tenantId, query)` - Quick search for dropdowns
+
+**ProductController** (`src/controllers/productController.ts`)
+- Joi validation schemas for all operations
+- HTTP handlers for all endpoints
+- Role-based access: OWNER/ADMIN (full access), MANAGER (read + adjust stock), EMPLOYEE (read only)
+
+**ProductRoutes** (`src/routes/v1/productRoutes.ts`)
+- All routes behind `tenantIsolationMiddleware`
+- Role requirements per endpoint
+- File upload middleware for images
+
+### Frontend Service
+
+**productService.ts** (`frontend/src/services/productService.ts`)
+```typescript
+export interface Product {
+  id: string;
+  productId: string;
+  productCode: string;
+  productName: string;
+  description?: string;
+  category: string;
+  unitPrice: number;
+  currentStock: number;
+  unitOfMeasure: string;
+  imageUrl?: string;
+  isActive: boolean;
+  // ... all other fields
+}
+
+export const productService = {
+  getProducts: (filters?) => Promise<Product[]>,
+  getProductById: (id) => Promise<Product>,
+  createProduct: (data) => Promise<Product>,
+  updateProduct: (id, data) => Promise<Product>,
+  deleteProduct: (id) => Promise<void>,
+  searchProducts: (query) => Promise<Product[]>,
+  adjustStock: (id, movement) => Promise<void>,
+  getStockHistory: (id, filters?) => Promise<StockMovement[]>,
+  getLowStockProducts: () => Promise<Product[]>,
+  uploadImage: (id, file) => Promise<string>,
+};
+```
+
+### UI/UX Specifications
+
+**Colors:**
+- Stock Status: Green (normal), Orange (low), Red (critical)
+- Category Tags: Different color per category
+- Movement Type: Blue (in), Red (out), Purple (transfer)
+
+**Icons:**
+- Product: ShoppingOutlined
+- Stock: InboxOutlined
+- Low Stock: WarningOutlined (red)
+- Transfer: SwapOutlined
+
+**Validation:**
+- Product Code: Unique per company
+- Unit Price: Must be > 0
+- Stock quantities: Cannot be negative
+- Reorder point: Must be < max stock level
+
+### Required Fields
+
+**Minimum Required for Product Creation:**
+1. Product Code (auto-generated or manual)
+2. Product Name
+3. Category
+4. Unit Price
+5. Unit of Measure (UOM)
+
+**Optional but Recommended:**
+- Description
+- Image
+- Min/Max stock levels
+- Reorder point
+- Cost price (for profit margin calculation)
+
+---
+
 ## ✅ Implementation Checklist
 
 ### Sprint 3.4 - Quality Control
@@ -647,6 +1063,30 @@ enum DesignStatus {
 - [ ] Add routes to AppRouter
 - [ ] Test all APIs
 - [ ] Verify UI patterns
+
+### Sprint 3.6 - Product Master & Inventory
+- [ ] Create Prisma schema for products, product_location_stock, product_stock_movements
+- [ ] Run migration
+- [ ] Implement ProductService (backend)
+- [ ] Implement ProductController (backend)
+- [ ] Create product routes with file upload middleware
+- [ ] Implement ProductsListPage (frontend)
+- [ ] Implement ProductFormDrawer (frontend)
+- [ ] Implement StockAdjustmentModal (frontend)
+- [ ] Implement StockMovementHistoryPage (frontend)
+- [ ] Implement LowStockAlertsPage (frontend)
+- [ ] Implement ProductDropdownSelector component (frontend)
+- [ ] Create product service (frontend API client)
+- [ ] Integrate ProductDropdownSelector into OrderFormDrawer
+- [ ] Integrate ProductDropdownSelector into Purchase Orders
+- [ ] Integrate ProductDropdownSelector into Invoices
+- [ ] Add stock reservation logic to order creation
+- [ ] Add stock release logic to order cancellation
+- [ ] Add routes to AppRouter and Sidebar
+- [ ] Test all APIs (CRUD, stock movements, reservations)
+- [ ] Test multi-location stock tracking
+- [ ] Test low stock alerts
+- [ ] Verify UI patterns and responsive design
 
 ---
 
