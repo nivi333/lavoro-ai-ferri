@@ -1,0 +1,25 @@
+@import '../../index.scss';
+
+.quality-defect-form {
+  .form-section {
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: $text-primary;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid $border-light;
+    }
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .ant-form-item-label > label {
+    font-weight: 500;
+    color: $text-primary;
+  }
+}

@@ -38,6 +38,10 @@ model companies {
   user_companies    user_companies[]
   orders            orders[]            @relation("CompanyOrders")
   financial_documents financial_documents[]
+  quality_checkpoints quality_checkpoints[]
+  quality_defects   quality_defects[]
+  quality_metrics   quality_metrics[]
+  compliance_reports compliance_reports[]
 }
 
 model company_locations {
@@ -64,6 +68,7 @@ model company_locations {
   companies       companies    @relation(fields: [company_id], references: [id], onDelete: Cascade)
   orders          orders[]     @relation("LocationOrders")
   financial_documents financial_documents[]
+  quality_checkpoints quality_checkpoints[]
 }
 
 model sessions {
@@ -161,6 +166,7 @@ model orders {
   location        company_locations? @relation("LocationOrders", fields: [location_id], references: [id])
   order_items     order_items[]
   financial_documents financial_documents[] @relation("OrderFinancialDocuments")
+  quality_checkpoints quality_checkpoints[]
 }
 
 model order_items {
@@ -201,4 +207,162 @@ model financial_documents {
   company         companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location        company_locations @relation(fields: [location_id], references: [id])
   order           orders?           @relation("OrderFinancialDocuments", fields: [order_id], references: [id], onDelete: SetNull)
+}
+
+// Quality Control System Tables
+
+model quality_checkpoints {
+  id              String         @id @default(uuid())
+  checkpoint_id   String         @unique
+  company_id      String
+  location_id     String?
+  order_id        String?
+  checkpoint_type CheckpointType
+  checkpoint_name String
+  inspector_name  String
+  inspection_date DateTime
+  status          QCStatus
+  overall_score   Decimal?       @db.Decimal(5, 2)
+  notes           String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime
+
+  company companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation(fields: [location_id], references: [id])
+  order   orders?            @relation(fields: [order_id], references: [id])
+  defects quality_defects[]
+  metrics quality_metrics[]
+
+  @@index([company_id])
+  @@index([checkpoint_type])
+  @@index([status])
+}
+
+enum CheckpointType {
+  INCOMING_MATERIAL
+  IN_PROCESS
+  FINAL_INSPECTION
+  PACKAGING
+  RANDOM_SAMPLING
+}
+
+enum QCStatus {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+  CONDITIONAL_PASS
+  REWORK_REQUIRED
+}
+
+model quality_defects {
+  id                String           @id @default(uuid())
+  defect_id         String           @unique
+  company_id        String
+  checkpoint_id     String
+  defect_category   DefectCategory
+  defect_type       String
+  severity          DefectSeverity
+  quantity          Int
+  description       String?
+  image_url         String?
+  resolution_status ResolutionStatus
+  resolution_notes  String?
+  resolved_by       String?
+  resolved_at       DateTime?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime
+
+  company    companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  checkpoint quality_checkpoints @relation(fields: [checkpoint_id], references: [id])
+
+  @@index([company_id])
+  @@index([defect_category])
+  @@index([severity])
+  @@index([resolution_status])
+}
+
+enum DefectCategory {
+  FABRIC
+  STITCHING
+  COLOR
+  MEASUREMENT
+  PACKAGING
+  FINISHING
+  LABELING
+}
+
+enum DefectSeverity {
+  CRITICAL
+  MAJOR
+  MINOR
+}
+
+enum ResolutionStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+model quality_metrics {
+  id              String   @id @default(uuid())
+  metric_id       String   @unique
+  company_id      String
+  checkpoint_id   String
+  metric_name     String
+  metric_value    Decimal  @db.Decimal(10, 4)
+  unit_of_measure String
+  min_threshold   Decimal? @db.Decimal(10, 4)
+  max_threshold   Decimal? @db.Decimal(10, 4)
+  is_within_range Boolean
+  notes           String?
+  created_at      DateTime @default(now())
+
+  company    companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  checkpoint quality_checkpoints @relation(fields: [checkpoint_id], references: [id])
+
+  @@index([company_id])
+  @@index([checkpoint_id])
+}
+
+model compliance_reports {
+  id              String           @id @default(uuid())
+  report_id       String           @unique
+  company_id      String
+  report_type     ComplianceType
+  report_date     DateTime
+  auditor_name    String
+  certification   String?
+  validity_period String?
+  status          ComplianceStatus
+  findings        String?
+  recommendations String?
+  document_url    String?
+  created_at      DateTime         @default(now())
+  updated_at      DateTime
+
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id])
+  @@index([report_type])
+  @@index([status])
+}
+
+enum ComplianceType {
+  ISO_9001
+  ISO_14001
+  OEKO_TEX
+  GOTS
+  WRAP
+  SA8000
+  BSCI
+  SEDEX
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PENDING_REVIEW
+  EXPIRED
 }

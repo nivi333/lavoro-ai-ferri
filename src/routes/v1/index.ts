@@ -5,6 +5,7 @@ import companyRoutes from './companyRoutes';
 import locationRoutes from './locationRoutes';
 import orderRoutes from './orderRoutes';
 import financialDocumentRoutes from './financialDocumentRoutes';
+import qualityRoutes from './qualityRoutes';
 // import inventoryRoutes from './inventoryRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
@@ -26,9 +27,10 @@ router.get('/', (req, res) => {
       companies: '/companies',
       locations: '/locations',
       orders: '/orders',
-      inventory: '/inventory',
-      production: '/production',
-      quality: '/quality (coming soon)',
+      financialDocuments: '/financial-documents',
+      quality: '/quality',
+      inventory: '/inventory (coming soon)',
+      production: '/production (coming soon)',
       reports: '/reports (coming soon)',
     },
     documentation: '/docs',
@@ -49,9 +51,9 @@ router.use('/companies', companyRoutes);
 router.use('/locations', locationRoutes);
 router.use('/orders', orderRoutes);
 router.use('/financial-documents', financialDocumentRoutes);
+router.use('/quality', qualityRoutes);
 // router.use('/inventory', inventoryRoutes);
 // router.use('/production', productionRoutes);
-// router.use('/quality', qualityRoutes);
 // router.use('/reports', reportRoutes);
 
 export default router;
