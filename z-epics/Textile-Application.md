@@ -1478,17 +1478,252 @@ Stages:
 - **Required Fields**: Product code, name, category, unit price, UOM (minimum)
 - **Benefits**: Eliminate errors, consistent pricing, real-time stock, faster workflows
 
-### **🎯 CURRENT STATUS**
-- **Phase 1**: ✅ **100% COMPLETED** (Foundation & Authentication)
-- **Phase 2**: ✅ **100% COMPLETED** (Company Management & Location System)
-- **Phase 2.5**: ✅ **100% COMPLETED** (Dashboard & User Profile Management)
-- **Phase 3.3**: ✅ **100% COMPLETED** (Order Management System)
-- **Phase 3.4**: ✅ **100% COMPLETED** (Quality Control System - All Modules)
-- **Phase 3.5**: 📋 **NEXT UP** (Textile-Specific Features)
-- **Phase 3.6**: 📋 **PLANNED** (Product Master & Inventory)
+### **📋 PLANNED - Sprint 3.7: Machine Maintenance & Service Management**
+**Monitor and maintain machines and equipment to reduce downtime and optimize production efficiency.**
+
+#### **Core Features**
+
+**1. Machine Master Data Management**
+- **Machine Registry**: Comprehensive database of all machines by industry type
+  - Textile Industry Machines: Looms, Knitting Machines, Dyeing Machines, Cutting Machines, Sewing Machines, Finishing Equipment, Spinning Machines, Warping Machines, etc.
+  - Machine Details: Machine ID, Name, Type, Model, Manufacturer, Serial Number, Purchase Date, Warranty Period
+  - Location Assignment: Link machines to specific company locations (factory, warehouse, branch)
+  - Technical Specifications: Capacity, Speed, Power Consumption, Dimensions, Operating Parameters
+  - Documentation: Manuals, Certificates, Compliance Documents (PDF uploads)
+  - Images: Machine photos, QR code labels for quick identification
+
+**2. Machine Status Tracking**
+- **Real-Time Status Dashboard**: Visual overview of all machines
+  - 🟢 **In Use**: Currently operating in production
+  - 🟡 **Under Maintenance**: Scheduled or preventive maintenance
+  - 🔴 **Under Repair**: Breakdown or emergency repair
+  - 🔵 **New/Idle**: Available for assignment
+  - ⚫ **Decommissioned**: Retired or sold machines
+- **Status History**: Complete timeline of status changes with timestamps
+- **Utilization Metrics**: Machine usage hours, idle time, efficiency percentage
+- **Performance KPIs**: OEE (Overall Equipment Effectiveness), MTBF (Mean Time Between Failures), MTTR (Mean Time To Repair)
+
+**3. Preventive Maintenance Scheduling**
+- **Maintenance Calendar**: Visual calendar for scheduled maintenance
+- **Maintenance Types**:
+  - Daily Checks: Cleaning, lubrication, basic inspections
+  - Weekly Maintenance: Detailed inspections, minor adjustments
+  - Monthly Service: Comprehensive servicing, parts replacement
+  - Quarterly Overhaul: Major maintenance, calibration
+  - Annual Certification: Compliance checks, safety audits
+- **Auto Reminders**: Email/SMS notifications before due dates (7 days, 3 days, 1 day)
+- **Maintenance Checklist**: Predefined tasks for each machine type
+- **Parts Inventory**: Track spare parts usage and stock levels
+- **Cost Tracking**: Maintenance costs per machine, budget vs actual
+- **Vendor Management**: Service provider details, contracts, SLAs
+
+**4. Breakdown Reporting & Ticketing**
+- **Quick Breakdown Logging**: Mobile-friendly form for operators
+  - Machine selection, Issue description, Severity level (Critical, High, Medium, Low)
+  - Photo/video upload of the issue
+  - Operator name, timestamp, location
+- **Real-Time Alerts**: Instant notifications to maintenance team
+  - Push notifications, SMS, Email
+  - Escalation rules based on severity and response time
+- **Ticket Management**: Complete workflow from report to resolution
+  - Ticket ID, Status (Open, In Progress, Resolved, Closed)
+  - Assigned technician, Priority, Estimated resolution time
+  - Parts required, Labor hours, Downtime duration
+  - Root cause analysis, Resolution notes
+- **Downtime Tracking**: Automatic calculation of production loss
+  - Downtime hours, Production units lost, Revenue impact
+  - Downtime reasons categorization (mechanical, electrical, operator error, etc.)
+
+**5. Machine Assignment & Operator Management**
+- **User Assignment**: Assign machines to specific operators/technicians
+  - Primary operator, Backup operators
+  - Shift-wise assignments (Morning, Afternoon, Night)
+  - Skill-based matching (operator certification vs machine requirements)
+- **Operator Training Records**: Track certifications and training
+  - Training completion dates, Certification expiry
+  - Skill levels (Beginner, Intermediate, Expert)
+  - Safety training compliance
+- **Operator Performance**: Track efficiency per operator
+  - Production output, Quality metrics, Breakdown frequency
+  - Best practices sharing, Performance reviews
+
+**6. IoT Sensor Integration (Advanced)**
+- **Sensor Data Collection**: Real-time machine health monitoring
+  - Temperature, Vibration, Pressure, Speed, Power consumption
+  - Sensor thresholds and alert triggers
+- **Predictive Maintenance**: AI-powered failure prediction
+  - Anomaly detection using machine learning
+  - Predictive alerts before actual breakdown
+  - Recommended maintenance actions
+- **Auto-Ticket Generation**: Sensors auto-create maintenance tickets
+  - Threshold breach triggers automatic ticket
+  - Pre-filled with sensor data and diagnostics
+  - Suggested parts and actions based on sensor readings
+
+**7. Maintenance Analytics & Reporting**
+- **Maintenance Dashboard**: Key metrics visualization
+  - Total machines, Active vs Idle, Maintenance due count
+  - Breakdown frequency trends, MTBF/MTTR charts
+  - Cost analysis (maintenance vs production loss)
+- **Reports**:
+  - Maintenance Schedule Report (upcoming tasks)
+  - Breakdown Analysis Report (frequency, causes, costs)
+  - Machine Utilization Report (usage hours, efficiency)
+  - Cost Analysis Report (maintenance budget tracking)
+  - Compliance Report (safety checks, certifications)
+- **Export Options**: PDF, Excel, CSV for audit trails
+
+#### **Database Schema**
+
+**Tables**:
+1. `machines` - Machine master data
+2. `machine_status_history` - Status change tracking
+3. `maintenance_schedules` - Preventive maintenance plans
+4. `maintenance_tasks` - Individual maintenance tasks
+5. `breakdown_tickets` - Breakdown reports and tickets
+6. `machine_assignments` - User-machine assignments
+7. `machine_sensors` - IoT sensor configurations (optional)
+8. `sensor_readings` - Sensor data logs (optional)
+9. `maintenance_parts` - Spare parts inventory
+10. `maintenance_costs` - Cost tracking
+
+**Enums**:
+- `MachineType` (industry-specific: LOOM, KNITTING_MACHINE, DYEING_MACHINE, etc.)
+- `MachineStatus` (IN_USE, UNDER_MAINTENANCE, UNDER_REPAIR, NEW, IDLE, DECOMMISSIONED)
+- `MaintenanceType` (PREVENTIVE, CORRECTIVE, PREDICTIVE, EMERGENCY)
+- `BreakdownSeverity` (CRITICAL, HIGH, MEDIUM, LOW)
+- `TicketStatus` (OPEN, IN_PROGRESS, RESOLVED, CLOSED, CANCELLED)
+
+#### **User Stories**
+
+| Feature | User Story | Acceptance Criteria |
+|---------|-----------|---------------------|
+| **Preventive Maintenance** | As a maintenance engineer, I want to schedule maintenance, so machines operate smoothly. | Auto reminders before due date (7d, 3d, 1d). Maintenance checklist completion tracking. Cost and parts tracking. |
+| **Breakdown Reporting** | As an operator, I want to log machine breakdowns, so repair can be initiated quickly. | Real-time alerts to maintenance team. Mobile-friendly form with photo upload. Automatic downtime calculation. |
+| **IoT Sensor Integration** | As an engineer, I want IoT sensors to detect issues, so predictive maintenance is possible. | Alerts auto-trigger maintenance ticket. Sensor threshold configuration. Anomaly detection and predictions. |
+| **Machine Assignment** | As a production manager, I want to assign machines to operators, so accountability is clear. | Shift-wise assignments. Skill-based matching. Performance tracking per operator. |
+| **Maintenance Analytics** | As a factory manager, I want to see maintenance metrics, so I can optimize costs and efficiency. | Dashboard with KPIs (MTBF, MTTR, OEE). Cost analysis reports. Breakdown trend analysis. |
+
+#### **Benefits**
+- **Reduced Downtime**: Proactive maintenance prevents unexpected breakdowns
+- **Cost Optimization**: Track maintenance costs, optimize spare parts inventory
+- **Improved Efficiency**: Better machine utilization, operator accountability
+- **Compliance**: Maintain safety certifications, audit trails
+- **Data-Driven Decisions**: Analytics for equipment replacement, upgrade planning
+- **Predictive Capabilities**: IoT integration enables predictive maintenance (future-ready)
+
+---
+
+### **📋 RECOMMENDED NEW FEATURES FOR TEXTILE ERP**
+
+#### **Sprint 3.8: Production Planning & Scheduling**
+**Why Critical**: Textile manufacturing requires complex production planning with multiple dependencies (yarn → fabric → dyeing → garment). Without proper planning, you face bottlenecks, missed deadlines, and inefficient resource utilization.
+
+**Features**:
+- **Production Orders**: Link sales orders to production schedules
+- **Capacity Planning**: Machine capacity vs order requirements
+- **Material Requirements Planning (MRP)**: Auto-calculate raw material needs
+- **Production Scheduling**: Gantt charts, timeline views, drag-and-drop scheduling
+- **Work Orders**: Detailed production instructions for each stage
+- **Shop Floor Control**: Real-time production tracking, progress updates
+- **Bottleneck Detection**: Identify and resolve production constraints
+- **Benefits**: 30% faster production cycles, 25% better resource utilization, on-time delivery
+
+#### **Sprint 3.9: Supplier & Procurement Management**
+**Why Critical**: Textile production depends heavily on timely raw material supply (yarn, dyes, chemicals, accessories). Poor supplier management leads to production delays and quality issues.
+
+**Features**:
+- **Supplier Master**: Vendor database with ratings, certifications, payment terms
+- **Purchase Requisitions**: Material request workflow with approvals
+- **Purchase Orders**: Auto-generate POs from production requirements
+- **Supplier Performance**: On-time delivery, quality ratings, price trends
+- **RFQ Management**: Request for quotations, bid comparison
+- **Goods Receipt**: Incoming material inspection and quality checks
+- **Supplier Payments**: Payment tracking, aging reports
+- **Benefits**: 20% cost savings through better negotiation, reduced stockouts
+
+#### **Sprint 3.10: Costing & Pricing Management**
+**Why Critical**: Textile products have complex costing (yarn cost, dyeing cost, labor, overheads). Accurate costing is essential for profitability and competitive pricing.
+
+**Features**:
+- **Bill of Materials (BOM)**: Multi-level BOM for garments (fabric → yarn → fiber)
+- **Cost Sheets**: Detailed cost breakdown (material, labor, overhead, profit margin)
+- **Standard Costing**: Set standard costs, track variances
+- **Actual Costing**: Real-time cost tracking from production
+- **Pricing Rules**: Cost-plus pricing, market-based pricing, volume discounts
+- **Profitability Analysis**: Product-wise, order-wise, customer-wise margins
+- **What-If Analysis**: Simulate cost changes (raw material price increase, etc.)
+- **Benefits**: 15% margin improvement, better pricing decisions, cost control
+
+#### **Sprint 3.11: Warehouse & Logistics Management**
+**Why Critical**: Textile businesses handle large volumes of raw materials, WIP, and finished goods across multiple locations. Efficient warehouse management reduces handling costs and improves order fulfillment.
+
+**Features**:
+- **Multi-Warehouse Management**: Separate warehouses for raw materials, WIP, finished goods
+- **Bin/Rack Location**: Precise storage location tracking
+- **Barcode/RFID Scanning**: Quick receiving, picking, dispatch
+- **Stock Transfers**: Inter-warehouse transfers with tracking
+- **Picking & Packing**: Order fulfillment workflow, packing lists
+- **Shipping Integration**: Carrier integration, tracking numbers, delivery proof
+- **Warehouse Analytics**: Storage utilization, picking efficiency, aging stock
+- **Benefits**: 40% faster order fulfillment, 30% reduced handling costs
+
+#### **Sprint 3.12: Customer Relationship Management (CRM)**
+**Why Critical**: Textile B2B requires managing long-term customer relationships, repeat orders, and custom requirements. CRM helps retain customers and grow revenue.
+
+**Features**:
+- **Customer Master**: Complete customer profiles, contact history
+- **Lead Management**: Track inquiries, quotations, follow-ups
+- **Sales Pipeline**: Visual pipeline from lead to order
+- **Customer Orders History**: Past orders, preferences, pricing
+- **Customer Portal**: Self-service order tracking, invoice download
+- **Communication Log**: Email, calls, meetings tracking
+- **Customer Analytics**: Top customers, revenue trends, churn risk
+- **Benefits**: 25% increase in repeat orders, better customer retention
+
+#### **Sprint 3.13: Financial Accounting Integration**
+**Why Critical**: Textile ERP needs seamless integration with accounting for accurate financial reporting, tax compliance, and business insights.
+
+**Features**:
+- **Chart of Accounts**: Industry-standard accounting structure
+- **Journal Entries**: Auto-posting from transactions (sales, purchases, payments)
+- **Accounts Receivable**: Customer invoices, payments, aging
+- **Accounts Payable**: Supplier bills, payments, aging
+- **Bank Reconciliation**: Match bank statements with transactions
+- **GST/Tax Management**: Tax calculations, returns, compliance
+- **Financial Reports**: P&L, Balance Sheet, Cash Flow, Trial Balance
+- **Benefits**: Real-time financial visibility, tax compliance, audit readiness
+
+---
+
+### **🎯 CURRENT STATUS (REORGANIZED)**
+
+#### **Completed Phases** ✅
+- **Phase 1**: ✅ **COMPLETED** - Foundation & Authentication
+- **Phase 2**: ✅ **COMPLETED** - Company Management & Location System
+- **Phase 2.5**: ✅ **COMPLETED** - Dashboard & User Profile Management
+- **Phase 3.3**: ✅ **COMPLETED** - Order Management System
+- **Phase 3.4**: ✅ **COMPLETED** - Quality Control System (Checkpoints, Defects, Compliance)
+- **Phase 3.5**: � **IN PROGRESS** - Textile-Specific Features (Backend ✅, Frontend 🔄)
+- **Phase 3.5.1**: ✅ **COMPLETED** - Industry-Specific Navigation System
+
+#### **Planned Phases** 📋
+- **Phase 3.6**: 📋 **PLANNED** - Product Master & Inventory Management
+- **Phase 3.7**: 📋 **PLANNED** - Machine Maintenance & Service Management ⭐ NEW
+- **Phase 3.8**: 📋 **RECOMMENDED** - Production Planning & Scheduling
+- **Phase 3.9**: 📋 **RECOMMENDED** - Supplier & Procurement Management
+- **Phase 3.10**: 📋 **RECOMMENDED** - Costing & Pricing Management
+- **Phase 3.11**: 📋 **RECOMMENDED** - Warehouse & Logistics Management
+- **Phase 3.12**: 📋 **RECOMMENDED** - Customer Relationship Management (CRM)
+- **Phase 3.13**: 📋 **RECOMMENDED** - Financial Accounting Integration
+
+#### **Development Metrics**
 - **Code Quality**: High (TypeScript strict mode, ESLint, Prettier, Husky)
 - **Testing**: Framework ready (Jest, Vitest, Cypress planned)
 - **Deployment**: CI/CD pipeline configured and functional
+- **Database**: Multi-tenant PostgreSQL with Prisma ORM
+- **Security**: JWT authentication, role-based access control, tenant isolation
+- **Performance**: Redis caching, connection pooling, optimized queries
 
 ---
 
@@ -1498,10 +1733,21 @@ This EPIC provides a comprehensive roadmap for building a world-class multi-tena
 
 The combination of modern technology stack, AI-powered features, and industry-specific workflows will create a powerful platform that transforms traditional textile businesses into modern, data-driven operations with improved efficiency, reduced costs, and enhanced competitiveness in the global market.
 
-**Total Estimated Effort**: 18-22 weeks with 6-8 person team (extended due to comprehensive feature set)  
-**Budget Estimate**: $900K - $1.4M (including team, infrastructure, and tools)  
-**ROI Timeline**: 6-12 months post-launch  
-**Market Opportunity**: $50M+ textile ERP market segment
+#### **Project Estimates (Updated)**
+
+**Core Features (Phase 1 - 3.7)**:
+- **Effort**: 24-28 weeks with 6-8 person team
+- **Budget**: $1.2M - $1.8M (including team, infrastructure, and tools)
+- **Features**: Authentication, Company Management, Orders, Quality, Textile Operations, Products, Maintenance
+
+**With Recommended Features (Phase 3.8 - 3.13)**:
+- **Effort**: 36-42 weeks with 8-10 person team
+- **Budget**: $1.8M - $2.5M (full-featured textile ERP)
+- **Features**: All core + Production Planning, Procurement, Costing, Warehouse, CRM, Accounting
+
+**ROI Timeline**: 8-14 months post-launch  
+**Market Opportunity**: $80M+ textile ERP market segment (expanded with new features)  
+**Competitive Edge**: Only textile ERP with industry-specific navigation, machine maintenance, and predictive analytics
 
 ### **Key Success Factors**
 - **Industry Expertise**: Deep understanding of textile manufacturing processes
