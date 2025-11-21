@@ -120,8 +120,12 @@ const UserProfilePage: React.FC = () => {
         <Col xs={24} lg={8}>
           <Card className="profile-card">
             <div className="profile-header">
-              <Avatar size={100} style={{ backgroundColor: '#7b5fc9' }}>
-                {getInitials(user.firstName, user.lastName)}
+              <Avatar 
+                size={100} 
+                src={user.avatarUrl}
+                style={{ backgroundColor: user.avatarUrl ? 'transparent' : '#7b5fc9' }}
+              >
+                {!user.avatarUrl && getInitials(user.firstName, user.lastName)}
               </Avatar>
               <h2>
                 {user.firstName} {user.lastName}

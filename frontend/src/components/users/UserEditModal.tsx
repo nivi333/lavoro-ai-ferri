@@ -9,6 +9,8 @@ import {
   message,
   Divider,
   Alert,
+  Upload,
+  Avatar,
 } from 'antd';
 import {
   UserOutlined,
@@ -37,6 +39,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [roleChanged, setRoleChanged] = useState(false);
   const [originalRole, setOriginalRole] = useState<string>('');
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
 
   useEffect(() => {
     if (user && visible) {
@@ -52,11 +55,34 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
       });
       setOriginalRole(user.role);
       setRoleChanged(false);
+      setAvatarUrl(user.avatarUrl || '');
     }
   }, [user, visible, form]);
 
   const handleRoleChange = (newRole: string) => {
     setRoleChanged(newRole !== originalRole);
+  };
+
+  const beforeUpload = (file: File) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG/WEBP files!');
+      return false;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must be smaller than 2MB!');
+      return false;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    return false; // Prevent automatic upload
   };
 
   const handleSubmit = async (values: any) => {
@@ -88,6 +114,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
         lastName: values.lastName,
         email: values.email,
         phone: values.phone,
+        avatarUrl: avatarUrl || undefined,
         role: values.role,
         department: values.department,
         locationId: values.locationId,
@@ -108,6 +135,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
   const handleClose = () => {
     form.resetFields();
     setRoleChanged(false);
+    setAvatarUrl('');
     onClose();
   };
 
@@ -129,6 +157,23 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
           onFinish={handleSubmit}
         >
           <Divider orientation="left">Personal Information</Divider>
+
+          <Form.Item label="Avatar (Optional)" style={{ marginBottom: 16 }}>
+            <Upload
+              listType="picture-circle"
+              showUploadList={false}
+              beforeUpload={beforeUpload}
+            >
+              {avatarUrl ? (
+                <Avatar size={100} src={avatarUrl} />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <UserOutlined style={{ fontSize: 24 }} />
+                  <div style={{ marginTop: 8, fontSize: 12 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </Form.Item>
 
           <Space style={{ width: '100%' }} size="middle">
             <Form.Item

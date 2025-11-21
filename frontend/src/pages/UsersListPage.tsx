@@ -334,8 +334,12 @@ const UsersListPage: React.FC = () => {
       width: 250,
       render: (_, record) => (
         <Space>
-          <Avatar size={40} style={{ backgroundColor: '#7b5fc9' }}>
-            {getInitials(record.firstName, record.lastName)}
+          <Avatar 
+            size={40} 
+            src={record.avatarUrl} 
+            style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#7b5fc9' }}
+          >
+            {!record.avatarUrl && getInitials(record.firstName, record.lastName)}
           </Avatar>
           <div>
             <div className="user-name">

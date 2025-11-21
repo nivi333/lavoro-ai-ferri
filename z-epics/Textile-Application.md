@@ -364,17 +364,17 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - **Error Handling**: Proper error states with retry options for failed operations ✅
   - **Real-time Updates**: Automatic refresh when company data changes elsewhere ✅
 
-### **Sprint 2.2: Location Management System** (Week 5)
+### **Sprint 2.2: Location Management System** (Week 5) ✅ **COMPLETED**
 
 #### **Backend Tasks**
-- [x] **Location Management API**
-  - Location CRUD with company association
-  - Headquarters designation logic
-  - **Default location management with custom naming**
-  - Address validation and geocoding
-  - **Default/Head Office changeability**: Allow changing default and head office status
-  - **Financial document integration**: Link default location to invoices, bills, POs
-  - Location hierarchy management (head office can be different from default)
+- [x] **Location Management API** ✅
+  - Location CRUD with company association ✅
+  - Headquarters designation logic ✅
+  - **Default location management with custom naming** ✅
+  - Address validation and geocoding ✅
+  - **Default/Head Office changeability**: Allow changing default and head office status ✅
+  - **Financial document integration**: Link default location to invoices, bills, POs ✅
+  - Location hierarchy management (head office can be different from default) ✅
 
 #### **Frontend Tasks**
 - [x] **Location Management Interface** ✅ **COMPLETED**
@@ -473,22 +473,23 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - **Real-time Updates**: Table refreshes when locations are modified elsewhere ✅
   - **Error Handling**: Proper error states with retry options for failed operations ✅
 
-### **Sprint 2.3: User & Role Management** (Week 6)
+### **Sprint 2.3: User & Role Management** (Week 6) ✅ **COMPLETED**
 
 #### **Backend Tasks**
-- [x] **User Management API**
-  - User invitation system
-  - Role assignment and permission management
-  - Bulk user operations
-  - User activity tracking
+- [x] **User Management API** ✅
+  - User invitation system ✅
+  - Role assignment and permission management ✅
+  - Bulk user operations ✅
+  - User activity tracking ✅
+  - Avatar upload support (base64 storage) ✅
 
 #### **Frontend Tasks**
-- [x] **User Management Interface** ✅ **COMPLETED**
+- [x] **User Management Interface** ✅ **COMPLETED WITH AVATAR UPLOAD**
   - **Users List Screen** (`/users`) with professional table layout ✅
     - **Header**: "Team Members" + Invite User button (top-right) ✅
     - **Table Layout**: Professional Ant Design Table with avatar, name, email, role, status, last active ✅
     - **Table Columns**: 
-      - **Avatar**: Circular user avatar (40px) with fallback to initials
+      - **Avatar**: Circular user avatar (40px) with image upload support, fallback to initials ✅
       - **Name**: Full name with primary text styling
       - **Email**: Contact email with secondary text styling  
       - **Role**: Badge component (OWNER=blue, ADMIN=purple, MANAGER=green, EMPLOYEE=gray)
@@ -510,18 +511,21 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
     - **Pagination**: Page-based pagination (10, 25, 50, 100 per page)
     - **Empty State**: Custom empty state with "No team members found" message and invite button
     - **Loading States**: Skeleton loading for table rows during data fetch
-  - **User Invitation Screen** (`/users/invite`) with welcoming design ✅
+  - **User Invitation Drawer** (drawer component) with welcoming design ✅
     - **Form Fields**: User info (email, firstName, lastName), role assignment, location assignment, department ✅
+    - **Avatar Upload**: Circular image upload (JPG/PNG/WEBP, max 2MB) with base64 encoding ✅
     - **Role Preview**: Show permissions for selected role with feature access matrix ✅
     - **Bulk Invites**: CSV upload for multiple invitations (max 100 users) ✅
     - **Custom Message**: Personalized invitation text with company branding ✅
   - **User Edit Modal** (inline editing functionality) ✅
     - **Modal Trigger**: Edit action from table row menu ✅
-    - **Form Sections**: Personal Info, Role & Permissions, Contact Details ✅
+    - **Form Sections**: Personal Info (with avatar upload), Role & Permissions, Contact Details ✅
+    - **Avatar Upload**: Circular image upload with preview and update capability ✅
     - **Field Validation**: Real-time validation with error messages ✅
     - **Role Change Confirmation**: Warning modal for role demotion/promotion ✅
     - **Save/Cancel Actions**: Bottom-aligned action buttons ✅
   - **User Profile Screen** (`/users/:id`) with detailed analytics ✅
+    - **Avatar Display**: Large circular avatar (100px) with image support ✅
     - **Sections**: Personal, Role & Permissions, Activity, Performance ✅
     - **Role History**: Track role changes over time with timeline ✅
     - **Permission Details**: Granular permission view with feature matrix ✅
