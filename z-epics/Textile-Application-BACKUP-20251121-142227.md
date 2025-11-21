@@ -35,6 +35,15 @@
 - **API Testing**: Supertest
 - **E2E Testing**: Playwright (planned)
 
+## Project Development Standards
+- Reuse existing components  
+- Follow theme variables (primary: #7b5fc9, accent: #a2d8e5)
+- SCSS only, no inline styles
+- Follow existing naming conventions
+- Match current code structure and patterns
+- Logo always top-left
+- Buttons: medium/small only
+- Forms: 5-20 fields = drawer, <5 = modal, >20 = page
 ---
 
 ## 📋 EPIC Overview

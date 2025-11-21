@@ -145,7 +145,7 @@ class CompanyService {
             company_id: companyId,
             name: companyData.name,
             slug: uniqueSlug,
-            industry: companyData.industry,
+            industry: companyData.industry as any,
             description: companyData.description,
             logo_url: companyData.logoUrl,
             website: companyData.website,

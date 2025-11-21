@@ -1,0 +1,27 @@
+@import '../../index.scss';
+
+.user-edit-modal {
+  .ant-form-item {
+    margin-bottom: var(--spacing3);
+  }
+
+  .ant-divider {
+    margin: var(--spacing3) 0;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .ant-space {
+    width: 100%;
+    gap: var(--spacing2) !important;
+
+    .ant-form-item {
+      flex: 1;
+      margin-bottom: var(--spacing3);
+    }
+  }
+
+  .ant-alert {
+    margin-bottom: var(--spacing3);
+  }
+}

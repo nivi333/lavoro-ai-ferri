@@ -1,0 +1,119 @@
+@import '../index.scss';
+
+.users-list-page {
+  padding: var(--spacing4);
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing4);
+
+    .header-left {
+      h1 {
+        font-family: var(--font-family-heading);
+        font-size: var(--fontSize3Xl);
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      .subtitle {
+        font-size: var(--fontSizeSm);
+        color: var(--text-secondary);
+        margin: var(--spacing1) 0 0 0;
+      }
+    }
+
+    .header-right {
+      button {
+        padding: var(--spacing2);
+      }
+    }
+  }
+
+  .filters-section {
+    margin-bottom: var(--spacing3);
+    padding: var(--spacing3);
+    background: var(--bg-secondary);
+    border-radius: var(--borderRadius);
+    border: 1px solid var(--border-light);
+  }
+
+  .bulk-actions {
+    margin-bottom: var(--spacing3);
+    padding: var(--spacing2) var(--spacing3);
+    background: var(--accent-color);
+    border-radius: var(--borderRadius);
+    border: 1px solid var(--primary-color);
+
+    .selected-count {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-right: var(--spacing2);
+    }
+
+    button {
+      padding: var(--spacing1) var(--spacing2);
+    }
+  }
+
+  .ant-table {
+    background: var(--bg-secondary);
+    border-radius: var(--borderRadius);
+
+    .user-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: var(--fontSizeMd);
+    }
+
+    .user-email {
+      font-size: var(--fontSizeSm);
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .last-active {
+      font-size: var(--fontSizeSm);
+      color: var(--text-secondary);
+    }
+  }
+
+  .ant-empty {
+    padding: var(--spacing6) 0;
+
+    .ant-empty-description {
+      color: var(--text-secondary);
+      font-size: var(--fontSizeMd);
+      margin-top: var(--spacing2);
+    }
+
+    button {
+      margin-top: var(--spacing3);
+    }
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .users-list-page {
+    background-color: var(--bg-primary);
+
+    .filters-section {
+      background: var(--bg-secondary);
+      border-color: var(--border-dark);
+    }
+
+    .bulk-actions {
+      background: rgba(123, 95, 201, 0.1);
+      border-color: var(--primary-color);
+    }
+
+    .ant-table {
+      background: var(--bg-secondary);
+    }
+  }
+}

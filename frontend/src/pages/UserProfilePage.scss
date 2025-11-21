@@ -1,0 +1,106 @@
+@import '../index.scss';
+
+.user-profile-page {
+  padding: var(--spacing4);
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+
+  &.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .page-header {
+    margin-bottom: var(--spacing4);
+
+    button {
+      padding: var(--spacing2);
+    }
+  }
+
+  .profile-card {
+    .profile-header {
+      text-align: center;
+      padding: var(--spacing3) 0;
+
+      h2 {
+        margin: var(--spacing3) 0 var(--spacing2) 0;
+        font-family: var(--font-family-heading);
+        font-size: var(--fontSize2Xl);
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .status-badge {
+        margin-top: var(--spacing2);
+      }
+    }
+
+    .contact-info {
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing2);
+        color: var(--text-secondary);
+
+        .icon {
+          font-size: var(--fontSizeLg);
+          color: var(--primary-color);
+        }
+      }
+    }
+  }
+
+  .activity-title {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .activity-time {
+    font-size: var(--fontSizeSm);
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .no-activity {
+    text-align: center;
+    padding: var(--spacing4);
+    color: var(--text-secondary);
+  }
+
+  .ant-card {
+    background: var(--bg-secondary);
+    border-radius: var(--borderRadius);
+    border: 1px solid var(--border-light);
+
+    .ant-card-head {
+      border-bottom: 1px solid var(--border-light);
+    }
+  }
+
+  .ant-descriptions-item-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .ant-descriptions-item-content {
+    color: var(--text-primary);
+  }
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .user-profile-page {
+    background-color: var(--bg-primary);
+
+    .ant-card {
+      background: var(--bg-secondary);
+      border-color: var(--border-dark);
+
+      .ant-card-head {
+        border-bottom-color: var(--border-dark);
+      }
+    }
+  }
+}
