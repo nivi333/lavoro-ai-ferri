@@ -10,6 +10,7 @@ interface CreateUserData {
   firstName: string;
   lastName: string;
   password: string;
+  avatarUrl?: string;
   role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
   companyId: string;
   department?: string;
@@ -21,6 +22,7 @@ interface UpdateUserData {
   lastName?: string;
   email?: string;
   phone?: string;
+  avatarUrl?: string;
   role?: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
   department?: string;
   locationId?: string;
@@ -87,6 +89,7 @@ class UserService {
               last_name: true,
               email: true,
               phone: true,
+              avatar_url: true,
               is_active: true,
               created_at: true,
               updated_at: true,
@@ -114,6 +117,7 @@ class UserService {
         lastName: uc.users.last_name,
         email: uc.users.email || '',
         phone: uc.users.phone || '',
+        avatarUrl: uc.users.avatar_url || '',
         role: uc.role,
         isActive: uc.is_active,
         lastActive: uc.users.sessions[0]?.updated_at || uc.users.updated_at,
@@ -168,6 +172,7 @@ class UserService {
               last_name: true,
               email: true,
               phone: true,
+              avatar_url: true,
               is_active: true,
               created_at: true,
               updated_at: true,
@@ -196,6 +201,7 @@ class UserService {
         lastName: userCompany.users.last_name,
         email: userCompany.users.email || '',
         phone: userCompany.users.phone || '',
+        avatarUrl: userCompany.users.avatar_url || '',
         role: userCompany.role,
         isActive: userCompany.is_active,
         createdAt: userCompany.created_at,
@@ -293,6 +299,7 @@ class UserService {
             email: userData.email || null,
             phone: userData.phone || null,
             password: hashedPassword,
+            avatar_url: userData.avatarUrl || null,
             is_active: true,
             created_at: new Date(),
             updated_at: new Date(),
@@ -413,7 +420,7 @@ class UserService {
       // Update user data
       const updatedUser = await globalPrisma.$transaction(async (tx) => {
         // Update user table
-        if (updateData.firstName || updateData.lastName || updateData.email || updateData.phone) {
+        if (updateData.firstName || updateData.lastName || updateData.email || updateData.phone || updateData.avatarUrl !== undefined) {
           await tx.users.update({
             where: { id: userId },
             data: {
@@ -421,6 +428,7 @@ class UserService {
               ...(updateData.lastName && { last_name: updateData.lastName }),
               ...(updateData.email && { email: updateData.email }),
               ...(updateData.phone && { phone: updateData.phone }),
+              ...(updateData.avatarUrl !== undefined && { avatar_url: updateData.avatarUrl }),
               updated_at: new Date(),
             },
           });

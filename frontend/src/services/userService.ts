@@ -8,6 +8,7 @@ export interface User {
   lastName: string;
   email: string;
   phone: string;
+  avatarUrl?: string;
   role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
   isActive: boolean;
   lastActive: string;
@@ -33,6 +34,7 @@ export interface InviteUserRequest {
   firstName: string;
   lastName: string;
   password: string;
+  avatarUrl?: string;
   role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
   department?: string;
   locationId?: string;
@@ -54,6 +56,7 @@ export interface UpdateUserRequest {
   lastName?: string;
   email?: string;
   phone?: string;
+  avatarUrl?: string;
   role?: 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
   department?: string;
   locationId?: string;

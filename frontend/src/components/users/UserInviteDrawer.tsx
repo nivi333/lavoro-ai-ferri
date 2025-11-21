@@ -8,6 +8,7 @@ import {
   Space,
   message,
   Upload,
+  Avatar,
   Divider,
   Alert,
   Table,
@@ -49,12 +50,35 @@ const UserInviteDrawer: React.FC<UserInviteDrawerProps> = ({
   const [inviteMode, setInviteMode] = useState<'single' | 'bulk'>('single');
   const [bulkUsers, setBulkUsers] = useState<BulkUser[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>('EMPLOYEE');
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
 
   const rolePermissions = {
     OWNER: ['Full system access', 'Manage all users', 'Company settings', 'Billing'],
     ADMIN: ['Manage users', 'All modules access', 'Reports', 'Settings'],
     MANAGER: ['Team management', 'Module access', 'Reports'],
     EMPLOYEE: ['Limited module access', 'Basic operations'],
+  };
+
+  const beforeUpload = (file: File) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG/WEBP files!');
+      return false;
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must be smaller than 2MB!');
+      return false;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    return false; // Prevent automatic upload
   };
 
   const handleSubmit = async (values: any) => {
@@ -66,6 +90,7 @@ const UserInviteDrawer: React.FC<UserInviteDrawerProps> = ({
         firstName: values.firstName,
         lastName: values.lastName,
         password: values.password,
+        avatarUrl: avatarUrl || undefined,
         role: values.role,
         department: values.department,
         locationId: values.locationId,
@@ -182,6 +207,7 @@ const UserInviteDrawer: React.FC<UserInviteDrawerProps> = ({
     form.resetFields();
     setBulkUsers([]);
     setInviteMode('single');
+    setAvatarUrl('');
     onClose();
   };
 
@@ -235,6 +261,23 @@ const UserInviteDrawer: React.FC<UserInviteDrawerProps> = ({
             className="invite-form"
           >
             <Divider orientation="left">User Information</Divider>
+
+            <Form.Item label="Avatar (Optional)" style={{ marginBottom: 16 }}>
+              <Upload
+                listType="picture-circle"
+                showUploadList={false}
+                beforeUpload={beforeUpload}
+              >
+                {avatarUrl ? (
+                  <Avatar size={100} src={avatarUrl} />
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <UserOutlined style={{ fontSize: 24 }} />
+                    <div style={{ marginTop: 8, fontSize: 12 }}>Upload</div>
+                  </div>
+                )}
+              </Upload>
+            </Form.Item>
 
             <Form.Item
               label="Email"
