@@ -42,18 +42,24 @@
 - Bug fixes: locationName validation, JWT role inclusion
 - Financial documents with location integration
 
-### 🔄 In Progress
-- Sprint 3.4: Quality Control System - Frontend (Checkpoints ✅, Defects ✅, Compliance Reports ⏳)
-
 ### ✅ Completed
 - Sprint 3.4 Backend: Database schema, Service, Controller, Routes
 - Sprint 3.4 Frontend: Quality Checkpoints (List + Form Drawer)
 - Sprint 3.4 Frontend: Quality Defects (List + Form Drawer)
+- Sprint 3.4 Frontend: Compliance Reports (List + Form Drawer)
 - Sprint 3.4 Frontend: Quality Service API integration
+- Sprint 3.4 Frontend: Routes and sidebar navigation for all Quality modules
+- UI/UX Enhancement: isActive default value set to true, disabled on create, editable only on edit (Company, Location, Product drawers)
 
-### ⏳ Todo
-- Sprint 3.4: Compliance Reports page and drawer
-- Sprint 3.5: Textile-Specific Features
+### 🔄 In Progress
+- Sprint 3.5: Textile-Specific Features - Frontend (Pages & Drawers)
+
+### ✅ Completed (Sprint 3.5)
+- Database Schema: All 5 textile tables with enums (fabric_production, yarn_manufacturing, dyeing_finishing, garment_manufacturing, design_patterns)
+- Database Migration: Successfully applied textile features migration
+- Backend Service: TextileService with full CRUD operations for all 5 modules
+- Backend Controller: TextileController with Joi validation for all endpoints
+- Backend Routes: Textile routes registered in v1/index with proper authentication and role-based access
 
 ---
 
@@ -1026,29 +1032,29 @@ export const productService = {
 ## ✅ Implementation Checklist
 
 ### Sprint 3.4 - Quality Control
-- [ ] Create Prisma schema for quality tables
-- [ ] Run migration
-- [ ] Implement QualityService (backend)
-- [ ] Implement QualityController (backend)
-- [ ] Create quality routes
-- [ ] Implement QualityCheckpointsListPage (frontend)
-- [ ] Implement QualityCheckpointFormDrawer (frontend)
-- [ ] Implement QualityDefectsListPage (frontend)
-- [ ] Implement QualityDefectFormDrawer (frontend)
-- [ ] Implement QualityMetricsTable (frontend)
-- [ ] Implement ComplianceReportsListPage (frontend)
-- [ ] Implement ComplianceReportFormDrawer (frontend)
-- [ ] Create quality service (frontend API client)
-- [ ] Add routes to AppRouter
+- [x] Create Prisma schema for quality tables
+- [x] Run migration
+- [x] Implement QualityService (backend)
+- [x] Implement QualityController (backend)
+- [x] Create quality routes
+- [x] Implement QualityCheckpointsListPage (frontend)
+- [x] Implement QualityCheckpointFormDrawer (frontend)
+- [x] Implement QualityDefectsListPage (frontend)
+- [x] Implement QualityDefectFormDrawer (frontend)
+- [x] Implement QualityMetricsTable (frontend)
+- [x] Implement ComplianceReportsListPage (frontend)
+- [x] Implement ComplianceReportFormDrawer (frontend)
+- [x] Create quality service (frontend API client)
+- [x] Add routes to AppRouter
 - [ ] Test all APIs
-- [ ] Verify UI patterns
+- [x] Verify UI patterns
 
 ### Sprint 3.5 - Textile Features
-- [ ] Create Prisma schema for textile tables
-- [ ] Run migration
-- [ ] Implement TextileService (backend)
-- [ ] Implement TextileController (backend)
-- [ ] Create textile routes
+- [x] Create Prisma schema for textile tables
+- [x] Run migration
+- [x] Implement TextileService (backend)
+- [x] Implement TextileController (backend)
+- [x] Create textile routes
 - [ ] Implement FabricProductionListPage (frontend)
 - [ ] Implement FabricProductionFormDrawer (frontend)
 - [ ] Implement YarnManufacturingListPage (frontend)

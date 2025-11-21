@@ -46,9 +46,23 @@ export default function Sidebar() {
           label: 'Production',
         },
         {
-          key: '/quality',
+          key: 'quality',
           icon: <SafetyOutlined />,
           label: 'Quality Control',
+          children: [
+            {
+              key: '/quality/checkpoints',
+              label: 'Checkpoints',
+            },
+            {
+              key: '/quality/defects',
+              label: 'Defects',
+            },
+            {
+              key: '/quality/compliance',
+              label: 'Compliance',
+            },
+          ],
         },
       ],
     },

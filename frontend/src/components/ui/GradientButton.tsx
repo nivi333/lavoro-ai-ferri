@@ -15,19 +15,18 @@ interface GradientButtonProps {
 }
 
 // Reusable gradient button component
-export default function GradientButton({ 
-  children, 
-  onClick, 
-  loading = false, 
+export default function GradientButton({
+  children,
+  onClick,
+  loading = false,
   disabled = false,
   type = 'primary',
   size = 'middle',
   block = false,
   className = '',
   htmlType = 'button',
-  style = {}
+  style = {},
 }: GradientButtonProps) {
-  
   const getGradientClassName = () => {
     switch (type) {
       case 'primary':
@@ -44,7 +43,7 @@ export default function GradientButton({
       case 'small':
         return { height: '32px', fontSize: '12px', padding: '0 16px' };
       case 'middle':
-        return { height: '40px', fontSize: '14px', padding: '0 24px' };
+        return { height: '36px', fontSize: '14px', padding: '0 24px' };
       case 'large':
         return { height: '48px', fontSize: '16px', padding: '0 32px' };
       default:

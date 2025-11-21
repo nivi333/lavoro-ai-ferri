@@ -14,6 +14,9 @@ import {
 } from '../pages';
 import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
+import QualityCheckpointsListPage from '../pages/QualityCheckpointsListPage';
+import QualityDefectsListPage from '../pages/QualityDefectsListPage';
+import ComplianceReportsListPage from '../pages/ComplianceReportsListPage';
 
 // Main application router component
 export default function AppRouter() {
@@ -102,6 +105,33 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <ProductsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/quality/checkpoints'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <QualityCheckpointsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/quality/defects'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <QualityDefectsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/quality/compliance'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ComplianceReportsListPage />
                 </ProtectedRoute>
               }
             />

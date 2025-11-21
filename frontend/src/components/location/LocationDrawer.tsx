@@ -167,7 +167,7 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
               <div className='active-toggle-row'>
                 <span className='active-label'>Active</span>
                 <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
-                  <Switch />
+                  <Switch disabled={!editingLocation} />
                 </Form.Item>
               </div>
             </div>

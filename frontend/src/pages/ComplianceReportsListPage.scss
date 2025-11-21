@@ -1,0 +1,51 @@
+@import '../styles/index.scss';
+
+.compliance-reports-page {
+  padding: var(--spacing4);
+  background: var(--bg-primary);
+  min-height: 100vh;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing4);
+    padding-bottom: var(--spacing3);
+    border-bottom: 1px solid var(--border-light);
+
+    .header-left {
+      h1 {
+        font-size: var(--fontSize3Xl);
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing1) 0;
+      }
+
+      p {
+        font-size: var(--fontSizeMd);
+        color: var(--text-secondary);
+        margin: 0;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      gap: var(--spacing2);
+    }
+  }
+
+  .filters-section {
+    margin-bottom: var(--spacing3);
+    padding: var(--spacing3);
+    background: var(--bg-secondary);
+    border-radius: var(--borderRadiusMd);
+    border: 1px solid var(--border-light);
+  }
+
+  .ant-table-wrapper {
+    background: var(--bg-secondary);
+    border-radius: var(--borderRadiusMd);
+    padding: var(--spacing3);
+    border: 1px solid var(--border-light);
+  }
+}

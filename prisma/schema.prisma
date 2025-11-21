@@ -44,6 +44,11 @@ model companies {
   compliance_reports compliance_reports[]
   products          products[]
   product_categories product_categories[]
+  fabric_production fabric_production[]
+  yarn_manufacturing yarn_manufacturing[]
+  dyeing_finishing  dyeing_finishing[]
+  garment_manufacturing garment_manufacturing[]
+  design_patterns   design_patterns[]
 }
 
 model company_locations {
@@ -71,6 +76,10 @@ model company_locations {
   orders          orders[]     @relation("LocationOrders")
   financial_documents financial_documents[]
   quality_checkpoints quality_checkpoints[]
+  fabric_production fabric_production[]
+  yarn_manufacturing yarn_manufacturing[]
+  dyeing_finishing  dyeing_finishing[]
+  garment_manufacturing garment_manufacturing[]
 }
 
 model sessions {
@@ -169,6 +178,7 @@ model orders {
   order_items     order_items[]
   financial_documents financial_documents[] @relation("OrderFinancialDocuments")
   quality_checkpoints quality_checkpoints[]
+  garment_manufacturing garment_manufacturing[]
 }
 
 model order_items {
@@ -460,4 +470,245 @@ enum StockAdjustmentType {
   RETURN
   DAMAGE
   TRANSFER
+}
+
+// ============================================
+// TEXTILE-SPECIFIC FEATURES (Sprint 3.5)
+// ============================================
+
+model fabric_production {
+  id              String   @id @default(uuid())
+  fabric_id       String
+  company_id      String
+  location_id     String?
+  fabric_type     FabricType
+  fabric_name     String
+  composition     String
+  weight_gsm      Decimal  @db.Decimal(8, 2)
+  width_inches    Decimal  @db.Decimal(6, 2)
+  color           String
+  pattern         String?
+  finish_type     String?
+  quantity_meters Decimal  @db.Decimal(10, 2)
+  production_date DateTime
+  batch_number    String
+  quality_grade   QualityGrade
+  notes           String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime
+
+  company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation(fields: [location_id], references: [id])
+
+  @@unique([company_id, fabric_id])
+  @@index([company_id])
+  @@index([fabric_type])
+  @@index([quality_grade])
+}
+
+enum FabricType {
+  COTTON
+  SILK
+  WOOL
+  POLYESTER
+  NYLON
+  LINEN
+  RAYON
+  SPANDEX
+  BLEND
+}
+
+enum QualityGrade {
+  A_GRADE
+  B_GRADE
+  C_GRADE
+  REJECT
+}
+
+model yarn_manufacturing {
+  id              String      @id @default(uuid())
+  yarn_id         String
+  company_id      String
+  location_id     String?
+  yarn_type       YarnType
+  yarn_count      String
+  twist_per_inch  Decimal?    @db.Decimal(6, 2)
+  ply             Int
+  color           String
+  dye_lot         String?
+  quantity_kg     Decimal     @db.Decimal(10, 2)
+  production_date DateTime
+  batch_number    String
+  process_type    YarnProcess
+  quality_grade   QualityGrade
+  notes           String?
+  created_at      DateTime    @default(now())
+  updated_at      DateTime
+
+  company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation(fields: [location_id], references: [id])
+
+  @@unique([company_id, yarn_id])
+  @@index([company_id])
+  @@index([yarn_type])
+  @@index([process_type])
+}
+
+enum YarnType {
+  COTTON
+  POLYESTER
+  WOOL
+  SILK
+  ACRYLIC
+  NYLON
+  BLEND
+}
+
+enum YarnProcess {
+  SPINNING
+  WEAVING
+  KNITTING
+  TWISTING
+}
+
+model dyeing_finishing {
+  id                String         @id @default(uuid())
+  process_id        String
+  company_id        String
+  location_id       String?
+  fabric_id         String?
+  process_type      DyeingProcess
+  color_code        String
+  color_name        String
+  dye_method        String?
+  recipe_code       String?
+  quantity_meters   Decimal        @db.Decimal(10, 2)
+  process_date      DateTime
+  batch_number      String
+  machine_number    String?
+  temperature_c     Decimal?       @db.Decimal(5, 2)
+  duration_minutes  Int?
+  quality_check     Boolean        @default(false)
+  color_fastness    String?
+  shrinkage_percent Decimal?       @db.Decimal(5, 2)
+  notes             String?
+  created_at        DateTime       @default(now())
+  updated_at        DateTime
+
+  company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation(fields: [location_id], references: [id])
+
+  @@unique([company_id, process_id])
+  @@index([company_id])
+  @@index([process_type])
+}
+
+enum DyeingProcess {
+  DYEING
+  PRINTING
+  FINISHING
+  WASHING
+  BLEACHING
+  MERCERIZING
+}
+
+model garment_manufacturing {
+  id               String          @id @default(uuid())
+  garment_id       String
+  company_id       String
+  location_id      String?
+  order_id         String?
+  garment_type     GarmentType
+  style_number     String
+  size             String
+  color            String
+  fabric_id        String?
+  quantity         Int
+  production_stage ProductionStage
+  cut_date         DateTime?
+  sew_date         DateTime?
+  finish_date      DateTime?
+  pack_date        DateTime?
+  operator_name    String?
+  line_number      String?
+  quality_passed   Boolean         @default(false)
+  defect_count     Int             @default(0)
+  notes            String?
+  created_at       DateTime        @default(now())
+  updated_at       DateTime
+
+  company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation(fields: [location_id], references: [id])
+  order    orders?            @relation(fields: [order_id], references: [id])
+
+  @@unique([company_id, garment_id])
+  @@index([company_id])
+  @@index([garment_type])
+  @@index([production_stage])
+  @@index([order_id])
+}
+
+enum GarmentType {
+  SHIRT
+  T_SHIRT
+  PANTS
+  JEANS
+  DRESS
+  SKIRT
+  JACKET
+  COAT
+  SWEATER
+  SHORTS
+  UNDERWEAR
+  SOCKS
+}
+
+enum ProductionStage {
+  CUTTING
+  SEWING
+  FINISHING
+  QUALITY_CHECK
+  PACKING
+  COMPLETED
+}
+
+model design_patterns {
+  id                String         @id @default(uuid())
+  design_id         String
+  company_id        String
+  design_name       String
+  design_category   DesignCategory
+  designer_name     String?
+  season            String?
+  color_palette     String[]
+  pattern_repeat    String?
+  design_file_url   String?
+  sample_image_url  String?
+  status            DesignStatus
+  notes             String?
+  created_at        DateTime       @default(now())
+  updated_at        DateTime
+
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@unique([company_id, design_id])
+  @@index([company_id])
+  @@index([design_category])
+  @@index([status])
+}
+
+enum DesignCategory {
+  PRINT
+  EMBROIDERY
+  WEAVE
+  KNIT
+  APPLIQUE
+  DIGITAL_PRINT
+}
+
+enum DesignStatus {
+  CONCEPT
+  APPROVED
+  IN_PRODUCTION
+  ARCHIVED
 }

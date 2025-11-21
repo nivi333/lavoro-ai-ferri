@@ -37,43 +37,32 @@
     margin-bottom: 12px;
   }
 
-  .image-upload-section {
-    margin-bottom: 16px;
+  .product-image-upload {
+    width: 120px;
+    margin: 0 auto 12px auto;
+    display: block;
 
-    .image-preview {
-      width: 120px;
-      height: 120px;
-      border: 2px dashed #d9d9d9;
-      border-radius: 8px;
+    .product-avatar {
+      width: 120px !important;
+      height: 120px !important;
+      border-radius: 50%;
+    }
+
+    .product-upload-icon {
+      font-size: 32px;
+      color: #8c8c8c;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 8px;
-      overflow: hidden;
-
-      .uploaded-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .image-placeholder {
-        text-align: center;
-        padding: 16px;
-
-        .upload-text {
-          font-size: 12px;
-          color: #8c8c8c;
-          margin-top: 8px;
-        }
-
-        .upload-hint {
-          font-size: 11px;
-          color: #bfbfbf;
-          margin-top: 4px;
-        }
-      }
     }
+  }
+
+  .product-image-help-text {
+    text-align: center;
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-bottom: 16px;
+    line-height: 1.5;
   }
 
   .ant-form-item {

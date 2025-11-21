@@ -340,7 +340,7 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
               <div className='active-toggle-row'>
                 <span className='active-label'>Active</span>
                 <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
-                  <Switch />
+                  <Switch disabled={!isEditing} />
                 </Form.Item>
               </div>
             </div>

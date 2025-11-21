@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Form, Input, InputNumber, Select, Button, message, Row, Col, Switch, Upload } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import type { UploadFile } from 'antd/es/upload/interface';
+import {
+  Drawer,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Button,
+  message,
+  Row,
+  Col,
+  Switch,
+  Upload,
+  Avatar,
+} from 'antd';
+import { AppstoreOutlined } from '@ant-design/icons';
 import { GradientButton } from '../ui';
 import { productService, CreateProductRequest, ProductDetail } from '../../services/productService';
 import './ProductFormDrawer.scss';
@@ -63,7 +75,6 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
   const [form] = Form.useForm<ProductFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const isEditing = mode === 'edit' && !!editingProductId;
 
@@ -83,7 +94,6 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
             stockQuantity: 0,
           });
           setImageUrl('');
-          setFileList([]);
         }
       } catch (error: any) {
         console.error('Error loading product:', error);
@@ -113,23 +123,29 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
     });
     if (product.imageUrl) {
       setImageUrl(product.imageUrl);
-      setFileList([{
-        uid: '-1',
-        name: 'image.png',
-        status: 'done',
-        url: product.imageUrl,
-      }]);
     }
   };
 
-  const handleImageUpload = (info: any) => {
-    setFileList(info.fileList);
-    if (info.file.status === 'done') {
-      setImageUrl(info.file.response?.url || '');
-      message.success('Image uploaded successfully');
-    } else if (info.file.status === 'error') {
-      message.error('Image upload failed');
+  const beforeUpload = (file: File) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG files!');
+      return false;
     }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+      return false;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = e => {
+      setImageUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    return false; // Prevent automatic upload
   };
 
   const handleSubmit = async () => {
@@ -180,7 +196,6 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
   const handleCancel = () => {
     form.resetFields();
     setImageUrl('');
-    setFileList([]);
     onClose();
   };
 
@@ -192,7 +207,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
             <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch />
+              <Switch disabled={!isEditing} />
             </Form.Item>
           </div>
         </div>
@@ -215,33 +230,30 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
         {/* Section 1: Basic Information with Image */}
         <div className='form-section'>
           <h3 className='section-title'>Basic Information</h3>
-          
+
           {/* Image Upload */}
-          <div className='image-upload-section'>
-            <div className='image-preview'>
-              {imageUrl ? (
-                <img src={imageUrl} alt='Product' className='uploaded-image' />
-              ) : (
-                <div className='image-placeholder'>
-                  <UploadOutlined style={{ fontSize: 32, color: '#8c8c8c' }} />
-                  <div className='upload-text'>Upload Product Image (JPG/PNG, max 2MB)</div>
-                  <div className='upload-hint'>Drag & drop or click to upload</div>
-                </div>
-              )}
-            </div>
+          <Col span={24}>
             <Upload
-              listType='picture'
-              fileList={fileList}
-              onChange={handleImageUpload}
-              beforeUpload={() => false}
-              maxCount={1}
-              accept='image/*'
+              name='avatar'
+              listType='picture-circle'
+              className='product-image-upload'
+              showUploadList={false}
+              beforeUpload={beforeUpload}
             >
-              <Button icon={<UploadOutlined />} size='small'>
-                {imageUrl ? 'Change Image' : 'Upload Image'}
-              </Button>
+              {imageUrl ? (
+                <Avatar src={imageUrl} size={120} className='product-avatar' />
+              ) : (
+                <span className='product-upload-icon'>
+                  <AppstoreOutlined />
+                </span>
+              )}
             </Upload>
-          </div>
+            <div className='product-image-help-text'>
+              Upload Product Image (JPG/PNG, max 2MB)
+              <br />
+              Drag & drop or click to upload
+            </div>
+          </Col>
 
           <Row gutter={12}>
             <Col span={24}>
@@ -320,12 +332,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
           <Row gutter={12}>
             <Col span={12}>
               <Form.Item name='stockQuantity' label='Stock Quantity'>
-                <InputNumber
-                  min={0}
-                  precision={0}
-                  style={{ width: '100%' }}
-                  placeholder='0'
-                />
+                <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder='0' />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -379,12 +386,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
             </Col>
             <Col span={12}>
               <Form.Item name='weight' label='Weight (kg)'>
-                <InputNumber
-                  min={0}
-                  precision={3}
-                  style={{ width: '100%' }}
-                  placeholder='0.000'
-                />
+                <InputNumber min={0} precision={3} style={{ width: '100%' }} placeholder='0.000' />
               </Form.Item>
             </Col>
           </Row>
