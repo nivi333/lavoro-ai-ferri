@@ -1,23 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Avatar } from 'antd';
 import {
-  DashboardOutlined,
-  InboxOutlined,
-  SettingOutlined,
-  TeamOutlined,
-  BarChartOutlined,
-  ShoppingCartOutlined,
   UserOutlined,
   LogoutOutlined,
   DownOutlined,
   BankOutlined,
-  FileTextOutlined,
-  SafetyOutlined,
-  ToolOutlined,
-  AppstoreOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
+import { getNavigationByIndustry, type IndustryType } from '../../config/navigationConfig';
 import './Sidebar.scss';
 
 const { Sider } = Layout;
@@ -28,101 +20,24 @@ export default function Sidebar() {
   const { currentCompany, logout } = useAuth();
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
 
-  // Navigation menu items
-  const menuItems = [
-    {
-      key: '/dashboard',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-    },
-    {
-      key: 'manufacturing',
-      icon: <ToolOutlined />,
-      label: 'Manufacturing',
-      children: [
-        {
-          key: '/production',
-          icon: <SettingOutlined />,
-          label: 'Production',
-        },
-        {
-          key: 'quality',
-          icon: <SafetyOutlined />,
-          label: 'Quality Control',
-          children: [
-            {
-              key: '/quality/checkpoints',
-              label: 'Checkpoints',
-            },
-            {
-              key: '/quality/defects',
-              label: 'Defects',
-            },
-            {
-              key: '/quality/compliance',
-              label: 'Compliance',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      key: 'inventory',
-      icon: <InboxOutlined />,
-      label: 'Inventory',
-      children: [
-        {
-          key: '/products',
-          icon: <AppstoreOutlined />,
-          label: 'Products',
-        },
-        {
-          key: '/inventory',
-          icon: <InboxOutlined />,
-          label: 'Stock Management',
-        },
-        {
-          key: '/procurement',
-          icon: <ShoppingCartOutlined />,
-          label: 'Procurement',
-        },
-      ],
-    },
-    {
-      key: 'sales',
-      icon: <BarChartOutlined />,
-      label: 'Sales & Orders',
-      children: [
-        {
-          key: '/orders',
-          icon: <FileTextOutlined />,
-          label: 'Orders',
-        },
-        {
-          key: '/customers',
-          icon: <TeamOutlined />,
-          label: 'Customers',
-        },
-      ],
-    },
-    {
-      key: 'finance',
-      icon: <BankOutlined />,
-      label: 'Finance',
-      children: [
-        {
-          key: '/accounting',
-          icon: <FileTextOutlined />,
-          label: 'Accounting',
-        },
-        {
-          key: '/reports',
-          icon: <BarChartOutlined />,
-          label: 'Financial Reports',
-        },
-      ],
-    },
-  ];
+  // Get navigation menu items based on company industry
+  const menuItems = useMemo(() => {
+    // Default to TEXTILE if no company or industry
+    const industry = (currentCompany?.industry as IndustryType) || 'TEXTILE';
+    const navigationItems = getNavigationByIndustry(industry);
+
+    // Convert navigation config to Ant Design Menu format
+    return navigationItems.map((item) => ({
+      key: item.path,
+      icon: <item.icon />,
+      label: item.label,
+      children: item.children?.map((child) => ({
+        key: child.path,
+        icon: child.icon ? <child.icon /> : undefined,
+        label: child.label,
+      })),
+    }));
+  }, [currentCompany?.industry]);
 
   const handleLogout = () => {
     logout();

@@ -1442,12 +1442,28 @@ Stages:
 - **Navigation**: Routes and sidebar menu for all Quality Control modules ✅
 - **UI/UX**: isActive field default true, disabled on create, editable on edit ✅
 
-### **📋 PLANNED - Sprint 3.5: Textile-Specific Features**
+### **� IN PROGRESS - Sprint 3.5: Textile-Specific Features**
+#### Backend Implementation ✅ COMPLETED
+- **Database Schema**: 5 tables (fabric_production, yarn_manufacturing, dyeing_finishing, garment_manufacturing, design_patterns) ✅
+- **Enums**: 9 textile-specific enums (FabricType, QualityGrade, YarnType, YarnProcess, DyeingProcess, GarmentType, ProductionStage, DesignCategory, DesignStatus) ✅
+- **Service Layer**: TextileService with full CRUD operations for all 5 modules ✅
+- **Controller Layer**: TextileController with Joi validation ✅
+- **Routes**: Textile routes registered with role-based access control ✅
+- **API Testing**: All endpoints tested and verified ✅
+
+#### Frontend Implementation 🔄 IN PROGRESS
 - **Fabric Production**: Fabric tracking with type, composition, weight, width, quality grades
 - **Yarn Manufacturing**: Yarn production with count, twist, ply, dye lot tracking
 - **Dyeing & Finishing**: Color processing with recipes, parameters, quality checks
 - **Garment Manufacturing**: Production stages from cutting to packing with quality tracking
 - **Design & Patterns**: Design catalog with categories, seasons, status management
+
+#### Industry-Specific Navigation 📋 PLANNED
+- **Context-Aware Sidebar**: Show only textile-relevant modules
+- **Company Industry Field**: Track company industry type in database
+- **Dynamic Menu**: Render sidebar based on company.industry
+- **Textile Modules**: Fabric, Yarn, Dyeing, Garment, Design (for textile companies)
+- **Core Modules**: Always visible (Dashboard, Orders, Quality, Finance, Reports)
 
 ### **📋 PLANNED - Sprint 3.6: Product Master & Inventory Management**
 - **Product Catalog**: Centralized product/item master with complete specifications

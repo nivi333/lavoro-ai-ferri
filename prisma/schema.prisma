@@ -13,7 +13,7 @@ model companies {
   company_id        String              @unique
   name              String
   slug              String              @unique
-  industry          String?
+  industry          IndustryType        @default(TEXTILE)
   description       String?
   logo_url          String?
   website           String?
@@ -711,4 +711,13 @@ enum DesignStatus {
   APPROVED
   IN_PRODUCTION
   ARCHIVED
+}
+
+enum IndustryType {
+  TEXTILE
+  FOOD_BEVERAGE
+  AUTOMOTIVE
+  PHARMACEUTICAL
+  ELECTRONICS
+  GENERAL
 }

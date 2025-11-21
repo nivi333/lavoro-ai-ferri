@@ -1070,6 +1070,53 @@ export const productService = {
 - [ ] Test all APIs
 - [ ] Verify UI patterns
 
+### Sprint 3.5.1 - Industry-Specific Navigation (Textile Focus)
+**Epic: Context-Aware Navigation System**
+
+#### Database Schema Updates
+- [ ] Add `industry` enum to companies table (TEXTILE, FOOD_BEVERAGE, AUTOMOTIVE, PHARMACEUTICAL, ELECTRONICS, GENERAL)
+- [ ] Add `industry` field to companies table with default 'TEXTILE'
+- [ ] Run migration to add industry field
+- [ ] Update existing companies to have industry = 'TEXTILE'
+
+#### Backend Updates
+- [ ] Update CompanyService to include industry in create/update
+- [ ] Update CompanyController validation schema to include industry
+- [ ] Add industry field to company DTO mapping
+- [ ] Update company creation API to accept industry
+- [ ] Update company profile API to return industry
+
+#### Frontend - Sidebar Navigation Logic
+- [ ] Create `src/config/navigationConfig.ts` with industry-specific menu definitions
+- [ ] Define CORE_MODULES (always visible): Dashboard, Companies, Locations, Orders, Quality, Finance
+- [ ] Define TEXTILE_MODULES: Fabric Production, Yarn Manufacturing, Dyeing & Finishing, Garment Manufacturing, Design & Patterns
+- [ ] Update Sidebar.tsx to read company.industry from context
+- [ ] Implement dynamic menu rendering based on industry
+- [ ] Add proper icons for textile modules (ScissorOutlined, BgColorsOutlined, etc.)
+- [ ] Test sidebar shows only textile modules for textile companies
+
+#### Frontend - Company Context Updates
+- [ ] Update CompanyContext to include industry field
+- [ ] Update company switch API call to fetch industry
+- [ ] Store industry in localStorage alongside company data
+- [ ] Update CompanyCreationDrawer to include industry selection
+- [ ] Add industry field to company profile page
+
+#### Testing & Verification
+- [ ] Test company creation with industry selection
+- [ ] Test sidebar renders correctly for textile industry
+- [ ] Test all textile module routes are accessible
+- [ ] Test core modules are always visible
+- [ ] Test company switching maintains correct navigation
+- [ ] Verify localStorage persistence of industry
+- [ ] Test with multiple companies of same industry
+
+#### Documentation
+- [ ] Update README with industry-specific navigation feature
+- [ ] Document how to add new industries
+- [ ] Document how to add industry-specific modules
+- [ ] Add comments in navigationConfig.ts
+
 ### Sprint 3.6 - Product Master & Inventory
 - [ ] Create Prisma schema for products, product_location_stock, product_stock_movements
 - [ ] Run migration
