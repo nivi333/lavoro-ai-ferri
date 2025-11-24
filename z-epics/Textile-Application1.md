@@ -9,7 +9,7 @@
 - **Language**: TypeScript (Node.js)
 - **Framework**: Express.js
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT (JSON Web Tokens)
+- **Authentication**: JWT (JSON Web Tokens) - 3 days expiration
 - **Caching**: Redis (Docker containerized)
 - **API Documentation**: Swagger/OpenAPI
 
@@ -21,6 +21,91 @@
 - **Form Handling**: Ant Design Form
 - **Routing**: React Router v6
 - **API State**: React Query (optional, for caching)
+
+---
+
+## 🔄 RECENT MAJOR CHANGES & IMPLEMENTATIONS
+
+### **User Invitation System Overhaul (November 2024)**
+
+#### **Previous Implementation Issues:**
+- Bulk invite functionality was creating users directly
+- Missing `companyId` in invite payloads
+- Token expiration was only 1 hour
+- No proper invitation workflow
+
+#### **New Implementation:**
+1. **Invitation Flow Redesign:**
+   - **UserInviteDrawer.tsx**: ❌ DELETED completely
+   - **UserInviteModal.tsx**: ✅ NEW - Simple modal with 2 fields only
+     - `emailOrPhone`: Single field supporting both email and phone validation
+     - `role`: ADMIN, MANAGER, EMPLOYEE (no OWNER invites)
+     - `locationId`: Optional location assignment
+   - **Bulk Functionality**: ❌ REMOVED completely from frontend and backend
+
+2. **Database Schema Changes:**
+   - **user_invitations table**: ✅ NEW table for pending invitations
+     ```sql
+     CREATE TABLE "user_invitations" (
+         "id" TEXT NOT NULL,
+         "user_id" TEXT NOT NULL,
+         "company_id" TEXT NOT NULL,
+         "invited_by" TEXT NOT NULL,
+         "role" TEXT NOT NULL,
+         "location_id" TEXT,
+         "status" TEXT NOT NULL DEFAULT 'PENDING',
+         "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+         "updated_at" TIMESTAMP(3) NOT NULL,
+         CONSTRAINT "user_invitations_pkey" PRIMARY KEY ("id")
+     );
+     ```
+
+3. **Backend API Changes:**
+   - **POST /api/v1/companies/:tenantId/invite**: ✅ UPDATED
+     - Now creates pending invitations instead of direct memberships
+     - Validates user exists before creating invitation
+     - Prevents duplicate invitations
+   - **POST /api/v1/companies/accept-invitation/:invitationId**: ✅ NEW
+     - Accepts pending invitations and creates user_companies entry
+     - Updates invitation status to 'ACCEPTED'
+   - **GET /api/v1/companies**: ✅ UPDATED
+     - Now returns both confirmed companies and pending invitations
+     - Includes `status: 'CONFIRMED' | 'PENDING'` field
+
+4. **Frontend UI Enhancements:**
+   - **Companies List**: ✅ UPDATED with role badges
+     - Role badges with color coding (OWNER: Blue, ADMIN: Purple, MANAGER: Green, EMPLOYEE: Orange)
+     - Accept buttons for pending invitations
+     - Badge component instead of Tag component
+   - **UserInviteModal**: ✅ NEW component features
+     - GradientButton instead of primary buttons
+     - Auto-closes on successful invitation
+     - Single emailOrPhone field with validation
+     - Location selection dropdown
+
+5. **Authentication & Security:**
+   - **JWT Token Expiration**: ✅ UPDATED from 1h to 3 days
+   - **Role-Based Access Control**: ✅ ENHANCED
+     - EMPLOYEE users cannot see "Users" or "Invite User" in sidebar
+     - Only OWNER/ADMIN/MANAGER can access user management
+   - **Global Email/Phone Uniqueness**: ✅ ENFORCED
+     - One email = one user globally across all companies
+     - Users can belong to multiple companies with different roles
+
+#### **Critical Workflow Changes:**
+1. **Old Flow**: Invite → Create User → Add to Company
+2. **New Flow**: Invite → Create Invitation → User Accepts → Add to Company
+
+#### **Files Modified/Created:**
+- ✅ **CREATED**: `/frontend/src/components/users/UserInviteModal.tsx`
+- ❌ **DELETED**: `/frontend/src/components/users/UserInviteDrawer.tsx`
+- ❌ **DELETED**: `/frontend/src/components/users/UserInviteDrawer.scss`
+- ✅ **UPDATED**: `/src/services/companyService.ts` - Added pending invitations support
+- ✅ **UPDATED**: `/src/controllers/companyController.ts` - New invitation endpoints
+- ✅ **UPDATED**: `/frontend/src/pages/CompaniesListPage.tsx` - Role badges and Accept buttons
+- ✅ **UPDATED**: `/frontend/src/types/auth.ts` - Added status and invitationId fields
+- ✅ **CREATED**: `/prisma/migrations/20251124_create_user_invitations/migration.sql`
+- ✅ **UPDATED**: `/src/routes/v1/companyRoutes.ts` - Accept invitation route
 - **Icons**: Ant Design icons
 
 ### **DevOps & Infrastructure**

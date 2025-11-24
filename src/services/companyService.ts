@@ -342,9 +342,10 @@ class CompanyService {
     }
   }
 
-  // Get all companies for a user with their roles
+  // Get all companies for a user with their roles (including pending invitations)
   async getUserCompanies(userId: string) {
     try {
+      // Get confirmed companies
       const userCompanies = await globalPrisma.user_companies.findMany({
         where: {
           user_id: userId,
@@ -358,7 +359,22 @@ class CompanyService {
         },
       });
 
-      return userCompanies.map(uc => {
+      // Get pending invitations
+      const pendingInvitations = await globalPrisma.$queryRaw`
+        SELECT 
+          ui.id as invitation_id,
+          ui.role,
+          ui.status,
+          ui.created_at as invited_at,
+          c.*
+        FROM user_invitations ui
+        JOIN companies c ON ui.company_id = c.id
+        WHERE ui.user_id = ${userId} AND ui.status = 'PENDING'
+        ORDER BY ui.created_at DESC
+      `;
+
+      // Map confirmed companies
+      const confirmedCompanies = userCompanies.map(uc => {
         const company = uc.companies;
         return {
           id: company.id,
@@ -386,11 +402,47 @@ class CompanyService {
           isActive: company.is_active,
           role: uc.role,
           joinedAt: uc.created_at,
+          status: 'CONFIRMED' as const,
         };
       });
+
+      // Map pending invitations
+      const pendingCompanies = (pendingInvitations as any[]).map(inv => ({
+        id: inv.id,
+        companyId: inv.company_id,
+        name: inv.name,
+        slug: inv.slug,
+        industry: industryToDisplay(inv.industry),
+        description: inv.description,
+        logoUrl: inv.logo_url,
+        website: inv.website,
+        taxId: inv.tax_id,
+        email: inv.email,
+        phone: inv.phone,
+        addressLine1: inv.address_line_1,
+        addressLine2: inv.address_line_2,
+        city: inv.city,
+        state: inv.state,
+        country: inv.country,
+        pincode: inv.pincode,
+        contactInfo: inv.contact_info,
+        establishedDate: inv.established_date,
+        businessType: inv.business_type,
+        certifications: inv.certifications,
+        defaultLocation: inv.default_location,
+        isActive: inv.is_active,
+        role: inv.role,
+        joinedAt: inv.invited_at,
+        status: 'PENDING' as const,
+        invitationId: inv.invitation_id,
+      }));
+
+      // Combine and return both confirmed and pending
+      return [...confirmedCompanies, ...pendingCompanies];
     } catch (error) {
       console.error('Error fetching user companies:', error);
-      throw new Error('Failed to fetch user companies');
+      // Return empty array instead of throwing to prevent login issues
+      return [];
     }
   }
 
@@ -775,6 +827,62 @@ class CompanyService {
       };
     } catch (error) {
       console.error('Error inviting user:', error);
+      throw error;
+    }
+  }
+
+  // Accept invitation and add user to company
+  async acceptInvitation(userId: string, invitationId: string) {
+    try {
+      // Find the invitation
+      const invitation = await globalPrisma.$queryRaw`
+        SELECT * FROM user_invitations 
+        WHERE id = ${invitationId} 
+        AND user_id = ${userId} 
+        AND status = 'PENDING'
+      `;
+
+      if (!Array.isArray(invitation) || invitation.length === 0) {
+        throw new Error('Invitation not found or already processed');
+      }
+
+      const inv = invitation[0] as any;
+
+      // Check if user is already a member of this company
+      const existingUserCompany = await globalPrisma.user_companies.findFirst({
+        where: {
+          user_id: userId,
+          company_id: inv.company_id,
+        },
+      });
+
+      if (existingUserCompany) {
+        throw new Error('User is already a member of this company');
+      }
+
+      // Create user_companies entry and update invitation status in transaction
+      await globalPrisma.$transaction(async (prisma) => {
+        // Add user to company
+        await prisma.$executeRaw`
+          INSERT INTO user_companies (id, user_id, company_id, role, is_active, created_at, updated_at)
+          VALUES (${uuidv4()}, ${userId}, ${inv.company_id}, ${inv.role}, true, NOW(), NOW())
+        `;
+
+        // Update invitation status to ACCEPTED
+        await prisma.$executeRaw`
+          UPDATE user_invitations 
+          SET status = 'ACCEPTED', updated_at = NOW()
+          WHERE id = ${invitationId}
+        `;
+      });
+
+      return {
+        companyId: inv.company_id,
+        role: inv.role,
+        status: 'ACCEPTED',
+      };
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
       throw error;
     }
   }

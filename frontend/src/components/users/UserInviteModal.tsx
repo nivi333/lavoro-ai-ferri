@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, message, Space, Typography } from 'antd';
 import { companyService } from '../../services/companyService';
 import useAuth from '../../contexts/AuthContext';
+import { GradientButton } from '../ui';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -78,6 +79,7 @@ const UserInviteModal: React.FC<UserInviteModalProps> = ({ visible, onClose, onS
 
       form.resetFields();
       onSuccess();
+      onClose(); // Close modal on success
     } catch (error: any) {
       console.error('Invite error:', error);
       message.error(error.message || 'Failed to invite users');
@@ -95,39 +97,45 @@ const UserInviteModal: React.FC<UserInviteModalProps> = ({ visible, onClose, onS
     <Modal
       title='Invite Team Members'
       open={visible}
-      onCancel={handleClose}
-      onOk={() => form.submit()}
-      confirmLoading={loading}
-      okText='Send Invitations'
-      cancelText='Cancel'
+      footer={[
+        <GradientButton key='cancel' onClick={handleClose}>
+          Cancel
+        </GradientButton>,
+        <GradientButton
+          key='submit'
+          onClick={() => form.submit()}
+          loading={loading}
+          style={{ marginLeft: 8 }}
+        >
+          Send Invitation
+        </GradientButton>,
+      ]}
       width={500}
     >
       <Form form={form} layout='vertical' onFinish={handleSubmit}>
         <Form.Item
-          name="emailOrPhone"
-          label="Email or Phone"
+          name='emailOrPhone'
+          label='Email or Phone'
           rules={[
             { required: true, message: 'Please enter email or phone number' },
             {
               validator: (_, value) => {
                 if (!value) return Promise.resolve();
-                
+
                 const trimmedValue = value.trim();
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
-                
+
                 if (!emailRegex.test(trimmedValue) && !phoneRegex.test(trimmedValue)) {
                   return Promise.reject(new Error('Please enter a valid email or phone number'));
                 }
-                
+
                 return Promise.resolve();
               },
             },
           ]}
         >
-          <Input
-            placeholder="user@example.com or +1234567890"
-          />
+          <Input placeholder='user@example.com or +1234567890' />
         </Form.Item>
 
         <Form.Item

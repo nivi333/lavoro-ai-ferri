@@ -39,6 +39,11 @@ router.post('/:tenantId/invite',
   companyController.inviteUser.bind(companyController)
 );
 
+// Accept company invitation
+router.post('/accept-invitation/:invitationId', 
+  companyController.acceptInvitation.bind(companyController)
+);
+
 // Delete company (OWNER only)
 router.delete('/:tenantId',
   requireRole(['OWNER']),

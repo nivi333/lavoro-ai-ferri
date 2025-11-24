@@ -235,6 +235,26 @@ class CompanyService {
       throw error;
     }
   }
+
+  async acceptInvitation(invitationId: string): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/companies/accept-invitation/${invitationId}`, {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to accept invitation');
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error('Error accepting invitation:', error);
+      throw error;
+    }
+  }
 }
 
 export const companyService = new CompanyService();

@@ -323,6 +323,41 @@ export class CompanyController {
     }
   }
 
+  /**
+   * Accept company invitation
+   * POST /api/v1/companies/accept-invitation/:invitationId
+   */
+  async acceptInvitation(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.userId!;
+      const { invitationId } = req.params;
+
+      logger.info('Accept invitation request:', {
+        userId,
+        invitationId,
+      });
+
+      const result = await companyService.acceptInvitation(userId, invitationId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Invitation accepted successfully',
+        data: result,
+      });
+    } catch (error: any) {
+      logger.error('Error accepting invitation:', error);
+      const statusCode =
+        error.message === 'Invitation not found or already processed'
+          ? 404
+          : error.message === 'User is already a member of this company'
+            ? 409
+            : 500;
+      res.status(statusCode).json({
+        success: false,
+        message: error.message || 'Failed to accept invitation',
+      });
+    }
+  }
 
   /**
    * Check if company slug is available

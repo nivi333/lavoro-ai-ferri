@@ -7,6 +7,7 @@ import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
 import HeadingText from '../components/ui/HeadingText';
 import { GradientButton } from '../components/ui';
 import { BrandLogo } from '../components/BrandLogo';
+import { companyService } from '../services/companyService';
 import './CompaniesListPage.scss';
 import { COMPANY_TEXT } from '../constants/company';
 import { Company } from '../types/auth';
@@ -38,6 +39,21 @@ export default function CompaniesListPage() {
     } catch (error) {
       console.error('Error refreshing companies:', error);
       message.warning('Company created but failed to refresh list. Please refresh the page.');
+    }
+  };
+
+  const handleAcceptInvitation = async (invitationId: string) => {
+    try {
+      setLoading(true);
+      // TODO: Implement accept invitation API call
+      await companyService.acceptInvitation(invitationId);
+      message.success('Invitation accepted successfully!');
+      await refreshCompanies();
+    } catch (error: any) {
+      console.error('Error accepting invitation:', error);
+      message.error(error.message || 'Failed to accept invitation');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -201,6 +217,17 @@ export default function CompaniesListPage() {
                               fontWeight: 500,
                             }}
                           />
+                          {company.status === 'PENDING' && (
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <GradientButton
+                                size="small"
+                                onClick={() => handleAcceptInvitation(company.invitationId!)}
+                                style={{ marginLeft: 8, fontSize: '11px', padding: '2px 8px' }}
+                              >
+                                Accept
+                              </GradientButton>
+                            </div>
+                          )}
                           <TeamOutlined className='companies-card-team' />
                         </div>
                       </li>

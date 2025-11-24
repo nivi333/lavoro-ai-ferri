@@ -15,6 +15,8 @@ export interface Company {
   role: CompanyRole;
   country?: string;
   description?: string;
+  status?: 'CONFIRMED' | 'PENDING';
+  invitationId?: string;
 }
 
 export interface AuthTokens {
