@@ -683,11 +683,13 @@ export class ProductService {
     return {
       id: product.id,
       productId: product.product_id,
+      productCode: product.product_code,
       companyId: product.company_id,
       categoryId: product.category_id,
       sku: product.sku,
       name: product.name,
       description: product.description,
+      productType: product.product_type,
       material: product.material,
       color: product.color,
       size: product.size,

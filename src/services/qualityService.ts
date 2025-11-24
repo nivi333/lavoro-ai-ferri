@@ -10,16 +10,26 @@ interface CreateCheckpointData {
   inspectionDate: Date;
   orderId?: string;
   locationId?: string;
+  productId?: string;
+  batchNumber?: string;
+  totalBatch?: number;
+  lotNumber?: string;
+  sampleSize?: number;
+  testedQuantity?: number;
   overallScore?: number;
   notes?: string;
 }
 
 interface CreateDefectData {
   checkpointId: string;
+  productId?: string;
   defectCategory: DefectCategory;
   defectType: string;
   severity: DefectSeverity;
   quantity: number;
+  batchNumber?: string;
+  lotNumber?: string;
+  affectedItems?: number;
   description?: string;
   imageUrl?: string;
 }
@@ -134,6 +144,24 @@ export class QualityService {
     return `CR${nextNumber.toString().padStart(3, '0')}`;
   }
 
+  // Generate compliance report code (COMP001, COMP002, etc.) - GLOBALLY UNIQUE
+  private async generateReportCode(companyId: string): Promise<string> {
+    // Find the last report globally since report_code has @unique constraint
+    const lastReport = await this.prisma.compliance_reports.findFirst({
+      where: { report_code: { not: null } },
+      orderBy: { created_at: 'desc' },
+      select: { report_code: true },
+    });
+
+    if (!lastReport || !lastReport.report_code) {
+      return 'COMP001';
+    }
+
+    const lastNumber = parseInt(lastReport.report_code.substring(4));
+    const nextNumber = lastNumber + 1;
+    return `COMP${nextNumber.toString().padStart(3, '0')}`;
+  }
+
   // Create Quality Checkpoint
   async createCheckpoint(companyId: string, data: CreateCheckpointData) {
     const checkpointId = await this.generateCheckpointId(companyId);
@@ -148,6 +176,12 @@ export class QualityService {
         checkpoint_name: data.checkpointName,
         inspector_name: data.inspectorName,
         inspection_date: data.inspectionDate,
+        product_id: data.productId,
+        batch_number: data.batchNumber,
+        total_batch: data.totalBatch,
+        lot_number: data.lotNumber,
+        sample_size: data.sampleSize,
+        tested_quantity: data.testedQuantity,
         status: QCStatus.PENDING,
         overall_score: data.overallScore ?? null,
         notes: data.notes ?? null,
@@ -331,10 +365,14 @@ export class QualityService {
         defect_id: defectId,
         company_id: companyId,
         checkpoint_id: data.checkpointId,
+        product_id: data.productId,
         defect_category: data.defectCategory,
         defect_type: data.defectType,
         severity: data.severity,
         quantity: data.quantity,
+        batch_number: data.batchNumber,
+        lot_number: data.lotNumber,
+        affected_items: data.affectedItems,
         description: data.description ?? null,
         image_url: data.imageUrl ?? null,
         resolution_status: ResolutionStatus.OPEN,

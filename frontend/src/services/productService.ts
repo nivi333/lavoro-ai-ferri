@@ -23,6 +23,7 @@ export interface ProductSummary {
   sku: string;
   name: string;
   description?: string;
+  productType: string;
   material?: string;
   color?: string;
   size?: string;
@@ -67,6 +68,7 @@ export interface CreateProductRequest {
   sku?: string;
   name: string;
   description?: string;
+  productType: string;
   material?: string;
   color?: string;
   size?: string;

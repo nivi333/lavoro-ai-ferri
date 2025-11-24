@@ -236,10 +236,16 @@ model quality_checkpoints {
   company_id      String
   location_id     String?
   order_id        String?
+  product_id      String?
   checkpoint_type CheckpointType
   checkpoint_name String
   inspector_name  String
   inspection_date DateTime
+  batch_number    String?
+  total_batch     Int?
+  lot_number      String?
+  sample_size     Int?
+  tested_quantity Int?
   status          QCStatus
   overall_score   Decimal?       @db.Decimal(5, 2)
   notes           String?
@@ -249,12 +255,15 @@ model quality_checkpoints {
   company companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
   order   orders?            @relation(fields: [order_id], references: [id])
+  product products?          @relation(fields: [product_id], references: [id])
   defects quality_defects[]
   metrics quality_metrics[]
 
   @@index([company_id])
   @@index([checkpoint_type])
   @@index([status])
+  @@index([batch_number])
+  @@index([product_id])
 }
 
 enum CheckpointType {
@@ -263,6 +272,7 @@ enum CheckpointType {
   FINAL_INSPECTION
   PACKAGING
   RANDOM_SAMPLING
+  BATCH_TEST
 }
 
 enum QCStatus {
@@ -279,10 +289,14 @@ model quality_defects {
   defect_id         String           @unique
   company_id        String
   checkpoint_id     String
+  product_id        String?
   defect_category   DefectCategory
   defect_type       String
   severity          DefectSeverity
   quantity          Int
+  batch_number      String?
+  lot_number        String?
+  affected_items    Int?
   description       String?
   image_url         String?
   resolution_status ResolutionStatus
@@ -294,12 +308,15 @@ model quality_defects {
 
   company    companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
   checkpoint quality_checkpoints @relation(fields: [checkpoint_id], references: [id])
+  product    products?           @relation("ProductDefects", fields: [product_id], references: [id])
   comments   defect_comments[]
 
   @@index([company_id])
   @@index([defect_category])
   @@index([severity])
   @@index([resolution_status])
+  @@index([batch_number])
+  @@index([product_id])
 }
 
 enum DefectCategory {
@@ -349,6 +366,7 @@ model quality_metrics {
 model compliance_reports {
   id              String           @id @default(uuid())
   report_id       String           @unique
+  report_code     String?          @unique
   company_id      String
   report_type     ComplianceType
   report_date     DateTime
@@ -417,6 +435,7 @@ model products {
   sku             String
   name            String
   description     String?
+  product_type    ProductType    @default(OWN_MANUFACTURE)
   material        String?
   color           String?
   size            String?
@@ -437,6 +456,8 @@ model products {
   company         companies           @relation(fields: [company_id], references: [id], onDelete: Cascade)
   category        product_categories? @relation(fields: [category_id], references: [id], onDelete: SetNull)
   stock_adjustments stock_adjustments[]
+  quality_checkpoints quality_checkpoints[]
+  quality_defects quality_defects[] @relation("ProductDefects")
 
   @@unique([company_id, product_id])
   @@unique([company_id, product_code])
@@ -478,6 +499,15 @@ enum StockAdjustmentType {
   RETURN
   DAMAGE
   TRANSFER
+}
+
+enum ProductType {
+  OWN_MANUFACTURE
+  VENDOR_SUPPLIED
+  OUTSOURCED
+  RAW_MATERIAL
+  FINISHED_GOODS
+  SEMI_FINISHED
 }
 
 // ============================================

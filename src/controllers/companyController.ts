@@ -269,8 +269,7 @@ export class CompanyController {
 
   /**
    * Invite user to company
-   * POST /api/v1/companies/invite
-   * Uses current company from JWT token (req.tenantId)
+   * POST /api/v1/companies/:tenantId/invite
    */
   async inviteUser(req: Request, res: Response): Promise<void> {
     try {
@@ -285,7 +284,7 @@ export class CompanyController {
       }
 
       const userId = req.userId!;
-      const tenantId = req.tenantId!; // Get current company from JWT token
+      const { tenantId } = req.params; // Get tenantId from route parameter
       const { email, role } = value;
 
       const invitation = await companyService.inviteUser(userId, tenantId, email, role);

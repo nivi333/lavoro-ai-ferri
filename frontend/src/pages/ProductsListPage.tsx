@@ -172,6 +172,15 @@ export default function ProductsListPage() {
       ),
     },
     {
+      title: 'Product Code',
+      dataIndex: 'productCode',
+      key: 'productCode',
+      width: 120,
+      render: (productCode: string) => (
+        <div className='product-code'>{productCode}</div>
+      ),
+    },
+    {
       title: 'Product Name',
       dataIndex: 'name',
       key: 'name',
@@ -180,6 +189,15 @@ export default function ProductsListPage() {
           <div className='product-name'>{name}</div>
           <div className='product-sku'>SKU: {record.sku}</div>
         </div>
+      ),
+    },
+    {
+      title: 'Barcode',
+      dataIndex: 'barcode',
+      key: 'barcode',
+      width: 120,
+      render: (barcode?: string) => (
+        <div className='product-barcode'>{barcode || '—'}</div>
       ),
     },
     {

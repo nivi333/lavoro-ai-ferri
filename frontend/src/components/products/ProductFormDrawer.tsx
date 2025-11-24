@@ -51,6 +51,7 @@ interface ProductFormValues {
   productCode?: string;
   name: string;
   description?: string;
+  productType: string;
   material?: string;
   color?: string;
   size?: string;
@@ -90,6 +91,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
           form.resetFields();
           form.setFieldsValue({
             unitOfMeasure: 'PCS',
+            productType: 'OWN_MANUFACTURE',
             isActive: true,
             stockQuantity: 0,
           });
@@ -109,6 +111,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
       productCode: product.productCode,
       name: product.name,
       description: product.description,
+      productType: product.productType,
       material: product.material,
       color: product.color,
       size: product.size,
@@ -157,6 +160,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
         productCode: values.productCode,
         name: values.name,
         description: values.description,
+        productType: values.productType,
         material: values.material,
         color: values.color,
         size: values.size,
@@ -284,6 +288,25 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
             <Col span={24}>
               <Form.Item name='description' label='Description'>
                 <TextArea rows={3} placeholder='Enter product description' />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={12}>
+            <Col span={24}>
+              <Form.Item
+                name='productType'
+                label='Product Type'
+                rules={[{ required: true, message: 'Please select product type' }]}
+              >
+                <Select placeholder='Select product type'>
+                  <Option value='OWN_MANUFACTURE'>Own Manufacture</Option>
+                  <Option value='VENDOR_SUPPLIED'>Vendor Supplied</Option>
+                  <Option value='OUTSOURCED'>Outsourced</Option>
+                  <Option value='RAW_MATERIAL'>Raw Material</Option>
+                  <Option value='FINISHED_GOODS'>Finished Goods</Option>
+                  <Option value='SEMI_FINISHED'>Semi-Finished</Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>

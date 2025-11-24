@@ -13,6 +13,12 @@ const createCheckpointSchema = Joi.object({
   inspectionDate: Joi.date().required(),
   orderId: Joi.string().optional(),
   locationId: Joi.string().optional(),
+  productId: Joi.string().optional(),
+  batchNumber: Joi.string().optional(),
+  totalBatch: Joi.number().integer().min(1).optional(),
+  lotNumber: Joi.string().optional(),
+  sampleSize: Joi.number().integer().min(1).optional(),
+  testedQuantity: Joi.number().integer().min(1).optional(),
   overallScore: Joi.number().min(0).max(100).optional(),
   notes: Joi.string().max(1000).optional(),
 });
@@ -28,10 +34,14 @@ const updateCheckpointSchema = Joi.object({
 
 const createDefectSchema = Joi.object({
   checkpointId: Joi.string().required(),
+  productId: Joi.string().optional(),
   defectCategory: Joi.string().valid(...Object.values(DefectCategory)).required(),
   defectType: Joi.string().min(1).max(255).required(),
   severity: Joi.string().valid(...Object.values(DefectSeverity)).required(),
   quantity: Joi.number().integer().min(1).required(),
+  affectedItems: Joi.number().integer().min(1).optional(),
+  batchNumber: Joi.string().optional(),
+  lotNumber: Joi.string().optional(),
   description: Joi.string().max(1000).optional(),
   imageUrl: Joi.string().uri().optional(),
 });

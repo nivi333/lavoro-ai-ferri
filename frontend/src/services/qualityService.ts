@@ -9,16 +9,26 @@ interface CreateCheckpointData {
   inspectionDate: string;
   orderId?: string;
   locationId?: string;
+  productId?: string;
+  batchNumber?: string;
+  totalBatch?: number;
+  lotNumber?: string;
+  sampleSize?: number;
+  testedQuantity?: number;
   overallScore?: number;
   notes?: string;
 }
 
 interface CreateDefectData {
   checkpointId: string;
+  productId?: string;
   defectCategory: string;
   defectType: string;
   severity: string;
   quantity: number;
+  batchNumber?: string;
+  lotNumber?: string;
+  affectedItems?: number;
   description?: string;
   imageUrl?: string;
 }
