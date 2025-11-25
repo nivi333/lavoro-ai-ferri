@@ -1010,10 +1010,10 @@ button {
     >div,
     >span,
     >* {
-      white-space: nowrap !important;
+
       overflow: hidden !important;
       text-overflow: ellipsis !important;
-      display: inline-block !important;
+
       max-width: 100% !important;
     }
   }
