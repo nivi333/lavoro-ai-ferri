@@ -31,6 +31,7 @@ import {
 import dayjs from 'dayjs';
 import { Line, Bar, Pie } from '@ant-design/plots';
 import { GradientButton } from '../components/ui';
+import { Heading } from '../components/Heading';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -309,16 +310,14 @@ const QualityReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="quality-reports-page" style={{ padding: '24px' }}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Quality Reports</h1>
-          <p className="text-gray-600">Generate and view quality analysis reports</p>
-        </div>
+    <div className="page-container">
+      <div className="page-header-section">
+        <Heading level={2} className="page-title">
+          Quality Reports
+        </Heading>
         <GradientButton 
           onClick={handleGenerateReport}
-          size="middle"
+          size="small"
         >
           <BarChartOutlined /> 
           Generate Report

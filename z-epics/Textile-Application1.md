@@ -215,7 +215,7 @@ title={
 - **Invite Flow**: POST `/api/v1/companies/invite` uses logged-in user's current company automatically
 - **Error Messages**: Provide specific, actionable error messages (e.g., "Invited user does not exist in the system" not "Invalid token")
 - **Validation**: Check company context before role permissions in middleware chain
----
+
 Before making ANY changes to a component:
 
 Find and read the EXACT reference component (e.g., CompanyCreationDrawer.tsx,CompanyCreationDrawer.scss and etc.,)
@@ -224,6 +224,7 @@ Copy the EXACT CSS approach - no new SCSS files, use what's already there
 Copy the EXACT button/action pattern - same buttons, same positioning, same styling
 Only change the field names and labels - nothing else
 Do NOT create new files or new CSS - use existing patterns only"
+---
 ## 📋 EPIC Overview
 
 **Epic Name**: Multi-Tenant Textile Manufacturing ERP System  
@@ -1237,6 +1238,153 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Import/Export documentation system
   - Supply chain visibility dashboard
 
+### **📋 PLANNED - Sprint 3.6: Product Master & Inventory Management**
+- **Product Catalog**: Centralized product/item master with complete specifications
+- **Multi-Location Inventory**: Stock tracking across all company locations
+- **Stock Movements**: Complete transaction history (purchase, sale, transfer, adjustments)
+- **Stock Reservations**: Reserve/release stock for orders with availability tracking
+- **Low Stock Alerts**: Automatic alerts when stock falls below reorder point
+- **Product Dropdown Integration**: Replace manual entry in Orders, POs, Invoices
+- **Pricing Management**: Unit price, cost price, tax rates, profit margin tracking
+- **Textile-Specific Fields**: Fabric type, color, size, weight (GSM), composition
+- **Image Management**: Main image + additional images + specification documents
+- **Required Fields**: Product code, name, category, unit price, UOM (minimum)
+- **Benefits**: Eliminate errors, consistent pricing, real-time stock, faster workflows
+
+### **📋 PLANNED - Sprint 3.7: Machine Maintenance & Service Management**
+**Monitor and maintain machines and equipment to reduce downtime and optimize production efficiency.**
+
+#### **Core Features**
+
+**1. Machine Master Data Management**
+- **Machine Registry**: Comprehensive database of all machines by industry type
+  - Textile Industry Machines: Looms, Knitting Machines, Dyeing Machines, Cutting Machines, Sewing Machines, Finishing Equipment, Spinning Machines, Warping Machines, etc.
+  - Machine Details: Machine ID, Name, Type, Model, Manufacturer, Serial Number, Purchase Date, Warranty Period
+  - Location Assignment: Link machines to specific company locations (factory, warehouse, branch)
+  - Technical Specifications: Capacity, Speed, Power Consumption, Dimensions, Operating Parameters
+  - Documentation: Manuals, Certificates, Compliance Documents (PDF uploads)
+  - Images: Machine photos, QR code labels for quick identification
+
+**2. Machine Status Tracking**
+- **Real-Time Status Dashboard**: Visual overview of all machines
+  - 🟢 **In Use**: Currently operating in production
+  - 🟡 **Under Maintenance**: Scheduled or preventive maintenance
+  - 🔴 **Under Repair**: Breakdown or emergency repair
+  - 🔵 **New/Idle**: Available for assignment
+  - ⚫ **Decommissioned**: Retired or sold machines
+- **Status History**: Complete timeline of status changes with timestamps
+- **Utilization Metrics**: Machine usage hours, idle time, efficiency percentage
+- **Performance KPIs**: OEE (Overall Equipment Effectiveness), MTBF (Mean Time Between Failures), MTTR (Mean Time To Repair)
+
+**3. Preventive Maintenance Scheduling**
+- **Maintenance Calendar**: Visual calendar for scheduled maintenance
+- **Maintenance Types**:
+  - Daily Checks: Cleaning, lubrication, basic inspections
+  - Weekly Maintenance: Detailed inspections, minor adjustments
+  - Monthly Service: Comprehensive servicing, parts replacement
+  - Quarterly Overhaul: Major maintenance, calibration
+  - Annual Certification: Compliance checks, safety audits
+- **Auto Reminders**: Email/SMS notifications before due dates (7 days, 3 days, 1 day)
+- **Maintenance Checklist**: Predefined tasks for each machine type
+- **Parts Inventory**: Track spare parts usage and stock levels
+- **Cost Tracking**: Maintenance costs per machine, budget vs actual
+- **Vendor Management**: Service provider details, contracts, SLAs
+
+**4. Breakdown Reporting & Ticketing**
+- **Quick Breakdown Logging**: Mobile-friendly form for operators
+  - Machine selection, Issue description, Severity level (Critical, High, Medium, Low)
+  - Photo/video upload of the issue
+  - Operator name, timestamp, location
+- **Real-Time Alerts**: Instant notifications to maintenance team
+  - Push notifications, SMS, Email
+  - Escalation rules based on severity and response time
+- **Ticket Management**: Complete workflow from report to resolution
+  - Ticket ID, Status (Open, In Progress, Resolved, Closed)
+  - Assigned technician, Priority, Estimated resolution time
+  - Parts required, Labor hours, Downtime duration
+  - Root cause analysis, Resolution notes
+- **Downtime Tracking**: Automatic calculation of production loss
+  - Downtime hours, Production units lost, Revenue impact
+  - Downtime reasons categorization (mechanical, electrical, operator error, etc.)
+
+**5. Machine Assignment & Operator Management**
+- **User Assignment**: Assign machines to specific operators/technicians
+  - Primary operator, Backup operators
+  - Shift-wise assignments (Morning, Afternoon, Night)
+  - Skill-based matching (operator certification vs machine requirements)
+- **Operator Training Records**: Track certifications and training
+  - Training completion dates, Certification expiry
+  - Skill levels (Beginner, Intermediate, Expert)
+  - Safety training compliance
+- **Operator Performance**: Track efficiency per operator
+  - Production output, Quality metrics, Breakdown frequency
+  - Best practices sharing, Performance reviews
+
+**6. IoT Sensor Integration (Advanced)**
+- **Sensor Data Collection**: Real-time machine health monitoring
+  - Temperature, Vibration, Pressure, Speed, Power consumption
+  - Sensor thresholds and alert triggers
+- **Predictive Maintenance**: AI-powered failure prediction
+  - Anomaly detection using machine learning
+  - Predictive alerts before actual breakdown
+  - Recommended maintenance actions
+- **Auto-Ticket Generation**: Sensors auto-create maintenance tickets
+  - Threshold breach triggers automatic ticket
+  - Pre-filled with sensor data and diagnostics
+  - Suggested parts and actions based on sensor readings
+
+**7. Maintenance Analytics & Reporting**
+- **Maintenance Dashboard**: Key metrics visualization
+  - Total machines, Active vs Idle, Maintenance due count
+  - Breakdown frequency trends, MTBF/MTTR charts
+  - Cost analysis (maintenance vs production loss)
+- **Reports**:
+  - Maintenance Schedule Report (upcoming tasks)
+  - Breakdown Analysis Report (frequency, causes, costs)
+  - Machine Utilization Report (usage hours, efficiency)
+  - Cost Analysis Report (maintenance budget tracking)
+  - Compliance Report (safety checks, certifications)
+- **Export Options**: PDF, Excel, CSV for audit trails
+
+#### **Database Schema**
+
+**Tables**:
+1. `machines` - Machine master data
+2. `machine_status_history` - Status change tracking
+3. `maintenance_schedules` - Preventive maintenance plans
+4. `maintenance_tasks` - Individual maintenance tasks
+5. `breakdown_tickets` - Breakdown reports and tickets
+6. `machine_assignments` - User-machine assignments
+7. `machine_sensors` - IoT sensor configurations (optional)
+8. `sensor_readings` - Sensor data logs (optional)
+9. `maintenance_parts` - Spare parts inventory
+10. `maintenance_costs` - Cost tracking
+
+**Enums**:
+- `MachineType` (industry-specific: LOOM, KNITTING_MACHINE, DYEING_MACHINE, etc.)
+- `MachineStatus` (IN_USE, UNDER_MAINTENANCE, UNDER_REPAIR, NEW, IDLE, DECOMMISSIONED)
+- `MaintenanceType` (PREVENTIVE, CORRECTIVE, PREDICTIVE, EMERGENCY)
+- `BreakdownSeverity` (CRITICAL, HIGH, MEDIUM, LOW)
+- `TicketStatus` (OPEN, IN_PROGRESS, RESOLVED, CLOSED, CANCELLED)
+
+#### **User Stories**
+
+| Feature | User Story | Acceptance Criteria |
+|---------|-----------|---------------------|
+| **Preventive Maintenance** | As a maintenance engineer, I want to schedule maintenance, so machines operate smoothly. | Auto reminders before due date (7d, 3d, 1d). Maintenance checklist completion tracking. Cost and parts tracking. |
+| **Breakdown Reporting** | As an operator, I want to log machine breakdowns, so repair can be initiated quickly. | Real-time alerts to maintenance team. Mobile-friendly form with photo upload. Automatic downtime calculation. |
+| **IoT Sensor Integration** | As an engineer, I want IoT sensors to detect issues, so predictive maintenance is possible. | Alerts auto-trigger maintenance ticket. Sensor threshold configuration. Anomaly detection and predictions. |
+| **Machine Assignment** | As a production manager, I want to assign machines to operators, so accountability is clear. | Shift-wise assignments. Skill-based matching. Performance tracking per operator. |
+| **Maintenance Analytics** | As a factory manager, I want to see maintenance metrics, so I can optimize costs and efficiency. | Dashboard with KPIs (MTBF, MTTR, OEE). Cost analysis reports. Breakdown trend analysis. |
+
+#### **Benefits**
+- **Reduced Downtime**: Proactive maintenance prevents unexpected breakdowns
+- **Cost Optimization**: Track maintenance costs, optimize spare parts inventory
+- **Improved Efficiency**: Better machine utilization, operator accountability
+- **Compliance**: Maintain safety certifications, audit trails
+- **Data-Driven Decisions**: Analytics for equipment replacement, upgrade planning
+- **Predictive Capabilities**: IoT integration enables predictive maintenance (future-ready)
+
 ### **📋 PLANNED - Sprint 3.8: Production Planning & Scheduling**
 **Why Critical**: Textile manufacturing requires complex production planning with multiple dependencies (yarn → fabric → dyeing → garment). Without proper planning, you face bottlenecks, missed deadlines, and inefficient resource utilization.
 
@@ -2002,171 +2150,11 @@ Stages:
 - **Textile Modules**: Fabric, Yarn, Dyeing, Garment, Design (for textile companies)
 - **Core Modules**: Always visible (Dashboard, Orders, Quality, Finance, Reports)
 
-
-### **📋 PLANNED - Sprint 3.6: Product Master & Inventory Management**
-- **Product Catalog**: Centralized product/item master with complete specifications
-- **Multi-Location Inventory**: Stock tracking across all company locations
-- **Stock Movements**: Complete transaction history (purchase, sale, transfer, adjustments)
-- **Stock Reservations**: Reserve/release stock for orders with availability tracking
-- **Low Stock Alerts**: Automatic alerts when stock falls below reorder point
-- **Product Dropdown Integration**: Replace manual entry in Orders, POs, Invoices
-- **Pricing Management**: Unit price, cost price, tax rates, profit margin tracking
-- **Textile-Specific Fields**: Fabric type, color, size, weight (GSM), composition
-- **Image Management**: Main image + additional images + specification documents
-- **Required Fields**: Product code, name, category, unit price, UOM (minimum)
-- **Benefits**: Eliminate errors, consistent pricing, real-time stock, faster workflows
-
-### **📋 PLANNED - Sprint 3.7: Machine Maintenance & Service Management**
-**Monitor and maintain machines and equipment to reduce downtime and optimize production efficiency.**
-
-#### **Core Features**
-
-**1. Machine Master Data Management**
-- **Machine Registry**: Comprehensive database of all machines by industry type
-  - Textile Industry Machines: Looms, Knitting Machines, Dyeing Machines, Cutting Machines, Sewing Machines, Finishing Equipment, Spinning Machines, Warping Machines, etc.
-  - Machine Details: Machine ID, Name, Type, Model, Manufacturer, Serial Number, Purchase Date, Warranty Period
-  - Location Assignment: Link machines to specific company locations (factory, warehouse, branch)
-  - Technical Specifications: Capacity, Speed, Power Consumption, Dimensions, Operating Parameters
-  - Documentation: Manuals, Certificates, Compliance Documents (PDF uploads)
-  - Images: Machine photos, QR code labels for quick identification
-
-**2. Machine Status Tracking**
-- **Real-Time Status Dashboard**: Visual overview of all machines
-  - 🟢 **In Use**: Currently operating in production
-  - 🟡 **Under Maintenance**: Scheduled or preventive maintenance
-  - 🔴 **Under Repair**: Breakdown or emergency repair
-  - 🔵 **New/Idle**: Available for assignment
-  - ⚫ **Decommissioned**: Retired or sold machines
-- **Status History**: Complete timeline of status changes with timestamps
-- **Utilization Metrics**: Machine usage hours, idle time, efficiency percentage
-- **Performance KPIs**: OEE (Overall Equipment Effectiveness), MTBF (Mean Time Between Failures), MTTR (Mean Time To Repair)
-
-**3. Preventive Maintenance Scheduling**
-- **Maintenance Calendar**: Visual calendar for scheduled maintenance
-- **Maintenance Types**:
-  - Daily Checks: Cleaning, lubrication, basic inspections
-  - Weekly Maintenance: Detailed inspections, minor adjustments
-  - Monthly Service: Comprehensive servicing, parts replacement
-  - Quarterly Overhaul: Major maintenance, calibration
-  - Annual Certification: Compliance checks, safety audits
-- **Auto Reminders**: Email/SMS notifications before due dates (7 days, 3 days, 1 day)
-- **Maintenance Checklist**: Predefined tasks for each machine type
-- **Parts Inventory**: Track spare parts usage and stock levels
-- **Cost Tracking**: Maintenance costs per machine, budget vs actual
-- **Vendor Management**: Service provider details, contracts, SLAs
-
-**4. Breakdown Reporting & Ticketing**
-- **Quick Breakdown Logging**: Mobile-friendly form for operators
-  - Machine selection, Issue description, Severity level (Critical, High, Medium, Low)
-  - Photo/video upload of the issue
-  - Operator name, timestamp, location
-- **Real-Time Alerts**: Instant notifications to maintenance team
-  - Push notifications, SMS, Email
-  - Escalation rules based on severity and response time
-- **Ticket Management**: Complete workflow from report to resolution
-  - Ticket ID, Status (Open, In Progress, Resolved, Closed)
-  - Assigned technician, Priority, Estimated resolution time
-  - Parts required, Labor hours, Downtime duration
-  - Root cause analysis, Resolution notes
-- **Downtime Tracking**: Automatic calculation of production loss
-  - Downtime hours, Production units lost, Revenue impact
-  - Downtime reasons categorization (mechanical, electrical, operator error, etc.)
-
-**5. Machine Assignment & Operator Management**
-- **User Assignment**: Assign machines to specific operators/technicians
-  - Primary operator, Backup operators
-  - Shift-wise assignments (Morning, Afternoon, Night)
-  - Skill-based matching (operator certification vs machine requirements)
-- **Operator Training Records**: Track certifications and training
-  - Training completion dates, Certification expiry
-  - Skill levels (Beginner, Intermediate, Expert)
-  - Safety training compliance
-- **Operator Performance**: Track efficiency per operator
-  - Production output, Quality metrics, Breakdown frequency
-  - Best practices sharing, Performance reviews
-
-**6. IoT Sensor Integration (Advanced)**
-- **Sensor Data Collection**: Real-time machine health monitoring
-  - Temperature, Vibration, Pressure, Speed, Power consumption
-  - Sensor thresholds and alert triggers
-- **Predictive Maintenance**: AI-powered failure prediction
-  - Anomaly detection using machine learning
-  - Predictive alerts before actual breakdown
-  - Recommended maintenance actions
-- **Auto-Ticket Generation**: Sensors auto-create maintenance tickets
-  - Threshold breach triggers automatic ticket
-  - Pre-filled with sensor data and diagnostics
-  - Suggested parts and actions based on sensor readings
-
-**7. Maintenance Analytics & Reporting**
-- **Maintenance Dashboard**: Key metrics visualization
-  - Total machines, Active vs Idle, Maintenance due count
-  - Breakdown frequency trends, MTBF/MTTR charts
-  - Cost analysis (maintenance vs production loss)
-- **Reports**:
-  - Maintenance Schedule Report (upcoming tasks)
-  - Breakdown Analysis Report (frequency, causes, costs)
-  - Machine Utilization Report (usage hours, efficiency)
-  - Cost Analysis Report (maintenance budget tracking)
-  - Compliance Report (safety checks, certifications)
-- **Export Options**: PDF, Excel, CSV for audit trails
-
-#### **Database Schema**
-
-**Tables**:
-1. `machines` - Machine master data
-2. `machine_status_history` - Status change tracking
-3. `maintenance_schedules` - Preventive maintenance plans
-4. `maintenance_tasks` - Individual maintenance tasks
-5. `breakdown_tickets` - Breakdown reports and tickets
-6. `machine_assignments` - User-machine assignments
-7. `machine_sensors` - IoT sensor configurations (optional)
-8. `sensor_readings` - Sensor data logs (optional)
-9. `maintenance_parts` - Spare parts inventory
-10. `maintenance_costs` - Cost tracking
-
-**Enums**:
-- `MachineType` (industry-specific: LOOM, KNITTING_MACHINE, DYEING_MACHINE, etc.)
-- `MachineStatus` (IN_USE, UNDER_MAINTENANCE, UNDER_REPAIR, NEW, IDLE, DECOMMISSIONED)
-- `MaintenanceType` (PREVENTIVE, CORRECTIVE, PREDICTIVE, EMERGENCY)
-- `BreakdownSeverity` (CRITICAL, HIGH, MEDIUM, LOW)
-- `TicketStatus` (OPEN, IN_PROGRESS, RESOLVED, CLOSED, CANCELLED)
-
-#### **User Stories**
-
-| Feature | User Story | Acceptance Criteria |
-|---------|-----------|---------------------|
-| **Preventive Maintenance** | As a maintenance engineer, I want to schedule maintenance, so machines operate smoothly. | Auto reminders before due date (7d, 3d, 1d). Maintenance checklist completion tracking. Cost and parts tracking. |
-| **Breakdown Reporting** | As an operator, I want to log machine breakdowns, so repair can be initiated quickly. | Real-time alerts to maintenance team. Mobile-friendly form with photo upload. Automatic downtime calculation. |
-| **IoT Sensor Integration** | As an engineer, I want IoT sensors to detect issues, so predictive maintenance is possible. | Alerts auto-trigger maintenance ticket. Sensor threshold configuration. Anomaly detection and predictions. |
-| **Machine Assignment** | As a production manager, I want to assign machines to operators, so accountability is clear. | Shift-wise assignments. Skill-based matching. Performance tracking per operator. |
-| **Maintenance Analytics** | As a factory manager, I want to see maintenance metrics, so I can optimize costs and efficiency. | Dashboard with KPIs (MTBF, MTTR, OEE). Cost analysis reports. Breakdown trend analysis. |
-
-#### **Benefits**
-- **Reduced Downtime**: Proactive maintenance prevents unexpected breakdowns
-- **Cost Optimization**: Track maintenance costs, optimize spare parts inventory
-- **Improved Efficiency**: Better machine utilization, operator accountability
-- **Compliance**: Maintain safety certifications, audit trails
-- **Data-Driven Decisions**: Analytics for equipment replacement, upgrade planning
-- **Predictive Capabilities**: IoT integration enables predictive maintenance (future-ready)
-
----
-
-
----
-
-### **🎯 CURRENT STATUS (REORGANIZED)**
-
-#### **Completed Phases** ✅
-- **Phase 1**: ✅ **COMPLETED** - Foundation & Authentication
-- **Phase 2**: ✅ **COMPLETED** - Company Management & Location System
-- **Phase 2.5**: ✅ **COMPLETED** - Dashboard & User Profile Management
+5**: ✅ **COMPLETED** - Dashboard & User Profile Management
 - **Phase 3.3**: ✅ **COMPLETED** - Order Management System
 - **Phase 3.4**: ✅ **COMPLETED** - Quality Control System (Checkpoints, Defects, Compliance)
-- **Phase 3.5**: � **IN PROGRESS** - Textile-Specific Features (Backend ✅, Frontend 🔄)
+- **Phase 3.5**: ✅ **COMPLETED** - Textile-Specific Features (Backend ✅, Frontend ✅)
 - **Phase 3.5.1**: ✅ **COMPLETED** - Industry-Specific Navigation System
-
-#### **Planned Phases** 📋
 - **Phase 3.6**: 📋 **PLANNED** - Product Master & Inventory Management
 - **Phase 3.7**: 📋 **PLANNED** - Machine Maintenance & Service Management ⭐ NEW
 - **Phase 3.8**: 📋 **RECOMMENDED** - Production Planning & Scheduling

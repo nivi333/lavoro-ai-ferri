@@ -3,7 +3,6 @@ import {
   Table,
   Button,
   Tag,
-  Space,
   Avatar,
   Dropdown,
   Modal,
@@ -143,18 +142,25 @@ export default function LocationListPage() {
     {
       title: 'Location',
       key: 'location',
+      width: 300,
       render: (record: Location) => (
-        <Space>
-          <Avatar src={record.imageUrl} icon={<EnvironmentOutlined />}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Avatar 
+            src={record.imageUrl} 
+            icon={<EnvironmentOutlined />}
+            style={{ flexShrink: 0 }}
+          >
             {record.name.charAt(0)}
           </Avatar>
-          <div>
-            <div className='location-name'>{record.name}</div>
-            <div className='location-address'>
-              {record.addressLine1}, {record.addressLine2},{record.city}, {record.state}
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className='location-name' style={{ fontWeight: 500, marginBottom: 2 }}>
+              {record.name}
+            </div>
+            <div className='location-address' style={{ color: '#666', fontSize: '12px', lineHeight: '1.4' }}>
+              {record.addressLine1}{record.addressLine2 ? `, ${record.addressLine2}` : ''}, {record.city}, {record.state}
             </div>
           </div>
-        </Space>
+        </div>
       ),
     },
     {
@@ -166,24 +172,35 @@ export default function LocationListPage() {
     {
       title: 'Contact',
       key: 'contact',
+      width: 180,
       render: (record: Location) => (
         <div className='location-contact'>
-          {record.email && <div>{record.email}</div>}
-          {record.phone && <div>{record.phone}</div>}
+          {record.email && <div style={{ fontSize: '12px', marginBottom: 2 }}>{record.email}</div>}
+          {record.phone && <div style={{ fontSize: '12px', color: '#666' }}>{record.phone}</div>}
         </div>
       ),
     },
     {
       title: 'Default',
       key: 'isDefault',
-      width: 100,
-      render: (record: Location) => <Checkbox checked={record.isDefault} disabled />,
+      width: 80,
+      align: 'center' as const,
+      render: (record: Location) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Checkbox checked={record.isDefault} disabled />
+        </div>
+      ),
     },
     {
       title: 'Headquarters',
       key: 'isHeadquarters',
-      width: 120,
-      render: (record: Location) => <Checkbox checked={record.isHeadquarters} disabled />,
+      width: 100,
+      align: 'center' as const,
+      render: (record: Location) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Checkbox checked={record.isHeadquarters} disabled />
+        </div>
+      ),
     },
     {
       title: 'Status',

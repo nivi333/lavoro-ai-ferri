@@ -558,8 +558,9 @@ model fabric_production {
   batch_number    String
   quality_grade   QualityGrade
   notes           String?
+  is_active       Boolean  @default(true)
   created_at      DateTime @default(now())
-  updated_at      DateTime
+  updated_at      DateTime @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -606,8 +607,9 @@ model yarn_manufacturing {
   process_type    YarnProcess
   quality_grade   QualityGrade
   notes           String?
+  is_active       Boolean     @default(true)
   created_at      DateTime    @default(now())
-  updated_at      DateTime
+  updated_at      DateTime    @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -656,8 +658,9 @@ model dyeing_finishing {
   color_fastness    String?
   shrinkage_percent Decimal?       @db.Decimal(5, 2)
   notes             String?
+  is_active         Boolean        @default(true)
   created_at        DateTime       @default(now())
-  updated_at        DateTime
+  updated_at        DateTime       @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -698,8 +701,9 @@ model garment_manufacturing {
   quality_passed   Boolean         @default(false)
   defect_count     Int             @default(0)
   notes            String?
+  is_active        Boolean         @default(true)
   created_at       DateTime        @default(now())
-  updated_at       DateTime
+  updated_at       DateTime        @updatedAt
 
   company  companies          @relation(fields: [company_id], references: [id], onDelete: Cascade)
   location company_locations? @relation(fields: [location_id], references: [id])
@@ -750,8 +754,9 @@ model design_patterns {
   sample_image_url  String?
   status            DesignStatus
   notes             String?
+  is_active         Boolean        @default(true)
   created_at        DateTime       @default(now())
-  updated_at        DateTime
+  updated_at        DateTime       @updatedAt
 
   company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
@@ -943,3 +948,4 @@ model inspection_metrics {
   @@unique([company_id, period_start, period_end])
   @@index([company_id, period_start])
 }
+

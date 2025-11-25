@@ -349,23 +349,23 @@ const UsersListPage: React.FC = () => {
     {
       title: 'User',
       key: 'user',
-      width: 250,
+      width: 280,
       render: (_, record) => (
-        <Space>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Avatar 
             size={40} 
             src={record.avatarUrl} 
-            style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#7b5fc9' }}
+            style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#7b5fc9', flexShrink: 0 }}
           >
             {!record.avatarUrl && getInitials(record.firstName, record.lastName)}
           </Avatar>
-          <div>
-            <div className="user-name">
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="user-name" style={{ fontWeight: 500, marginBottom: 2 }}>
               {record.firstName} {record.lastName}
             </div>
-            <div className="user-email">{record.email}</div>
+            <div className="user-email" style={{ color: '#666', fontSize: '12px' }}>{record.email}</div>
           </div>
-        </Space>
+        </div>
       ),
     },
     {

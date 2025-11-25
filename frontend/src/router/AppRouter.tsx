@@ -23,6 +23,7 @@ import ComplianceReportsListPage from '../pages/ComplianceReportsListPage';
 import UsersListPage from '../pages/UsersListPage';
 import UserProfilePage from '../pages/UserProfilePage';
 import QualityReportsPage from '../pages/QualityReportsPage';
+import FabricProductionPage from '../pages/textile/FabricProductionPage';
 
 // Main application router component
 export default function AppRouter() {
@@ -191,6 +192,18 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <UserProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Textile Manufacturing Routes */}
+            <Route
+              path='/textile/fabric-production'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <MainLayout>
+                    <FabricProductionPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
