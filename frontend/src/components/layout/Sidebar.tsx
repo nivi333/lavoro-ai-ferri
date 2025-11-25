@@ -133,8 +133,8 @@ export default function Sidebar() {
   const getOpenKeys = () => {
     const path = location.pathname;
     
-    // Open Quality Control submenu if on quality pages
-    if (path.includes('/quality')) {
+    // Open Quality Control submenu if on quality or inspection pages
+    if (path.includes('/quality') || path.includes('/inspections')) {
       return ['/quality'];
     }
     

@@ -147,8 +147,14 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
   return (
     <Drawer
       title={
-        <div className='drawer-title'>
+        <div className='drawer-header-with-switch'>
           <span>{editingLocation ? 'Edit Location' : 'Add New Location'}</span>
+          <div className='header-switch'>
+            <span className='switch-label'>Active</span>
+            <Form.Item name='isActive' valuePropName='checked' noStyle>
+              <Switch disabled={!editingLocation} />
+            </Form.Item>
+          </div>
         </div>
       }
       placement='right'
@@ -164,12 +170,6 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
           <div className='ccd-section'>
             <div className='ccd-section-header'>
               <div className='ccd-section-title'>Basic Information</div>
-              <div className='active-toggle-row'>
-                <span className='active-label'>Active</span>
-                <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
-                  <Switch disabled={!editingLocation} />
-                </Form.Item>
-              </div>
             </div>
             <Col span={24}>
               <Upload

@@ -98,10 +98,10 @@ const QualityDefectFormDrawer: React.FC<QualityDefectFormDrawerProps> = ({
   return (
     <Drawer
       title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className='drawer-header-with-switch'>
           <span>Report Quality Defect</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', color: '#666' }}>Active</span>
+          <div className='header-switch'>
+            <span className='switch-label'>Active</span>
             <Form.Item name='isActive' valuePropName='checked' noStyle>
               <Switch disabled />
             </Form.Item>

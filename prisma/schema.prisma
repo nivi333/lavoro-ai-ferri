@@ -272,6 +272,7 @@ model quality_checkpoints {
   status          QCStatus
   overall_score   Decimal?       @db.Decimal(5, 2)
   notes           String?
+  is_active       Boolean        @default(true)
   created_at      DateTime       @default(now())
   updated_at      DateTime
 
@@ -326,6 +327,7 @@ model quality_defects {
   resolution_notes  String?
   resolved_by       String?
   resolved_at       DateTime?
+  is_active         Boolean          @default(true)
   created_at        DateTime         @default(now())
   updated_at        DateTime
 
@@ -400,6 +402,7 @@ model compliance_reports {
   findings        String?
   recommendations String?
   document_url    String?
+  is_active       Boolean          @default(true)
   created_at      DateTime         @default(now())
   updated_at      DateTime
 
@@ -825,9 +828,12 @@ model quality_inspections {
   reference_type    String            // PRODUCT, ORDER, BATCH
   reference_id      String
   location_id       String?
-  inspector_id      String
+  inspector_id      String?
+  inspector_name    String?
   template_id       String?
-  scheduled_date    DateTime
+  scheduled_date    DateTime?
+  inspection_date   DateTime?
+  next_inspection_date DateTime?
   started_at        DateTime?
   completed_at      DateTime?
   status            InspectionStatus  @default(PENDING)
@@ -835,11 +841,12 @@ model quality_inspections {
   quality_score     Float?
   inspector_notes   String?
   recommendations   String?
+  is_active         Boolean           @default(true)
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
   
   companies         companies         @relation(fields: [company_id], references: [id], onDelete: Cascade)
-  inspector         users             @relation("InspectionInspector", fields: [inspector_id], references: [id])
+  inspector         users?            @relation("InspectionInspector", fields: [inspector_id], references: [id])
   template          inspection_templates? @relation(fields: [template_id], references: [id])
   checkpoints       inspection_checkpoints[]
   

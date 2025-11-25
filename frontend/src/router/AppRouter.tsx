@@ -12,6 +12,8 @@ import {
   LocationListPage,
   OrdersListPage,
   ProductsListPage,
+  InspectionsListPage,
+  InspectionDetailsPage,
 } from '../pages';
 import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
@@ -141,6 +143,24 @@ export default function AppRouter() {
                   <MainLayout>
                     <ComplianceReportsListPage />
                   </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/inspections'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <InspectionsListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/inspections/:id'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <InspectionDetailsPage />
                 </ProtectedRoute>
               }
             />

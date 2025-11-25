@@ -14,7 +14,10 @@ export interface Inspection {
     lastName: string;
     avatarUrl?: string;
   };
+  inspectorName?: string;
   scheduledDate: string;
+  inspectionDate?: string;
+  nextInspectionDate?: string;
   startedAt?: string;
   completedAt?: string;
   status: 'PENDING' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'CONDITIONAL';
@@ -22,6 +25,7 @@ export interface Inspection {
   qualityScore?: number;
   checkpointsTotal: number;
   checkpointsCompleted: number;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -95,11 +99,17 @@ export interface CreateInspectionData {
   referenceType: string;
   referenceId: string;
   locationId?: string;
-  inspectorId: string;
+  inspectorId?: string;
+  inspectorName?: string;
   templateId?: string;
-  scheduledDate: string;
+  scheduledDate?: string;
+  inspectionDate?: string;
+  nextInspectionDate?: string;
   inspectorNotes?: string;
   recommendations?: string;
+  status?: 'PENDING' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'CONDITIONAL';
+  qualityScore?: number;
+  isActive?: boolean;
 }
 
 export interface UpdateInspectionData {
@@ -110,6 +120,7 @@ export interface UpdateInspectionData {
   qualityScore?: number;
   inspectorNotes?: string;
   recommendations?: string;
+  isActive?: boolean;
 }
 
 export interface CompleteInspectionData {
@@ -364,4 +375,5 @@ class InspectionService {
   }
 }
 
-export default new InspectionService();
+export const inspectionService = new InspectionService();
+export default inspectionService;

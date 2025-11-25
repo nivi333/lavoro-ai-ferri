@@ -88,6 +88,12 @@ export const CORE_MODULES: MenuItem[] = [
     path: '/quality',
     children: [
       {
+        key: 'inspections',
+        label: 'Inspections',
+        icon: SafetyOutlined,
+        path: '/inspections',
+      },
+      {
         key: 'quality-checkpoints',
         label: 'Checkpoints',
         icon: SafetyOutlined,

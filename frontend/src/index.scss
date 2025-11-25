@@ -671,3 +671,370 @@ button {
   height: 45px;
   font-size: 22px;
 }
+
+// ============================================================================
+// INSPECTION FORM DRAWER STYLES
+// ============================================================================
+
+.ifd-content {
+  padding: 24px 32px 0 32px;
+  font-family: $font-family-body;
+  font-size: 1rem;
+  color: $primary-text-color;
+  background: $bg-primary;
+  display: flex;
+  flex-direction: column;
+}
+
+.ifd-section {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ifd-section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $primary-text-color;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+
+.ifd-divider {
+  margin: 8px 0 16px 0;
+  border-color: $border-light;
+}
+
+.ifd-input,
+.ifd-select {
+  width: 100%;
+
+  .ant-select-selector {
+    font-size: 14px;
+  }
+}
+
+.ifd-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+  padding-bottom: 18px;
+  border-top: 1px solid $border-light;
+  position: sticky;
+  bottom: 0;
+  background: $bg-primary;
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.ifd-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.ifd-form-content {
+  flex: 1;
+
+  padding-bottom: 16px;
+
+}
+
+.ifd-cancel-btn {
+  margin-right: $spacing-sm;
+}
+
+// ============================================================================
+// INSPECTION DETAILS PAGE STYLES
+// ============================================================================
+
+.inspection-details-page {
+  padding: $spacing-md;
+
+  .details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-light;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      .back-button {
+        color: $primary-color;
+        font-size: $font-size-sm;
+
+        &:hover {
+          color: darken($primary-color, 10%);
+        }
+      }
+
+      .page-title {
+        margin: 0;
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .status-bar {
+    display: flex;
+    gap: $spacing-md;
+    margin-bottom: $spacing-md;
+    padding: $spacing-sm;
+    background: $bg-secondary;
+    border-radius: $border-radius-base;
+    border: 1px solid $border-light;
+    flex-wrap: wrap;
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+
+      .label {
+        font-weight: 600;
+        color: $text-primary;
+        font-size: $font-size-sm;
+      }
+
+      .value {
+        color: $text-secondary;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+
+  :global {
+    .ant-tabs {
+      .ant-tabs-tab {
+        font-size: $font-size-sm;
+        padding: $spacing-sm $spacing-md;
+      }
+
+      .ant-tabs-content {
+        padding: $spacing-md 0;
+      }
+    }
+
+    .ant-card {
+      border-color: $border-light;
+      border-radius: $border-radius-base;
+
+      .ant-card-head {
+        background: $bg-secondary;
+        border-bottom: 1px solid $border-light;
+        padding: $spacing-sm;
+
+        .ant-card-head-title {
+          font-size: $font-size-sm;
+          font-weight: 600;
+          color: $primary-color;
+        }
+      }
+
+      .ant-card-body {
+        padding: $spacing-sm;
+      }
+    }
+
+    .ant-table {
+
+      // Global Ant Design Table Overrides
+      .ant-table-thead>tr>th {
+        background: #fafafa;
+        border-bottom: 2px solid #f0f0f0;
+        font-weight: 600;
+        color: #262626;
+        padding: 12px 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ant-table-tbody>tr>td {
+        padding: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 0;
+      }
+
+      .ant-table-tbody>tr:hover>td {
+        padding: 10px;
+        background: #f5f5f5;
+      }
+
+      // Ensure table cells content stays in one line
+      .ant-table-cell {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+
+        padding: 10px;
+        text-overflow: ellipsis !important;
+      }
+
+      // Fix for nested content in table cells
+      .ant-table-cell>div,
+      .ant-table-cell>span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 10px;
+        display: block;
+        max-width: 100%;
+      }
+    }
+
+    .ant-divider {
+      margin: $spacing-sm 0;
+    }
+  }
+
+  .tab-content {
+    padding: $spacing-sm 0;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-xs 0;
+
+    .label {
+      font-weight: 600;
+      color: $text-primary;
+      font-size: $font-size-sm;
+    }
+
+    .value {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+    }
+  }
+
+  .notes-content {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+}
+
+// ============================================================================
+// INSPECTIONS LIST PAGE STYLES
+// ============================================================================
+
+.inspections-list-page {
+  .page-title {
+    margin-bottom: $spacing-md;
+  }
+
+  .filters-section {
+    margin-bottom: $spacing-md;
+
+    .filters-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+    }
+  }
+
+  .table-section {
+    background: $bg-primary;
+    border-radius: $border-radius-base;
+    border: 1px solid $border-light;
+    padding: $spacing-md;
+
+    :global {
+      .ant-table {
+        .ant-table-tbody>tr>td {
+          padding-top: 8px;
+          padding-bottom: 8px;
+        }
+
+        .inspection-id {
+          font-weight: 500;
+          color: $primary-color;
+        }
+
+        .inspection-type {
+          font-size: 12px;
+          color: $secondary-text-color;
+          margin-top: 2px;
+        }
+
+        .status-value {
+          font-weight: 600;
+          color: $primary-text-color;
+        }
+      }
+    }
+  }
+}
+
+// Global Table Single Line Override - Applied to ALL tables
+.ant-table {
+  .ant-table-thead>tr>th {
+    padding: 10px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .ant-table-tbody>tr>td {
+    padding: 10px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  // Ensure all content inside table cells stays in one line
+  .ant-table-cell {
+    padding: 10px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    >div,
+    >span,
+    >* {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: inline-block !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+// Drawer Header with Switch - Global Component
+.drawer-header-with-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .header-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .switch-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+  }
+}

@@ -316,7 +316,17 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
   return (
     <Drawer
-      title={<span className='ccd-title'>{drawerTitle}</span>}
+      title={
+        <div className='drawer-header-with-switch'>
+          <span className='ccd-title'>{drawerTitle}</span>
+          <div className='header-switch'>
+            <span className='switch-label'>Active</span>
+            <Form.Item name='isActive' valuePropName='checked' noStyle>
+              <Switch disabled={!isEditing} />
+            </Form.Item>
+          </div>
+        </div>
+      }
       width={720}
       onClose={handleDrawerClose}
       open={open}
@@ -337,12 +347,6 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           <div className='ccd-section'>
             <div className='ccd-section-header'>
               <div className='ccd-section-title'>Basic Information</div>
-              <div className='active-toggle-row'>
-                <span className='active-label'>Active</span>
-                <Form.Item name='isActive' valuePropName='checked' className='active-toggle-item'>
-                  <Switch disabled={!isEditing} />
-                </Form.Item>
-              </div>
             </div>
             <Col span={24}>
               <Upload

@@ -59,6 +59,7 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
           status: checkpoint.status,
           overallScore: checkpoint.overallScore,
           notes: checkpoint.notes,
+          isActive: checkpoint.isActive !== undefined ? checkpoint.isActive : true,
         });
       } else {
         // Creating new checkpoint - reset form
@@ -136,10 +137,10 @@ const QualityCheckpointFormDrawer: React.FC<QualityCheckpointFormDrawerProps> = 
   return (
     <Drawer
       title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className='drawer-header-with-switch'>
           <span>{checkpoint ? 'Edit Quality Checkpoint' : 'Create Quality Checkpoint'}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '14px', color: '#666' }}>Active</span>
+          <div className='header-switch'>
+            <span className='switch-label'>Active</span>
             <Form.Item name='isActive' valuePropName='checked' noStyle>
               <Switch disabled={!checkpoint} />
             </Form.Item>

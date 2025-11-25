@@ -6,14 +6,20 @@ const globalPrisma = new PrismaClient();
 // Interfaces for Inspection System
 export interface CreateInspectionData {
   inspectionType: InspectionType;
-  referenceType: string; // PRODUCT, ORDER, BATCH
+  referenceType: string;
   referenceId: string;
   locationId?: string;
-  inspectorId: string;
+  inspectorId?: string;
+  inspectorName?: string;
   templateId?: string;
-  scheduledDate: Date;
+  scheduledDate?: Date;
+  inspectionDate?: Date;
+  nextInspectionDate?: Date;
+  status?: InspectionStatus;
+  qualityScore?: number;
   inspectorNotes?: string;
   recommendations?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateInspectionData {
@@ -24,6 +30,10 @@ export interface UpdateInspectionData {
   qualityScore?: number;
   inspectorNotes?: string;
   recommendations?: string;
+  inspectorName?: string;
+  inspectionDate?: Date;
+  nextInspectionDate?: Date;
+  isActive?: boolean;
 }
 
 export interface CreateInspectionTemplateData {
@@ -107,12 +117,17 @@ export class InspectionService {
         reference_type: data.referenceType,
         reference_id: data.referenceId,
         location_id: data.locationId || null,
-        inspector_id: data.inspectorId,
+        inspector_id: data.inspectorId || null,
+        inspector_name: data.inspectorName || null,
         template_id: data.templateId || null,
-        scheduled_date: data.scheduledDate,
-        status: InspectionStatus.PENDING,
+        scheduled_date: data.scheduledDate || null,
+        inspection_date: data.inspectionDate || null,
+        next_inspection_date: data.nextInspectionDate || null,
+        status: data.status || InspectionStatus.PENDING,
+        quality_score: data.qualityScore || null,
         inspector_notes: data.inspectorNotes || null,
         recommendations: data.recommendations || null,
+        is_active: data.isActive !== undefined ? data.isActive : true,
         created_at: now,
         updated_at: now,
       },
@@ -160,15 +175,22 @@ export class InspectionService {
       referenceType: inspection.reference_type,
       referenceId: inspection.reference_id,
       locationId: inspection.location_id || undefined,
-      inspector: {
+      inspector: inspection.inspector ? {
         id: inspection.inspector.id,
         firstName: inspection.inspector.first_name,
         lastName: inspection.inspector.last_name,
         email: inspection.inspector.email || '',
-      },
+      } : null,
+      inspectorName: inspection.inspector_name || undefined,
       templateId: inspection.template_id || undefined,
-      scheduledDate: inspection.scheduled_date,
+      scheduledDate: inspection.scheduled_date || undefined,
+      inspectionDate: inspection.inspection_date || undefined,
+      nextInspectionDate: inspection.next_inspection_date || undefined,
       status: inspection.status,
+      qualityScore: inspection.quality_score || undefined,
+      inspectorNotes: inspection.inspector_notes || undefined,
+      recommendations: inspection.recommendations || undefined,
+      isActive: inspection.is_active,
       createdAt: inspection.created_at,
       updatedAt: inspection.updated_at,
     };
@@ -242,13 +264,16 @@ export class InspectionService {
       inspectionType: inspection.inspection_type,
       referenceType: inspection.reference_type,
       referenceId: inspection.reference_id,
-      inspector: {
+      inspector: inspection.inspector ? {
         id: inspection.inspector.id,
         firstName: inspection.inspector.first_name,
         lastName: inspection.inspector.last_name,
         avatarUrl: inspection.inspector.avatar_url || undefined,
-      },
-      scheduledDate: inspection.scheduled_date,
+      } : null,
+      inspectorName: inspection.inspector_name || undefined,
+      scheduledDate: inspection.scheduled_date || undefined,
+      inspectionDate: inspection.inspection_date || undefined,
+      nextInspectionDate: inspection.next_inspection_date || undefined,
       startedAt: inspection.started_at || undefined,
       completedAt: inspection.completed_at || undefined,
       status: inspection.status,
@@ -256,6 +281,7 @@ export class InspectionService {
       qualityScore: inspection.quality_score || undefined,
       checkpointsTotal: inspection.checkpoints.length,
       checkpointsCompleted: inspection.checkpoints.filter(cp => cp.result).length,
+      isActive: inspection.is_active,
       createdAt: inspection.created_at,
       updatedAt: inspection.updated_at,
     }));

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Form, Input, Select, DatePicker, Button, message, Upload } from 'antd';
+import { Drawer, Form, Input, Select, DatePicker, Button, message, Upload, Switch } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { qualityService } from '../../services/qualityService';
@@ -38,6 +38,7 @@ const ComplianceReportFormDrawer: React.FC<ComplianceReportFormDrawerProps> = ({
         status: report.status,
         findings: report.findings,
         recommendations: report.recommendations,
+        isActive: report.isActive !== undefined ? report.isActive : true,
       });
       if (report.documentUrl) {
         setDocumentUrl(report.documentUrl);
@@ -47,6 +48,7 @@ const ComplianceReportFormDrawer: React.FC<ComplianceReportFormDrawerProps> = ({
       form.setFieldsValue({
         reportDate: dayjs(),
         status: 'PENDING_REVIEW',
+        isActive: true,
       });
       setDocumentUrl('');
     }
@@ -120,7 +122,17 @@ const ComplianceReportFormDrawer: React.FC<ComplianceReportFormDrawerProps> = ({
 
   return (
     <Drawer
-      title={isEditing ? 'Edit Compliance Report' : 'Create Compliance Report'}
+      title={
+        <div className='drawer-header-with-switch'>
+          <span>{isEditing ? 'Edit Compliance Report' : 'Create Compliance Report'}</span>
+          <div className='header-switch'>
+            <span className='switch-label'>Active</span>
+            <Form.Item name='isActive' valuePropName='checked' noStyle>
+              <Switch disabled={!isEditing} />
+            </Form.Item>
+          </div>
+        </div>
+      }
       width={720}
       open={visible}
       onClose={handleCancel}

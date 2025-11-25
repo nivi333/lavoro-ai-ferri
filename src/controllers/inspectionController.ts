@@ -9,11 +9,17 @@ const createInspectionSchema = Joi.object({
   referenceType: Joi.string().valid('PRODUCT', 'ORDER', 'BATCH').required(),
   referenceId: Joi.string().required(),
   locationId: Joi.string().optional(),
-  inspectorId: Joi.string().required(),
+  inspectorId: Joi.string().optional(),
+  inspectorName: Joi.string().optional(),
   templateId: Joi.string().optional(),
-  scheduledDate: Joi.date().required(),
+  scheduledDate: Joi.date().optional(),
+  inspectionDate: Joi.date().optional(),
+  nextInspectionDate: Joi.date().optional(),
   inspectorNotes: Joi.string().max(1000).optional(),
   recommendations: Joi.string().max(1000).optional(),
+  status: Joi.string().valid('PENDING', 'IN_PROGRESS', 'PASSED', 'FAILED', 'CONDITIONAL').optional(),
+  qualityScore: Joi.number().min(0).max(100).optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 const updateInspectionSchema = Joi.object({
@@ -24,6 +30,10 @@ const updateInspectionSchema = Joi.object({
   qualityScore: Joi.number().min(0).max(100).optional(),
   inspectorNotes: Joi.string().max(1000).optional(),
   recommendations: Joi.string().max(1000).optional(),
+  inspectorName: Joi.string().optional(),
+  inspectionDate: Joi.date().optional(),
+  nextInspectionDate: Joi.date().optional(),
+  isActive: Joi.boolean().optional(),
 }).min(1);
 
 const completeInspectionSchema = Joi.object({

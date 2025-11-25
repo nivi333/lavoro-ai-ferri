@@ -26,6 +26,71 @@
 
 ## 🔄 RECENT MAJOR CHANGES & IMPLEMENTATIONS
 
+### **Active Toggle Implementation (November 2024)** ✅ **COMPLETED**
+
+#### **Implementation Overview:**
+- **Universal Active Toggle**: Added `is_active` field to all major entities (companies, locations, products, inspections, quality checkpoints, defects, compliance reports)
+- **Consistent UI Pattern**: All form drawers now have Active toggle in header (top-right position)
+- **Default Behavior**: New records default to `active: true` with toggle disabled during creation
+- **Edit Functionality**: Toggle enabled only during edit mode for existing records
+
+#### **Database Schema Changes:**
+- **Added `is_active` field** to all relevant tables:
+  ```sql
+  -- Companies, Locations (already existed)
+  ALTER TABLE companies ADD COLUMN is_active BOOLEAN DEFAULT true;
+  ALTER TABLE company_locations ADD COLUMN is_active BOOLEAN DEFAULT true;
+  
+  -- Quality Control Tables
+  ALTER TABLE quality_inspections ADD COLUMN is_active BOOLEAN DEFAULT true;
+  ALTER TABLE quality_checkpoints ADD COLUMN is_active BOOLEAN DEFAULT true;
+  ALTER TABLE quality_defects ADD COLUMN is_active BOOLEAN DEFAULT true;
+  ALTER TABLE compliance_reports ADD COLUMN is_active BOOLEAN DEFAULT true;
+  
+  -- Products (already existed)
+  ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT true;
+  ```
+
+#### **Frontend Implementation:**
+1. **Drawer Header Pattern**: All drawers use consistent `drawer-header-with-switch` CSS class
+2. **Form Initialization**: 
+   - **Create Mode**: `isActive: true` (disabled toggle)
+   - **Edit Mode**: `isActive: record.isActive` (enabled toggle)
+3. **Global CSS**: Added reusable styles in `index.scss` for consistent appearance
+4. **Table Columns**: Added Active status column with Green/Red tags
+
+#### **Backend Integration:**
+- **API Validation**: Updated Joi schemas to accept optional `isActive` field
+- **Service Layer**: All CRUD operations support `isActive` field
+- **Default Values**: Backend ensures `isActive: true` for new records when not specified
+
+#### **Affected Components:**
+- ✅ **CompanyCreationDrawer**: Header toggle, default true, disabled on create
+- ✅ **LocationDrawer**: Header toggle, default true, disabled on create  
+- ✅ **ProductFormDrawer**: Header toggle, default true, disabled on create
+- ✅ **InspectionFormDrawer**: Header toggle, default true, disabled on create
+- ✅ **QualityCheckpointFormDrawer**: Header toggle, default true, disabled on create
+- ✅ **QualityDefectFormDrawer**: Header toggle, default true, disabled on create
+- ✅ **ComplianceReportFormDrawer**: Header toggle, default true, disabled on create
+
+#### **Future Implementation Rule:**
+**ALL new form drawers MUST include Active toggle in header using this pattern:**
+```tsx
+title={
+  <div className='drawer-header-with-switch'>
+    <span>{isEditing ? 'Edit [Entity]' : 'Create [Entity]'}</span>
+    <div className='header-switch'>
+      <span className='switch-label'>Active</span>
+      <Form.Item name='isActive' valuePropName='checked' noStyle>
+        <Switch disabled={!isEditing} />
+      </Form.Item>
+    </div>
+  </div>
+}
+```
+
+---
+
 ### **User Invitation System Overhaul (November 2024)**
 
 #### **Previous Implementation Issues:**
@@ -151,7 +216,14 @@
 - **Error Messages**: Provide specific, actionable error messages (e.g., "Invited user does not exist in the system" not "Invalid token")
 - **Validation**: Check company context before role permissions in middleware chain
 ---
+Before making ANY changes to a component:
 
+Find and read the EXACT reference component (e.g., CompanyCreationDrawer.tsx,CompanyCreationDrawer.scss and etc.,)
+Copy the EXACT structure - same imports, same layout, same styling approach
+Copy the EXACT CSS approach - no new SCSS files, use what's already there
+Copy the EXACT button/action pattern - same buttons, same positioning, same styling
+Only change the field names and labels - nothing else
+Do NOT create new files or new CSS - use existing patterns only"
 ## 📋 EPIC Overview
 
 **Epic Name**: Multi-Tenant Textile Manufacturing ERP System  
@@ -902,101 +974,103 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Metrics methods: getMetrics ✅
  
 
-- [ ] **InspectionsListPage** (`frontend/src/pages/InspectionsListPage.tsx`)
-  - **Header**: "Quality Inspections" + "New Inspection" button
-  - **Professional AntD Table**:
-    - **Columns**:
-      - **Inspection ID**: Auto-generated ID with link to details
-      - **Type**: Badge (Incoming, In-Process, Final, Random)
-      - **Product/Order**: Name with SKU/Order number
-      - **Inspector**: User name with avatar
-      - **Date**: Formatted date with time
-      - **Status**: Status tag (Pending=yellow, In Progress=blue, Passed=green, Failed=red)
-      - **Result**: Pass/Fail with score percentage
-      - **Defects**: Count of defects found
-      - **Actions**: More menu (View, Edit, Complete, Print Report)
-  - **Filters & Search**:
-    - Search bar: Inspection ID, product name, order number
-    - Type filter: Dropdown (All Types, Incoming, In-Process, Final, Random)
-    - Status filter: Dropdown (All, Pending, In Progress, Passed, Failed)
-    - Date range picker
-    - Inspector filter: Dropdown with user list
-    - Location filter: Dropdown with company locations
-  - **Bulk Actions**:
-    - Selected count indicator
-    - Bulk assign inspector
-    - Bulk export to PDF/Excel
-    - Bulk delete (with confirmation)
-  - **Pagination**: 10, 25, 50, 100 per page
-  - **Empty State**: "No inspections found" with "Create Inspection" button
+- [x] **InspectionsListPage** (`frontend/src/pages/InspectionsListPage.tsx`) ✅ **COMPLETED**
+  - **Header**: "Quality Inspections" + "New Inspection" button ✅
+  - **Professional AntD Table**: ✅
+    - **Columns**: ✅
+      - **Inspection ID**: Auto-generated ID with link to details ✅
+      - **Type**: Badge (Incoming, In-Process, Final, Random) ✅
+      - **Product/Order**: Name with SKU/Order number ✅
+      - **Inspector**: User name with avatar ✅
+      - **Date**: Formatted date with time ✅
+      - **Status**: Status tag (Pending=yellow, In Progress=blue, Passed=green, Failed=red) ✅
+      - **Result**: Pass/Fail with score percentage ✅
+      - **Defects**: Count of defects found ✅
+      - **Actions**: More menu (View, Edit, Complete, Print Report) ✅
+  - **Filters & Search**: ✅
+    - Search bar: Inspection ID, product name, order number ✅
+    - Type filter: Dropdown (All Types, Incoming, In-Process, Final, Random) ✅
+    - Status filter: Dropdown (All, Pending, In Progress, Passed, Failed) ✅
+    - Date range picker ✅
+    - Inspector filter: Dropdown with user list ✅
+    - Location filter: Dropdown with company locations ✅
+  - **Bulk Actions**: ✅
+    - Selected count indicator ✅
+    - Bulk assign inspector ✅
+    - Bulk export to PDF/Excel ✅
+    - Bulk delete (with confirmation) ✅
+  - **Pagination**: 10, 25, 50, 100 per page ✅
+  - **Empty State**: "No inspections found" with "Create Inspection" button ✅
+  - **Sidebar Navigation**: Added under Quality Control > Inspections ✅
 
-- [ ] **InspectionFormDrawer** (`frontend/src/components/quality/InspectionFormDrawer.tsx`)
-  - **Large Drawer** (800px width) for create/edit inspection
-  - **Section 1: Basic Information**
-    - Inspection Type: Dropdown (Incoming Material, In-Process, Final Product, Random Check)
-    - Reference Type: Radio (Product, Order, Batch)
-    - Reference Selection: Searchable dropdown based on type
-    - Location: Dropdown with company locations
-    - Inspector: Dropdown with users (default to current user)
-    - Scheduled Date: Date picker
-  - **Section 2: Inspection Template**
-    - Template Selection: Dropdown with predefined templates
-    - Or "Create Custom Checklist" option
-    - Dynamic checklist based on template
-  - **Section 3: Inspection Checklist**
-    - Dynamic checkpoint items from template
-    - Each checkpoint:
-      - Checkpoint name (e.g., "Fabric Quality", "Stitching Integrity")
-      - Pass/Fail toggle or rating (1-5 stars)
-      - Notes field for observations
-      - Photo upload for evidence
-    - Add custom checkpoint button
-  - **Section 4: Overall Assessment**
-    - Overall Result: Radio (Pass, Fail, Conditional Pass)
-    - Quality Score: Auto-calculated percentage
-    - Inspector Notes: Text area for summary
-    - Recommendations: Text area for corrective actions
-  - **Real-time Validation**: Required fields, score calculation
-  - **Auto-save Draft**: Save progress automatically
-  - **Cancel & Save/Complete buttons** at bottom
+- [x] **InspectionFormDrawer** (`frontend/src/components/quality/InspectionFormDrawer.tsx`) ✅ **COMPLETED**
+  - **Large Drawer** (800px width) for create/edit inspection ✅
+  - **Section 1: Basic Information** ✅
+    - Inspection Type: Dropdown (Incoming Material, In-Process, Final Product, Random Check) ✅
+    - Reference Type: Radio (Product, Order, Batch) ✅
+    - Reference Selection: Searchable dropdown based on type ✅
+    - Location: Dropdown with company locations ✅
+    - Inspector: Dropdown with users (default to current user) ✅
+    - Scheduled Date: Date picker ✅
+  - **Section 2: Inspection Template** ✅
+    - Template Selection: Dropdown with predefined templates ✅
+    - Or "Create Custom Checklist" option ✅
+    - Dynamic checklist based on template ✅
+  - **Section 3: Inspection Checklist** ✅
+    - Dynamic checkpoint items from template ✅
+    - Each checkpoint: ✅
+      - Checkpoint name (e.g., "Fabric Quality", "Stitching Integrity") ✅
+      - Pass/Fail toggle or rating (1-5 stars) ✅
+      - Notes field for observations ✅
+      - Photo upload for evidence ✅
+    - Add custom checkpoint button ✅
+  - **Section 4: Overall Assessment** ✅
+    - Overall Result: Radio (Pass, Fail, Conditional Pass) ✅
+    - Quality Score: Auto-calculated percentage ✅
+    - Inspector Notes: Text area for summary ✅
+    - Recommendations: Text area for corrective actions ✅
+  - **Real-time Validation**: Required fields, score calculation ✅
+  - **Auto-save Draft**: Save progress automatically ✅
+  - **Cancel & Save/Complete buttons** at bottom ✅
 
-- [ ] **InspectionDetailsPage** (`frontend/src/pages/InspectionDetailsPage.tsx`)
-  - **Header**: Inspection ID + Status badge + Action buttons
-  - **Action Buttons**:
-    - Edit (if not completed)
-    - Complete Inspection (if in progress)
-    - Print Report
-    - Export PDF
-    - Delete (ADMIN only)
-  - **Inspection Information Card**:
-    - Type, Reference (Product/Order), Location
-    - Inspector details with avatar
-    - Scheduled Date, Completed Date
-    - Duration (time taken)
-  - **Checklist Results Section**:
-    - Table of all checkpoints with results
-    - Pass/Fail indicators with color coding
-    - Notes and photos for each checkpoint
-    - Expandable rows for detailed observations
-  - **Overall Assessment Card**:
-    - Quality Score (large percentage display)
-    - Pass/Fail result with badge
-    - Inspector notes
-    - Recommendations
-  - **Defects Section** (if any found):
-    - List of defects linked to this inspection
-    - Defect severity, description, status
-    - Link to defect details
-  - **Activity Timeline**:
-    - Inspection created
-    - Started by inspector
-    - Checkpoints completed
-    - Defects reported
-    - Inspection completed
-  - **Related Items**:
-    - Link to product/order
-    - Link to previous inspections of same item
-    - Link to location
+- [x] **InspectionDetailsPage** (`frontend/src/pages/InspectionDetailsPage.tsx`) ✅ **COMPLETED**
+  - **Header**: Inspection ID + Status badge + Action buttons ✅
+  - **Action Buttons**: ✅
+    - Edit (if not completed) ✅
+    - Complete Inspection (if in progress) ✅
+    - Print Report ✅
+    - Export PDF ✅
+    - Delete (ADMIN only) ✅
+  - **Inspection Information Card**: ✅
+    - Type, Reference (Product/Order), Location ✅
+    - Inspector details with avatar ✅
+    - Scheduled Date, Completed Date ✅
+    - Duration (time taken) ✅
+  - **Checklist Results Section**: ✅
+    - Table of all checkpoints with results ✅
+    - Pass/Fail indicators with color coding ✅
+    - Notes and photos for each checkpoint ✅
+    - Expandable rows for detailed observations ✅
+  - **Overall Assessment Card**: ✅
+    - Quality Score (large percentage display) ✅
+    - Pass/Fail result with badge ✅
+    - Inspector notes ✅
+    - Recommendations ✅
+  - **Defects Section** (if any found): ✅
+    - List of defects linked to this inspection ✅
+    - Defect severity, description, status ✅
+    - Link to defect details ✅
+  - **Activity Timeline**: ✅
+    - Inspection created ✅
+    - Started by inspector ✅
+    - Checkpoints completed ✅
+    - Defects reported ✅
+    - Inspection completed ✅
+  - **Related Items**: ✅
+    - Link to product/order ✅
+    - Link to previous inspections of same item ✅
+    - Link to location ✅
+  - **Sidebar Navigation**: Accessible via Quality Control > Inspections > Details ✅
 
 - [ ] **DefectsListPage** (`frontend/src/pages/DefectsListPage.tsx`)
   - **Header**: "Quality Defects" + "Report Defect" button
@@ -1031,6 +1105,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 - [ ] **DefectFormDrawer** (`frontend/src/components/quality/DefectFormDrawer.tsx`)
   - **Drawer** (720px) for report/edit defect
+  - **Header**: Active toggle (disabled on create, enabled on edit, default true)
   - **Section 1: Defect Information**
     - Severity: Radio buttons (Critical, High, Medium, Low)
     - Category: Dropdown (Material, Workmanship, Design, Packaging, Other)
@@ -1105,6 +1180,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 - [ ] **TemplateFormDrawer** (`frontend/src/components/quality/TemplateFormDrawer.tsx`)
   - **Drawer** (720px) for create/edit template
+  - **Header**: Active toggle (disabled on create, enabled on edit, default true)
   - **Section 1: Template Information**
     - Template Name: Input (required)
     - Description: Text area
@@ -1199,6 +1275,84 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - B2B/B2C sales channel management
   - Import/Export documentation system
   - Supply chain visibility dashboard
+
+### **📋 PLANNED - Sprint 3.8: Production Planning & Scheduling**
+**Why Critical**: Textile manufacturing requires complex production planning with multiple dependencies (yarn → fabric → dyeing → garment). Without proper planning, you face bottlenecks, missed deadlines, and inefficient resource utilization.
+
+**Features**:
+- **Production Orders**: Link sales orders to production schedules
+- **Capacity Planning**: Machine capacity vs order requirements
+- **Material Requirements Planning (MRP)**: Auto-calculate raw material needs
+- **Production Scheduling**: Gantt charts, timeline views, drag-and-drop scheduling
+- **Work Orders**: Detailed production instructions for each stage
+- **Shop Floor Control**: Real-time production tracking, progress updates
+- **Bottleneck Detection**: Identify and resolve production constraints
+- **Benefits**: 30% faster production cycles, 25% better resource utilization, on-time delivery
+
+### **📋 PLANNED - Sprint 3.9: Supplier & Procurement Management**
+**Why Critical**: Textile production depends heavily on timely raw material supply (yarn, dyes, chemicals, accessories). Poor supplier management leads to production delays and quality issues.
+
+**Features**:
+- **Supplier Master**: Vendor database with ratings, certifications, payment terms
+- **Purchase Requisitions**: Material request workflow with approvals
+- **Purchase Orders**: Auto-generate POs from production requirements
+- **Supplier Performance**: On-time delivery, quality ratings, price trends
+- **RFQ Management**: Request for quotations, bid comparison
+- **Goods Receipt**: Incoming material inspection and quality checks
+- **Supplier Payments**: Payment tracking, aging reports
+- **Benefits**: 20% cost savings through better negotiation, reduced stockouts
+
+### **📋 PLANNED - Sprint 3.10: Costing & Pricing Management**
+**Why Critical**: Textile products have complex costing (yarn cost, dyeing cost, labor, overheads). Accurate costing is essential for profitability and competitive pricing.
+
+**Features**:
+- **Bill of Materials (BOM)**: Multi-level BOM for garments (fabric → yarn → fiber)
+- **Cost Sheets**: Detailed cost breakdown (material, labor, overhead, profit margin)
+- **Standard Costing**: Set standard costs, track variances
+- **Actual Costing**: Real-time cost tracking from production
+- **Pricing Rules**: Cost-plus pricing, market-based pricing, volume discounts
+- **Profitability Analysis**: Product-wise, order-wise, customer-wise margins
+- **What-If Analysis**: Simulate cost changes (raw material price increase, etc.)
+- **Benefits**: 15% margin improvement, better pricing decisions, cost control
+
+### **📋 PLANNED - Sprint 3.11: Warehouse & Logistics Management**
+**Why Critical**: Textile businesses handle large volumes of raw materials, WIP, and finished goods across multiple locations. Efficient warehouse management reduces handling costs and improves order fulfillment.
+
+**Features**:
+- **Multi-Warehouse Management**: Separate warehouses for raw materials, WIP, finished goods
+- **Bin/Rack Location**: Precise storage location tracking
+- **Barcode/RFID Scanning**: Quick receiving, picking, dispatch
+- **Stock Transfers**: Inter-warehouse transfers with tracking
+- **Picking & Packing**: Order fulfillment workflow, packing lists
+- **Shipping Integration**: Carrier integration, tracking numbers, delivery proof
+- **Warehouse Analytics**: Storage utilization, picking efficiency, aging stock
+- **Benefits**: 40% faster order fulfillment, 30% reduced handling costs
+
+### **📋 PLANNED - Sprint 3.12: Customer Relationship Management (CRM)**
+**Why Critical**: Textile B2B requires managing long-term customer relationships, repeat orders, and custom requirements. CRM helps retain customers and grow revenue.
+
+**Features**:
+- **Customer Master**: Complete customer profiles, contact history
+- **Lead Management**: Track inquiries, quotations, follow-ups
+- **Sales Pipeline**: Visual pipeline from lead to order
+- **Customer Orders History**: Past orders, preferences, pricing
+- **Customer Portal**: Self-service order tracking, invoice download
+- **Communication Log**: Email, calls, meetings tracking
+- **Customer Analytics**: Top customers, revenue trends, churn risk
+- **Benefits**: 25% increase in repeat orders, better customer retention
+
+### **📋 PLANNED - Sprint 3.13: Financial Accounting Integration**
+**Why Critical**: Textile ERP needs seamless integration with accounting for accurate financial reporting, tax compliance, and business insights.
+
+**Features**:
+- **Chart of Accounts**: Industry-standard accounting structure
+- **Journal Entries**: Auto-posting from transactions (sales, purchases, payments)
+- **Accounts Receivable**: Customer invoices, payments, aging
+- **Accounts Payable**: Supplier bills, payments, aging
+- **Bank Reconciliation**: Match bank statements with transactions
+- **GST/Tax Management**: Tax calculations, returns, compliance
+- **Financial Reports**: P&L, Balance Sheet, Cash Flow, Trial Balance
+- **Benefits**: Real-time financial visibility, tax compliance, audit readiness
 
 ---
 
@@ -2037,85 +2191,6 @@ Stages:
 
 ---
 
-### **📋 RECOMMENDED NEW FEATURES FOR TEXTILE ERP**
-
-#### **Sprint 3.8: Production Planning & Scheduling**
-**Why Critical**: Textile manufacturing requires complex production planning with multiple dependencies (yarn → fabric → dyeing → garment). Without proper planning, you face bottlenecks, missed deadlines, and inefficient resource utilization.
-
-**Features**:
-- **Production Orders**: Link sales orders to production schedules
-- **Capacity Planning**: Machine capacity vs order requirements
-- **Material Requirements Planning (MRP)**: Auto-calculate raw material needs
-- **Production Scheduling**: Gantt charts, timeline views, drag-and-drop scheduling
-- **Work Orders**: Detailed production instructions for each stage
-- **Shop Floor Control**: Real-time production tracking, progress updates
-- **Bottleneck Detection**: Identify and resolve production constraints
-- **Benefits**: 30% faster production cycles, 25% better resource utilization, on-time delivery
-
-#### **Sprint 3.9: Supplier & Procurement Management**
-**Why Critical**: Textile production depends heavily on timely raw material supply (yarn, dyes, chemicals, accessories). Poor supplier management leads to production delays and quality issues.
-
-**Features**:
-- **Supplier Master**: Vendor database with ratings, certifications, payment terms
-- **Purchase Requisitions**: Material request workflow with approvals
-- **Purchase Orders**: Auto-generate POs from production requirements
-- **Supplier Performance**: On-time delivery, quality ratings, price trends
-- **RFQ Management**: Request for quotations, bid comparison
-- **Goods Receipt**: Incoming material inspection and quality checks
-- **Supplier Payments**: Payment tracking, aging reports
-- **Benefits**: 20% cost savings through better negotiation, reduced stockouts
-
-#### **Sprint 3.10: Costing & Pricing Management**
-**Why Critical**: Textile products have complex costing (yarn cost, dyeing cost, labor, overheads). Accurate costing is essential for profitability and competitive pricing.
-
-**Features**:
-- **Bill of Materials (BOM)**: Multi-level BOM for garments (fabric → yarn → fiber)
-- **Cost Sheets**: Detailed cost breakdown (material, labor, overhead, profit margin)
-- **Standard Costing**: Set standard costs, track variances
-- **Actual Costing**: Real-time cost tracking from production
-- **Pricing Rules**: Cost-plus pricing, market-based pricing, volume discounts
-- **Profitability Analysis**: Product-wise, order-wise, customer-wise margins
-- **What-If Analysis**: Simulate cost changes (raw material price increase, etc.)
-- **Benefits**: 15% margin improvement, better pricing decisions, cost control
-
-#### **Sprint 3.11: Warehouse & Logistics Management**
-**Why Critical**: Textile businesses handle large volumes of raw materials, WIP, and finished goods across multiple locations. Efficient warehouse management reduces handling costs and improves order fulfillment.
-
-**Features**:
-- **Multi-Warehouse Management**: Separate warehouses for raw materials, WIP, finished goods
-- **Bin/Rack Location**: Precise storage location tracking
-- **Barcode/RFID Scanning**: Quick receiving, picking, dispatch
-- **Stock Transfers**: Inter-warehouse transfers with tracking
-- **Picking & Packing**: Order fulfillment workflow, packing lists
-- **Shipping Integration**: Carrier integration, tracking numbers, delivery proof
-- **Warehouse Analytics**: Storage utilization, picking efficiency, aging stock
-- **Benefits**: 40% faster order fulfillment, 30% reduced handling costs
-
-#### **Sprint 3.12: Customer Relationship Management (CRM)**
-**Why Critical**: Textile B2B requires managing long-term customer relationships, repeat orders, and custom requirements. CRM helps retain customers and grow revenue.
-
-**Features**:
-- **Customer Master**: Complete customer profiles, contact history
-- **Lead Management**: Track inquiries, quotations, follow-ups
-- **Sales Pipeline**: Visual pipeline from lead to order
-- **Customer Orders History**: Past orders, preferences, pricing
-- **Customer Portal**: Self-service order tracking, invoice download
-- **Communication Log**: Email, calls, meetings tracking
-- **Customer Analytics**: Top customers, revenue trends, churn risk
-- **Benefits**: 25% increase in repeat orders, better customer retention
-
-#### **Sprint 3.13: Financial Accounting Integration**
-**Why Critical**: Textile ERP needs seamless integration with accounting for accurate financial reporting, tax compliance, and business insights.
-
-**Features**:
-- **Chart of Accounts**: Industry-standard accounting structure
-- **Journal Entries**: Auto-posting from transactions (sales, purchases, payments)
-- **Accounts Receivable**: Customer invoices, payments, aging
-- **Accounts Payable**: Supplier bills, payments, aging
-- **Bank Reconciliation**: Match bank statements with transactions
-- **GST/Tax Management**: Tax calculations, returns, compliance
-- **Financial Reports**: P&L, Balance Sheet, Cash Flow, Trial Balance
-- **Benefits**: Real-time financial visibility, tax compliance, audit readiness
 
 ---
 
