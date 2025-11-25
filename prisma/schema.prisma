@@ -36,6 +36,7 @@ model companies {
   default_location  String?
   company_locations company_locations[]
   user_companies    user_companies[]
+  user_invitations  user_invitations[]
   orders            orders[]            @relation("CompanyOrders")
   financial_documents financial_documents[]
   quality_checkpoints quality_checkpoints[]
@@ -124,9 +125,31 @@ model users {
   updated_at              DateTime
   sessions                sessions[]
   user_companies          user_companies[]
+  invitations_sent        user_invitations[] @relation("InvitationSender")
+  invitations_received    user_invitations[] @relation("InvitationReceiver")
   inspections             quality_inspections[] @relation("InspectionInspector")
   templates_created       inspection_templates[] @relation("TemplateCreator")
   defect_comments         defect_comments[] @relation("DefectCommentUser")
+}
+
+model user_invitations {
+  id          String    @id
+  user_id     String
+  company_id  String
+  invited_by  String
+  role        String
+  location_id String?
+  status      String    @default("PENDING")
+  created_at  DateTime  @default(now())
+  updated_at  DateTime
+
+  user        users     @relation("InvitationReceiver", fields: [user_id], references: [id], onDelete: Cascade)
+  company     companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  inviter     users     @relation("InvitationSender", fields: [invited_by], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([company_id])
+  @@index([status])
 }
 
 enum LocationType {

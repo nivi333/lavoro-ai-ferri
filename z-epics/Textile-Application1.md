@@ -1864,7 +1864,7 @@ Stages:
 - **Navigation**: Routes and sidebar menu for all Quality Control modules ✅
 - **UI/UX**: isActive field default true, disabled on create, editable on edit ✅
 
-### **� IN PROGRESS - Sprint 3.5: Textile-Specific Features**
+### **🔄 IN PROGRESS - Sprint 3.5: Textile-Specific Features**
 #### Backend Implementation ✅ COMPLETED
 - **Database Schema**: 5 tables (fabric_production, yarn_manufacturing, dyeing_finishing, garment_manufacturing, design_patterns) ✅
 - **Enums**: 9 textile-specific enums (FabricType, QualityGrade, YarnType, YarnProcess, DyeingProcess, GarmentType, ProductionStage, DesignCategory, DesignStatus) ✅
@@ -1886,6 +1886,7 @@ Stages:
 - **Dynamic Menu**: Render sidebar based on company.industry
 - **Textile Modules**: Fabric, Yarn, Dyeing, Garment, Design (for textile companies)
 - **Core Modules**: Always visible (Dashboard, Orders, Quality, Finance, Reports)
+
 
 ### **📋 PLANNED - Sprint 3.6: Product Master & Inventory Management**
 - **Product Catalog**: Centralized product/item master with complete specifications

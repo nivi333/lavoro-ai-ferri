@@ -865,7 +865,7 @@ class CompanyService {
         // Add user to company
         await prisma.$executeRaw`
           INSERT INTO user_companies (id, user_id, company_id, role, is_active, created_at, updated_at)
-          VALUES (${uuidv4()}, ${userId}, ${inv.company_id}, ${inv.role}, true, NOW(), NOW())
+          VALUES (${uuidv4()}, ${userId}, ${inv.company_id}, ${inv.role}::"Role", true, NOW(), NOW())
         `;
 
         // Update invitation status to ACCEPTED
