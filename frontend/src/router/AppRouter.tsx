@@ -16,6 +16,7 @@ import {
   InspectionsListPage,
   InspectionDetailsPage,
 } from '../pages';
+import MachineListPage from '../pages/MachineListPage';
 import CompanyDetailPage from '../pages/CompanyDetailPage';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 import QualityCheckpointsListPage from '../pages/QualityCheckpointsListPage';
@@ -121,9 +122,16 @@ export default function AppRouter() {
               path='/inventory'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <MainLayout>
-                    <InventoryListPage />
-                  </MainLayout>
+                  <InventoryListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/machines'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <MachineListPage />
                 </ProtectedRoute>
               }
             />

@@ -28,7 +28,7 @@ export default function Sidebar() {
 
     // Filter navigation items based on user role
     const userRole = currentCompany?.role;
-    const filteredItems = navigationItems.filter((item) => {
+    const filteredItems = navigationItems.filter(item => {
       // Users menu is only visible to OWNER, ADMIN, and MANAGER
       if (item.key === 'users') {
         return userRole && ['OWNER', 'ADMIN', 'MANAGER'].includes(userRole);
@@ -37,11 +37,11 @@ export default function Sidebar() {
     });
 
     // Convert navigation config to Ant Design Menu format
-    return filteredItems.map((item) => ({
+    return filteredItems.map(item => ({
       key: item.path,
       icon: <item.icon />,
       label: item.label,
-      children: item.children?.map((child) => ({
+      children: item.children?.map(child => ({
         key: child.path,
         icon: child.icon ? <child.icon /> : undefined,
         label: child.label,
@@ -97,7 +97,7 @@ export default function Sidebar() {
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key.startsWith('/')) {
       // Redirect placeholder routes to dashboard
-      const placeholderRoutes = ['/inventory', '/customers', '/machinery', '/reports', '/analytics'];
+      const placeholderRoutes = ['/customers', '/reports', '/analytics'];
       if (placeholderRoutes.includes(key)) {
         navigate('/dashboard');
       } else {
@@ -108,14 +108,14 @@ export default function Sidebar() {
 
   const getSelectedKeys = () => {
     const path = location.pathname;
-    
+
     // Find the exact matching menu item
     for (const item of menuItems) {
       // Check if it's a direct match
       if (item.key === path) {
         return [path];
       }
-      
+
       // Check children for match
       if (item.children) {
         for (const child of item.children) {
@@ -125,24 +125,24 @@ export default function Sidebar() {
         }
       }
     }
-    
+
     // Default to dashboard if no match
     return ['/dashboard'];
   };
 
   const getOpenKeys = () => {
     const path = location.pathname;
-    
+
     // Open Quality Control submenu if on quality or inspection pages
     if (path.includes('/quality') || path.includes('/inspections')) {
       return ['/quality'];
     }
-    
+
     // Open Textile Operations submenu if on textile pages
     if (path.includes('/textile')) {
       return ['/textile'];
     }
-    
+
     return [];
   };
 
@@ -159,7 +159,11 @@ export default function Sidebar() {
             placement='bottomLeft'
           >
             <div className='sidebar-header'>
-              <Avatar size={32} style={{ border: '1px solid #b3b3b3', padding: '2px' }} src={currentCompany.logoUrl}>
+              <Avatar
+                size={32}
+                style={{ border: '1px solid #b3b3b3', padding: '2px' }}
+                src={currentCompany.logoUrl}
+              >
                 {currentCompany.name.charAt(0)}
               </Avatar>
               <div className='company-details'>
@@ -181,7 +185,6 @@ export default function Sidebar() {
           className='navigation-menu'
           inlineIndent={20}
         />
-
       </div>
     </Sider>
   );

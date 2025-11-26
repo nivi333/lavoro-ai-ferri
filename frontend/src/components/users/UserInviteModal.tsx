@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, message, Space, Typography } from 'antd';
+import { Modal, Form, Input, Select, message, Space, Typography, Button } from 'antd';
 import { companyService } from '../../services/companyService';
 import useAuth from '../../contexts/AuthContext';
 import { GradientButton } from '../ui';
@@ -97,10 +97,11 @@ const UserInviteModal: React.FC<UserInviteModalProps> = ({ visible, onClose, onS
     <Modal
       title='Invite Team Members'
       open={visible}
+      onCancel={handleClose}
       footer={[
-        <GradientButton key='cancel' onClick={handleClose}>
+        <Button key='cancel' onClick={handleClose}>
           Cancel
-        </GradientButton>,
+        </Button>,
         <GradientButton
           key='submit'
           onClick={() => form.submit()}

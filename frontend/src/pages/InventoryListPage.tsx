@@ -8,10 +8,8 @@ import {
   Tag, 
   Avatar, 
   Typography, 
-  Card, 
-  Row, 
-  Col, 
-  Statistic, 
+  Empty,
+  Spin,
   message, 
   Dropdown,
   Tooltip
@@ -19,9 +17,7 @@ import {
 import { 
   SearchOutlined, 
   FilterOutlined, 
-  PlusOutlined, 
   MoreOutlined,
-  WarningOutlined,
   StockOutlined,
   SwapOutlined,
   BookOutlined,
@@ -31,14 +27,16 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Heading } from '../components/Heading';
+import { GradientButton } from '../components/ui';
+import { MainLayout } from '../components/layout';
+import { useHeader } from '../contexts/HeaderContext';
 import { inventoryService, LocationInventory, InventoryFilters } from '../services/inventoryService';
 import { locationService } from '../services/locationService';
 import useAuth from '../contexts/AuthContext';
 import ProductSelector from '../components/products/ProductSelector';
-import { StockMovementModal, StockReservationModal, StockAlertsCard } from '../components/inventory';
+import { StockMovementModal, StockReservationModal } from '../components/inventory';
 import './InventoryListPage.scss';
 
-const { Option } = Select;
 const { Text } = Typography;
 
 interface Location {
@@ -53,23 +51,28 @@ const InventoryListPage: React.FC = () => {
   const [inventory, setInventory] = useState<LocationInventory[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<InventoryFilters>({});
+  const [tableLoading, setTableLoading] = useState(false);
+  const [filters] = useState<InventoryFilters>({});
   const [searchText, setSearchText] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
+  const [selectedProduct, setSelectedProduct] = useState<string | undefined>(undefined);
   const [stockMovementModalVisible, setStockMovementModalVisible] = useState(false);
   const [stockReservationModalVisible, setStockReservationModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<LocationInventory | null>(null);
   const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
   const fetchRef = useRef<boolean>(false);
 
-  // Statistics
-  const totalProducts = inventory.length;
-  const lowStockItems = inventory.filter(item => 
-    item.reorderLevel && item.availableQuantity <= item.reorderLevel
-  ).length;
-  const outOfStockItems = inventory.filter(item => item.availableQuantity <= 0).length;
-  const totalValue = inventory.reduce((sum, item) => 
-    sum + (item.stockQuantity * item.product.costPrice), 0
-  );
+  // Set header actions
+  useEffect(() => {
+    setHeaderActions(
+      <GradientButton onClick={handleAddInventory} size='small'>
+        Add Inventory
+      </GradientButton>
+    );
+
+    return () => setHeaderActions(null);
+  }, [setHeaderActions]);
 
   // Fetch locations
   useEffect(() => {
@@ -95,7 +98,13 @@ const InventoryListPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await inventoryService.getLocationInventory(filters);
+      const currentFilters = {
+        ...filters,
+        search: searchText || undefined,
+        locationId: selectedLocation,
+        productId: selectedProduct
+      };
+      const response = await inventoryService.getLocationInventory(currentFilters);
       if (response.success) {
         setInventory(response.data || []);
       }
@@ -108,25 +117,43 @@ const InventoryListPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchInventory();
-  }, [currentCompany?.id, filters]);
-
-  // Handle search
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    setFilters(prev => ({ ...prev, search: value || undefined }));
+  const refreshInventory = async () => {
+    try {
+      setTableLoading(true);
+      const currentFilters = {
+        ...filters,
+        search: searchText || undefined,
+        locationId: selectedLocation,
+        productId: selectedProduct
+      };
+      const response = await inventoryService.getLocationInventory(currentFilters);
+      if (response.success) {
+        setInventory(response.data || []);
+      }
+    } catch (error) {
+      console.error('Error refreshing inventory:', error);
+      message.error('Failed to refresh inventory data');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  // Handle filter changes
-  const handleFilterChange = (key: keyof InventoryFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  useEffect(() => {
+    if (currentCompany) {
+      fetchInventory();
+    }
+  }, [currentCompany, searchText, selectedLocation, selectedProduct]);
+
+  // Handle add inventory
+  const handleAddInventory = () => {
+    message.info('Add inventory feature coming soon');
   };
 
   // Clear filters
   const clearFilters = () => {
-    setFilters({});
     setSearchText('');
+    setSelectedLocation(undefined);
+    setSelectedProduct(undefined);
   };
 
   // Get stock status
@@ -374,165 +401,104 @@ const InventoryListPage: React.FC = () => {
     setSelectedRecord(null);
   };
 
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage inventory.</div>
+      </MainLayout>
+    );
+  }
+
   return (
-    <div className="inventory-list-page">
-      {/* Header */}
-      <div className="inventory-header">
-        <div className="inventory-header-content">
-          <Heading level={2}>Inventory Management</Heading>
-          <div className="inventory-header-actions">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => message.info('Add inventory feature coming soon')}
-            >
-              Add Inventory
-            </Button>
-          </div>
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Inventory
+          </Heading>
         </div>
-      </div>
 
-      {/* Statistics Cards and Alerts */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Total Products"
-              value={totalProducts}
-              prefix={<AppstoreOutlined style={{ color: '#1890ff' }} />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Low Stock Items"
-              value={lowStockItems}
-              prefix={<WarningOutlined style={{ color: '#faad14' }} />}
-              valueStyle={{ color: lowStockItems > 0 ? '#faad14' : undefined }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Out of Stock"
-              value={outOfStockItems}
-              prefix={<AlertOutlined style={{ color: '#ff4d4f' }} />}
-              valueStyle={{ color: outOfStockItems > 0 ? '#ff4d4f' : undefined }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Total Value"
-              value={totalValue}
-              prefix="₹"
-              precision={0}
-              formatter={(value) => `${Number(value).toLocaleString()}`}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Stock Alerts */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col span={24}>
-          <StockAlertsCard maxItems={3} />
-        </Col>
-      </Row>
-
-      {/* Filters */}
-      <Card style={{ marginBottom: '24px' }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} md={8}>
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search products..."
+              placeholder='Search products...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
             <Select
-              placeholder="Select location"
-              style={{ width: '100%' }}
-              value={filters.locationId}
-              onChange={(value) => handleFilterChange('locationId', value)}
+              placeholder='All Locations'
+              value={selectedLocation}
+              onChange={setSelectedLocation}
+              style={{ width: 200 }}
               allowClear
             >
               {locations.map(location => (
-                <Option key={location.id} value={location.id}>
+                <Select.Option key={location.id} value={location.id}>
                   {location.name}
                   {location.isHeadquarters && ' (HQ)'}
-                </Option>
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
             <ProductSelector
-              placeholder="Select product"
-              style={{ width: '100%' }}
-              value={filters.productId}
-              onChange={(value) => handleFilterChange('productId', value)}
+              placeholder="All Products"
+              style={{ width: 200 }}
+              value={selectedProduct}
+              onChange={setSelectedProduct}
               allowClear
               showStockInfo={false}
             />
-          </Col>
-          <Col xs={24} sm={12} md={4}>
-            <Space>
-              <Select
-                placeholder="Stock status"
-                style={{ width: '120px' }}
-                onChange={(value) => {
-                  handleFilterChange('lowStock', value === 'low' ? true : undefined);
-                  handleFilterChange('outOfStock', value === 'out' ? true : undefined);
-                }}
-                allowClear
-              >
-                <Option value="low">Low Stock</Option>
-                <Option value="out">Out of Stock</Option>
-              </Select>
-              <Tooltip title="Refresh">
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={fetchInventory}
-                  loading={loading}
-                />
-              </Tooltip>
+            <Tooltip title="Refresh">
               <Button
-                icon={<FilterOutlined />}
-                onClick={clearFilters}
-                disabled={Object.keys(filters).length === 0}
-              >
-                Clear
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+                icon={<ReloadOutlined />}
+                onClick={refreshInventory}
+                loading={tableLoading}
+              />
+            </Tooltip>
+            <Button
+              icon={<FilterOutlined />}
+              onClick={clearFilters}
+              disabled={!searchText && !selectedLocation && !selectedProduct}
+            >
+              Clear
+            </Button>
+          </Space>
+        </div>
 
-      {/* Inventory Table */}
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={inventory}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            total: inventory.length,
-            pageSize: 20,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-          }}
-          scroll={{ x: 1200 }}
-          size="middle"
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : inventory.length === 0 ? (
+            <Empty description='No inventory found'>
+              <GradientButton size='small' onClick={handleAddInventory}>
+                Add First Inventory
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={inventory}
+              rowKey="id"
+              loading={tableLoading}
+              pagination={{
+                total: inventory.length,
+                pageSize: 20,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`,
+              }}
+              scroll={{ x: 1200 }}
+              size="middle"
+              className='inventory-table'
+            />
+          )}
+        </div>
+      </div>
 
       {/* Modals */}
       <StockMovementModal
@@ -550,7 +516,7 @@ const InventoryListPage: React.FC = () => {
         initialProductId={selectedRecord?.productId}
         initialLocationId={selectedRecord?.locationId}
       />
-    </div>
+    </MainLayout>
   );
 };
 

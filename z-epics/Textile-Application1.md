@@ -721,30 +721,37 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 ---
 
-## **PHASE 2.5: DASHBOARD & CORE UI** (Week 6.5)
+## **PHASE 2.5: UNIFIED DASHBOARD & CORE UI** (Week 6.5)
 
-### **Sprint 2.5: Main Dashboard Implementation**
+### **Sprint 2.5: Single Unified Dashboard Implementation**
 
 #### **Backend Tasks**
-- [x] **Dashboard Data APIs**
-  - KPI calculation endpoints
-  - Real-time activity feed API
-  - Company metrics aggregation
-  - Quick actions data services
+- [x] **Unified Dashboard Data APIs**
+  - Consolidated KPI calculation endpoints for all modules
+  - Real-time activity feed API across all business functions
+  - Company-wide metrics aggregation
+  - Quick actions data services for all features
 
 #### **Frontend Tasks**
-- [x] **Main Dashboard Implementation**
-  - Main Dashboard (`/dashboard`) with executive layout
-  - Header: Logo, company switcher, search, notifications, user menu
-  - Sidebar: Navigation menu (collapsible)
-  - KPI Cards: Users, Locations, Activity, Growth metrics
-  - Real-time updates: Live activity feed
-  - Quick actions: Common tasks shortcuts
-  - Company switcher: Multi-tenant company selection
-  - Analytics Dashboard (`/analytics`) with detailed reporting
-  - User analytics: Login patterns, role distribution, activity heatmaps
-  - Location analytics: Utilization, performance, growth
-  - System analytics: Performance metrics, usage statistics
+- [x] **Single Unified Dashboard Implementation**
+  - **Main Dashboard (`/dashboard`)** - The ONLY dashboard in the system
+  - **Unified Layout**: All features accessible from single dashboard
+  - **Header**: Logo, company switcher, search, notifications, user menu
+  - **Sidebar**: Complete navigation menu for all modules (collapsible)
+  - **Consolidated KPI Cards**: 
+    - Users, Locations, Products, Inventory, Quality, Orders
+    - Production metrics, Financial metrics, Machine status
+    - All business metrics in one unified view
+  - **Real-time Updates**: Live activity feed from all modules
+  - **Quick Actions**: Shortcuts to all major functions
+  - **Company Switcher**: Multi-tenant company selection
+  - **Module Widgets**: Each business area has widget space on main dashboard
+    - Inventory alerts and stock levels
+    - Quality control status
+    - Production schedules
+    - Order pipeline
+    - Machine maintenance alerts
+    - Financial summaries
   - Date range filters: Custom reporting periods
   - Export options: PDF, Excel, CSV reports
   - Drill-down: Detailed views from summary data
@@ -787,10 +794,10 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Inventory valuation (FIFO, LIFO, Weighted Average)
 
 #### **Frontend Tasks**
-- [x] **Inventory Dashboard**
-  - Stock levels overview
-  - Low stock alerts
-  - Inventory movement history
+- [x] **Inventory Module Integration**
+  - Stock levels widget on main dashboard
+  - Low stock alerts in unified dashboard
+  - Inventory movement summary in activity feed
   - Stock adjustment forms
 
 - [x] **Material Management**
@@ -815,10 +822,10 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Production reporting
 
 #### **Frontend Tasks**
-- [x] **Production Dashboard**
-  - Production KPIs and metrics
-  - Work order management
-  - Production scheduling interface
+- [x] **Production Module Integration**
+  - Production KPIs widget on main dashboard
+  - Work order status in unified dashboard
+  - Production scheduling summary in activity feed
   - Resource utilization charts
 
 - [x] **Manufacturing Execution**
@@ -1221,7 +1228,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 
 #### **Frontend Tasks**
 - [ ] **Textile Manufacturing Interface**
-  - ~~Fabric Production Dashboard with process monitoring~~ *(Optional: Dashboard enhancement - can be implemented later)*
+  - ~~Fabric Production Dashboard with process monitoring~~ *(Integrated into unified dashboard)*
   - Yarn Manufacturing workflow management
   - Dyeing & Finishing quality control interface
   - Pattern & Design CAD integration tools
@@ -1230,15 +1237,15 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
   - Cut & Sew Operations management interface
   - Quality Control inspection workflows
   - Bulk order management system
-  - Assembly line monitoring dashboard
+  - Assembly line monitoring integrated into unified dashboard
 
 - [ ] **Trading Operations Interface**
   - Wholesale trading platform
   - B2B/B2C sales channel management
   - Import/Export documentation system
-  - Supply chain visibility dashboard
+  - Supply chain visibility integrated into unified dashboard
 
-### **📋 PLANNED - Sprint 3.6: Product Master & Inventory Management**
+### **✅ COMPLETED - Sprint 3.6: Product Master & Inventory Management**
 - **Product Catalog**: Centralized product/item master with complete specifications
 - **Multi-Location Inventory**: Stock tracking across all company locations
 - **Stock Movements**: Complete transaction history (purchase, sale, transfer, adjustments)
@@ -1251,7 +1258,7 @@ Build a comprehensive, AI-powered, multi-tenant ERP system specifically designed
 - **Required Fields**: Product code, name, category, unit price, UOM (minimum)
 - **Benefits**: Eliminate errors, consistent pricing, real-time stock, faster workflows
 
-### **📋 PLANNED - Sprint 3.7: Machine Maintenance & Service Management**
+### **📋 DETAILED PLAN - Sprint 3.7: Machine Maintenance & Service Management**
 **Monitor and maintain machines and equipment to reduce downtime and optimize production efficiency.**
 
 #### **Core Features**
@@ -2249,3 +2256,432 @@ The combination of modern technology stack, AI-powered features, and industry-sp
 - `frontend/src/components/users/UserInviteDrawer.tsx` - Updated to use company service
 - `src/routes/v1/companyRoutes.ts` - Fixed route pattern
 - `src/controllers/companyController.ts` - Updated validation and logging
+
+---
+
+## 🔧 **SPRINT 3.7 DETAILED IMPLEMENTATION PLAN** ✅ **COMPLETED**
+
+### **📋 Machine Maintenance & Service Management - Complete Implementation Strategy** ✅ **IMPLEMENTED**
+
+#### **🏗️ BACKEND IMPLEMENTATION**
+
+##### **1. Database Schema Design**
+
+**New Tables to Create:**
+```sql
+-- Machine Master Data
+CREATE TABLE machines (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  machine_id VARCHAR(50) NOT NULL,
+  company_id UUID NOT NULL REFERENCES companies(id),
+  location_id UUID REFERENCES company_locations(id),
+  name VARCHAR(200) NOT NULL,
+  machine_type VARCHAR(100), -- Loom, Knitting, Dyeing, etc.
+  model VARCHAR(100),
+  manufacturer VARCHAR(100),
+  serial_number VARCHAR(100),
+  purchase_date DATE,
+  warranty_expiry DATE,
+  specifications JSONB, -- Technical specs
+  image_url VARCHAR(500),
+  qr_code VARCHAR(100),
+  status machine_status DEFAULT 'IDLE',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Machine Status History
+CREATE TABLE machine_status_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  machine_id UUID NOT NULL REFERENCES machines(id),
+  company_id UUID NOT NULL,
+  previous_status machine_status,
+  new_status machine_status NOT NULL,
+  changed_by UUID REFERENCES users(id),
+  reason TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Maintenance Schedules
+CREATE TABLE maintenance_schedules (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  schedule_id VARCHAR(50) NOT NULL,
+  machine_id UUID NOT NULL REFERENCES machines(id),
+  company_id UUID NOT NULL,
+  maintenance_type maintenance_type NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT,
+  frequency_days INTEGER, -- Every X days
+  last_completed DATE,
+  next_due DATE NOT NULL,
+  estimated_hours DECIMAL(5,2),
+  assigned_technician UUID REFERENCES users(id),
+  checklist JSONB, -- Array of tasks
+  parts_required JSONB, -- Array of parts
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Maintenance Records
+CREATE TABLE maintenance_records (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  record_id VARCHAR(50) NOT NULL,
+  machine_id UUID NOT NULL REFERENCES machines(id),
+  schedule_id UUID REFERENCES maintenance_schedules(id),
+  company_id UUID NOT NULL,
+  maintenance_type maintenance_type NOT NULL,
+  performed_by UUID REFERENCES users(id),
+  performed_date DATE NOT NULL,
+  duration_hours DECIMAL(5,2),
+  tasks_completed JSONB,
+  parts_used JSONB,
+  cost DECIMAL(10,2),
+  notes TEXT,
+  next_maintenance_date DATE,
+  status maintenance_record_status DEFAULT 'COMPLETED',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Breakdown Reports
+CREATE TABLE breakdown_reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  ticket_id VARCHAR(50) NOT NULL,
+  machine_id UUID NOT NULL REFERENCES machines(id),
+  company_id UUID NOT NULL,
+  reported_by UUID REFERENCES users(id),
+  severity breakdown_severity NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  breakdown_time TIMESTAMP NOT NULL,
+  resolved_time TIMESTAMP,
+  assigned_technician UUID REFERENCES users(id),
+  root_cause TEXT,
+  resolution_notes TEXT,
+  parts_used JSONB,
+  labor_hours DECIMAL(5,2),
+  repair_cost DECIMAL(10,2),
+  downtime_hours DECIMAL(8,2),
+  production_loss DECIMAL(12,2),
+  status breakdown_status DEFAULT 'OPEN',
+  priority breakdown_priority DEFAULT 'MEDIUM',
+  images JSONB, -- Array of image URLs
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Machine Assignments
+CREATE TABLE machine_assignments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  machine_id UUID NOT NULL REFERENCES machines(id),
+  operator_id UUID NOT NULL REFERENCES users(id),
+  company_id UUID NOT NULL,
+  shift_type shift_type,
+  assigned_date DATE NOT NULL,
+  is_primary BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Enums to Create:**
+```sql
+CREATE TYPE machine_status AS ENUM ('IN_USE', 'UNDER_MAINTENANCE', 'UNDER_REPAIR', 'IDLE', 'DECOMMISSIONED');
+CREATE TYPE maintenance_type AS ENUM ('DAILY_CHECK', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'ANNUAL', 'EMERGENCY');
+CREATE TYPE maintenance_record_status AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+CREATE TYPE breakdown_severity AS ENUM ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW');
+CREATE TYPE breakdown_status AS ENUM ('OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED');
+CREATE TYPE breakdown_priority AS ENUM ('URGENT', 'HIGH', 'MEDIUM', 'LOW');
+CREATE TYPE shift_type AS ENUM ('MORNING', 'AFTERNOON', 'NIGHT');
+```
+
+##### **2. Backend Services Architecture**
+
+**Files to Create:**
+
+1. **`src/services/machineService.ts`**
+   - Machine CRUD operations
+   - Status management and history tracking
+   - Machine assignment logic
+   - Utilization calculations
+   - Performance metrics (OEE, MTBF, MTTR)
+
+2. **`src/services/maintenanceService.ts`**
+   - Schedule management and automation
+   - Maintenance record tracking
+   - Cost calculations
+   - Parts inventory integration
+   - Reminder notifications
+
+3. **`src/services/breakdownService.ts`**
+   - Ticket creation and management
+   - Escalation logic
+   - Downtime calculations
+   - Real-time notifications
+   - Resolution tracking
+
+4. **`src/controllers/machineController.ts`**
+   - RESTful API endpoints for machines
+   - Status update endpoints
+   - Assignment management
+   - Performance analytics
+
+5. **`src/controllers/maintenanceController.ts`**
+   - Schedule CRUD operations
+   - Maintenance record management
+   - Cost tracking endpoints
+   - Calendar integration
+
+6. **`src/controllers/breakdownController.ts`**
+   - Breakdown reporting endpoints
+   - Ticket management
+   - Mobile-optimized endpoints
+   - Real-time status updates
+
+7. **`src/routes/v1/machineRoutes.ts`**
+   - Complete API routing structure
+   - Role-based access control
+   - Validation middleware
+
+##### **3. API Endpoints Structure**
+
+**Machine Management:**
+- `GET /api/v1/machines` - List all machines with filters
+- `POST /api/v1/machines` - Create new machine
+- `GET /api/v1/machines/:id` - Get machine details
+- `PUT /api/v1/machines/:id` - Update machine
+- `PATCH /api/v1/machines/:id/status` - Update machine status
+- `GET /api/v1/machines/:id/history` - Get status history
+- `POST /api/v1/machines/:id/assign` - Assign operator
+- `GET /api/v1/machines/analytics` - Performance metrics
+
+**Maintenance Management:**
+- `GET /api/v1/maintenance/schedules` - List schedules
+- `POST /api/v1/maintenance/schedules` - Create schedule
+- `PUT /api/v1/maintenance/schedules/:id` - Update schedule
+- `POST /api/v1/maintenance/records` - Record maintenance
+- `GET /api/v1/maintenance/due` - Get due maintenance
+- `GET /api/v1/maintenance/calendar` - Calendar view
+- `GET /api/v1/maintenance/costs` - Cost analytics
+
+**Breakdown Management:**
+- `POST /api/v1/breakdowns` - Report breakdown
+- `GET /api/v1/breakdowns` - List tickets
+- `PATCH /api/v1/breakdowns/:id` - Update ticket
+- `POST /api/v1/breakdowns/:id/resolve` - Resolve ticket
+- `GET /api/v1/breakdowns/analytics` - Breakdown analytics
+
+#### **🎨 FRONTEND IMPLEMENTATION**
+
+##### **1. Component Architecture**
+
+**Reusable Components from Existing System:**
+- **Form Patterns**: Reuse drawer/modal patterns from ProductFormDrawer, LocationDrawer
+- **Table Components**: Reuse table structure from InventoryListPage, ProductsListPage
+- **Status Tags**: Reuse status tag patterns from inventory system
+- **Filter Components**: Reuse filter patterns from InventoryListPage
+- **Statistics Cards**: Reuse KPI card patterns from dashboard
+- **Date Components**: Reuse DatePicker patterns from existing forms
+
+**New Components to Create:**
+
+1. **`MachineListPage.tsx`** - Main machines management page
+   - **Style**: Follow InventoryListPage pattern with statistics cards
+   - **Features**: Machine grid/list view, status filters, search
+   - **Reused Elements**: Table structure, filter cards, statistics layout
+
+2. **`MachineFormDrawer.tsx`** - Machine creation/editing
+   - **Style**: Follow ProductFormDrawer pattern with sections
+   - **Features**: Machine details, specifications, image upload
+   - **Reused Elements**: Drawer structure, form validation, image upload
+
+3. **`MachineStatusCard.tsx`** - Real-time status display
+   - **Style**: Follow StockAlertsCard pattern
+   - **Features**: Status indicators, quick actions
+   - **Reused Elements**: Card layout, badge components, action buttons
+
+4. **`MaintenanceScheduleModal.tsx`** - Schedule management
+   - **Style**: Follow StockMovementModal pattern
+   - **Features**: Schedule creation, recurring tasks, checklist
+   - **Reused Elements**: Modal structure, form sections, date pickers
+
+5. **`BreakdownReportModal.tsx`** - Mobile-optimized breakdown reporting
+   - **Style**: Follow StockReservationModal pattern
+   - **Features**: Quick reporting, photo upload, severity selection
+   - **Reused Elements**: Modal structure, image upload, priority selectors
+
+6. **`MaintenanceCalendar.tsx`** - Calendar view for schedules
+   - **Style**: Custom calendar component with Ant Design styling
+   - **Features**: Monthly/weekly view, drag-drop scheduling
+   - **Reused Elements**: Date components, modal triggers
+
+7. **`MachineAnalyticsWidget.tsx`** - Analytics widget for unified dashboard
+   - **Style**: Follow dashboard card patterns (integrates into main dashboard)
+   - **Features**: Machine KPIs, status summary, breakdown alerts
+   - **Reused Elements**: Statistics cards, chart containers, alert badges
+
+##### **2. Page Structure & Navigation**
+
+**Main Navigation Integration:**
+- Add "Machines" to navigationConfig.ts under CORE_MODULES
+- Icon: `ToolOutlined` (already imported)
+- Path: `/machines`
+- Sub-navigation for different views
+
+**Page Hierarchy:**
+```
+/machines
+├── /machines (MachineListPage) - Main machines overview
+├── /machines/maintenance (MaintenanceListPage) - Maintenance schedules
+├── /machines/breakdowns (BreakdownListPage) - Breakdown tickets
+└── /machines/:id (MachineDetailPage) - Individual machine details
+```
+
+**Dashboard Integration:**
+- Machine analytics integrated into main `/dashboard` page
+- Machine status widgets in unified dashboard
+- No separate analytics dashboard - all metrics in main dashboard
+
+##### **3. UI/UX Design Patterns**
+
+**Visual Design:**
+- **Color Coding**: 
+  - 🟢 Green: In Use, Completed maintenance
+  - 🟡 Yellow: Under maintenance, Due soon
+  - 🔴 Red: Under repair, Overdue, Critical
+  - 🔵 Blue: Idle, Scheduled
+  - ⚫ Gray: Decommissioned
+
+**Status Indicators:**
+- **Machine Cards**: Large status badges with icons
+- **List View**: Status columns with colored tags
+- **Dashboard**: Real-time status counters
+
+**Mobile Optimization:**
+- **Breakdown Reporting**: Large touch targets, camera integration
+- **Status Updates**: Quick action buttons
+- **Notifications**: Push notification support
+
+##### **4. Data Integration Strategy**
+
+**Service Layer:**
+```typescript
+// machineService.ts
+export interface Machine {
+  id: string;
+  machineId: string;
+  name: string;
+  type: string;
+  status: MachineStatus;
+  location: Location;
+  specifications: MachineSpecs;
+  // ... other fields
+}
+
+// maintenanceService.ts  
+export interface MaintenanceSchedule {
+  id: string;
+  machineId: string;
+  type: MaintenanceType;
+  nextDue: Date;
+  // ... other fields
+}
+
+// breakdownService.ts
+export interface BreakdownReport {
+  id: string;
+  ticketId: string;
+  machineId: string;
+  severity: BreakdownSeverity;
+  status: BreakdownStatus;
+  // ... other fields
+}
+```
+
+**Real-time Updates:**
+- WebSocket integration for status changes
+- Auto-refresh for critical alerts
+- Push notifications for breakdowns
+
+##### **5. Integration with Existing Systems**
+
+**Inventory Integration:**
+- Link spare parts to maintenance records
+- Auto-deduct parts from inventory
+- Parts procurement alerts
+
+**User Management Integration:**
+- Operator assignments using existing user system
+- Role-based permissions (TECHNICIAN, OPERATOR, MANAGER)
+- Training record tracking
+
+**Location Integration:**
+- Machine-location relationships
+- Location-based maintenance teams
+- Multi-location reporting
+
+#### **📊 ANALYTICS & REPORTING**
+
+**Key Metrics to Track:**
+1. **OEE (Overall Equipment Effectiveness)**
+2. **MTBF (Mean Time Between Failures)**
+3. **MTTR (Mean Time To Repair)**
+4. **Maintenance Cost per Machine**
+5. **Downtime Analysis**
+6. **Operator Performance**
+
+**Dashboard Widgets:**
+- Machine status overview
+- Maintenance due alerts
+- Breakdown trends
+- Cost analysis charts
+- Performance KPIs
+
+#### **🔄 IMPLEMENTATION PHASES**
+
+**Phase 1: Core Machine Management (Week 1-2)**
+- Database schema and migrations
+- Basic machine CRUD operations
+- Machine status tracking
+- Simple list and form interfaces
+
+**Phase 2: Maintenance Scheduling (Week 3-4)**
+- Maintenance schedule system
+- Calendar integration
+- Notification system
+- Maintenance record tracking
+
+**Phase 3: Breakdown Management (Week 5-6)**
+- Breakdown reporting system
+- Ticket management workflow
+- Mobile-optimized interfaces
+- Real-time notifications
+
+**Phase 4: Analytics & Integration (Week 7-8)**
+- Performance analytics
+- Integration with existing systems
+- Advanced reporting
+- Mobile app optimization
+
+#### **🎯 SUCCESS METRICS**
+
+**Technical Metrics:**
+- 99.9% API uptime
+- <200ms response times
+- Mobile-responsive design
+- Real-time data updates
+
+**Business Metrics:**
+- 25% reduction in machine downtime
+- 30% improvement in maintenance efficiency
+- 40% faster breakdown response time
+- Complete maintenance audit trail
+
+**User Experience:**
+- Intuitive mobile breakdown reporting
+- One-click status updates
+- Automated maintenance reminders
+- Comprehensive analytics dashboard
+
+This implementation will leverage all existing patterns and components while adding powerful machine maintenance capabilities to the textile ERP system.

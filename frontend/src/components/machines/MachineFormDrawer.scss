@@ -1,0 +1,84 @@
+@import '../../index.scss';
+
+.drawer-header-with-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .header-switch {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .switch-label {
+      font-size: $font-size-sm;
+      font-weight: 400;
+      color: $text-primary;
+    }
+  }
+}
+
+.machine-form {
+  .form-section {
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $border-light;
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .section-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .machine-image-upload {
+    width: 120px;
+    margin: 0 auto $spacing-sm auto;
+    display: block;
+
+    .machine-avatar {
+      width: 120px !important;
+      height: 120px !important;
+      border-radius: 50%;
+    }
+
+    .machine-upload-icon {
+      font-size: $font-size-3xl;
+      color: $tertiary-text-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .machine-image-help-text {
+    text-align: center;
+    font-size: $font-size-xs;
+    color: $tertiary-text-color;
+    margin-bottom: $spacing-md;
+    line-height: 1.5;
+  }
+
+  .ant-form-item {
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+
+  button {
+    height: 36px;
+    font-size: $font-size-sm;
+  }
+}

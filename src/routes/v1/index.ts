@@ -10,6 +10,7 @@ import inspectionRoutes from './inspectionRoutes';
 import productRoutes from './productRoutes';
 import textileRoutes from './textileRoutes';
 import inventoryRoutes from './inventoryRoutes';
+import machineRoutes from './machineRoutes';
 import userRoutes from '../userRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
@@ -38,6 +39,7 @@ router.get('/', (req, res) => {
       textile: '/textile',
       users: '/users',
       inventory: '/inventory',
+      machines: '/machines',
       production: '/production (coming soon)',
       reports: '/reports (coming soon)',
     },
@@ -64,6 +66,7 @@ router.use('/inspections', inspectionRoutes);
 router.use('/products', productRoutes);
 router.use('/textile', textileRoutes);
 router.use('/inventory', inventoryRoutes);
+router.use('/machines', machineRoutes);
 router.use('/users', userRoutes);
 // router.use('/production', productionRoutes);
 // router.use('/reports', reportRoutes);

@@ -15,7 +15,7 @@ import {
   BarChartOutlined,
 } from '@ant-design/icons';
 
-export type IndustryType = 
+export type IndustryType =
   | 'Textile Manufacturing'
   | 'Garment Production'
   | 'Knitting & Weaving'
@@ -55,7 +55,7 @@ export const CORE_MODULES: MenuItem[] = [
     key: 'inventory',
     label: 'Inventory',
     icon: AppstoreOutlined,
-    path: '/inventory', // Placeholder - routes to dashboard via click handler
+    path: '/inventory',
   },
   {
     key: 'orders',
@@ -76,10 +76,10 @@ export const CORE_MODULES: MenuItem[] = [
     path: '/users',
   },
   {
-    key: 'machinery',
-    label: 'Machinery',
+    key: 'machines',
+    label: 'Machines',
     icon: ToolOutlined,
-    path: '/machinery', // Placeholder - routes to dashboard via click handler
+    path: '/machines',
   },
   {
     key: 'quality',
@@ -239,7 +239,7 @@ export const getNavigationByIndustry = (industry: IndustryType): MenuItem[] => {
   const financeIndex = CORE_MODULES.findIndex(m => m.key === 'finance');
   const beforeFinance = CORE_MODULES.slice(0, financeIndex);
   const afterFinance = CORE_MODULES.slice(financeIndex);
-  
+
   return [...beforeFinance, ...specificModules, ...afterFinance];
 };
 
