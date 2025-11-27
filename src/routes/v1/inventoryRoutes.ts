@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import inventoryController from '../../controllers/inventoryController';
+import { inventoryController } from '../../controllers/inventoryController';
 import { requireRole } from '../../middleware/tenantIsolation';
 
 const router = Router();
@@ -79,6 +79,28 @@ router.patch(
   '/alerts/:alertId/acknowledge',
   requireRole(['OWNER', 'ADMIN', 'MANAGER']),
   inventoryController.acknowledgeStockAlert
+);
+
+/**
+ * @route   GET /api/v1/inventory/movement-types
+ * @desc    Get stock movement types enum
+ * @access  OWNER, ADMIN, MANAGER, EMPLOYEE
+ */
+router.get(
+  '/movement-types',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']),
+  inventoryController.getStockMovementTypes
+);
+
+/**
+ * @route   GET /api/v1/inventory/reservation-types
+ * @desc    Get reservation types enum
+ * @access  OWNER, ADMIN, MANAGER, EMPLOYEE
+ */
+router.get(
+  '/reservation-types',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']),
+  inventoryController.getReservationTypes
 );
 
 export default router;
