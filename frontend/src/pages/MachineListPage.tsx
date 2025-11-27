@@ -11,6 +11,12 @@ import {
   Select,
   Avatar,
   Space,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Progress,
+  Tooltip,
 } from 'antd';
 import {
   MoreOutlined,
@@ -18,6 +24,15 @@ import {
   DeleteOutlined,
   SearchOutlined,
   ToolOutlined,
+  CheckCircleOutlined,
+  WarningOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+  StopOutlined,
+  ThunderboltOutlined,
+  CalendarOutlined,
+  HistoryOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import useAuth from '../contexts/AuthContext';
 import { useHeader } from '../contexts/HeaderContext';
@@ -46,6 +61,8 @@ export default function MachineListPage() {
   const [searchText, setSearchText] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const fetchInProgressRef = useRef(false);
 
   useEffect(() => {
@@ -61,6 +78,7 @@ export default function MachineListPage() {
   useEffect(() => {
     if (currentCompany) {
       fetchData();
+      fetchAnalytics();
     }
   }, [currentCompany, searchText, selectedLocation, statusFilter]);
 
@@ -100,6 +118,18 @@ export default function MachineListPage() {
     }
   };
 
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const analyticsData = await machineService.getAnalytics();
+      setAnalytics(analyticsData);
+    } catch (error: any) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   const refreshMachines = async () => {
     try {
       setTableLoading(true);
@@ -109,6 +139,7 @@ export default function MachineListPage() {
         status: statusFilter as any,
       });
       setMachines(machinesData.data || []);
+      await fetchAnalytics();
     } catch (error: any) {
       console.error('Error refreshing machines:', error);
       message.error(error.message || 'Failed to refresh machines');
@@ -252,7 +283,14 @@ export default function MachineListPage() {
       width: 150,
       render: (record: Machine) => {
         if (record.currentOperator) {
-          return `${record.currentOperator.firstName} ${record.currentOperator.lastName}`;
+          return (
+            <Tooltip title={`Operator: ${record.currentOperator.firstName} ${record.currentOperator.lastName}`}>
+              <Space>
+                <Avatar size='small' icon={<UserOutlined />} />
+                {`${record.currentOperator.firstName} ${record.currentOperator.lastName}`}
+              </Space>
+            </Tooltip>
+          );
         }
         return '—';
       },
@@ -289,13 +327,27 @@ export default function MachineListPage() {
           },
           {
             key: 'maintenance',
+            icon: <CalendarOutlined />,
             label: 'Schedule Maintenance',
             onClick: () => handleScheduleMaintenance(record),
           },
           {
             key: 'breakdown',
+            icon: <WarningOutlined />,
             label: 'Report Breakdown',
             onClick: () => handleReportBreakdown(record),
+          },
+          {
+            key: 'history',
+            icon: <HistoryOutlined />,
+            label: 'View History',
+            onClick: () => message.info('History view coming soon'),
+          },
+          {
+            key: 'assign',
+            icon: <UserOutlined />,
+            label: 'Assign Operator',
+            onClick: () => message.info('Operator assignment coming soon'),
           },
           {
             type: 'divider' as const,
@@ -331,8 +383,186 @@ export default function MachineListPage() {
       <div className='page-container'>
         <div className='page-header-section'>
           <Heading level={2} className='page-title'>
-            Machines
+            Machine Management
           </Heading>
+        </div>
+
+        {/* Real-Time Status Dashboard */}
+        <div className='stats-section'>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card'>
+                <Statistic
+                  title='Total Machines'
+                  value={analytics?.totalMachines || 0}
+                  prefix={<ToolOutlined />}
+                  valueStyle={{ color: '#7b5fc9' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card stat-card-success'>
+                <Statistic
+                  title='In Use'
+                  value={analytics?.machinesByStatus?.IN_USE || 0}
+                  prefix={<CheckCircleOutlined />}
+                  valueStyle={{ color: '#52c41a' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card stat-card-warning'>
+                <Statistic
+                  title='Under Maintenance'
+                  value={analytics?.machinesByStatus?.UNDER_MAINTENANCE || 0}
+                  prefix={<WarningOutlined />}
+                  valueStyle={{ color: '#faad14' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card stat-card-error'>
+                <Statistic
+                  title='Under Repair'
+                  value={analytics?.machinesByStatus?.UNDER_REPAIR || 0}
+                  prefix={<CloseCircleOutlined />}
+                  valueStyle={{ color: '#ff4d4f' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card stat-card-idle'>
+                <Statistic
+                  title='Idle'
+                  value={analytics?.machinesByStatus?.IDLE || 0}
+                  prefix={<ClockCircleOutlined />}
+                  valueStyle={{ color: '#8c8c8c' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={4}>
+              <Card className='stat-card'>
+                <Statistic
+                  title='New'
+                  value={analytics?.machinesByStatus?.NEW || 0}
+                  prefix={<StopOutlined />}
+                  valueStyle={{ color: '#1890ff' }}
+                  loading={analyticsLoading}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Performance KPIs */}
+          <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+            <Col xs={24} sm={12} md={8}>
+              <Card className='kpi-card'>
+                <div className='kpi-header'>
+                  <ThunderboltOutlined className='kpi-icon' />
+                  <span className='kpi-title'>Active Breakdowns</span>
+                </div>
+                <div className='kpi-value'>{analytics?.activeBreakdowns || 0}</div>
+                <div className='kpi-subtitle'>Tickets open or in progress</div>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card className='kpi-card'>
+                <div className='kpi-header'>
+                  <CalendarOutlined className='kpi-icon' />
+                  <span className='kpi-title'>Due Maintenance</span>
+                </div>
+                <div className='kpi-value'>{analytics?.dueMaintenance || 0}</div>
+                <div className='kpi-subtitle'>Next 7 days</div>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Card className='kpi-card kpi-card-danger'>
+                <div className='kpi-header'>
+                  <HistoryOutlined className='kpi-icon' />
+                  <span className='kpi-title'>Overdue Maintenance</span>
+                </div>
+                <div className='kpi-value'>{analytics?.overdueMaintenance || 0}</div>
+                <div className='kpi-subtitle'>Requires immediate attention</div>
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Machine Utilization */}
+          {analytics && analytics.totalMachines > 0 && (
+            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+              <Col xs={24}>
+                <Card title='Machine Utilization' className='utilization-card'>
+                  <Row gutter={16}>
+                    <Col xs={24} md={12}>
+                      <div className='utilization-item'>
+                        <div className='utilization-label'>
+                          <CheckCircleOutlined style={{ color: '#52c41a' }} /> In Use
+                        </div>
+                        <Progress
+                          percent={Math.round(
+                            ((analytics.machinesByStatus?.IN_USE || 0) /
+                              analytics.totalMachines) *
+                              100
+                          )}
+                          strokeColor='#52c41a'
+                        />
+                      </div>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <div className='utilization-item'>
+                        <div className='utilization-label'>
+                          <ClockCircleOutlined style={{ color: '#8c8c8c' }} /> Idle
+                        </div>
+                        <Progress
+                          percent={Math.round(
+                            ((analytics.machinesByStatus?.IDLE || 0) /
+                              analytics.totalMachines) *
+                              100
+                          )}
+                          strokeColor='#8c8c8c'
+                        />
+                      </div>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <div className='utilization-item'>
+                        <div className='utilization-label'>
+                          <WarningOutlined style={{ color: '#faad14' }} /> Under Maintenance
+                        </div>
+                        <Progress
+                          percent={Math.round(
+                            ((analytics.machinesByStatus?.UNDER_MAINTENANCE || 0) /
+                              analytics.totalMachines) *
+                              100
+                          )}
+                          strokeColor='#faad14'
+                        />
+                      </div>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <div className='utilization-item'>
+                        <div className='utilization-label'>
+                          <CloseCircleOutlined style={{ color: '#ff4d4f' }} /> Under Repair
+                        </div>
+                        <Progress
+                          percent={Math.round(
+                            ((analytics.machinesByStatus?.UNDER_REPAIR || 0) /
+                              analytics.totalMachines) *
+                              100
+                          )}
+                          strokeColor='#ff4d4f'
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
+              </Col>
+            </Row>
+          )}
         </div>
 
         <div className='filters-section'>

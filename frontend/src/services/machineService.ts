@@ -514,6 +514,18 @@ class MachineService {
 
     return response.json();
   }
+
+  // Alias for getMachineAnalytics
+  async getAnalytics(): Promise<MachineAnalytics> {
+    const response = await this.getMachineAnalytics();
+    return response.data || {
+      totalMachines: 0,
+      machinesByStatus: {} as Record<MachineStatus, number>,
+      activeBreakdowns: 0,
+      dueMaintenance: 0,
+      overdueMaintenance: 0,
+    };
+  }
 }
 
 export const machineService = new MachineService();
