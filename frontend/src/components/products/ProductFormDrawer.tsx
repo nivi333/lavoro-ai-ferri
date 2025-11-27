@@ -76,6 +76,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
   const [form] = Form.useForm<ProductFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [isActive, setIsActive] = useState(true);
 
   const isEditing = mode === 'edit' && !!editingProductId;
 
@@ -88,13 +89,16 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
           const product = await productService.getProductById(editingProductId);
           populateForm(product);
         } else {
+          // Reset form with default values for create mode
           form.resetFields();
+          // Set default values AFTER reset to ensure they stick
           form.setFieldsValue({
             unitOfMeasure: 'PCS',
             productType: 'OWN_MANUFACTURE',
-            isActive: true,
+            isActive: true, // Default to active in create mode
             stockQuantity: 0,
           });
+          setIsActive(true);
           setImageUrl('');
         }
       } catch (error: any) {
@@ -105,6 +109,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
 
     loadData();
   }, [visible, isEditing, editingProductId]);
+
 
   const populateForm = (product: ProductDetail) => {
     form.setFieldsValue({
@@ -124,6 +129,7 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
       barcode: product.barcode,
       isActive: product.isActive,
     });
+    setIsActive(product.isActive);
     if (product.imageUrl) {
       setImageUrl(product.imageUrl);
     }
@@ -210,9 +216,14 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
           <span>{isEditing ? 'Edit Product' : 'Create Product'}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!isEditing} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!isEditing}
+            />
           </div>
         </div>
       }
@@ -230,7 +241,19 @@ export const ProductFormDrawer: React.FC<ProductFormDrawerProps> = ({
         </div>
       }
     >
-      <Form form={form} layout='vertical' className='product-form'>
+      <Form
+        form={form}
+        layout='vertical'
+        className='product-form'
+        onValuesChange={(_, allValues) => {
+          if (allValues.isActive !== undefined) {
+            setIsActive(allValues.isActive);
+          }
+        }}
+      >
+        <Form.Item name='isActive' valuePropName='checked' hidden>
+          <Switch />
+        </Form.Item>
         {/* Section 1: Basic Information with Image */}
         <div className='form-section'>
           <h3 className='section-title'>Basic Information</h3>

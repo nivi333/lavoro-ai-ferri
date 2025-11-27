@@ -17,7 +17,7 @@ import { ToolOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { GradientButton } from '../ui';
 import { machineService, Machine, MachineStatus, OperationalStatus } from '../../services/machineService';
-import { userService, User } from '../../services/userService';
+import { userService } from '../../services/userService';
 import useAuth from '../../contexts/AuthContext';
 import './MachineFormDrawer.scss';
 
@@ -162,6 +162,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
   const [users, setUsers] = useState<any[]>([]);
+  const [isActive, setIsActive] = useState(true);
   const { currentCompany } = useAuth();
 
   const isEditing = mode === 'edit' && !!editingMachineId;
@@ -190,13 +191,16 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
             populateForm(response.data);
           }
         } else {
+          // Reset form first
           form.resetFields();
           const machineTypes = getMachineTypeOptions();
+          // Set default values AFTER reset to ensure they stick
           form.setFieldsValue({
             machineType: machineTypes.length > 0 ? machineTypes[0].value : 'Other',
             operationalStatus: 'FREE',
-            isActive: true,
+            isActive: true, // Default to active in create mode
           });
+          setIsActive(true);
           setImageUrl('');
         }
       } catch (error: any) {
@@ -226,6 +230,7 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
       status: machine.status,
       isActive: machine.isActive,
     });
+    setIsActive(machine.isActive);
     if (machine.imageUrl) {
       setImageUrl(machine.imageUrl);
     }
@@ -312,9 +317,14 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
           <span>{isEditing ? 'Edit Machine' : 'Create Machine'}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!isEditing} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!isEditing}
+            />
           </div>
         </div>
       }
@@ -332,7 +342,19 @@ export const MachineFormDrawer: React.FC<MachineFormDrawerProps> = ({
         </div>
       }
     >
-      <Form form={form} layout='vertical' className='machine-form'>
+      <Form
+        form={form}
+        layout='vertical'
+        className='machine-form'
+        onValuesChange={(_, allValues) => {
+          if (allValues.isActive !== undefined) {
+            setIsActive(allValues.isActive);
+          }
+        }}
+      >
+        <Form.Item name='isActive' valuePropName='checked' hidden>
+          <Switch />
+        </Form.Item>
         {/* Section 1: Basic Information with Image */}
         <div className='form-section'>
           <h3 className='section-title'>Basic Information</h3>

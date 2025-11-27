@@ -37,35 +37,46 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [isActive, setIsActive] = useState(true);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (editingLocation) {
-      form.setFieldsValue({
-        name: editingLocation.name,
-        locationId: editingLocation.locationId,
-        email: editingLocation.email || '',
-        phone: editingLocation.phone || '',
-        country: editingLocation.country,
-        addressLine1: editingLocation.addressLine1 || '',
-        addressLine2: editingLocation.addressLine2 || '',
-        city: editingLocation.city,
-        state: editingLocation.state,
-        pincode: editingLocation.pincode,
-        locationType: editingLocation.locationType,
-        isDefault: editingLocation.isDefault || false,
-        isHeadquarters: editingLocation.isHeadquarters || false,
-        isActive: editingLocation.isActive !== undefined ? editingLocation.isActive : true,
-      });
-      if (editingLocation.imageUrl) {
-        setImageUrl(editingLocation.imageUrl);
+    if (visible) {
+      if (editingLocation) {
+        form.setFieldsValue({
+          name: editingLocation.name,
+          locationId: editingLocation.locationId,
+          email: editingLocation.email || '',
+          phone: editingLocation.phone || '',
+          country: editingLocation.country,
+          addressLine1: editingLocation.addressLine1 || '',
+          addressLine2: editingLocation.addressLine2 || '',
+          city: editingLocation.city,
+          state: editingLocation.state,
+          pincode: editingLocation.pincode,
+          locationType: editingLocation.locationType,
+          isDefault: editingLocation.isDefault || false,
+          isHeadquarters: editingLocation.isHeadquarters || false,
+          isActive: editingLocation.isActive !== undefined ? editingLocation.isActive : true,
+        });
+        setIsActive(editingLocation.isActive !== undefined ? editingLocation.isActive : true);
+        if (editingLocation.imageUrl) {
+          setImageUrl(editingLocation.imageUrl);
+        }
+      } else {
+        // Reset form first
+        form.resetFields();
+        // Then set default values to ensure they stick
+        form.setFieldsValue({
+          isActive: true, // Default to active for new locations
+          isDefault: false,
+          isHeadquarters: false,
+        });
+        setIsActive(true);
+        setImageUrl('');
       }
-    } else {
-      form.resetFields();
-      form.setFieldsValue({ isActive: true }); // Default to active for new locations
-      setImageUrl('');
     }
-  }, [editingLocation, form]);
+  }, [visible, editingLocation, form]);
 
   const beforeUpload = (file: File) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -151,9 +162,14 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
           <span>{editingLocation ? 'Edit Location' : 'Add New Location'}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
-            <Form.Item name='isActive' valuePropName='checked' noStyle>
-              <Switch disabled={!editingLocation} />
-            </Form.Item>
+            <Switch
+              checked={isActive}
+              onChange={checked => {
+                setIsActive(checked);
+                form.setFieldsValue({ isActive: checked });
+              }}
+              disabled={!editingLocation}
+            />
           </div>
         </div>
       }
@@ -164,7 +180,20 @@ const LocationDrawer: React.FC<LocationDrawerProps> = ({
       className='location-drawer'
       footer={null}
     >
-      <Form form={form} layout='vertical' onFinish={onFinish} className='ccd-form'>
+      <Form
+        form={form}
+        layout='vertical'
+        onFinish={onFinish}
+        className='ccd-form'
+        onValuesChange={(_, allValues) => {
+          if (allValues.isActive !== undefined) {
+            setIsActive(allValues.isActive);
+          }
+        }}
+      >
+        <Form.Item name='isActive' valuePropName='checked' hidden>
+          <Switch />
+        </Form.Item>
         <div className='ccd-form-content'>
           {/* Section 1: Basic Information */}
           <div className='ccd-section'>
