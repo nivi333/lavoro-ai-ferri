@@ -817,6 +817,7 @@ enum ShiftType {
 // Multi-Location Inventory Management
 model location_inventory {
   id              String   @id @default(uuid())
+  inventory_code  String   // Auto-generated: INV001, INV002, etc.
   product_id      String
   location_id     String
   company_id      String
@@ -831,6 +832,7 @@ model location_inventory {
   product  products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
   location company_locations @relation(fields: [location_id], references: [id], onDelete: Cascade)
 
+  @@unique([company_id, inventory_code])
   @@unique([product_id, location_id])
   @@index([company_id])
   @@index([location_id])

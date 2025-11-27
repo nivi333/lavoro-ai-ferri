@@ -8,6 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export interface LocationInventory {
   id: string;
+  inventoryCode: string;
   productId: string;
   locationId: string;
   stockQuantity: number;

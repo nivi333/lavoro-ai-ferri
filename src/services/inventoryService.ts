@@ -77,6 +77,30 @@ class InventoryService {
   private prisma = prisma;
 
   /**
+   * Generate unique inventory code for company
+   */
+  private async generateInventoryCode(companyId: string): Promise<string> {
+    try {
+      const lastInventory = await this.prisma.location_inventory.findFirst({
+        where: { company_id: companyId },
+        orderBy: { inventory_code: 'desc' },
+        select: { inventory_code: true },
+      });
+
+      if (!lastInventory) {
+        return 'INV001';
+      }
+
+      const numericPart = parseInt(lastInventory.inventory_code.substring(3), 10);
+      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      return `INV${next.toString().padStart(3, '0')}`;
+    } catch (error) {
+      console.error('Error generating inventory code:', error);
+      return `INV${Date.now().toString().slice(-3)}`;
+    }
+  }
+
+  /**
    * Get inventory for a specific location or all locations
    */
   async getLocationInventory(companyId: string, filters: InventoryFilters = {}) {
@@ -141,6 +165,7 @@ class InventoryService {
 
       return inventory.map(item => ({
         id: item.id,
+        inventoryCode: item.inventory_code,
         productId: item.product_id,
         locationId: item.location_id,
         stockQuantity: Number(item.stock_quantity),
@@ -166,44 +191,69 @@ class InventoryService {
     try {
       const availableQuantity = data.stockQuantity - (data.reservedQuantity || 0);
 
-      const inventory = await this.prisma.location_inventory.upsert({
+      // Check if inventory exists
+      const existingInventory = await this.prisma.location_inventory.findUnique({
         where: {
           product_id_location_id: {
             product_id: data.productId,
             location_id: data.locationId,
           },
         },
-        update: {
-          stock_quantity: data.stockQuantity,
-          reserved_quantity: data.reservedQuantity || 0,
-          available_quantity: availableQuantity,
-          reorder_level: data.reorderLevel,
-          max_stock_level: data.maxStockLevel,
-          last_updated: new Date(),
-          updated_by: updatedBy,
-        },
-        create: {
-          product_id: data.productId,
-          location_id: data.locationId,
-          company_id: companyId,
-          stock_quantity: data.stockQuantity,
-          reserved_quantity: data.reservedQuantity || 0,
-          available_quantity: availableQuantity,
-          reorder_level: data.reorderLevel,
-          max_stock_level: data.maxStockLevel,
-          updated_by: updatedBy,
-        },
-        include: {
-          product: true,
-          location: true,
-        },
       });
+
+      let inventory;
+      if (existingInventory) {
+        // Update existing inventory
+        inventory = await this.prisma.location_inventory.update({
+          where: {
+            product_id_location_id: {
+              product_id: data.productId,
+              location_id: data.locationId,
+            },
+          },
+          data: {
+            stock_quantity: data.stockQuantity,
+            reserved_quantity: data.reservedQuantity || 0,
+            available_quantity: availableQuantity,
+            reorder_level: data.reorderLevel,
+            max_stock_level: data.maxStockLevel,
+            last_updated: new Date(),
+            updated_by: updatedBy,
+          },
+          include: {
+            product: true,
+            location: true,
+          },
+        });
+      } else {
+        // Create new inventory with generated code
+        const inventoryCode = await this.generateInventoryCode(companyId);
+        inventory = await this.prisma.location_inventory.create({
+          data: {
+            inventory_code: inventoryCode,
+            product_id: data.productId,
+            location_id: data.locationId,
+            company_id: companyId,
+            stock_quantity: data.stockQuantity,
+            reserved_quantity: data.reservedQuantity || 0,
+            available_quantity: availableQuantity,
+            reorder_level: data.reorderLevel,
+            max_stock_level: data.maxStockLevel,
+            updated_by: updatedBy,
+          },
+          include: {
+            product: true,
+            location: true,
+          },
+        });
+      }
 
       // Check for low stock alerts
       await this.checkAndCreateStockAlerts(companyId, data.productId, data.locationId);
 
       return {
         id: inventory.id,
+        inventoryCode: inventory.inventory_code,
         productId: inventory.product_id,
         locationId: inventory.location_id,
         stockQuantity: Number(inventory.stock_quantity),

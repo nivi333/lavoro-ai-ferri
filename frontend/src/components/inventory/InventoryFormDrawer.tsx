@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, Form, InputNumber, Select, message, Row, Col } from 'antd';
+import { Drawer, Form, Input, InputNumber, Select, message, Row, Col } from 'antd';
 import { GradientButton } from '../ui';
 import { inventoryService, UpdateLocationInventoryRequest } from '../../services/inventoryService';
 import { locationService } from '../../services/locationService';
@@ -16,6 +16,7 @@ interface InventoryFormDrawerProps {
 }
 
 interface InventoryFormValues {
+  inventoryCode?: string;
   productId: string;
   locationId: string;
   stockQuantity: number;
@@ -117,6 +118,18 @@ export const InventoryFormDrawer: React.FC<InventoryFormDrawerProps> = ({
         <div className='form-section'>
           <h3 className='section-title'>Product & Location</h3>
           
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                name='inventoryCode'
+                label='Inventory Code'
+                tooltip='Auto-generated upon creation'
+              >
+                <Input disabled placeholder='Auto-generated (e.g., INV001)' />
+              </Form.Item>
+            </Col>
+          </Row>
+
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
