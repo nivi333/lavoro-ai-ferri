@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Button, Typography, message, Modal, Spin, Badge } from 'antd';
-import { ExclamationCircleOutlined, BankOutlined, TeamOutlined } from '@ant-design/icons';
+import { Button, Typography, message, Modal, Spin, Badge, Avatar } from 'antd';
+import { ExclamationCircleOutlined, TeamOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../contexts/AuthContext';
 import { CompanyCreationDrawer } from '../components/CompanyCreationDrawer';
@@ -191,15 +191,13 @@ export default function CompaniesListPage() {
                         <div className='companies-card-left'>
                           <div>
                             <div className='companies-card-title'>
-                              {company.logoUrl ? (
-                                <img
-                                  src={company.logoUrl}
-                                  alt={`${company.name} logo`}
-                                  className='companies-card-icon companies-card-logo'
-                                />
-                              ) : (
-                                <BankOutlined className='companies-card-icon' />
-                              )}
+                              <Avatar
+                                size={32}
+                                style={{ border: '1px solid #b3b3b3', padding: '2px' }}
+                                src={company.logoUrl}
+                              >
+                                {company.name.charAt(0)}
+                              </Avatar>
                               <Typography.Text className='companies-card-company-name'>
                                 {company.name}
                               </Typography.Text>
@@ -238,7 +236,9 @@ export default function CompaniesListPage() {
             </>
           ) : (
             <div className='companies-empty-state'>
-              <BankOutlined className='companies-empty-icon' />
+              <Avatar size={64} style={{ border: '2px solid #b3b3b3', padding: '4px', backgroundColor: '#f0f0f0' }}>
+                C
+              </Avatar>
               <div className='companies-empty-text'>{COMPANY_TEXT.NO_COMPANY_CREATED}</div>
             </div>
           )}
