@@ -12,6 +12,7 @@ import textileRoutes from './textileRoutes';
 import inventoryRoutes from './inventoryRoutes';
 import machineRoutes from './machineRoutes';
 import customerRoutes from './customerRoutes';
+import supplierRoutes from './supplierRoutes';
 import userRoutes from '../userRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
@@ -59,6 +60,7 @@ router.use(userRateLimit);
 
 // Protected routes
 router.use('/companies/:tenantId/customers', customerRoutes);
+router.use('/companies/:tenantId/suppliers', supplierRoutes);
 router.use('/companies', companyRoutes);
 router.use('/locations', locationRoutes);
 router.use('/orders', orderRoutes);

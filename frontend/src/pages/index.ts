@@ -28,6 +28,9 @@ export { default as OrdersListPage } from './orders/OrdersListPage';
 // Sales
 export { default as CustomerListPage } from './sales/CustomerListPage';
 
+// Purchase
+export { default as SupplierListPage } from './purchase/SupplierListPage';
+
 // Quality Control
 export { default as QualityCheckpointsListPage } from './quality/QualityCheckpointsListPage';
 export { default as QualityDefectsListPage } from './quality/QualityDefectsListPage';

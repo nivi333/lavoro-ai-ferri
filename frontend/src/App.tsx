@@ -1,10 +1,13 @@
+import { App as AntdApp } from 'antd';
 import AppRouter from './router/AppRouter';
 import ThemeProvider from './contexts/ThemeContext';
 
 function App() {
   return (
     <ThemeProvider>
-      <AppRouter />
+      <AntdApp>
+        <AppRouter />
+      </AntdApp>
     </ThemeProvider>
   );
 }
