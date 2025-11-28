@@ -226,7 +226,7 @@
   - [✅] Company Slug: Auto-generated from name with "lavoro.ai/" prefix, editable, unique validation
   - [✅] Industry: Dropdown with 10 options (Textile Manufacturing, Garment Production, etc.)
   - [✅] Description: Optional text area
-  - [✅] Country: Dropdown (no "Other" option)
+  - [✅] Country: Global CountrySelect component
   - [✅] Default Location Name: Custom name for head office
 - [✅] Section 2 - Head Office Location:
   - [✅] Address Line 1, Address Line 2, City, State, Pincode
@@ -279,7 +279,7 @@
   - [✅] Location Image: Drag & drop upload with cropping (2MB limit)
   - [✅] Description: Optional
 - [✅] Section 2 - Address Details:
-  - [✅] Country, Address Line 1, Address Line 2, City, State, Pincode (all required except Address Line 2)
+  - [✅] Country (Global CountrySelect), Address Line 1, Address Line 2, City, State, Pincode (all required except Address Line 2)
 - [✅] Section 3 - Contact Information:
   - [✅] Email (optional, with validation), Phone (with country code), Website
 - [✅] Section 4 - Settings (OWNER/ADMIN only):
@@ -339,7 +339,7 @@
   - [✅] Address Line 2: Text input (optional)
   - [✅] City: Text input (optional)
   - [✅] State/Province: Text input (optional)
-  - [✅] Country: Dropdown with search (optional)
+  - [✅] Country: Global CountrySelect component (optional)
   - [✅] Postal Code: Text input (optional, validated)
 - [✅] **Shipping Address**:
   - [✅] Same as Billing: Checkbox (if checked, copy billing address)
