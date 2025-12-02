@@ -7,6 +7,7 @@ import orderRoutes from './orderRoutes';
 import purchaseOrderRoutes from './purchaseOrderRoutes';
 import financialDocumentRoutes from './financialDocumentRoutes';
 import invoiceRoutes from './invoiceRoutes';
+import billRoutes from './billRoutes';
 
 import qualityRoutes from './qualityRoutes';
 import inspectionRoutes from './inspectionRoutes';
@@ -38,6 +39,7 @@ router.get('/', (req, res) => {
       orders: '/orders',
       purchaseOrders: '/purchase-orders',
       invoices: '/invoices',
+      bills: '/bills',
       financialDocuments: '/financial-documents',
       quality: '/quality',
       inspections: '/inspections',
@@ -71,6 +73,7 @@ router.use('/orders', orderRoutes);
 router.use('/purchase-orders', purchaseOrderRoutes);
 router.use('/financial-documents', financialDocumentRoutes);
 router.use('/invoices', invoiceRoutes);
+router.use('/bills', billRoutes);
 router.use('/quality', qualityRoutes);
 router.use('/inspections', inspectionRoutes);
 router.use('/products', productRoutes);

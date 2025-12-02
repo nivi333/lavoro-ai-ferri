@@ -28,6 +28,9 @@ export { default as OrdersListPage } from './orders/OrdersListPage';
 // Invoices
 export { default as InvoicesListPage } from './invoices/InvoicesListPage';
 
+// Bills
+export { default as BillsListPage } from './bills/BillsListPage';
+
 // Sales
 export { default as CustomerListPage } from './sales/CustomerListPage';
 

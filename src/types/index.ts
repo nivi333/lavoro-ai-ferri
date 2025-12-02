@@ -128,7 +128,7 @@ export interface CreateInvoiceForOrderData extends CreateFinancialDocumentBase {
   orderId: string;
 }
 
-export interface CreateBillData extends CreateFinancialDocumentBase {}
+// Old CreateBillData removed - using new detailed version below
 
 export interface PurchaseOrderItemInput {
   lineNumber?: number;
@@ -245,5 +245,68 @@ export interface ListInvoiceFilters {
   customerName?: string;
   customerId?: string;
   orderId?: string;
+  locationId?: string;
+}
+
+// Bill Management Types
+export type BillStatusType = 'DRAFT' | 'RECEIVED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+
+export interface BillItemInput {
+  lineNumber?: number;
+  productId?: string;
+  itemCode: string;
+  description?: string;
+  quantity: number;
+  unitOfMeasure: string;
+  unitCost: number;
+  discountPercent?: number;
+  taxRate?: number;
+  notes?: string;
+}
+
+export interface CreateBillData {
+  supplierId?: string;
+  supplierName: string;
+  supplierCode?: string;
+  purchaseOrderId?: string; // Optional link to Purchase Order
+  locationId: string; // Required
+  billNumber?: string;
+  billDate: Date;
+  dueDate: Date;
+  paymentTerms?: PaymentTermsType;
+  currency?: string;
+  shippingCharges?: number;
+  notes?: string;
+  supplierInvoiceNo?: string;
+  items: BillItemInput[];
+}
+
+export interface UpdateBillData {
+  supplierId?: string;
+  supplierName?: string;
+  supplierCode?: string;
+  locationId?: string;
+  billNumber?: string;
+  billDate?: Date;
+  dueDate?: Date;
+  paymentTerms?: PaymentTermsType;
+  currency?: string;
+  shippingCharges?: number;
+  amountPaid?: number;
+  paymentMethod?: PaymentMethodType;
+  paymentDate?: Date;
+  transactionRef?: string;
+  notes?: string;
+  supplierInvoiceNo?: string;
+  items?: BillItemInput[];
+}
+
+export interface ListBillFilters {
+  status?: BillStatusType;
+  fromDate?: Date;
+  toDate?: Date;
+  supplierName?: string;
+  supplierId?: string;
+  purchaseOrderId?: string;
   locationId?: string;
 }

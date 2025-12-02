@@ -13,6 +13,7 @@ import {
   LocationListPage,
   OrdersListPage,
   InvoicesListPage,
+  BillsListPage,
   ProductsListPage,
   InventoryListPage,
   MachineListPage,
@@ -144,6 +145,15 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <PurchaseOrdersListPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/purchase/bills'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <BillsListPage />
                 </ProtectedRoute>
               }
             />
