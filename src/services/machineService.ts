@@ -765,6 +765,61 @@ class MachineService {
       throw error;
     }
   }
+
+  // Delete machine (soft delete)
+  async deleteMachine(companyId: string, machineId: string) {
+    try {
+      const existingMachine = await prisma.machines.findFirst({
+        where: {
+          id: machineId,
+          company_id: companyId,
+        },
+      });
+
+      if (!existingMachine) {
+        throw new Error('Machine not found');
+      }
+
+      // Check if machine has active breakdowns
+      const activeBreakdowns = await prisma.breakdown_reports.count({
+        where: {
+          machine_id: machineId,
+          status: { in: ['OPEN', 'IN_PROGRESS'] },
+        },
+      });
+
+      if (activeBreakdowns > 0) {
+        throw new Error('Cannot delete machine with active breakdown reports. Please resolve all breakdowns first.');
+      }
+
+      // Soft delete by setting is_active to false
+      const machine = await prisma.machines.update({
+        where: { id: machineId },
+        data: {
+          is_active: false,
+          status: 'DECOMMISSIONED',
+          updated_at: new Date(),
+        },
+      });
+
+      // Create status history
+      await prisma.machine_status_history.create({
+        data: {
+          machine_id: machineId,
+          company_id: companyId,
+          previous_status: existingMachine.status,
+          new_status: 'DECOMMISSIONED',
+          reason: 'Machine deleted (soft delete)',
+        },
+      });
+
+      logger.info(`Machine deleted (soft): ${machine.machine_id} for company ${companyId}`);
+      return { success: true, message: 'Machine deleted successfully' };
+    } catch (error) {
+      logger.error('Error deleting machine:', error);
+      throw error;
+    }
+  }
 }
 
 export const machineService = new MachineService();

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar, Space, Tooltip } from 'antd';
+import { Table, Tag, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar, Space, Tooltip, Modal } from 'antd';
 import {
   MoreOutlined,
   EditOutlined,
@@ -10,6 +10,7 @@ import {
   CalendarOutlined,
   HistoryOutlined,
   UserOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
@@ -125,9 +126,39 @@ export default function MachineListPage() {
     setDrawerVisible(true);
   };
 
-  const handleDeleteMachine = async (_machine: Machine) => {
-    // TODO: Implement delete functionality when backend API is ready
-    message.info('Delete functionality will be implemented when backend API is ready');
+  const handleDeleteMachine = async (machine: Machine) => {
+    Modal.confirm({
+      title: 'Delete Machine',
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>Are you sure you want to delete machine <strong>{machine.name}</strong> ({machine.machineCode})?</p>
+          <p style={{ color: '#ff4d4f', fontSize: '12px' }}>
+            This will decommission the machine and mark it as inactive. This action cannot be undone.
+          </p>
+        </div>
+      ),
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          setTableLoading(true);
+          const result = await machineService.deleteMachine(machine.id);
+          if (result.success) {
+            message.success('Machine deleted successfully');
+            refreshMachines();
+          } else {
+            message.error(result.message || 'Failed to delete machine');
+          }
+        } catch (error: any) {
+          console.error('Error deleting machine:', error);
+          message.error(error.message || 'Failed to delete machine');
+        } finally {
+          setTableLoading(false);
+        }
+      },
+    });
   };
 
   const handleScheduleMaintenance = (machine: Machine) => {

@@ -11,6 +11,7 @@ router.get('/analytics', requireRole(['OWNER', 'ADMIN', 'MANAGER']), machineCont
 router.get('/:id', requireRole(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']), machineController.getMachineById);
 router.put('/:id', requireRole(['OWNER', 'ADMIN', 'MANAGER']), machineController.updateMachine);
 router.patch('/:id/status', requireRole(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']), machineController.updateMachineStatus);
+router.delete('/:id', requireRole(['OWNER', 'ADMIN']), machineController.deleteMachine);
 
 // Breakdown Management Routes
 router.post('/breakdowns', requireRole(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']), machineController.createBreakdownReport);

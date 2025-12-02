@@ -530,6 +530,51 @@ class MachineController {
       });
     }
   };
+
+  // Delete machine (soft delete)
+  deleteMachine = async (req: Request, res: Response) => {
+    try {
+      const companyId = req.tenantId;
+      const userId = req.userId;
+      
+      if (!companyId || !userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Company context required',
+        });
+      }
+
+      const { id } = req.params;
+      const result = await machineService.deleteMachine(companyId, id);
+
+      res.json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      logger.error('Error in deleteMachine:', error);
+      
+      if (error instanceof Error) {
+        if (error.message === 'Machine not found') {
+          return res.status(404).json({
+            success: false,
+            message: 'Machine not found',
+          });
+        }
+        if (error.message.includes('Cannot delete')) {
+          return res.status(400).json({
+            success: false,
+            message: error.message,
+          });
+        }
+      }
+      
+      res.status(500).json({
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to delete machine',
+      });
+    }
+  };
 }
 
 export const machineController = new MachineController();

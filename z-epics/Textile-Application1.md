@@ -910,100 +910,102 @@
 
 **Machine Master Data** ✅
 - [✅] Machine ID: Auto-generated (MCH0001, MCH0002, etc.)
-- [✅] Machine Code: Manual code for easy identification
+- [✅] Machine Code: Auto-generated (MC0001, MC0002, etc.)
 - [✅] Machine Name: Descriptive name
 - [✅] Machine Type: Industry-specific dropdown (dynamically filtered based on company industry)
-  - [ ] Textile Manufacturing: Ring Spinning Frame, Air Jet Loom, Circular Knitting Machine, etc. (15 types)
-  - [ ] Garment Production: Industrial Sewing Machine, Overlock Machine, Embroidery Machine, etc. (15 types)
-  - [ ] Fabric Processing: Singeing Machine, Dyeing Machine, Stentering Machine, etc. (14 types)
-  - [ ] Knitting & Weaving: Circular Knitting Machine, Rapier Loom, Jacquard Loom, etc. (14 types)
-  - [ ] Dyeing & Finishing: Jigger Dyeing Machine, Digital Textile Printer, Calendering Machine, etc. (15 types)
-  - [ ] Other: Generic types (9 types)
-- [ ] Model: Machine model number
-- [ ] Manufacturer: Manufacturer name
-- [ ] Serial Number: Unique serial number
-- [ ] Purchase Date: DatePicker
-- [ ] Warranty Expiry: DatePicker
-- [ ] Location: Link to company location
-- [ ] Technical Specifications: JSON field for capacity, speed, power, dimensions, etc.
-- [ ] Machine Image: Upload with preview
-- [ ] QR Code: Generate QR code for quick identification
-- [ ] Status: IN_USE, UNDER_MAINTENANCE, UNDER_REPAIR, IDLE, DECOMMISSIONED
-- [ ] Current Operator: Link to user (operator)
-- [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
+  - [✅] Textile Manufacturing: Ring Spinning Frame, Air Jet Loom, Circular Knitting Machine, etc. (15 types)
+  - [✅] Garment Production: Industrial Sewing Machine, Overlock Machine, Embroidery Machine, etc. (15 types)
+  - [✅] Fabric Processing: Singeing Machine, Dyeing Machine, Stentering Machine, etc. (14 types)
+  - [✅] Knitting & Weaving: Circular Knitting Machine, Rapier Loom, Jacquard Loom, etc. (14 types)
+  - [✅] Dyeing & Finishing: Jigger Dyeing Machine, Digital Textile Printer, Calendering Machine, etc. (15 types)
+  - [✅] Other: Generic types (9 types)
+- [✅] Model: Machine model number
+- [✅] Manufacturer: Manufacturer name
+- [✅] Serial Number: Unique serial number
+- [✅] Purchase Date: DatePicker
+- [✅] Warranty Expiry: DatePicker
+- [✅] Location: Link to company location
+- [✅] Technical Specifications: Text field for capacity, speed, power, dimensions, etc.
+- [✅] Machine Image: Upload with preview
+- [✅] QR Code: Text field for QR code identification
+- [✅] Status: NEW, IN_USE, UNDER_MAINTENANCE, UNDER_REPAIR, IDLE, DECOMMISSIONED
+- [✅] Current Operator: Link to user (operator)
+- [✅] Operational Status: FREE, BUSY, RESERVED, UNAVAILABLE
+- [✅] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
 
-**Machine Status Tracking**
-- [ ] Real-Time Status: Current operational status
-- [ ] Status History: Complete timeline of status changes
-- [ ] Utilization Metrics: Usage hours, idle time, efficiency percentage
-- [ ] Performance KPIs: OEE, MTBF, MTTR calculations
+**Machine Status Tracking** ✅
+- [✅] Real-Time Status: Current operational status
+- [✅] Status History: Complete timeline of status changes
+- [ ] Utilization Metrics: Usage hours, idle time, efficiency percentage (future)
+- [ ] Performance KPIs: OEE, MTBF, MTTR calculations (future)
 
-**Preventive Maintenance Scheduling**
-- [ ] Maintenance Types: DAILY_CHECK, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, EMERGENCY
-- [ ] Schedule Fields:
-  - [ ] Machine: Required
-  - [ ] Maintenance Type: Required dropdown
-  - [ ] Title: Short description
-  - [ ] Description: Detailed instructions
-  - [ ] Frequency: Every X days
-  - [ ] Last Completed: Date of last maintenance
-  - [ ] Next Due: Auto-calculated based on frequency
-  - [ ] Estimated Hours: Time estimate
-  - [ ] Assigned Technician: User dropdown
-  - [ ] Checklist: JSON array of tasks
-  - [ ] Parts Required: JSON array of parts
-- [ ] Auto Reminders: Email/SMS before due dates (7 days, 3 days, 1 day)
-- [ ] Maintenance Calendar: Visual calendar view
-- [ ] Cost Tracking: Track costs per maintenance
-- [ ] Vendor Management: Service provider details
+**Preventive Maintenance Scheduling** ✅
+- [✅] Maintenance Types: DAILY_CHECK, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, EMERGENCY
+- [✅] Schedule Fields:
+  - [✅] Machine: Required
+  - [✅] Maintenance Type: Required dropdown
+  - [✅] Title: Short description
+  - [✅] Description: Detailed instructions
+  - [✅] Frequency: Every X days
+  - [✅] Last Completed: Date of last maintenance
+  - [✅] Next Due: Auto-calculated based on frequency
+  - [✅] Estimated Hours: Time estimate
+  - [✅] Assigned Technician: User dropdown
+  - [✅] Checklist: JSON array of tasks
+  - [✅] Parts Required: JSON array of parts
+- [ ] Auto Reminders: Email/SMS before due dates (future)
+- [ ] Maintenance Calendar: Visual calendar view (future)
+- [ ] Cost Tracking: Track costs per maintenance (future)
+- [ ] Vendor Management: Service provider details (future)
 
-**Breakdown Reporting**
-- [ ] Quick Breakdown Form (Mobile-Friendly):
-  - [ ] Machine: Required dropdown
-  - [ ] Severity: CRITICAL, HIGH, MEDIUM, LOW
-  - [ ] Title: Short issue description
-  - [ ] Description: Detailed problem description
-  - [ ] Breakdown Time: Timestamp
-  - [ ] Photo/Video Upload: Evidence of issue
-  - [ ] Operator: Auto-filled from current user
-- [ ] Ticket Management:
-  - [ ] Ticket ID: Auto-generated
-  - [ ] Status: OPEN, IN_PROGRESS, RESOLVED, CLOSED
-  - [ ] Priority: URGENT, HIGH, MEDIUM, LOW
-  - [ ] Assigned Technician: User dropdown
-  - [ ] Estimated Resolution: Time estimate
-  - [ ] Parts Required: List of parts needed
-  - [ ] Labor Hours: Actual hours spent
-  - [ ] Root Cause: Analysis after resolution
-  - [ ] Resolution Notes: How it was fixed
-- [ ] Real-Time Alerts: Push notifications to maintenance team
-- [ ] Escalation Rules: Auto-escalate based on severity and response time
-- [ ] Downtime Tracking: Auto-calculate production loss
+**Breakdown Reporting** ✅
+- [✅] Quick Breakdown Form (Mobile-Friendly):
+  - [✅] Machine: Required dropdown
+  - [✅] Severity: CRITICAL, HIGH, MEDIUM, LOW
+  - [✅] Title: Short issue description
+  - [✅] Description: Detailed problem description
+  - [✅] Breakdown Time: Timestamp
+  - [✅] Photo/Video Upload: Evidence of issue (images array)
+  - [✅] Operator: Auto-filled from current user
+- [✅] Ticket Management:
+  - [✅] Ticket ID: Auto-generated (TKT0001, TKT0002, etc.)
+  - [✅] Status: OPEN, IN_PROGRESS, RESOLVED, CLOSED
+  - [✅] Priority: URGENT, HIGH, MEDIUM, LOW
+  - [✅] Assigned Technician: User dropdown
+  - [ ] Estimated Resolution: Time estimate (future)
+  - [✅] Parts Required: List of parts needed
+  - [✅] Labor Hours: Actual hours spent
+  - [✅] Root Cause: Analysis after resolution
+  - [✅] Resolution Notes: How it was fixed
+- [ ] Real-Time Alerts: Push notifications to maintenance team (future)
+- [ ] Escalation Rules: Auto-escalate based on severity and response time (future)
+- [✅] Downtime Tracking: Auto-calculate production loss
 
-**Machine Assignment & Operators**
-- [ ] Operator Assignment:
-  - [ ] Primary Operator: Main user
-  - [ ] Backup Operators: Secondary users
-  - [ ] Shift: MORNING, AFTERNOON, NIGHT
-  - [ ] Skill Matching: Match operator certification to machine requirements
-- [ ] Training Records: Track certifications and training completion
-- [ ] Operator Performance: Track efficiency, quality, breakdown frequency
+**Machine Assignment & Operators** ✅
+- [✅] Operator Assignment:
+  - [✅] Primary Operator: Main user (current_operator_id)
+  - [ ] Backup Operators: Secondary users (future)
+  - [ ] Shift: MORNING, AFTERNOON, NIGHT (future)
+  - [ ] Skill Matching: Match operator certification to machine requirements (future)
+- [ ] Training Records: Track certifications and training completion (future)
+- [ ] Operator Performance: Track efficiency, quality, breakdown frequency (future)
 
-**Machine List Page**
-- [ ] Table Columns: Image, Machine Code, Name, Type, Manufacturer, Model, Location, Status, Current Operator, Actions
-- [ ] Filters: Search, Location, Status, Type
-- [ ] Status Tags: Color-coded (In Use=Green, Under Maintenance=Yellow, Under Repair=Red, Idle=Gray)
-- [ ] Quick Actions: Edit, Update Status, Schedule Maintenance, Report Breakdown, Assign Operator
-- [ ] Empty State: "No machines found" with "Add Machine" button
+**Machine List Page** ✅
+- [✅] Table Columns: Image, Machine Code, Name, Type, Location, Current Operator, Operational Status, Status, Actions
+- [✅] Filters: Search, Location, Status
+- [✅] Status Tags: Color-coded (In Use=Green, Under Maintenance=Orange, Under Repair=Red, Idle=Gray, New=Blue)
+- [✅] Quick Actions: Edit, Update Status, Schedule Maintenance, Report Breakdown, Delete
+- [✅] Empty State: "No machines found" with "Add Machine" button
+- [✅] Delete: Soft delete with confirmation modal (decommissions machine)
 
-**Machine Analytics (Integrated in Main Dashboard)**
-- [ ] Machine Status Overview: Count by status
-- [ ] Maintenance Due: Upcoming maintenance in next 7 days
-- [ ] Active Breakdowns: Open and in-progress tickets
-- [ ] Overdue Maintenance: Past due maintenance count
-- [ ] Utilization Charts: Usage percentage by machine
-- [ ] Performance Metrics: OEE, MTBF, MTTR trends
-- [ ] Cost Analysis: Maintenance costs vs production loss
+**Machine Analytics (Integrated in Main Dashboard)** ✅
+- [✅] Machine Status Overview: Count by status
+- [✅] Maintenance Due: Upcoming maintenance in next 7 days
+- [✅] Active Breakdowns: Open and in-progress tickets
+- [✅] Overdue Maintenance: Past due maintenance count
+- [ ] Utilization Charts: Usage percentage by machine (future)
+- [ ] Performance Metrics: OEE, MTBF, MTTR trends (future)
+- [ ] Cost Analysis: Maintenance costs vs production loss (future)
 
 ---
 

@@ -526,6 +526,16 @@ class MachineService {
       overdueMaintenance: 0,
     };
   }
+
+  // Delete machine (soft delete)
+  async deleteMachine(id: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_BASE_URL}/machines/${id}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    });
+
+    return response.json();
+  }
 }
 
 export const machineService = new MachineService();
