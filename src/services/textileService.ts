@@ -19,6 +19,7 @@ interface CreateFabricData {
   productionDate: Date;
   batchNumber: string;
   qualityGrade: QualityGrade;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
 }
@@ -38,6 +39,7 @@ interface CreateYarnData {
   batchNumber: string;
   processType: YarnProcess;
   qualityGrade: QualityGrade;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
 }
@@ -60,6 +62,7 @@ interface CreateDyeingData {
   qualityCheck?: boolean;
   colorFastness?: string;
   shrinkagePercent?: number;
+  imageUrl?: string;
   fabricId?: string;
   locationId?: string;
   notes?: string;
@@ -84,6 +87,7 @@ interface CreateGarmentData {
   lineNumber?: string;
   qualityPassed?: boolean;
   defectCount?: number;
+  imageUrl?: string;
   orderId?: string;
   locationId?: string;
   notes?: string;
@@ -153,6 +157,7 @@ export class TextileService {
         production_date: data.productionDate,
         batch_number: data.batchNumber,
         quality_grade: data.qualityGrade,
+        image_url: data.imageUrl,
         notes: data.notes,
         updated_at: new Date(),
       },
@@ -209,6 +214,7 @@ export class TextileService {
         production_date: data.productionDate,
         batch_number: data.batchNumber,
         quality_grade: data.qualityGrade,
+        image_url: data.imageUrl,
         location_id: data.locationId,
         notes: data.notes,
         updated_at: new Date(),
@@ -244,7 +250,9 @@ export class TextileService {
       productionDate: fabric.production_date,
       batchNumber: fabric.batch_number,
       qualityGrade: fabric.quality_grade,
+      imageUrl: fabric.image_url,
       notes: fabric.notes,
+      isActive: fabric.is_active,
       createdAt: fabric.created_at,
       updatedAt: fabric.updated_at,
     };
@@ -290,6 +298,7 @@ export class TextileService {
         batch_number: data.batchNumber,
         process_type: data.processType,
         quality_grade: data.qualityGrade,
+        image_url: data.imageUrl,
         notes: data.notes,
         updated_at: new Date(),
       },
@@ -340,6 +349,7 @@ export class TextileService {
         batch_number: data.batchNumber,
         process_type: data.processType,
         quality_grade: data.qualityGrade,
+        image_url: data.imageUrl,
         location_id: data.locationId,
         notes: data.notes,
         updated_at: new Date(),
@@ -374,7 +384,9 @@ export class TextileService {
       batchNumber: yarn.batch_number,
       processType: yarn.process_type,
       qualityGrade: yarn.quality_grade,
+      imageUrl: yarn.image_url,
       notes: yarn.notes,
+      isActive: yarn.is_active,
       createdAt: yarn.created_at,
       updatedAt: yarn.updated_at,
     };
@@ -424,6 +436,7 @@ export class TextileService {
         quality_check: data.qualityCheck ?? false,
         color_fastness: data.colorFastness,
         shrinkage_percent: data.shrinkagePercent,
+        image_url: data.imageUrl,
         notes: data.notes,
         updated_at: new Date(),
       },
@@ -481,6 +494,7 @@ export class TextileService {
         quality_check: data.qualityCheck,
         color_fastness: data.colorFastness,
         shrinkage_percent: data.shrinkagePercent,
+        image_url: data.imageUrl,
         fabric_id: data.fabricId,
         location_id: data.locationId,
         notes: data.notes,
@@ -520,7 +534,9 @@ export class TextileService {
       qualityCheck: dyeing.quality_check,
       colorFastness: dyeing.color_fastness,
       shrinkagePercent: dyeing.shrinkage_percent ? parseFloat(dyeing.shrinkage_percent) : null,
+      imageUrl: dyeing.image_url,
       notes: dyeing.notes,
+      isActive: dyeing.is_active,
       createdAt: dyeing.created_at,
       updatedAt: dyeing.updated_at,
     };
@@ -571,6 +587,7 @@ export class TextileService {
         line_number: data.lineNumber,
         quality_passed: data.qualityPassed ?? false,
         defect_count: data.defectCount ?? 0,
+        image_url: data.imageUrl,
         notes: data.notes,
         updated_at: new Date(),
       },
@@ -625,6 +642,7 @@ export class TextileService {
         line_number: data.lineNumber,
         quality_passed: data.qualityPassed,
         defect_count: data.defectCount,
+        image_url: data.imageUrl,
         order_id: data.orderId,
         location_id: data.locationId,
         notes: data.notes,
@@ -677,7 +695,9 @@ export class TextileService {
       lineNumber: garment.line_number,
       qualityPassed: garment.quality_passed,
       defectCount: garment.defect_count,
+      imageUrl: garment.image_url,
       notes: garment.notes,
+      isActive: garment.is_active,
       createdAt: garment.created_at,
       updatedAt: garment.updated_at,
     };

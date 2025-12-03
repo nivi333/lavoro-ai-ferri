@@ -1,5 +1,4 @@
 import { message } from 'antd';
-import axios from 'axios';
 import { AuthStorage } from '../utils/storage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
@@ -24,6 +23,7 @@ export interface FabricProduction {
   productionDate: string;
   batchNumber: string;
   qualityGrade: string;
+  imageUrl?: string;
   notes?: string;
   isActive: boolean;
   createdAt: string;
@@ -48,6 +48,7 @@ export interface CreateFabricProductionData {
   productionDate: string;
   batchNumber: string;
   qualityGrade: string;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
   isActive?: boolean;
@@ -72,6 +73,7 @@ export interface YarnManufacturing {
   batchNumber: string;
   processType: string;
   qualityGrade: string;
+  imageUrl?: string;
   notes?: string;
   isActive: boolean;
   createdAt: string;
@@ -95,6 +97,7 @@ export interface CreateYarnManufacturingData {
   batchNumber: string;
   processType: string;
   qualityGrade: string;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
   isActive?: boolean;
@@ -123,6 +126,7 @@ export interface DyeingFinishing {
   qualityCheck: boolean;
   colorFastness?: string;
   shrinkagePercent?: number;
+  imageUrl?: string;
   notes?: string;
   isActive: boolean;
   createdAt: string;
@@ -149,6 +153,7 @@ export interface CreateDyeingFinishingData {
   qualityCheck?: boolean;
   colorFastness?: string;
   shrinkagePercent?: number;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
   isActive?: boolean;
@@ -178,6 +183,7 @@ export interface GarmentManufacturing {
   lineNumber?: string;
   qualityPassed: boolean;
   defectCount: number;
+  imageUrl?: string;
   notes?: string;
   isActive: boolean;
   createdAt: string;
@@ -205,6 +211,7 @@ export interface CreateGarmentManufacturingData {
   lineNumber?: string;
   qualityPassed?: boolean;
   defectCount?: number;
+  imageUrl?: string;
   locationId?: string;
   notes?: string;
   isActive?: boolean;
@@ -251,7 +258,20 @@ export interface CreateDesignPatternData {
 // ============================================
 const getAuthToken = (): string | null => {
   const tokens = AuthStorage.getTokens();
-  return tokens?.accessToken;
+  return tokens?.accessToken || null;
+};
+
+// Clean filters to remove undefined/null/empty values before sending to API
+const cleanFilters = (filters: any): Record<string, string> => {
+  if (!filters) return {};
+  const cleaned: Record<string, string> = {};
+  Object.keys(filters).forEach(key => {
+    const value = filters[key];
+    if (value !== undefined && value !== null && value !== '') {
+      cleaned[key] = String(value);
+    }
+  });
+  return cleaned;
 };
 
 const handleApiError = (error: any, defaultMessage: string) => {
@@ -263,7 +283,7 @@ const handleApiError = (error: any, defaultMessage: string) => {
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
-  
+
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -275,7 +295,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
@@ -300,7 +320,9 @@ export const fabricProductionService = {
   },
 
   async getFabricProductions(filters?: any): Promise<FabricProduction[]> {
-    const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    const cleaned = cleanFilters(filters);
+    const queryParams =
+      Object.keys(cleaned).length > 0 ? `?${new URLSearchParams(cleaned).toString()}` : '';
     const response = await apiRequest(`/textile/fabrics${queryParams}`);
     return response.data || [];
   },
@@ -310,7 +332,10 @@ export const fabricProductionService = {
     return response.data;
   },
 
-  async updateFabricProduction(fabricId: string, data: Partial<CreateFabricProductionData>): Promise<FabricProduction> {
+  async updateFabricProduction(
+    fabricId: string,
+    data: Partial<CreateFabricProductionData>
+  ): Promise<FabricProduction> {
     const response = await apiRequest(`/textile/fabrics/${fabricId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -338,7 +363,9 @@ export const yarnManufacturingService = {
   },
 
   async getYarnManufacturing(filters?: any): Promise<YarnManufacturing[]> {
-    const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    const cleaned = cleanFilters(filters);
+    const queryParams =
+      Object.keys(cleaned).length > 0 ? `?${new URLSearchParams(cleaned).toString()}` : '';
     const response = await apiRequest(`/textile/yarns${queryParams}`);
     return response.data || [];
   },
@@ -348,7 +375,10 @@ export const yarnManufacturingService = {
     return response.data;
   },
 
-  async updateYarnManufacturing(yarnId: string, data: Partial<CreateYarnManufacturingData>): Promise<YarnManufacturing> {
+  async updateYarnManufacturing(
+    yarnId: string,
+    data: Partial<CreateYarnManufacturingData>
+  ): Promise<YarnManufacturing> {
     const response = await apiRequest(`/textile/yarns/${yarnId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -376,7 +406,9 @@ export const dyeingFinishingService = {
   },
 
   async getDyeingFinishing(filters?: any): Promise<DyeingFinishing[]> {
-    const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    const cleaned = cleanFilters(filters);
+    const queryParams =
+      Object.keys(cleaned).length > 0 ? `?${new URLSearchParams(cleaned).toString()}` : '';
     const response = await apiRequest(`/textile/dyeing${queryParams}`);
     return response.data || [];
   },
@@ -386,7 +418,10 @@ export const dyeingFinishingService = {
     return response.data;
   },
 
-  async updateDyeingFinishing(processId: string, data: Partial<CreateDyeingFinishingData>): Promise<DyeingFinishing> {
+  async updateDyeingFinishing(
+    processId: string,
+    data: Partial<CreateDyeingFinishingData>
+  ): Promise<DyeingFinishing> {
     const response = await apiRequest(`/textile/dyeing/${processId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -405,7 +440,9 @@ export const dyeingFinishingService = {
 // GARMENT MANUFACTURING SERVICE
 // ============================================
 export const garmentManufacturingService = {
-  async createGarmentManufacturing(data: CreateGarmentManufacturingData): Promise<GarmentManufacturing> {
+  async createGarmentManufacturing(
+    data: CreateGarmentManufacturingData
+  ): Promise<GarmentManufacturing> {
     const response = await apiRequest('/textile/garments', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -414,7 +451,9 @@ export const garmentManufacturingService = {
   },
 
   async getGarmentManufacturing(filters?: any): Promise<GarmentManufacturing[]> {
-    const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    const cleaned = cleanFilters(filters);
+    const queryParams =
+      Object.keys(cleaned).length > 0 ? `?${new URLSearchParams(cleaned).toString()}` : '';
     const response = await apiRequest(`/textile/garments${queryParams}`);
     return response.data || [];
   },
@@ -424,7 +463,10 @@ export const garmentManufacturingService = {
     return response.data;
   },
 
-  async updateGarmentManufacturing(garmentId: string, data: Partial<CreateGarmentManufacturingData>): Promise<GarmentManufacturing> {
+  async updateGarmentManufacturing(
+    garmentId: string,
+    data: Partial<CreateGarmentManufacturingData>
+  ): Promise<GarmentManufacturing> {
     const response = await apiRequest(`/textile/garments/${garmentId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -432,7 +474,11 @@ export const garmentManufacturingService = {
     return response.data;
   },
 
-  async updateGarmentStage(garmentId: string, stage: string, notes?: string): Promise<GarmentManufacturing> {
+  async updateGarmentStage(
+    garmentId: string,
+    stage: string,
+    notes?: string
+  ): Promise<GarmentManufacturing> {
     const response = await apiRequest(`/textile/garments/${garmentId}/stage`, {
       method: 'PATCH',
       body: JSON.stringify({ stage, notes }),
@@ -460,7 +506,9 @@ export const designPatternService = {
   },
 
   async getDesignPatterns(filters?: any): Promise<DesignPattern[]> {
-    const queryParams = filters ? `?${new URLSearchParams(filters).toString()}` : '';
+    const cleaned = cleanFilters(filters);
+    const queryParams =
+      Object.keys(cleaned).length > 0 ? `?${new URLSearchParams(cleaned).toString()}` : '';
     const response = await apiRequest(`/textile/designs${queryParams}`);
     return response.data || [];
   },
@@ -470,7 +518,10 @@ export const designPatternService = {
     return response.data;
   },
 
-  async updateDesignPattern(designId: string, data: Partial<CreateDesignPatternData>): Promise<DesignPattern> {
+  async updateDesignPattern(
+    designId: string,
+    data: Partial<CreateDesignPatternData>
+  ): Promise<DesignPattern> {
     const response = await apiRequest(`/textile/designs/${designId}`, {
       method: 'PUT',
       body: JSON.stringify(data),

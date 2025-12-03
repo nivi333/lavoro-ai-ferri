@@ -1086,6 +1086,7 @@ model fabric_production {
   production_date DateTime
   batch_number    String
   quality_grade   QualityGrade
+  image_url       String?
   notes           String?
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
@@ -1135,6 +1136,7 @@ model yarn_manufacturing {
   batch_number    String
   process_type    YarnProcess
   quality_grade   QualityGrade
+  image_url       String?
   notes           String?
   is_active       Boolean      @default(true)
   created_at      DateTime     @default(now())
@@ -1186,6 +1188,7 @@ model dyeing_finishing {
   quality_check     Boolean       @default(false)
   color_fastness    String?
   shrinkage_percent Decimal?      @db.Decimal(5, 2)
+  image_url         String?
   notes             String?
   is_active         Boolean       @default(true)
   created_at        DateTime      @default(now())
@@ -1229,6 +1232,7 @@ model garment_manufacturing {
   line_number      String?
   quality_passed   Boolean         @default(false)
   defect_count     Int             @default(0)
+  image_url        String?
   notes            String?
   is_active        Boolean         @default(true)
   created_at       DateTime        @default(now())
