@@ -54,3 +54,5 @@ export { default as UsersListPage } from './users/UsersListPage';
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
 export { default as YarnManufacturingListPage } from './textile/YarnManufacturingListPage';
 export { default as DyeingFinishingListPage } from './textile/DyeingFinishingListPage';
+export { default as GarmentManufacturingListPage } from './textile/GarmentManufacturingListPage';
+export { default as DesignPatternsListPage } from './textile/DesignPatternsListPage';

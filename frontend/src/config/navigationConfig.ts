@@ -205,13 +205,13 @@ export const TEXTILE_MODULES: MenuItem[] = [
         key: 'fabric-production',
         label: 'Fabric Production',
         icon: SkinOutlined,
-        path: '/textile/fabric-production',
+        path: '/textile/fabrics',
       },
       {
         key: 'yarn-manufacturing',
         label: 'Yarn Manufacturing',
         icon: FormatPainterOutlined,
-        path: '/textile/yarn',
+        path: '/textile/yarns',
       },
       {
         key: 'dyeing-finishing',
