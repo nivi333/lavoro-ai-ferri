@@ -43,7 +43,9 @@ export interface CreateLocationData {
   locationType?: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
   isDefault?: boolean;
   isHeadquarters?: boolean;
+  isActive?: boolean;
   imageUrl?: string;
+  contactInfo?: Record<string, any>;
 }
 
 export interface UpdateLocationData {

@@ -28,16 +28,18 @@ export interface CreateLocationRequest {
   name: string;
   email?: string;
   phone?: string;
-  country: string;
-  addressLine1: string;
+  country?: string;
+  addressLine1?: string;
   addressLine2?: string;
-  city: string;
-  state: string;
-  pincode: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   isDefault?: boolean;
   isHeadquarters?: boolean;
+  isActive?: boolean;
   locationType?: 'BRANCH' | 'WAREHOUSE' | 'FACTORY' | 'STORE';
   imageUrl?: string;
+  contactInfo?: Record<string, any>;
 }
 
 export interface UpdateLocationRequest extends Partial<CreateLocationRequest> {

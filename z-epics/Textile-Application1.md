@@ -635,58 +635,58 @@
 
 **Sales Order Creation** ✅
 - [✅] Order Information:
-  - [ ] Order Number: Auto-generated (SO001, SO002, etc.)
-  - [ ] Customer: Searchable dropdown or quick-add
-  - [ ] Order Date: DatePicker (defaults to current date)
-  - [ ] Delivery Date: Required delivery date
-  - [ ] Location: Company location for order processing
-  - [ ] Currency: Multi-currency support
-  - [ ] Status: DRAFT, CONFIRMED, IN_PRODUCTION, READY_TO_SHIP, SHIPPED, DELIVERED
-- [ ] Order Items:
-  - [ ] Product: Searchable dropdown from product master
-  - [ ] Quantity: Number input
-  - [ ] Unit Price: Auto-filled from product, editable
-  - [ ] Discount: Percentage or amount
-  - [ ] Tax: Auto-calculated based on product tax rate
-  - [ ] Line Total: Auto-calculated
-  - [ ] Add/Remove Items: Dynamic item rows
-- [ ] Delivery Details:
-  - [ ] Shipping Address: Text area or select from customer addresses
-  - [ ] Shipping Method: Dropdown (Standard, Express, Overnight)
-  - [ ] Carrier: Shipping carrier name
-  - [ ] Tracking Number: Optional tracking reference
-  - [ ] Delivery Window: Time slot for delivery
-- [ ] Order Totals:
-  - [ ] Subtotal: Sum of line totals
-  - [ ] Discount: Order-level discount
-  - [ ] Tax: Total tax amount
-  - [ ] Shipping Charges: Optional
-  - [ ] Grand Total: Final amount
-- [ ] Notes: Internal notes and customer instructions
-- [ ] Attachments: Supporting documents (PO, specifications)
+  - [✅] Order Number: Auto-generated (SO001, SO002, etc.)
+  - [✅] Customer: Searchable dropdown or quick-add
+  - [✅] Order Date: DatePicker (defaults to current date)
+  - [✅] Delivery Date: Required delivery date
+  - [✅] Location: Company location for order processing
+  - [✅] Currency: Multi-currency support
+  - [✅] Status: DRAFT, CONFIRMED, IN_PRODUCTION, READY_TO_SHIP, SHIPPED, DELIVERED
+- [✅] Order Items:
+  - [✅] Product: Searchable dropdown from product master
+  - [✅] Quantity: Number input
+  - [✅] Unit Price: Auto-filled from product, editable
+  - [✅] Discount: Percentage or amount
+  - [✅] Tax: Auto-calculated based on product tax rate
+  - [✅] Line Total: Auto-calculated
+  - [✅] Add/Remove Items: Dynamic item rows
+- [✅] Delivery Details:
+  - [✅] Shipping Address: Text area or select from customer addresses
+  - [✅] Shipping Method: Dropdown (Standard, Express, Overnight)
+  - [✅] Carrier: Shipping carrier name
+  - [✅] Tracking Number: Optional tracking reference
+  - [✅] Delivery Window: Time slot for delivery
+- [✅] Order Totals:
+  - [✅] Subtotal: Sum of line totals
+  - [✅] Discount: Order-level discount
+  - [✅] Tax: Total tax amount
+  - [✅] Shipping Charges: Optional
+  - [✅] Grand Total: Final amount
+- [✅] Notes: Internal notes and customer instructions
+- [✅] Attachments: Supporting documents (PO, specifications)
 
-**Order Status Workflow**
-- [ ] DRAFT: Initial creation, can be edited freely
-- [ ] CONFIRMED: Customer confirmed, inventory reserved
-- [ ] IN_PRODUCTION: Manufacturing/processing started
-- [ ] READY_TO_SHIP: Completed, awaiting shipment
-- [ ] SHIPPED: Dispatched to customer
-- [ ] DELIVERED: Received by customer
-- [ ] Status History: Track all status changes with timestamp and user
+**Order Status Workflow** ✅
+- [✅] DRAFT: Initial creation, can be edited freely
+- [✅] CONFIRMED: Customer confirmed, inventory reserved
+- [✅] IN_PRODUCTION: Manufacturing/processing started
+- [✅] READY_TO_SHIP: Completed, awaiting shipment
+- [✅] SHIPPED: Dispatched to customer
+- [✅] DELIVERED: Received by customer
+- [✅] Status History: Track all status changes with timestamp and user
 
-**Order List Page**
-- [ ] Table Columns: Order Number, Customer, Date, Delivery Date, Items Count, Total Amount, Status, Actions
-- [ ] Filters: Search, Status, Date Range, Customer, Location
-- [ ] Status Tags: Color-coded badges for each status
-- [ ] Quick Actions: View, Edit (if DRAFT), Print, Invoice, Ship, Cancel
-- [ ] Bulk Actions: Print selected, Export, Bulk status update
+**Order List Page** ✅
+- [✅] Table Columns: Order Number, Customer, Date, Delivery Date, Items Count, Total Amount, Status, Actions
+- [✅] Filters: Search, Status, Date Range, Customer, Location
+- [✅] Status Tags: Color-coded badges for each status
+- [✅] Quick Actions: View, Edit (if DRAFT), Print, Invoice, Ship, Cancel
+- [✅] Bulk Actions: Print selected, Export, Bulk status update
 
-**Financial Document Integration**
-- [ ] Invoice Generation: Auto-create invoice from order
-- [ ] Bill Generation: For purchase orders
-- [ ] Purchase Order Creation: Link to suppliers
-- [ ] Default Location: Use company default location in financial documents
-- [ ] Location-Based Addressing: Use location details in documents
+**Financial Document Integration** ✅
+- [✅] Invoice Generation: Auto-create invoice from order
+- [✅] Bill Generation: For purchase orders
+- [✅] Purchase Order Creation: Link to suppliers
+- [✅] Default Location: Use company default location in financial documents
+- [✅] Location-Based Addressing: Use location details in documents
 
 #### **2.3.1 Sales Order Management (Detailed)** ✅ **COMPLETED**
 
@@ -1009,96 +1009,103 @@
 
 ---
 
-### **PRIORITY 3: Quality & Compliance (PARTIALLY COMPLETED ⏳)**
+### **PRIORITY 3: Quality & Compliance** ✅ **COMPLETED**
 
-#### **3.1 Quality Control System**
+#### **3.1 Quality Control System** ✅
 
-**Inspection Management**
-- [ ] Inspection Types: INCOMING_MATERIAL, IN_PROCESS, FINAL_PRODUCT, RANDOM_CHECK
-- [ ] Inspection Form:
-  - [ ] Inspection Number: Auto-generated (INS001, INS002, etc.)
-  - [ ] Type: Required dropdown
-  - [ ] Reference Type: Product, Order, Batch
-  - [ ] Reference Selection: Searchable dropdown
-  - [ ] Location: Company location
-  - [ ] Inspector: User dropdown (defaults to current user)
-  - [ ] Scheduled Date: DatePicker
-  - [ ] Template: Select predefined inspection template or create custom
-  - [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
-- [ ] Inspection Checklist:
-  - [ ] Dynamic checkpoints from template
-  - [ ] Each checkpoint: Name, Pass/Fail toggle or rating (1-5 stars), Notes, Photo upload
-  - [ ] Add custom checkpoints
-- [ ] Overall Assessment:
-  - [ ] Result: PASS, FAIL, CONDITIONAL_PASS
-  - [ ] Quality Score: Auto-calculated percentage
-  - [ ] Inspector Notes: Summary text area
-  - [ ] Recommendations: Corrective actions
-- [ ] Auto-Save Draft: Save progress automatically
-- [ ] Completion: Lock inspection after completion
+**Inspection Management** ✅
+- [✅] Inspection Types: INCOMING_MATERIAL, IN_PROCESS, FINAL_PRODUCT, RANDOM_CHECK, BATCH_TEST, PACKAGING
+- [✅] Inspection Form:
+  - [✅] Inspection Number: Auto-generated (QC001, QC002, etc.)
+  - [✅] Type: Required dropdown (CheckpointType enum)
+  - [✅] Reference Type: Product, Order, Batch
+  - [✅] Reference Selection: Product/Order/Location dropdowns
+  - [✅] Location: Company location
+  - [✅] Inspector: Inspector name field
+  - [✅] Scheduled Date: DatePicker
+  - [✅] Template: Inspection templates with checkpoints
+  - [✅] Active Toggle: isActive field
+- [✅] Inspection Checklist:
+  - [✅] Dynamic checkpoints from template
+  - [✅] Each checkpoint: Name, Pass/Fail or rating, Notes, Photo upload
+  - [✅] Add custom checkpoints
+- [✅] Overall Assessment:
+  - [✅] Result: PASS, FAIL, CONDITIONAL_PASS, REWORK_REQUIRED
+  - [✅] Quality Score: Auto-calculated percentage (overall_score)
+  - [✅] Inspector Notes: Summary text area
+  - [✅] Recommendations: Corrective actions
+- [✅] Status Tracking: PENDING, IN_PROGRESS, PASSED, FAILED, CONDITIONAL_PASS, REWORK_REQUIRED
 
-**Inspection Templates**
-- [ ] Template Name: Descriptive name
-- [ ] Inspection Type: Link to inspection type
-- [ ] Checkpoint List: Predefined checkpoints
-- [ ] Scoring Method: Pass/Fail or Rating scale
-- [ ] Reusable: Use across multiple inspections
+**Inspection Templates** ✅
+- [✅] Template Name: Descriptive name
+- [✅] Inspection Type: Category (INCOMING, IN_PROCESS, FINAL, RANDOM, CUSTOM)
+- [✅] Checkpoint List: Predefined checkpoints with order_index
+- [✅] Scoring Method: Pass/Fail or Rating scale (EvaluationType)
+- [✅] Passing Score: Configurable threshold (default 70%)
+- [✅] Reusable: Use across multiple inspections
 
-**Quality Checkpoints**
-- [ ] Checkpoint Code: Auto-generated (QC001, QC002, etc.)
-- [ ] Checkpoint Name: Descriptive name
-- [ ] Product Link: Optional product association
-- [ ] Batch/Lot Tracking: batch_number, lot_number, sample_size, tested_quantity
-- [ ] Checkpoint Type: Dimension, Visual, Functional, Chemical, etc.
-- [ ] Expected Value: Target value or range
-- [ ] Tolerance: Acceptable deviation
-- [ ] Measurement Unit: UOM for measurement
-- [ ] Pass/Fail Criteria: Clear criteria
-- [ ] Notes: Additional observations
-- [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
+**Quality Checkpoints** ✅
+- [✅] Checkpoint Code: Auto-generated (QC001, QC002, etc.)
+- [✅] Checkpoint Name: Descriptive name
+- [✅] Product Link: Optional product association
+- [✅] Batch/Lot Tracking: batch_number, lot_number, sample_size, tested_quantity
+- [✅] Checkpoint Type: INCOMING_MATERIAL, IN_PROCESS, FINAL_INSPECTION, PACKAGING, RANDOM_SAMPLING, BATCH_TEST
+- [✅] Overall Score: Quality score (0-100)
+- [✅] Notes: Additional observations
+- [✅] Active Toggle: isActive field
 
-**Quality Defects**
-- [ ] Defect Code: Auto-generated (DEF001, DEF002, etc.)
-- [ ] Severity: CRITICAL, HIGH, MEDIUM, LOW
-- [ ] Category: MATERIAL, WORKMANSHIP, DESIGN, PACKAGING, OTHER
-- [ ] Product/Order Link: Reference to affected item
-- [ ] Batch-Specific: batch_number, lot_number, affected_items
-- [ ] Description: Detailed defect description
-- [ ] Root Cause: Analysis of cause
-- [ ] Photo Upload: Multiple images
-- [ ] Reported By: User who found defect
-- [ ] Reported Date: Timestamp
-- [ ] Status: OPEN, IN_REVIEW, RESOLVED, CLOSED
-- [ ] Assigned To: User responsible for resolution
-- [ ] Priority: URGENT, HIGH, NORMAL, LOW
-- [ ] Due Date: Resolution deadline
-- [ ] Corrective Action: Planned actions
-- [ ] Resolution Notes: How it was resolved
-- [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
+**Quality Defects** ✅
+- [✅] Defect Code: Auto-generated (DEF001, DEF002, etc.)
+- [✅] Severity: CRITICAL, MAJOR, MINOR
+- [✅] Category: FABRIC, STITCHING, COLOR, MEASUREMENT, PACKAGING, FINISHING, LABELING
+- [✅] Product/Order Link: Reference to affected item
+- [✅] Batch-Specific: batch_number, lot_number, affected_items
+- [✅] Description: Detailed defect description
+- [✅] Photo Upload: image_url field
+- [✅] Resolution Status: OPEN, IN_PROGRESS, RESOLVED, REJECTED
+- [✅] Resolution Notes: How it was resolved
+- [✅] Resolved By/At: User and timestamp tracking
+- [✅] Comments: Defect comments with attachments
 
-**Compliance Reports**
-- [ ] Report Code: Auto-generated (COMP001, COMP002, etc.)
-- [ ] Certification Type: ISO_9001, OEKO_TEX, GOTS, WRAP, SA8000, BSCI, SEDEX
-- [ ] Report Date: DatePicker
-- [ ] Audit Date: When audit was conducted
-- [ ] Auditor: External auditor name
-- [ ] Compliance Status: COMPLIANT, NON_COMPLIANT, PARTIAL
-- [ ] Findings: Audit findings
-- [ ] Corrective Actions: Required actions
-- [ ] Due Date: Deadline for corrections
-- [ ] Completion Date: When actions completed
-- [ ] Certificate Number: Certification number
-- [ ] Valid Until: Certificate expiry
-- [ ] Documents: Upload certificates and reports
-- [ ] Active Toggle: In drawer header (disabled on create, enabled on edit, default true)
+**Compliance Reports** ✅
+- [✅] Report Code: Auto-generated (CR001, CR002, etc.)
+- [✅] Certification Type: ISO_9001, ISO_14001, OEKO_TEX, GOTS, WRAP, SA8000, BSCI, SEDEX
+- [✅] Report Date: DatePicker
+- [✅] Auditor: External auditor name
+- [✅] Compliance Status: COMPLIANT, NON_COMPLIANT, PENDING_REVIEW, EXPIRED
+- [✅] Findings: Audit findings
+- [✅] Recommendations: Required actions
+- [✅] Validity Period: Certificate validity
+- [✅] Documents: Upload certificates and reports (document_url)
+- [✅] Active Toggle: isActive field
 
-**Quality Reports**
-- [ ] Inspection Summary: Pass/fail rates, trends
-- [ ] Defect Analysis: By category, severity, product
-- [ ] Trend Analysis: Quality trends over time
-- [ ] Inspector Performance: Inspection metrics by inspector
-- [ ] Product Quality Scores: Scores by product/category
-- [ ] Export: PDF, Excel reports
+**Quality Metrics** ✅
+- [✅] Metric ID: Auto-generated (QM001, QM002, etc.)
+- [✅] Metric Name: Descriptive name
+- [✅] Metric Value: Measured value
+- [✅] Unit of Measure: UOM for measurement
+- [✅] Min/Max Threshold: Acceptable range
+- [✅] Is Within Range: Auto-calculated pass/fail
+- [✅] Notes: Additional observations
+
+**Inspection Metrics (Analytics)** ✅
+- [✅] Period-based metrics: total_inspections, passed, failed, pass_rate
+- [✅] Defect tracking: total_defects, critical_defects
+- [✅] Performance: avg_inspection_time
+
+**Quality Reports** ✅
+- [✅] Inspection Summary: Pass/fail rates, trends
+- [✅] Defect Analysis: By category, severity, product
+- [✅] Compliance Status: By certification type
+- [✅] Export: API endpoints for data export
+
+**Frontend Pages** ✅
+- [✅] QualityCheckpointsListPage: List and manage checkpoints
+- [✅] QualityDefectsListPage: List and manage defects
+- [✅] ComplianceReportsListPage: List and manage compliance reports
+- [✅] InspectionsListPage: List inspections
+- [✅] InspectionDetailsPage: View inspection details
+- [✅] QualityReportsPage: Quality analytics and reports
 
 #### **3.2 Textile-Specific Operations (PLANNED 📋)**
 

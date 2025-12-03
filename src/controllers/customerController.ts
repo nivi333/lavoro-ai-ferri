@@ -4,16 +4,17 @@ import { logger } from '../utils/logger';
 import Joi from 'joi';
 
 const createCustomerSchema = Joi.object({
+  code: Joi.string().max(50).optional().allow('', null),
   name: Joi.string().min(2).max(100).required(),
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
-    .optional(),
+    .optional().allow(null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
-    otherwise: Joi.string().max(100).optional(),
+    otherwise: Joi.string().max(100).optional().allow('', null),
   }),
-  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional(),
+  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
   primaryContactPerson: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   phone: Joi.string()
@@ -25,108 +26,109 @@ const createCustomerSchema = Joi.object({
   alternatePhone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
     .optional()
-    .allow('')
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid phone number with country code',
     }),
-  website: Joi.string().uri().optional().allow(''),
+  website: Joi.string().uri().optional().allow('', null),
   // Billing Address
-  billingAddressLine1: Joi.string().max(255).optional().allow(''),
-  billingAddressLine2: Joi.string().max(255).optional().allow(''),
-  billingCity: Joi.string().max(100).required(),
-  billingState: Joi.string().max(100).optional().allow(''),
-  billingCountry: Joi.string().max(100).required(),
-  billingPostalCode: Joi.string().max(20).optional().allow(''),
+  billingAddressLine1: Joi.string().max(255).optional().allow('', null),
+  billingAddressLine2: Joi.string().max(255).optional().allow('', null),
+  billingCity: Joi.string().max(100).optional().allow('', null),
+  billingState: Joi.string().max(100).optional().allow('', null),
+  billingCountry: Joi.string().max(100).optional().allow('', null),
+  billingPostalCode: Joi.string().max(20).optional().allow('', null),
   // Shipping Address
-  shippingAddressLine1: Joi.string().max(255).optional().allow(''),
-  shippingAddressLine2: Joi.string().max(255).optional().allow(''),
-  shippingCity: Joi.string().max(100).optional().allow(''),
-  shippingState: Joi.string().max(100).optional().allow(''),
-  shippingCountry: Joi.string().max(100).optional().allow(''),
-  shippingPostalCode: Joi.string().max(20).optional().allow(''),
+  shippingAddressLine1: Joi.string().max(255).optional().allow('', null),
+  shippingAddressLine2: Joi.string().max(255).optional().allow('', null),
+  shippingCity: Joi.string().max(100).optional().allow('', null),
+  shippingState: Joi.string().max(100).optional().allow('', null),
+  shippingCountry: Joi.string().max(100).optional().allow('', null),
+  shippingPostalCode: Joi.string().max(20).optional().allow('', null),
   sameAsBillingAddress: Joi.boolean().default(true),
   // Financial Information
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional(),
-  creditLimit: Joi.number().min(0).precision(2).optional(),
+    .optional().allow(null),
+  creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
   currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').default('INR'),
-  taxId: Joi.string().max(50).optional().allow(''),
+  taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
     .optional()
-    .allow('')
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid PAN number (e.g., ABCDE1234F)',
     }),
   // Additional Information
-  assignedSalesRep: Joi.string().uuid().optional().allow(''),
-  notes: Joi.string().max(500).optional().allow(''),
-  tags: Joi.array().items(Joi.string().max(50)).optional(),
+  assignedSalesRep: Joi.string().uuid().optional().allow('', null),
+  notes: Joi.string().max(500).optional().allow('', null),
+  tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   isActive: Joi.boolean().default(true),
 });
 
 const updateCustomerSchema = Joi.object({
+  code: Joi.string().max(50).optional().allow('', null),
   name: Joi.string().min(2).max(100).optional(),
   customerType: Joi.string()
     .valid('INDIVIDUAL', 'BUSINESS', 'DISTRIBUTOR', 'RETAILER', 'WHOLESALER')
-    .optional(),
+    .optional().allow(null),
   companyName: Joi.when('customerType', {
     is: Joi.string().valid('BUSINESS'),
     then: Joi.string().min(2).max(100).required(),
-    otherwise: Joi.string().max(100).optional(),
+    otherwise: Joi.string().max(100).optional().allow('', null),
   }),
-  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional(),
-  primaryContactPerson: Joi.string().min(2).max(100).optional(),
-  email: Joi.string().email().optional().allow(''),
+  customerCategory: Joi.string().valid('VIP', 'REGULAR', 'NEW', 'INACTIVE').optional().allow(null),
+  primaryContactPerson: Joi.string().min(2).max(100).optional().allow('', null),
+  email: Joi.string().email().optional().allow('', null),
   phone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
     .optional()
-    .allow('')
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid phone number with country code',
     }),
   alternatePhone: Joi.string()
     .pattern(/^[+]?[1-9][\d]{0,15}$/)
     .optional()
-    .allow('')
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid phone number with country code',
     }),
-  website: Joi.string().uri().optional().allow(''),
+  website: Joi.string().uri().optional().allow('', null),
   // Billing Address
-  billingAddressLine1: Joi.string().max(255).optional().allow(''),
-  billingAddressLine2: Joi.string().max(255).optional().allow(''),
-  billingCity: Joi.string().max(100).optional().allow(''),
-  billingState: Joi.string().max(100).optional().allow(''),
-  billingCountry: Joi.string().max(100).optional().allow(''),
-  billingPostalCode: Joi.string().max(20).optional().allow(''),
+  billingAddressLine1: Joi.string().max(255).optional().allow('', null),
+  billingAddressLine2: Joi.string().max(255).optional().allow('', null),
+  billingCity: Joi.string().max(100).optional().allow('', null),
+  billingState: Joi.string().max(100).optional().allow('', null),
+  billingCountry: Joi.string().max(100).optional().allow('', null),
+  billingPostalCode: Joi.string().max(20).optional().allow('', null),
   // Shipping Address
-  shippingAddressLine1: Joi.string().max(255).optional().allow(''),
-  shippingAddressLine2: Joi.string().max(255).optional().allow(''),
-  shippingCity: Joi.string().max(100).optional().allow(''),
-  shippingState: Joi.string().max(100).optional().allow(''),
-  shippingCountry: Joi.string().max(100).optional().allow(''),
-  shippingPostalCode: Joi.string().max(20).optional().allow(''),
+  shippingAddressLine1: Joi.string().max(255).optional().allow('', null),
+  shippingAddressLine2: Joi.string().max(255).optional().allow('', null),
+  shippingCity: Joi.string().max(100).optional().allow('', null),
+  shippingState: Joi.string().max(100).optional().allow('', null),
+  shippingCountry: Joi.string().max(100).optional().allow('', null),
+  shippingPostalCode: Joi.string().max(20).optional().allow('', null),
   sameAsBillingAddress: Joi.boolean().optional(),
   // Financial Information
   paymentTerms: Joi.string()
     .valid('NET_30', 'NET_60', 'NET_90', 'ADVANCE', 'COD', 'CREDIT')
-    .optional(),
-  creditLimit: Joi.number().min(0).precision(2).optional(),
-  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional(),
-  taxId: Joi.string().max(50).optional().allow(''),
+    .optional().allow(null),
+  creditLimit: Joi.number().min(0).precision(2).optional().allow(null),
+  currency: Joi.string().valid('INR', 'USD', 'EUR', 'GBP').optional().allow(null),
+  taxId: Joi.string().max(50).optional().allow('', null),
   panNumber: Joi.string()
     .pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
     .optional()
-    .allow('')
+    .allow('', null)
     .messages({
       'string.pattern.base': 'Please enter a valid PAN number (e.g., ABCDE1234F)',
     }),
   // Additional Information
-  assignedSalesRep: Joi.string().uuid().optional().allow(''),
-  notes: Joi.string().max(500).optional().allow(''),
-  tags: Joi.array().items(Joi.string().max(50)).optional(),
+  assignedSalesRep: Joi.string().uuid().optional().allow('', null),
+  notes: Joi.string().max(500).optional().allow('', null),
+  tags: Joi.array().items(Joi.string().max(50)).optional().allow(null),
   isActive: Joi.boolean().optional(),
 });
 
