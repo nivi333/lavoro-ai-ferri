@@ -11,18 +11,18 @@ import {
   InputNumber,
   Switch,
   Divider,
-  Space,
   App,
-  Checkbox,
 } from 'antd';
+import { AppstoreOutlined } from '@ant-design/icons';
 import {
   dyeingFinishingService,
   DyeingFinishing,
   CreateDyeingFinishingData,
   DYEING_PROCESSES,
 } from '../../services/textileService';
-import { GradientButton } from '../ui';
+import { GradientButton, ImageUpload } from '../ui';
 import dayjs from 'dayjs';
+import '../CompanyCreationDrawer.scss';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -48,6 +48,7 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   const isEditing = mode === 'edit' && !!processId;
 
@@ -82,6 +83,7 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
       processDate: data.processDate ? dayjs(data.processDate) : undefined,
     });
     setIsActive(data.isActive ?? true);
+    setImageUrl(data.imageUrl || '');
   };
 
   const resetForm = () => {
@@ -93,51 +95,67 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
       qualityCheck: false,
     });
     setIsActive(true);
+    setImageUrl('');
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
   };
 
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
-      const payload: any = {
+      const processData: CreateDyeingFinishingData = {
         ...values,
-        processDate: values.processDate.toISOString(),
+        processDate: values.processDate?.toISOString(),
+        temperature: values.temperature ? Number(values.temperature) : undefined,
+        duration: values.duration ? Number(values.duration) : undefined,
+        imageUrl: imageUrl || undefined,
+        isActive,
       };
 
       if (isEditing && processId) {
-        await dyeingFinishingService.updateDyeingFinishing(processId, payload);
-        message.success('Process record updated successfully');
+        await dyeingFinishingService.updateDyeingFinishing(processId, processData);
+        message.success('Process updated successfully');
       } else {
-        await dyeingFinishingService.createDyeingFinishing(payload);
-        message.success('Process record created successfully');
+        await dyeingFinishingService.createDyeingFinishing(processData);
+        message.success('Process created successfully');
       }
+
       onSuccess?.();
-      onClose();
-    } catch (error: any) {
-      message.error(error.message || 'Failed to save record');
+      handleClose();
+    } catch (error) {
+      console.error('Error saving process:', error);
+      message.error('Failed to save process');
     } finally {
       setLoading(false);
     }
   };
 
+  const drawerTitle = isEditing ? 'Edit Dyeing & Finishing' : 'Create Dyeing & Finishing';
+  const submitLabel = isEditing ? 'Save Changes' : 'Create';
+
   return (
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span>{isEditing ? 'Edit Process' : 'New Dyeing/Finishing Process'}</span>
+          <span className='ccd-title'>{drawerTitle}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
             <Switch
               checked={isActive}
-              onChange={(checked) => {
+              onChange={checked => {
                 setIsActive(checked);
                 form.setFieldsValue({ isActive: checked });
               }}
+              disabled={!isEditing}
             />
           </div>
         </div>
       }
       width={720}
-      onClose={onClose}
+      onClose={handleClose}
       open={open}
       className='company-creation-drawer'
       styles={{ body: { padding: 0 } }}
@@ -148,27 +166,42 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
           form={form}
           layout='vertical'
           onFinish={handleFinish}
-          initialValues={{ isActive: true, qualityCheck: false }}
+          initialValues={{
+            isActive: true,
+            processType: 'DYEING',
+            qualityCheck: false,
+          }}
           className='ccd-form'
         >
           <Form.Item name='isActive' valuePropName='checked' hidden>
             <Switch />
           </Form.Item>
-
           <div className='ccd-form-content'>
-            {/* Process Details */}
+            {/* Section 1: Basic Information */}
             <div className='ccd-section'>
-              <div className='ccd-section-title'>Process Details</div>
-              <Row gutter={16}>
+              <div className='ccd-section-header'>
+                <div className='ccd-section-title'>Basic Information</div>
+              </div>
+              <Col span={24}>
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  icon={<AppstoreOutlined />}
+                  helpText='Upload Process Image (PNG/JPG/SVG, max 2MB)'
+                />
+              </Col>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Process Type'
                     name='processType'
                     rules={[{ required: true, message: 'Please select process type' }]}
                   >
-                    <Select placeholder='Select type'>
-                      {DYEING_PROCESSES.map(type => (
-                        <Option key={type.value} value={type.value}>{type.label}</Option>
+                    <Select placeholder='Select process type' className='ccd-select'>
+                      {DYEING_PROCESSES.map(process => (
+                        <Option key={process.value} value={process.value}>
+                          {process.label}
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -179,71 +212,64 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
                     name='batchNumber'
                     rules={[{ required: true, message: 'Please enter batch number' }]}
                   >
-                    <Input placeholder='Enter batch number' />
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter batch number'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
-                    label='Process Date'
-                    name='processDate'
-                    rules={[{ required: true, message: 'Please select date' }]}
+                    label='Fabric ID'
+                    name='fabricId'
+                    rules={[{ required: true, message: 'Please enter fabric ID' }]}
                   >
-                    <DatePicker style={{ width: '100%' }} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label='Machine Number'
-                    name='machineNumber'
-                  >
-                    <Input placeholder='Optional machine ID' />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-
-            <Divider className='ccd-divider' />
-
-            {/* Color & Recipe */}
-            <div className='ccd-section'>
-              <div className='ccd-section-title'>Color & Recipe</div>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label='Color Name'
-                    name='colorName'
-                    rules={[{ required: true, message: 'Required' }]}
-                  >
-                    <Input placeholder='e.g., Navy Blue' />
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter fabric ID'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     label='Color Code'
                     name='colorCode'
-                    rules={[{ required: true, message: 'Required' }]}
+                    rules={[{ required: true, message: 'Please enter color code' }]}
                   >
-                    <Input placeholder='e.g., #000080 or Pantone' />
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter color code'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={12}>
-                  <Form.Item
-                    label='Recipe Code'
-                    name='recipeCode'
-                  >
-                    <Input placeholder='Optional recipe ID' />
+                  <Form.Item label='Color Name' name='colorName'>
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter color name'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    label='Dye Method'
-                    name='dyeMethod'
-                  >
-                    <Input placeholder='e.g., Reactive, Disperse' />
+                  <Form.Item label='Chemical Used' name='chemicalUsed'>
+                    <Input
+                      maxLength={64}
+                      autoComplete='off'
+                      placeholder='Enter chemicals used'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -251,60 +277,71 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
 
             <Divider className='ccd-divider' />
 
-            {/* Technical Parameters */}
+            {/* Section 2: Process Details */}
             <div className='ccd-section'>
-              <div className='ccd-section-title'>Technical Parameters</div>
-              <Row gutter={16}>
-                <Col span={8}>
+              <div className='ccd-section-title'>Process Details</div>
+              <Row gutter={12}>
+                <Col span={12}>
                   <Form.Item
-                    label='Quantity (Meters)'
-                    name='quantityMeters'
-                    rules={[{ required: true, message: 'Required' }]}
+                    label='Process Date'
+                    name='processDate'
+                    rules={[{ required: true, message: 'Please select process date' }]}
                   >
-                    <InputNumber min={0} style={{ width: '100%' }} placeholder='Meters' />
+                    <DatePicker
+                      placeholder='Select process date'
+                      className='ccd-input'
+                      style={{ width: '100%' }}
+                    />
                   </Form.Item>
                 </Col>
-                <Col span={8}>
-                  <Form.Item
-                    label='Temperature (°C)'
-                    name='temperatureC'
-                  >
-                    <InputNumber min={0} style={{ width: '100%' }} placeholder='Temp' />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    label='Duration (Min)'
-                    name='durationMinutes'
-                  >
-                    <InputNumber min={0} style={{ width: '100%' }} placeholder='Minutes' />
+                <Col span={12}>
+                  <Form.Item label='Machine ID' name='machineId'>
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter machine ID'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
-                <Col span={8}>
-                  <Form.Item
-                    label='Shrinkage (%)'
-                    name='shrinkagePercent'
-                  >
-                    <InputNumber min={0} max={100} style={{ width: '100%' }} placeholder='%' />
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Temperature (°C)' name='temperature'>
+                    <InputNumber
+                      placeholder='Enter temperature'
+                      min={0}
+                      step={0.1}
+                      style={{ width: '100%' }}
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
-                <Col span={8}>
-                  <Form.Item
-                    label='Color Fastness'
-                    name='colorFastness'
-                  >
-                    <Input placeholder='e.g., 4-5' />
+                <Col span={12}>
+                  <Form.Item label='Duration (minutes)' name='duration'>
+                    <InputNumber
+                      placeholder='Enter duration'
+                      min={0}
+                      style={{ width: '100%' }}
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
-                <Col span={8}>
-                  <Form.Item
-                    label='Quality Check'
-                    name='qualityCheck'
-                    valuePropName='checked'
-                  >
-                    <Checkbox>Passed QC</Checkbox>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item label='Operator Name' name='operatorName'>
+                    <Input
+                      maxLength={64}
+                      autoComplete='off'
+                      placeholder='Enter operator name'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Quality Check' name='qualityCheck' valuePropName='checked'>
+                    <Switch />
                   </Form.Item>
                 </Col>
               </Row>
@@ -312,13 +349,19 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
 
             <Divider className='ccd-divider' />
 
-            {/* Additional Information */}
+            {/* Section 3: Additional Information */}
             <div className='ccd-section'>
               <div className='ccd-section-title'>Additional Information</div>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={24}>
                   <Form.Item label='Notes' name='notes'>
-                    <TextArea rows={3} placeholder='Any additional notes...' />
+                    <TextArea
+                      rows={3}
+                      maxLength={500}
+                      autoComplete='off'
+                      placeholder='Enter any additional notes...'
+                      className='ccd-textarea'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -326,11 +369,11 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
           </div>
 
           <div className='ccd-actions'>
-            <Button onClick={onClose} className='ccd-cancel-btn'>
+            <Button onClick={handleClose} className='ccd-cancel-btn'>
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={loading}>
-              {isEditing ? 'Save Changes' : 'Create Record'}
+              {submitLabel}
             </GradientButton>
           </div>
         </Form>
@@ -338,3 +381,5 @@ export const DyeingFinishingDrawer: React.FC<DyeingFinishingDrawerProps> = ({
     </Drawer>
   );
 };
+
+export default DyeingFinishingDrawer;

@@ -3,18 +3,17 @@ import {
   Drawer,
   Form,
   Input,
-  Button,
-  Divider,
   Select,
-  Upload,
   Row,
   Col,
   DatePicker,
   Switch,
   InputNumber,
+  Divider,
+  Button,
   App,
 } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { AppstoreOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {
   fabricProductionService,
@@ -23,7 +22,7 @@ import {
   FABRIC_TYPES,
   QUALITY_GRADES,
 } from '../../services/textileService';
-import { GradientButton } from '../ui';
+import { GradientButton, ImageUpload } from '../ui';
 import '../CompanyCreationDrawer.scss';
 
 const { Option } = Select;
@@ -40,7 +39,7 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
   onClose,
   fabric,
 }) => {
-  const { message: appMessage } = App.useApp();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -69,27 +68,6 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
     }
   }, [visible, fabric, form]);
 
-  const beforeUpload = (file: File) => {
-    const isValidType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml';
-    if (!isValidType) {
-      appMessage.error('You can only upload JPG/PNG/SVG files!');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      appMessage.error('Image must be smaller than 2MB!');
-      return false;
-    }
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      setImageUrl(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    return false;
-  };
-
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
@@ -105,16 +83,16 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
 
       if (isEditing && fabric) {
         await fabricProductionService.updateFabricProduction(fabric.fabricId, fabricData);
-        appMessage.success('Fabric production updated successfully');
+        message.success('Fabric production updated successfully');
       } else {
         await fabricProductionService.createFabricProduction(fabricData);
-        appMessage.success('Fabric production created successfully');
+        message.success('Fabric production created successfully');
       }
 
       onClose(true);
     } catch (error) {
       console.error('Error saving fabric production:', error);
-      appMessage.error('Failed to save fabric production');
+      message.error('Failed to save fabric production');
     } finally {
       setLoading(false);
     }
@@ -172,6 +150,14 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
               <div className='ccd-section-header'>
                 <div className='ccd-section-title'>Basic Information</div>
               </div>
+              <Col span={24}>
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  icon={<AppstoreOutlined />}
+                  helpText='Upload Fabric Image (PNG/JPG/SVG, max 2MB)'
+                />
+              </Col>
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
@@ -361,46 +347,7 @@ export const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
 
             <Divider className='ccd-divider' />
 
-            {/* Section 3: Product Image */}
-            <div className='ccd-section'>
-              <div className='ccd-section-title'>Product Image</div>
-              <Row gutter={12}>
-                <Col span={24}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <Upload
-                      name='image'
-                      accept='image/png,image/jpeg,image/svg+xml'
-                      showUploadList={false}
-                      beforeUpload={beforeUpload}
-                    >
-                      <Button icon={<UploadOutlined />}>Upload Image</Button>
-                    </Upload>
-                    {imageUrl && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <img
-                          src={imageUrl}
-                          alt='Fabric'
-                          style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
-                        />
-                        <Button
-                          type='text'
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => setImageUrl('')}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ marginTop: 8, color: '#888', fontSize: 12 }}>
-                    Supported: PNG, JPG, SVG (max 2MB)
-                  </div>
-                </Col>
-              </Row>
-            </div>
-
-            <Divider className='ccd-divider' />
-
-            {/* Section 4: Additional Information */}
+            {/* Section 3: Additional Information */}
             <div className='ccd-section'>
               <div className='ccd-section-title'>Additional Information</div>
               <Row gutter={12}>

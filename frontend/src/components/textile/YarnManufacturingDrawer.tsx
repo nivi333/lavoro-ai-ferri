@@ -3,47 +3,41 @@ import {
   Drawer,
   Form,
   Input,
-  Button,
   Select,
   Row,
   Col,
   DatePicker,
-  InputNumber,
   Switch,
+  InputNumber,
   Divider,
+  Button,
   App,
-  Upload,
 } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { AppstoreOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import {
   yarnManufacturingService,
   YarnManufacturing,
+  CreateYarnManufacturingData,
   YARN_TYPES,
-  YARN_PROCESSES,
-  QUALITY_GRADES
+  QUALITY_GRADES,
 } from '../../services/textileService';
-import { GradientButton } from '../ui';
-import dayjs from 'dayjs';
+import { GradientButton, ImageUpload } from '../ui';
+import '../CompanyCreationDrawer.scss';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 interface YarnManufacturingDrawerProps {
-  open: boolean;
-  onClose: () => void;
-  onSuccess?: () => void;
-  mode?: 'create' | 'edit';
-  yarnId?: string;
-  initialData?: Partial<YarnManufacturing>;
+  visible: boolean;
+  onClose: (shouldRefresh?: boolean) => void;
+  yarn?: YarnManufacturing | null;
 }
 
 export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = ({
-  open,
+  visible,
   onClose,
-  onSuccess,
-  mode = 'create',
-  yarnId,
-  initialData,
+  yarn,
 }) => {
   const { message } = App.useApp();
   const [form] = Form.useForm();
@@ -51,105 +45,73 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
   const [isActive, setIsActive] = useState(true);
   const [imageUrl, setImageUrl] = useState<string>('');
 
-  const isEditing = mode === 'edit' && !!yarnId;
+  const isEditing = !!yarn;
 
   useEffect(() => {
-    if (open) {
-      if (isEditing && yarnId) {
-        fetchYarnDetails(yarnId);
-      } else if (initialData) {
-        setFormData(initialData);
+    if (visible) {
+      if (yarn) {
+        form.setFieldsValue({
+          ...yarn,
+          productionDate: dayjs(yarn.productionDate),
+        });
+        setIsActive(yarn.isActive ?? true);
+        setImageUrl(yarn.imageUrl || '');
       } else {
-        resetForm();
+        form.resetFields();
+        form.setFieldsValue({
+          isActive: true,
+          productionDate: dayjs(),
+        });
+        setIsActive(true);
+        setImageUrl('');
       }
     }
-  }, [open, isEditing, yarnId, initialData]);
-
-  const fetchYarnDetails = async (id: string) => {
-    try {
-      setLoading(true);
-      const data = await yarnManufacturingService.getYarnManufacturingById(id);
-      setFormData(data);
-    } catch (error) {
-      message.error('Failed to fetch yarn details');
-      onClose();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const setFormData = (data: any) => {
-    form.setFieldsValue({
-      ...data,
-      productionDate: data.productionDate ? dayjs(data.productionDate) : undefined,
-    });
-    setIsActive(data.isActive ?? true);
-    setImageUrl(data.imageUrl || '');
-  };
-
-  const resetForm = () => {
-    form.resetFields();
-    form.setFieldsValue({
-      isActive: true,
-      productionDate: dayjs(),
-      qualityGrade: 'A_GRADE',
-      processType: 'SPINNING',
-    });
-    setIsActive(true);
-    setImageUrl('');
-  };
-
-  const beforeUpload = (file: File) => {
-    const isValidType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml';
-    if (!isValidType) {
-      message.error('You can only upload JPG/PNG/SVG files!');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must be smaller than 2MB!');
-      return false;
-    }
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      setImageUrl(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    return false;
-  };
+  }, [visible, yarn, form]);
 
   const handleFinish = async (values: any) => {
     setLoading(true);
     try {
-      const payload: any = {
+      const yarnData: CreateYarnManufacturingData = {
         ...values,
         productionDate: values.productionDate.toISOString(),
+        yarnCount: Number(values.yarnCount),
+        quantityKg: Number(values.quantityKg),
         imageUrl: imageUrl || undefined,
+        isActive,
       };
 
-      if (isEditing && yarnId) {
-        await yarnManufacturingService.updateYarnManufacturing(yarnId, payload);
-        message.success('Yarn manufacturing record updated successfully');
+      if (isEditing && yarn) {
+        await yarnManufacturingService.updateYarnManufacturing(yarn.yarnId, yarnData);
+        message.success('Yarn manufacturing updated successfully');
       } else {
-        await yarnManufacturingService.createYarnManufacturing(payload);
-        message.success('Yarn manufacturing record created successfully');
+        await yarnManufacturingService.createYarnManufacturing(yarnData);
+        message.success('Yarn manufacturing created successfully');
       }
-      onSuccess?.();
-      onClose();
-    } catch (error: any) {
-      message.error(error.message || 'Failed to save record');
+
+      onClose(true);
+    } catch (error) {
+      console.error('Error saving yarn manufacturing:', error);
+      message.error('Failed to save yarn manufacturing');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleClose = () => {
+    form.resetFields();
+    setImageUrl('');
+    setIsActive(true);
+    onClose();
+  };
+
+  const drawerTitle = isEditing ? 'Edit Yarn Manufacturing' : 'Create Yarn Manufacturing';
+  const submitLabel = isEditing ? 'Save Changes' : 'Create';
 
   return (
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span>{isEditing ? 'Edit Yarn Production' : 'New Yarn Production'}</span>
+          <span className='ccd-title'>{drawerTitle}</span>
           <div className='header-switch'>
             <span className='switch-label'>Active</span>
             <Switch
@@ -158,13 +120,14 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                 setIsActive(checked);
                 form.setFieldsValue({ isActive: checked });
               }}
+              disabled={!isEditing}
             />
           </div>
         </div>
       }
       width={720}
-      onClose={onClose}
-      open={open}
+      onClose={handleClose}
+      open={visible}
       className='company-creation-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
@@ -180,25 +143,64 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
           <Form.Item name='isActive' valuePropName='checked' hidden>
             <Switch />
           </Form.Item>
-
           <div className='ccd-form-content'>
-            {/* Basic Information */}
+            {/* Section 1: Basic Information */}
             <div className='ccd-section'>
               <div className='ccd-section-header'>
-                <div className='ccd-section-title'>Yarn Details</div>
+                <div className='ccd-section-title'>Basic Information</div>
               </div>
-              <Row gutter={16}>
+              <Col span={24}>
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  icon={<AppstoreOutlined />}
+                  helpText='Upload Yarn Image (PNG/JPG/SVG, max 2MB)'
+                />
+              </Col>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Yarn Name'
+                    name='yarnName'
+                    rules={[{ required: true, message: 'Please enter yarn name' }]}
+                  >
+                    <Input
+                      maxLength={64}
+                      autoComplete='off'
+                      placeholder='Enter yarn name'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
                 <Col span={12}>
                   <Form.Item
                     label='Yarn Type'
                     name='yarnType'
                     rules={[{ required: true, message: 'Please select yarn type' }]}
                   >
-                    <Select placeholder='Select type'>
+                    <Select placeholder='Select yarn type' className='ccd-select'>
                       {YARN_TYPES.map(type => (
-                        <Option key={type.value} value={type.value}>{type.label}</Option>
+                        <Option key={type.value} value={type.value}>
+                          {type.label}
+                        </Option>
                       ))}
                     </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={12}>
+                <Col span={12}>
+                  <Form.Item
+                    label='Fiber Content'
+                    name='fiberContent'
+                    rules={[{ required: true, message: 'Please enter fiber content' }]}
+                  >
+                    <Input
+                      maxLength={128}
+                      autoComplete='off'
+                      placeholder='e.g., 100% Cotton, 60% Polyester'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -207,35 +209,39 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                     name='yarnCount'
                     rules={[{ required: true, message: 'Please enter yarn count' }]}
                   >
-                    <Input placeholder='e.g., 40s, 60s' />
+                    <InputNumber
+                      placeholder='Enter yarn count'
+                      min={0}
+                      step={0.1}
+                      style={{ width: '100%' }}
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
-                <Col span={8}>
-                  <Form.Item
-                    label='Ply'
-                    name='ply'
-                    rules={[{ required: true, message: 'Required' }]}
-                  >
-                    <InputNumber min={1} style={{ width: '100%' }} placeholder='e.g., 2' />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item
-                    label='Twist Per Inch'
-                    name='twistPerInch'
-                  >
-                    <InputNumber min={0} style={{ width: '100%' }} placeholder='e.g., 15.5' />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
+              <Row gutter={12}>
+                <Col span={12}>
                   <Form.Item
                     label='Color'
                     name='color'
-                    rules={[{ required: true, message: 'Required' }]}
+                    rules={[{ required: true, message: 'Please enter color' }]}
                   >
-                    <Input placeholder='Color name/code' />
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter color'
+                      className='ccd-input'
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label='Twist Type' name='twistType'>
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter twist type (optional)'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -243,34 +249,10 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
 
             <Divider className='ccd-divider' />
 
-            {/* Production Details */}
+            {/* Section 2: Production Details */}
             <div className='ccd-section'>
               <div className='ccd-section-title'>Production Details</div>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label='Process Type'
-                    name='processType'
-                    rules={[{ required: true, message: 'Please select process' }]}
-                  >
-                    <Select placeholder='Select process'>
-                      {YARN_PROCESSES.map(proc => (
-                        <Option key={proc.value} value={proc.value}>{proc.label}</Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label='Batch Number'
-                    name='batchNumber'
-                    rules={[{ required: true, message: 'Please enter batch number' }]}
-                  >
-                    <Input placeholder='Enter batch number' />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
                     label='Quantity (Kg)'
@@ -278,10 +260,11 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                     rules={[{ required: true, message: 'Please enter quantity' }]}
                   >
                     <InputNumber
-                      style={{ width: '100%' }}
-                      min={0}
                       placeholder='Enter quantity in kg'
-                      precision={2}
+                      min={0}
+                      step={0.1}
+                      style={{ width: '100%' }}
+                      className='ccd-input'
                     />
                   </Form.Item>
                 </Col>
@@ -289,30 +272,42 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
                   <Form.Item
                     label='Production Date'
                     name='productionDate'
-                    rules={[{ required: true, message: 'Please select date' }]}
+                    rules={[{ required: true, message: 'Please select production date' }]}
                   >
-                    <DatePicker style={{ width: '100%' }} />
+                    <DatePicker
+                      placeholder='Select production date'
+                      className='ccd-input'
+                      style={{ width: '100%' }}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
-                    label='Dye Lot'
-                    name='dyeLot'
+                    label='Batch Number'
+                    name='batchNumber'
+                    rules={[{ required: true, message: 'Please enter batch number' }]}
                   >
-                    <Input placeholder='Optional dye lot number' />
+                    <Input
+                      maxLength={32}
+                      autoComplete='off'
+                      placeholder='Enter batch number'
+                      className='ccd-input'
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     label='Quality Grade'
                     name='qualityGrade'
-                    rules={[{ required: true, message: 'Please select grade' }]}
+                    rules={[{ required: true, message: 'Please select quality grade' }]}
                   >
-                    <Select placeholder='Select grade'>
+                    <Select placeholder='Select quality grade' className='ccd-select'>
                       {QUALITY_GRADES.map(grade => (
-                        <Option key={grade.value} value={grade.value}>{grade.label}</Option>
+                        <Option key={grade.value} value={grade.value}>
+                          {grade.label}
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -322,52 +317,19 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
 
             <Divider className='ccd-divider' />
 
-            {/* Image Upload */}
-            <div className='ccd-section'>
-              <div className='ccd-section-title'>Product Image</div>
-              <Row gutter={16}>
-                <Col span={24}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <Upload
-                      name="image"
-                      accept="image/png,image/jpeg,image/svg+xml"
-                      showUploadList={false}
-                      beforeUpload={beforeUpload}
-                    >
-                      <Button icon={<UploadOutlined />}>Upload Image</Button>
-                    </Upload>
-                    {imageUrl && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <img
-                          src={imageUrl}
-                          alt="Yarn"
-                          style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
-                        />
-                        <Button
-                          type="text"
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => setImageUrl('')}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ marginTop: 8, color: '#888', fontSize: 12 }}>
-                    Supported: PNG, JPG, SVG (max 2MB)
-                  </div>
-                </Col>
-              </Row>
-            </div>
-
-            <Divider className='ccd-divider' />
-
-            {/* Additional Information */}
+            {/* Section 3: Additional Information */}
             <div className='ccd-section'>
               <div className='ccd-section-title'>Additional Information</div>
-              <Row gutter={16}>
+              <Row gutter={12}>
                 <Col span={24}>
                   <Form.Item label='Notes' name='notes'>
-                    <TextArea rows={3} placeholder='Any additional notes...' />
+                    <TextArea
+                      rows={3}
+                      maxLength={500}
+                      autoComplete='off'
+                      placeholder='Enter any additional notes...'
+                      className='ccd-textarea'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -375,11 +337,11 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
           </div>
 
           <div className='ccd-actions'>
-            <Button onClick={onClose} className='ccd-cancel-btn'>
+            <Button onClick={handleClose} className='ccd-cancel-btn'>
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={loading}>
-              {isEditing ? 'Save Changes' : 'Create Record'}
+              {submitLabel}
             </GradientButton>
           </div>
         </Form>
@@ -387,3 +349,5 @@ export const YarnManufacturingDrawer: React.FC<YarnManufacturingDrawerProps> = (
     </Drawer>
   );
 };
+
+export default YarnManufacturingDrawer;

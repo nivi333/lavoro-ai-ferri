@@ -12,11 +12,15 @@ import {
   Row,
   Col,
   Divider,
-  Upload,
 } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
-import { garmentManufacturingService, CreateGarmentManufacturingData, GARMENT_TYPES, PRODUCTION_STAGES } from '../../services/textileService';
-import { GradientButton } from '../ui';
+import { AppstoreOutlined } from '@ant-design/icons';
+import {
+  garmentManufacturingService,
+  CreateGarmentManufacturingData,
+  GARMENT_TYPES,
+  PRODUCTION_STAGES,
+} from '../../services/textileService';
+import { GradientButton, ImageUpload } from '../ui';
 import dayjs from 'dayjs';
 import '../CompanyCreationDrawer.scss';
 
@@ -64,7 +68,7 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
 
   const fetchGarmentDetails = async () => {
     if (!garmentId) return;
-    
+
     setLoading(true);
     try {
       const garment = await garmentManufacturingService.getGarmentManufacturingById(garmentId);
@@ -83,27 +87,6 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
     } finally {
       setLoading(false);
     }
-  };
-
-  const beforeUpload = (file: File) => {
-    const isValidType = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml';
-    if (!isValidType) {
-      message.error('You can only upload JPG/PNG/SVG files!');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must be smaller than 2MB!');
-      return false;
-    }
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      setImageUrl(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    return false;
   };
 
   const handleClose = () => {
@@ -155,7 +138,7 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
     }
   };
 
-  const drawerTitle = isEditing ? 'Edit Garment Record' : 'Add Garment Record';
+  const drawerTitle = isEditing ? 'Edit Garment Record' : 'Create Garment Record';
   const submitLabel = isEditing ? 'Save Changes' : 'Create';
 
   return (
@@ -167,7 +150,7 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
             <span className='switch-label'>Active</span>
             <Switch
               checked={isActive}
-              onChange={(checked) => {
+              onChange={checked => {
                 setIsActive(checked);
                 form.setFieldsValue({ isActive: checked });
               }}
@@ -205,6 +188,14 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
               <div className='ccd-section-header'>
                 <div className='ccd-section-title'>Basic Information</div>
               </div>
+              <Col span={24}>
+                <ImageUpload
+                  value={imageUrl}
+                  onChange={setImageUrl}
+                  icon={<AppstoreOutlined />}
+                  helpText='Upload Garment Image (PNG/JPG/SVG, max 2MB)'
+                />
+              </Col>
               <Row gutter={12}>
                 <Col span={12}>
                   <Form.Item
@@ -214,7 +205,9 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
                   >
                     <Select placeholder='Select garment type' className='ccd-select'>
                       {GARMENT_TYPES.map(type => (
-                        <Option key={type.value} value={type.value}>{type.label}</Option>
+                        <Option key={type.value} value={type.value}>
+                          {type.label}
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -306,7 +299,9 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
                   >
                     <Select placeholder='Select production stage' className='ccd-select'>
                       {PRODUCTION_STAGES.map(stage => (
-                        <Option key={stage.value} value={stage.value}>{stage.label}</Option>
+                        <Option key={stage.value} value={stage.value}>
+                          {stage.label}
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -396,11 +391,7 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
                 </Col>
                 <Col span={12}>
                   <Form.Item label='Defect Count' name='defectCount'>
-                    <InputNumber
-                      min={0}
-                      style={{ width: '100%' }}
-                      className='ccd-input'
-                    />
+                    <InputNumber min={0} style={{ width: '100%' }} className='ccd-input' />
                   </Form.Item>
                 </Col>
               </Row>
@@ -408,46 +399,7 @@ export const GarmentManufacturingDrawer: React.FC<GarmentManufacturingDrawerProp
 
             <Divider className='ccd-divider' />
 
-            {/* Section 5: Product Image */}
-            <div className='ccd-section'>
-              <div className='ccd-section-title'>Product Image</div>
-              <Row gutter={12}>
-                <Col span={24}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <Upload
-                      name='image'
-                      accept='image/png,image/jpeg,image/svg+xml'
-                      showUploadList={false}
-                      beforeUpload={beforeUpload}
-                    >
-                      <Button icon={<UploadOutlined />}>Upload Image</Button>
-                    </Upload>
-                    {imageUrl && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <img
-                          src={imageUrl}
-                          alt='Garment'
-                          style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
-                        />
-                        <Button
-                          type='text'
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => setImageUrl('')}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ marginTop: 8, color: '#888', fontSize: 12 }}>
-                    Supported: PNG, JPG, SVG (max 2MB)
-                  </div>
-                </Col>
-              </Row>
-            </div>
-
-            <Divider className='ccd-divider' />
-
-            {/* Section 6: Additional Information */}
+            {/* Section 5: Additional Information */}
             <div className='ccd-section'>
               <div className='ccd-section-title'>Additional Information</div>
               <Row gutter={12}>
