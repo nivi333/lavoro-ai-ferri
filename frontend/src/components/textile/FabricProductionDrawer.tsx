@@ -295,4 +295,5 @@ const FabricProductionDrawer: React.FC<FabricProductionDrawerProps> = ({
   );
 };
 
+export { FabricProductionDrawer };
 export default FabricProductionDrawer;
