@@ -1,152 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Input, Space, Tag, Row, Col, Select, DatePicker, Tooltip, App } from 'antd';
-import { PlusOutlined, SearchOutlined, FilterOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  Dropdown,
+  message,
+  Empty,
+  Spin,
+  Input,
+  Space,
+  Select,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
 import { fabricProductionService, FabricProduction, FABRIC_TYPES, QUALITY_GRADES } from '../../services/textileService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import { FabricProductionDrawer } from '../../components/textile/FabricProductionDrawer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import dayjs from 'dayjs';
-import { useDebounce } from '../../hooks/useDebounce';
+import './TextileListPage.scss';
 
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-export const FabricProductionListPage: React.FC = () => {
-  const { message, modal } = App.useApp();
+export default function FabricProductionListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [fabrics, setFabrics] = useState<FabricProduction[]>([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<FabricProduction[]>([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingFabric, setEditingFabric] = useState<FabricProduction | undefined>(undefined);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState({
-    fabricType: undefined as string | undefined,
-    qualityGrade: undefined as string | undefined,
-    isActive: undefined as boolean | undefined,
-    startDate: undefined as string | undefined,
-    endDate: undefined as string | undefined,
-  });
+  const [fabricTypeFilter, setFabricTypeFilter] = useState<string | undefined>(undefined);
+  const [qualityGradeFilter, setQualityGradeFilter] = useState<string | undefined>(undefined);
+  const fetchInProgressRef = useRef(false);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedFabricId, setSelectedFabricId] = useState<string | undefined>(undefined);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    setHeaderActions(
+      <GradientButton
+        onClick={handleAddFabric}
+        size='small'
+        disabled={isEmployee}
+      >
+        New Production
+      </GradientButton>
+    );
 
-  const debouncedSearch = useDebounce(searchText, 500);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, currentCompany?.role]);
 
-  const fetchFabrics = async (page = 1, pageSize = 10) => {
-    setLoading(true);
+  useEffect(() => {
+    if (currentCompany) {
+      fetchFabrics();
+    }
+  }, [currentCompany, searchText, fabricTypeFilter, qualityGradeFilter]);
+
+  const fetchFabrics = async () => {
+    if (fetchInProgressRef.current) return;
+
     try {
-      const queryParams: any = {
-        page,
-        limit: pageSize,
-        search: debouncedSearch,
-        ...filters,
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const filters: any = {
+        search: searchText || undefined,
+        fabricType: fabricTypeFilter,
+        qualityGrade: qualityGradeFilter,
       };
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => 
-        queryParams[key] === undefined && delete queryParams[key]
-      );
-
-      const response = await fabricProductionService.getFabricProductions(queryParams);
-      // Adjust based on actual API response structure
-      // Assuming response is { data: [], pagination: {} } or similar, but service returns array directly currently
-      // Let's assume the service might need adjustment or returns array. 
-      // Based on service code: return response.data || []
-      // We might need to handle pagination if the API supports it, but the service currently returns just data array in getFabricProductions
-      // If the backend supports pagination, we should update the service. For now, let's assume client-side pagination or update service later.
-      // Actually, the backend controller likely returns pagination. 
-      // Let's assume the service returns { data: [], pagination: {} } if updated, or just data.
-      // For now, let's just set data.
-      
-      if (Array.isArray(response)) {
-          setData(response);
-          setPagination({ ...pagination, current: page, pageSize, total: response.length }); // Mock total if no pagination
-      } else if ((response as any).fabrics) {
-           setData((response as any).fabrics);
-           setPagination({
-               current: (response as any).pagination.page,
-               pageSize: (response as any).pagination.limit,
-               total: (response as any).pagination.total
-           });
-      }
-      
+      const result = await fabricProductionService.getFabricProductions(filters);
+      setFabrics(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Error fetching fabrics:', error);
-      message.error('Failed to load fabric production records');
+      message.error('Failed to fetch fabric productions');
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 
-  useEffect(() => {
-    fetchFabrics(pagination.current, pagination.pageSize);
-  }, [debouncedSearch, filters, pagination.current, pagination.pageSize]);
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination(newPagination);
+  const handleAddFabric = () => {
+    setEditingFabric(undefined);
+    setDrawerOpen(true);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    setPagination({ ...pagination, current: 1 });
+  const handleEditFabric = (fabric: FabricProduction) => {
+    setEditingFabric(fabric);
+    setDrawerOpen(true);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDeleteFabric = async (fabric: FabricProduction) => {
+    try {
+      setTableLoading(true);
+      await fabricProductionService.deleteFabricProduction(fabric.id);
+      message.success('Fabric production deleted successfully');
+      fetchFabrics();
+    } catch (error) {
+      console.error('Error deleting fabric:', error);
+      message.error('Failed to delete fabric production');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  const handleDateRangeChange = (dates: any, dateStrings: [string, string]) => {
-    setFilters(prev => ({
-      ...prev,
-      startDate: dateStrings[0] || undefined,
-      endDate: dateStrings[1] || undefined,
-    }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDrawerClose = (shouldRefresh?: boolean) => {
+    setDrawerOpen(false);
+    setEditingFabric(undefined);
+    if (shouldRefresh) {
+      fetchFabrics();
+    }
   };
 
-  const handleCreate = () => {
-    setSelectedFabricId(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
+  const getQualityGradeLabel = (grade: string) => {
+    const found = QUALITY_GRADES.find(g => g.value === grade);
+    return found ? found.label : grade;
   };
 
-  const handleEdit = (record: FabricProduction) => {
-    setSelectedFabricId(record.id); // Use internal ID for editing
-    setDrawerMode('edit');
-    setDrawerVisible(true);
-  };
-
-  const handleDelete = (record: FabricProduction) => {
-    modal.confirm({
-      title: 'Delete Fabric Production',
-      content: `Are you sure you want to delete ${record.fabricName} (${record.batchNumber})?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await fabricProductionService.deleteFabricProduction(record.id);
-          message.success('Fabric production record deleted successfully');
-          fetchFabrics(pagination.current, pagination.pageSize);
-        } catch (error) {
-          message.error('Failed to delete record');
-        }
-      },
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setSelectedFabricId(undefined);
-  };
-
-  const handleFormSuccess = () => {
-    setDrawerVisible(false);
-    fetchFabrics(pagination.current, pagination.pageSize);
+  const getFabricTypeLabel = (type: string) => {
+    const found = FABRIC_TYPES.find(t => t.value === type);
+    return found ? found.label : type;
   };
 
   const columns = [
@@ -155,16 +130,16 @@ export const FabricProductionListPage: React.FC = () => {
       dataIndex: 'fabricId',
       key: 'fabricId',
       width: 120,
-      render: (text: string) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      render: (fabricId: string) => <span className='code-text'>{fabricId}</span>,
     },
     {
       title: 'Fabric Name',
       dataIndex: 'fabricName',
       key: 'fabricName',
-      render: (text: string, record: FabricProduction) => (
+      render: (name: string, record: FabricProduction) => (
         <div>
-          <div style={{ fontWeight: 500 }}>{text}</div>
-          <div style={{ fontSize: '12px', color: '#888' }}>{record.composition}</div>
+          <div className='primary-text'>{name}</div>
+          <div className='secondary-text'>{record.composition}</div>
         </div>
       ),
     },
@@ -179,17 +154,15 @@ export const FabricProductionListPage: React.FC = () => {
       dataIndex: 'fabricType',
       key: 'fabricType',
       width: 100,
-      render: (type: string) => (
-        <Tag color="blue">{FABRIC_TYPES.find(t => t.value === type)?.label || type}</Tag>
-      ),
+      render: (type: string) => getFabricTypeLabel(type),
     },
     {
       title: 'Quantity',
       dataIndex: 'quantityMeters',
       key: 'quantityMeters',
-      width: 120,
+      width: 100,
       align: 'right' as const,
-      render: (qty: number) => `${qty.toLocaleString()} m`,
+      render: (qty: number) => `${qty?.toLocaleString() || 0} m`,
     },
     {
       title: 'Grade',
@@ -197,151 +170,154 @@ export const FabricProductionListPage: React.FC = () => {
       key: 'qualityGrade',
       width: 100,
       render: (grade: string) => {
-        let color = 'default';
-        if (grade === 'A_GRADE') color = 'success';
-        if (grade === 'B_GRADE') color = 'warning';
-        if (grade === 'REJECT') color = 'error';
-        return <Tag color={color}>{QUALITY_GRADES.find(g => g.value === grade)?.label || grade}</Tag>;
+        const color = grade === 'A_GRADE' ? 'green' : grade === 'B_GRADE' ? 'blue' : grade === 'C_GRADE' ? 'orange' : 'red';
+        return <Tag color={color}>{getQualityGradeLabel(grade)}</Tag>;
       },
     },
     {
       title: 'Date',
       dataIndex: 'productionDate',
       key: 'productionDate',
-      width: 120,
-      render: (date: string) => dayjs(date).format('DD MMM YYYY'),
+      width: 110,
+      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
     },
     {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
-      width: 100,
+      width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'success' : 'default'}>
-          {isActive ? 'Active' : 'Inactive'}
-        </Tag>
+        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      align: 'center' as const,
-      render: (_: any, record: FabricProduction) => (
-        <Space size="small">
-          <Tooltip title="Edit">
-            <Button 
-              type="text" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEdit(record)} 
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
-              onClick={() => handleDelete(record)} 
-            />
-          </Tooltip>
-        </Space>
-      ),
+      width: 80,
+      render: (_: any, record: FabricProduction) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditFabric(record),
+            disabled: isEmployee,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            danger: true,
+            onClick: () => handleDeleteFabric(record),
+            disabled: isEmployee,
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  return (
-    <div className="fabric-production-list-page">
-      <PageHeader
-        title="Fabric Production"
-        subtitle="Manage fabric production records, batches, and quality"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            New Production
-          </Button>
-        }
-      />
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage fabric production.</div>
+      </MainLayout>
+    );
+  }
 
-      <Card bordered={false} className="filter-card" style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={8} md={6}>
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Fabric Production
+          </Heading>
+        </div>
+
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search fabric, batch, or color..."
+              placeholder='Search fabrics...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={handleSearch}
+              onChange={e => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={8} md={4}>
             <Select
-              placeholder="Fabric Type"
-              style={{ width: '100%' }}
+              placeholder='Fabric Type'
+              value={fabricTypeFilter}
+              onChange={setFabricTypeFilter}
+              style={{ width: 150 }}
               allowClear
-              value={filters.fabricType}
-              onChange={(val) => handleFilterChange('fabricType', val)}
             >
               {FABRIC_TYPES.map(type => (
-                <Option key={type.value} value={type.value}>{type.label}</Option>
+                <Select.Option key={type.value} value={type.value}>
+                  {type.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={8} md={4}>
             <Select
-              placeholder="Quality Grade"
-              style={{ width: '100%' }}
+              placeholder='Quality Grade'
+              value={qualityGradeFilter}
+              onChange={setQualityGradeFilter}
+              style={{ width: 150 }}
               allowClear
-              value={filters.qualityGrade}
-              onChange={(val) => handleFilterChange('qualityGrade', val)}
             >
               {QUALITY_GRADES.map(grade => (
-                <Option key={grade.value} value={grade.value}>{grade.label}</Option>
+                <Select.Option key={grade.value} value={grade.value}>
+                  {grade.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <RangePicker 
-              style={{ width: '100%' }} 
-              onChange={handleDateRangeChange}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={4} style={{ textAlign: 'right' }}>
-            <Space>
-              <Button 
-                icon={<ReloadOutlined />} 
-                onClick={() => fetchFabrics(pagination.current, pagination.pageSize)}
-              >
-                Refresh
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+          </Space>
+        </div>
 
-      <Card bordered={false} className="table-card">
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} items`,
-          }}
-          loading={loading}
-          onChange={handleTableChange}
-          scroll={{ x: 1000 }}
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : fabrics.length === 0 ? (
+            <Empty description='No fabric productions found'>
+              <GradientButton
+                size='small'
+                onClick={handleAddFabric}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
+                Create First Production
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={fabrics}
+              rowKey={record => record.id}
+              loading={tableLoading}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} records`,
+              }}
+              className='textile-table'
+            />
+          )}
+        </div>
+      </div>
 
       <FabricProductionDrawer
-        open={drawerVisible}
+        visible={drawerOpen}
         onClose={handleDrawerClose}
-        onSuccess={handleFormSuccess}
-        mode={drawerMode}
-        fabricId={selectedFabricId}
+        fabric={editingFabric}
       />
-    </div>
+    </MainLayout>
   );
-};
+}
 
-export default FabricProductionListPage;
+export { FabricProductionListPage };

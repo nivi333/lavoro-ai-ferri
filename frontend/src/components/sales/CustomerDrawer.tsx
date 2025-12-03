@@ -251,18 +251,6 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                   <Form.Item
                     label='Company Name'
                     name='companyName'
-                    rules={[
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (getFieldValue('customerType') === 'BUSINESS' && !value) {
-                            return Promise.reject(
-                              new Error('Company name is required for business type')
-                            );
-                          }
-                          return Promise.resolve();
-                        },
-                      }),
-                    ]}
                   >
                     <Input
                       maxLength={100}
@@ -317,7 +305,6 @@ export const CustomerDrawer: React.FC<CustomerDrawerProps> = ({
                     label='Phone Number'
                     name='phone'
                     rules={[
-                      { required: true, message: 'Please enter phone number' },
                       {
                         pattern: /^[+]?[1-9][\d]{0,15}$/,
                         message: 'Please enter a valid phone number with country code',

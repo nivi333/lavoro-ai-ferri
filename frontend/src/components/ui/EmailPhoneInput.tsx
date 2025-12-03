@@ -22,10 +22,6 @@ export const EmailPhoneInput: React.FC<EmailPhoneInputProps> = ({
       label={label}
       rules={[
         {
-          required,
-          message: `Please input your ${label.toLowerCase()}!`,
-        },
-        {
           validator: (_, value) => {
             if (!value || !value.trim()) {
               if (required) {

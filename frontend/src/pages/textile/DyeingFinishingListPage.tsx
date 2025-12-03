@@ -1,151 +1,152 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Input, Space, Tag, Row, Col, Select, DatePicker, Tooltip, App } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  Dropdown,
+  message,
+  Empty,
+  Spin,
+  Input,
+  Space,
+  Select,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SearchOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
 import { dyeingFinishingService, DyeingFinishing, DYEING_PROCESSES } from '../../services/textileService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import { DyeingFinishingDrawer } from '../../components/textile/DyeingFinishingDrawer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import dayjs from 'dayjs';
-import { useDebounce } from '../../hooks/useDebounce';
+import './TextileListPage.scss';
 
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-export const DyeingFinishingListPage: React.FC = () => {
-  const { message, modal } = App.useApp();
+export default function DyeingFinishingListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [processes, setProcesses] = useState<DyeingFinishing[]>([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<DyeingFinishing[]>([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingProcess, setEditingProcess] = useState<DyeingFinishing | undefined>(undefined);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState({
-    processType: undefined as string | undefined,
-    startDate: undefined as string | undefined,
-    endDate: undefined as string | undefined,
-  });
+  const [processTypeFilter, setProcessTypeFilter] = useState<string | undefined>(undefined);
+  const fetchInProgressRef = useRef(false);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedProcessId, setSelectedProcessId] = useState<string | undefined>(undefined);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    setHeaderActions(
+      <GradientButton
+        onClick={handleAddProcess}
+        size='small'
+        disabled={isEmployee}
+      >
+        New Process
+      </GradientButton>
+    );
 
-  const debouncedSearch = useDebounce(searchText, 500);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, currentCompany?.role]);
 
-  const fetchProcesses = async (page = 1, pageSize = 10) => {
-    setLoading(true);
+  useEffect(() => {
+    if (currentCompany) {
+      fetchProcesses();
+    }
+  }, [currentCompany, searchText, processTypeFilter]);
+
+  const fetchProcesses = async () => {
+    if (fetchInProgressRef.current) return;
+
     try {
-      const queryParams: any = {
-        page,
-        limit: pageSize,
-        search: debouncedSearch,
-        ...filters,
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const filters: any = {
+        search: searchText || undefined,
+        processType: processTypeFilter,
       };
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => 
-        queryParams[key] === undefined && delete queryParams[key]
-      );
-
-      const response = await dyeingFinishingService.getDyeingFinishing(queryParams);
-      
-      if (Array.isArray(response)) {
-          setData(response);
-          setPagination({ ...pagination, current: page, pageSize, total: response.length });
-      } else if ((response as any).data) {
-           setData((response as any).data);
-           setPagination({
-               current: (response as any).pagination?.page || 1,
-               pageSize: (response as any).pagination?.limit || 10,
-               total: (response as any).pagination?.total || 0
-           });
-      }
-      
+      const result = await dyeingFinishingService.getDyeingFinishing(filters);
+      setProcesses(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Error fetching processes:', error);
-      message.error('Failed to load dyeing & finishing records');
+      message.error('Failed to fetch dyeing & finishing records');
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 
-  useEffect(() => {
-    fetchProcesses(pagination.current, pagination.pageSize);
-  }, [debouncedSearch, filters, pagination.current, pagination.pageSize]);
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination(newPagination);
+  const handleAddProcess = () => {
+    setEditingProcess(undefined);
+    setDrawerOpen(true);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    setPagination({ ...pagination, current: 1 });
+  const handleEditProcess = (process: DyeingFinishing) => {
+    setEditingProcess(process);
+    setDrawerOpen(true);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDeleteProcess = async (process: DyeingFinishing) => {
+    try {
+      setTableLoading(true);
+      await dyeingFinishingService.deleteDyeingFinishing(process.id);
+      message.success('Process deleted successfully');
+      fetchProcesses();
+    } catch (error) {
+      console.error('Error deleting process:', error);
+      message.error('Failed to delete process');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  const handleDateRangeChange = (dates: any, dateStrings: [string, string]) => {
-    setFilters(prev => ({
-      ...prev,
-      startDate: dateStrings[0] || undefined,
-      endDate: dateStrings[1] || undefined,
-    }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDrawerClose = (shouldRefresh?: boolean) => {
+    setDrawerOpen(false);
+    setEditingProcess(undefined);
+    if (shouldRefresh) {
+      fetchProcesses();
+    }
   };
 
-  const handleCreate = () => {
-    setSelectedProcessId(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
-  };
-
-  const handleEdit = (record: DyeingFinishing) => {
-    setSelectedProcessId(record.id);
-    setDrawerMode('edit');
-    setDrawerVisible(true);
-  };
-
-  const handleDelete = (record: DyeingFinishing) => {
-    modal.confirm({
-      title: 'Delete Process Record',
-      content: `Are you sure you want to delete ${record.processType} batch ${record.batchNumber}?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await dyeingFinishingService.deleteDyeingFinishing(record.id);
-          message.success('Record deleted successfully');
-          fetchProcesses(pagination.current, pagination.pageSize);
-        } catch (error) {
-          message.error('Failed to delete record');
-        }
-      },
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setSelectedProcessId(undefined);
-  };
-
-  const handleFormSuccess = () => {
-    setDrawerVisible(false);
-    fetchProcesses(pagination.current, pagination.pageSize);
+  const getProcessTypeLabel = (type: string) => {
+    const found = DYEING_PROCESSES.find(p => p.value === type);
+    return found ? found.label : type;
   };
 
   const columns = [
     {
-      title: 'Process Type',
-      dataIndex: 'processType',
-      key: 'processType',
+      title: 'Process ID',
+      dataIndex: 'processId',
+      key: 'processId',
       width: 120,
-      render: (type: string) => (
-        <Tag color="purple">{DYEING_PROCESSES.find(p => p.value === type)?.label || type}</Tag>
+      render: (processId: string) => <span className='code-text'>{processId}</span>,
+    },
+    {
+      title: 'Color',
+      dataIndex: 'colorName',
+      key: 'colorName',
+      render: (colorName: string, record: DyeingFinishing) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              backgroundColor: record.colorCode,
+              borderRadius: 4,
+              border: '1px solid #d9d9d9',
+            }}
+          />
+          <div>
+            <div className='primary-text'>{colorName}</div>
+            <div className='secondary-text'>{record.colorCode}</div>
+          </div>
+        </div>
       ),
     },
     {
@@ -155,157 +156,165 @@ export const DyeingFinishingListPage: React.FC = () => {
       width: 120,
     },
     {
-      title: 'Color',
-      key: 'color',
-      render: (_: any, record: DyeingFinishing) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div 
-            style={{ 
-              width: 16, 
-              height: 16, 
-              borderRadius: '50%', 
-              backgroundColor: record.colorCode,
-              border: '1px solid #ddd'
-            }} 
-          />
-          <span>{record.colorName}</span>
-        </div>
-      ),
+      title: 'Process',
+      dataIndex: 'processType',
+      key: 'processType',
+      width: 100,
+      render: (type: string) => <Tag>{getProcessTypeLabel(type)}</Tag>,
     },
     {
       title: 'Quantity',
       dataIndex: 'quantityMeters',
       key: 'quantityMeters',
-      width: 120,
+      width: 100,
       align: 'right' as const,
-      render: (qty: number) => `${qty.toLocaleString()} m`,
+      render: (qty: number) => `${qty?.toLocaleString() || 0} m`,
     },
     {
-      title: 'QC Status',
+      title: 'Quality',
       dataIndex: 'qualityCheck',
       key: 'qualityCheck',
       width: 100,
-      align: 'center' as const,
       render: (passed: boolean) => (
-        passed ? 
-        <Tag color="success" icon={<CheckCircleOutlined />}>Passed</Tag> : 
-        <Tag color="warning" icon={<CloseCircleOutlined />}>Pending</Tag>
+        passed ? (
+          <Tag icon={<CheckCircleOutlined />} color='success'>Passed</Tag>
+        ) : (
+          <Tag icon={<CloseCircleOutlined />} color='error'>Failed</Tag>
+        )
       ),
     },
     {
       title: 'Date',
       dataIndex: 'processDate',
       key: 'processDate',
-      width: 120,
-      render: (date: string) => dayjs(date).format('DD MMM YYYY'),
+      width: 110,
+      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 90,
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+      ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      align: 'center' as const,
-      render: (_: any, record: DyeingFinishing) => (
-        <Space size="small">
-          <Tooltip title="Edit">
-            <Button 
-              type="text" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEdit(record)} 
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
-              onClick={() => handleDelete(record)} 
-            />
-          </Tooltip>
-        </Space>
-      ),
+      width: 80,
+      render: (_: any, record: DyeingFinishing) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditProcess(record),
+            disabled: isEmployee,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            danger: true,
+            onClick: () => handleDeleteProcess(record),
+            disabled: isEmployee,
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  return (
-    <div className="dyeing-finishing-list-page">
-      <PageHeader
-        title="Dyeing & Finishing"
-        subtitle="Manage dyeing, printing, and finishing processes"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            New Process
-          </Button>
-        }
-      />
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage dyeing & finishing.</div>
+      </MainLayout>
+    );
+  }
 
-      <Card bordered={false} className="filter-card" style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={8} md={6}>
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Dyeing & Finishing
+          </Heading>
+        </div>
+
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search batch, color, or recipe..."
+              placeholder='Search processes...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={handleSearch}
+              onChange={e => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={8} md={6}>
             <Select
-              placeholder="Process Type"
-              style={{ width: '100%' }}
+              placeholder='Process Type'
+              value={processTypeFilter}
+              onChange={setProcessTypeFilter}
+              style={{ width: 150 }}
               allowClear
-              value={filters.processType}
-              onChange={(val) => handleFilterChange('processType', val)}
             >
-              {DYEING_PROCESSES.map(proc => (
-                <Option key={proc.value} value={proc.value}>{proc.label}</Option>
+              {DYEING_PROCESSES.map(type => (
+                <Select.Option key={type.value} value={type.value}>
+                  {type.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={8}>
-            <RangePicker 
-              style={{ width: '100%' }} 
-              onChange={handleDateRangeChange}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={4} style={{ textAlign: 'right' }}>
-            <Space>
-              <Button 
-                icon={<ReloadOutlined />} 
-                onClick={() => fetchProcesses(pagination.current, pagination.pageSize)}
-              >
-                Refresh
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+          </Space>
+        </div>
 
-      <Card bordered={false} className="table-card">
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} items`,
-          }}
-          loading={loading}
-          onChange={handleTableChange}
-          scroll={{ x: 1000 }}
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : processes.length === 0 ? (
+            <Empty description='No dyeing & finishing records found'>
+              <GradientButton
+                size='small'
+                onClick={handleAddProcess}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
+                Create First Process
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={processes}
+              rowKey={record => record.id}
+              loading={tableLoading}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} records`,
+              }}
+              className='textile-table'
+            />
+          )}
+        </div>
+      </div>
 
       <DyeingFinishingDrawer
-        open={drawerVisible}
-        onClose={handleDrawerClose}
-        onSuccess={handleFormSuccess}
-        mode={drawerMode}
-        processId={selectedProcessId}
+        open={drawerOpen}
+        onClose={() => handleDrawerClose(false)}
+        onSuccess={() => handleDrawerClose(true)}
+        initialData={editingProcess}
       />
-    </div>
+    </MainLayout>
   );
-};
+}
 
-export default DyeingFinishingListPage;
+export { DyeingFinishingListPage };

@@ -315,7 +315,6 @@ export const SupplierDrawer: React.FC<SupplierDrawerProps> = ({
                     label='Phone Number'
                     name='phone'
                     rules={[
-                      { required: true, message: 'Please enter phone number' },
                       {
                         pattern: /^[+]?[1-9][\d]{0,15}$/,
                         message: 'Please enter a valid phone number with country code',

@@ -1,142 +1,129 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Input, Space, Tag, Row, Col, Select, DatePicker, Tooltip, App } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  Dropdown,
+  message,
+  Empty,
+  Spin,
+  Input,
+  Space,
+  Select,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SearchOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
 import { garmentManufacturingService, GarmentManufacturing, GARMENT_TYPES, PRODUCTION_STAGES } from '../../services/textileService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import { GarmentManufacturingDrawer } from '../../components/textile/GarmentManufacturingDrawer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { useDebounce } from '../../hooks/useDebounce';
+import './TextileListPage.scss';
 
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-export const GarmentManufacturingListPage: React.FC = () => {
-  const { message, modal } = App.useApp();
+export default function GarmentManufacturingListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [garments, setGarments] = useState<GarmentManufacturing[]>([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<GarmentManufacturing[]>([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingGarment, setEditingGarment] = useState<GarmentManufacturing | undefined>(undefined);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState({
-    garmentType: undefined as string | undefined,
-    productionStage: undefined as string | undefined,
-    startDate: undefined as string | undefined,
-    endDate: undefined as string | undefined,
-  });
+  const [garmentTypeFilter, setGarmentTypeFilter] = useState<string | undefined>(undefined);
+  const [stageFilter, setStageFilter] = useState<string | undefined>(undefined);
+  const fetchInProgressRef = useRef(false);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedGarmentId, setSelectedGarmentId] = useState<string | undefined>(undefined);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    setHeaderActions(
+      <GradientButton
+        onClick={handleAddGarment}
+        size='small'
+        disabled={isEmployee}
+      >
+        New Garment
+      </GradientButton>
+    );
 
-  const debouncedSearch = useDebounce(searchText, 500);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, currentCompany?.role]);
 
-  const fetchGarments = async (page = 1, pageSize = 10) => {
-    setLoading(true);
+  useEffect(() => {
+    if (currentCompany) {
+      fetchGarments();
+    }
+  }, [currentCompany, searchText, garmentTypeFilter, stageFilter]);
+
+  const fetchGarments = async () => {
+    if (fetchInProgressRef.current) return;
+
     try {
-      const queryParams: any = {
-        page,
-        limit: pageSize,
-        search: debouncedSearch,
-        ...filters,
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const filters: any = {
+        search: searchText || undefined,
+        garmentType: garmentTypeFilter,
+        productionStage: stageFilter,
       };
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => 
-        queryParams[key] === undefined && delete queryParams[key]
-      );
-
-      const response = await garmentManufacturingService.getGarmentManufacturing(queryParams);
-      
-      if (Array.isArray(response)) {
-          setData(response);
-          setPagination({ ...pagination, current: page, pageSize, total: response.length });
-      } else if ((response as any).data) {
-           setData((response as any).data);
-           setPagination({
-               current: (response as any).pagination?.page || 1,
-               pageSize: (response as any).pagination?.limit || 10,
-               total: (response as any).pagination?.total || 0
-           });
-      }
-      
+      const result = await garmentManufacturingService.getGarmentManufacturing(filters);
+      setGarments(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Error fetching garments:', error);
-      message.error('Failed to load garment manufacturing records');
+      message.error('Failed to fetch garment manufacturing records');
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 
-  useEffect(() => {
-    fetchGarments(pagination.current, pagination.pageSize);
-  }, [debouncedSearch, filters, pagination.current, pagination.pageSize]);
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination(newPagination);
+  const handleAddGarment = () => {
+    setEditingGarment(undefined);
+    setDrawerOpen(true);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    setPagination({ ...pagination, current: 1 });
+  const handleEditGarment = (garment: GarmentManufacturing) => {
+    setEditingGarment(garment);
+    setDrawerOpen(true);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDeleteGarment = async (garment: GarmentManufacturing) => {
+    try {
+      setTableLoading(true);
+      await garmentManufacturingService.deleteGarmentManufacturing(garment.id);
+      message.success('Garment deleted successfully');
+      fetchGarments();
+    } catch (error) {
+      console.error('Error deleting garment:', error);
+      message.error('Failed to delete garment');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  const handleDateRangeChange = (_dates: any, dateStrings: [string, string]) => {
-    setFilters(prev => ({
-      ...prev,
-      startDate: dateStrings[0] || undefined,
-      endDate: dateStrings[1] || undefined,
-    }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDrawerClose = (shouldRefresh?: boolean) => {
+    setDrawerOpen(false);
+    setEditingGarment(undefined);
+    if (shouldRefresh) {
+      fetchGarments();
+    }
   };
 
-  const handleCreate = () => {
-    setSelectedGarmentId(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
+  const getGarmentTypeLabel = (type: string) => {
+    const found = GARMENT_TYPES.find(t => t.value === type);
+    return found ? found.label : type;
   };
 
-  const handleEdit = (record: GarmentManufacturing) => {
-    setSelectedGarmentId(record.id);
-    setDrawerMode('edit');
-    setDrawerVisible(true);
-  };
-
-  const handleDelete = (record: GarmentManufacturing) => {
-    modal.confirm({
-      title: 'Delete Garment Record',
-      content: `Are you sure you want to delete garment "${record.styleNumber}"?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await garmentManufacturingService.deleteGarmentManufacturing(record.id);
-          message.success('Garment record deleted successfully');
-          fetchGarments(pagination.current, pagination.pageSize);
-        } catch (error) {
-          console.error('Error deleting garment:', error);
-          message.error('Failed to delete garment record');
-        }
-      },
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setSelectedGarmentId(undefined);
-  };
-
-  const handleDrawerSuccess = () => {
-    handleDrawerClose();
-    fetchGarments(pagination.current, pagination.pageSize);
+  const getStageLabel = (stage: string) => {
+    const found = PRODUCTION_STAGES.find(s => s.value === stage);
+    return found ? found.label : stage;
   };
 
   const getStageColor = (stage: string) => {
@@ -156,52 +143,35 @@ export const GarmentManufacturingListPage: React.FC = () => {
       dataIndex: 'garmentId',
       key: 'garmentId',
       width: 120,
-      render: (text: string) => <span style={{ fontFamily: 'monospace' }}>{text}</span>,
+      render: (garmentId: string) => <span className='code-text'>{garmentId}</span>,
     },
     {
-      title: 'Style Number',
+      title: 'Style',
       dataIndex: 'styleNumber',
       key: 'styleNumber',
-      width: 150,
-    },
-    {
-      title: 'Type',
-      dataIndex: 'garmentType',
-      key: 'garmentType',
-      width: 120,
-      render: (type: string) => {
-        const typeLabel = GARMENT_TYPES.find(t => t.value === type)?.label || type;
-        return <Tag>{typeLabel}</Tag>;
-      },
-    },
-    {
-      title: 'Size',
-      dataIndex: 'size',
-      key: 'size',
-      width: 80,
-    },
-    {
-      title: 'Color',
-      dataIndex: 'color',
-      key: 'color',
-      width: 100,
+      render: (style: string, record: GarmentManufacturing) => (
+        <div>
+          <div className='primary-text'>{style}</div>
+          <div className='secondary-text'>{getGarmentTypeLabel(record.garmentType)} • {record.size} • {record.color}</div>
+        </div>
+      ),
     },
     {
       title: 'Quantity',
       dataIndex: 'quantity',
       key: 'quantity',
       width: 100,
-      render: (qty: number) => qty.toLocaleString(),
+      align: 'right' as const,
+      render: (qty: number) => qty?.toLocaleString() || 0,
     },
     {
       title: 'Stage',
       dataIndex: 'productionStage',
       key: 'productionStage',
       width: 120,
-      render: (stage: string) => {
-        const stageLabel = PRODUCTION_STAGES.find(s => s.value === stage)?.label || stage;
-        return <Tag color={getStageColor(stage)}>{stageLabel}</Tag>;
-      },
+      render: (stage: string) => (
+        <Tag color={getStageColor(stage)}>{getStageLabel(stage)}</Tag>
+      ),
     },
     {
       title: 'Quality',
@@ -210,9 +180,9 @@ export const GarmentManufacturingListPage: React.FC = () => {
       width: 100,
       render: (passed: boolean) => (
         passed ? (
-          <Tag icon={<CheckCircleOutlined />} color="success">Passed</Tag>
+          <Tag icon={<CheckCircleOutlined />} color='success'>Passed</Tag>
         ) : (
-          <Tag icon={<CloseCircleOutlined />} color="error">Failed</Tag>
+          <Tag icon={<CloseCircleOutlined />} color='error'>Failed</Tag>
         )
       ),
     },
@@ -226,121 +196,144 @@ export const GarmentManufacturingListPage: React.FC = () => {
       ),
     },
     {
+      title: 'Status',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 90,
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+      ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      render: (_: any, record: GarmentManufacturing) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
+      width: 80,
+      render: (_: any, record: GarmentManufacturing) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditGarment(record),
+            disabled: isEmployee,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            danger: true,
+            onClick: () => handleDeleteGarment(record),
+            disabled: isEmployee,
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  return (
-    <div className="page-container">
-      <PageHeader
-        title="Garment Manufacturing"
-        subtitle="Manage garment production records"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            Add Garment
-          </Button>
-        }
-      />
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage garment manufacturing.</div>
+      </MainLayout>
+    );
+  }
 
-      <Card>
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col xs={24} sm={12} md={6}>
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Garment Manufacturing
+          </Heading>
+        </div>
+
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search by style number..."
+              placeholder='Search garments...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={handleSearch}
+              onChange={e => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={12} md={4}>
             <Select
-              placeholder="Garment Type"
-              value={filters.garmentType}
-              onChange={(value) => handleFilterChange('garmentType', value)}
+              placeholder='Garment Type'
+              value={garmentTypeFilter}
+              onChange={setGarmentTypeFilter}
+              style={{ width: 150 }}
               allowClear
-              style={{ width: '100%' }}
             >
               {GARMENT_TYPES.map(type => (
-                <Option key={type.value} value={type.value}>{type.label}</Option>
+                <Select.Option key={type.value} value={type.value}>
+                  {type.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={4}>
             <Select
-              placeholder="Production Stage"
-              value={filters.productionStage}
-              onChange={(value) => handleFilterChange('productionStage', value)}
+              placeholder='Stage'
+              value={stageFilter}
+              onChange={setStageFilter}
+              style={{ width: 150 }}
               allowClear
-              style={{ width: '100%' }}
             >
               {PRODUCTION_STAGES.map(stage => (
-                <Option key={stage.value} value={stage.value}>{stage.label}</Option>
+                <Select.Option key={stage.value} value={stage.value}>
+                  {stage.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <RangePicker
-              onChange={handleDateRangeChange}
-              style={{ width: '100%' }}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={4}>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => fetchGarments(pagination.current, pagination.pageSize)}
-            >
-              Refresh
-            </Button>
-          </Col>
-        </Row>
+          </Space>
+        </div>
 
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `Total ${total} records`,
-          }}
-          onChange={handleTableChange}
-          scroll={{ x: 1200 }}
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : garments.length === 0 ? (
+            <Empty description='No garment manufacturing records found'>
+              <GradientButton
+                size='small'
+                onClick={handleAddGarment}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
+                Create First Garment
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={garments}
+              rowKey={record => record.id}
+              loading={tableLoading}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} records`,
+              }}
+              className='textile-table'
+            />
+          )}
+        </div>
+      </div>
 
       <GarmentManufacturingDrawer
-        visible={drawerVisible}
-        mode={drawerMode}
-        garmentId={selectedGarmentId}
-        onClose={handleDrawerClose}
-        onSuccess={handleDrawerSuccess}
+        visible={drawerOpen}
+        mode={editingGarment ? 'edit' : 'create'}
+        garmentId={editingGarment?.id}
+        onClose={() => handleDrawerClose(false)}
+        onSuccess={() => handleDrawerClose(true)}
       />
-    </div>
+    </MainLayout>
   );
-};
+}
 
-export default GarmentManufacturingListPage;
+export { GarmentManufacturingListPage };

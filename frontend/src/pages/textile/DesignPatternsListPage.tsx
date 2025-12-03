@@ -1,130 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Input, Space, Tag, Row, Col, Select, Tooltip, App, Image } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  Dropdown,
+  message,
+  Empty,
+  Spin,
+  Input,
+  Space,
+  Select,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
 import { designPatternService, DesignPattern, DESIGN_CATEGORIES, DESIGN_STATUSES } from '../../services/textileService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import { DesignPatternDrawer } from '../../components/textile/DesignPatternDrawer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import { useDebounce } from '../../hooks/useDebounce';
+import './TextileListPage.scss';
 
-const { Option } = Select;
-
-export const DesignPatternsListPage: React.FC = () => {
-  const { message, modal } = App.useApp();
+export default function DesignPatternsListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [designs, setDesigns] = useState<DesignPattern[]>([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<DesignPattern[]>([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingDesign, setEditingDesign] = useState<DesignPattern | undefined>(undefined);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState({
-    designCategory: undefined as string | undefined,
-    status: undefined as string | undefined,
-  });
+  const [categoryFilter, setCategoryFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const fetchInProgressRef = useRef(false);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedDesignId, setSelectedDesignId] = useState<string | undefined>(undefined);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    setHeaderActions(
+      <GradientButton
+        onClick={handleAddDesign}
+        size='small'
+        disabled={isEmployee}
+      >
+        New Design
+      </GradientButton>
+    );
 
-  const debouncedSearch = useDebounce(searchText, 500);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, currentCompany?.role]);
 
-  const fetchDesigns = async (page = 1, pageSize = 10) => {
-    setLoading(true);
+  useEffect(() => {
+    if (currentCompany) {
+      fetchDesigns();
+    }
+  }, [currentCompany, searchText, categoryFilter, statusFilter]);
+
+  const fetchDesigns = async () => {
+    if (fetchInProgressRef.current) return;
+
     try {
-      const queryParams: any = {
-        page,
-        limit: pageSize,
-        search: debouncedSearch,
-        ...filters,
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const filters: any = {
+        search: searchText || undefined,
+        designCategory: categoryFilter,
+        status: statusFilter,
       };
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => 
-        queryParams[key] === undefined && delete queryParams[key]
-      );
-
-      const response = await designPatternService.getDesignPatterns(queryParams);
-      
-      if (Array.isArray(response)) {
-          setData(response);
-          setPagination({ ...pagination, current: page, pageSize, total: response.length });
-      } else if ((response as any).data) {
-           setData((response as any).data);
-           setPagination({
-               current: (response as any).pagination?.page || 1,
-               pageSize: (response as any).pagination?.limit || 10,
-               total: (response as any).pagination?.total || 0
-           });
-      }
-      
+      const result = await designPatternService.getDesignPatterns(filters);
+      setDesigns(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Error fetching designs:', error);
-      message.error('Failed to load design patterns');
+      message.error('Failed to fetch design patterns');
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 
-  useEffect(() => {
-    fetchDesigns(pagination.current, pagination.pageSize);
-  }, [debouncedSearch, filters, pagination.current, pagination.pageSize]);
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination(newPagination);
+  const handleAddDesign = () => {
+    setEditingDesign(undefined);
+    setDrawerOpen(true);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    setPagination({ ...pagination, current: 1 });
+  const handleEditDesign = (design: DesignPattern) => {
+    setEditingDesign(design);
+    setDrawerOpen(true);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDeleteDesign = async (design: DesignPattern) => {
+    try {
+      setTableLoading(true);
+      await designPatternService.deleteDesignPattern(design.id);
+      message.success('Design pattern deleted successfully');
+      fetchDesigns();
+    } catch (error) {
+      console.error('Error deleting design:', error);
+      message.error('Failed to delete design pattern');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  const handleCreate = () => {
-    setSelectedDesignId(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
+  const handleDrawerClose = (shouldRefresh?: boolean) => {
+    setDrawerOpen(false);
+    setEditingDesign(undefined);
+    if (shouldRefresh) {
+      fetchDesigns();
+    }
   };
 
-  const handleEdit = (record: DesignPattern) => {
-    setSelectedDesignId(record.id);
-    setDrawerMode('edit');
-    setDrawerVisible(true);
+  const getCategoryLabel = (category: string) => {
+    const found = DESIGN_CATEGORIES.find(c => c.value === category);
+    return found ? found.label : category;
   };
 
-  const handleDelete = (record: DesignPattern) => {
-    modal.confirm({
-      title: 'Delete Design Pattern',
-      content: `Are you sure you want to delete design "${record.designName}"?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await designPatternService.deleteDesignPattern(record.id);
-          message.success('Design pattern deleted successfully');
-          fetchDesigns(pagination.current, pagination.pageSize);
-        } catch (error) {
-          console.error('Error deleting design:', error);
-          message.error('Failed to delete design pattern');
-        }
-      },
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setSelectedDesignId(undefined);
-  };
-
-  const handleDrawerSuccess = () => {
-    handleDrawerClose();
-    fetchDesigns(pagination.current, pagination.pageSize);
+  const getStatusLabel = (status: string) => {
+    const found = DESIGN_STATUSES.find(s => s.value === status);
+    return found ? found.label : status;
   };
 
   const getStatusColor = (status: string) => {
@@ -145,68 +142,25 @@ export const DesignPatternsListPage: React.FC = () => {
       dataIndex: 'designId',
       key: 'designId',
       width: 120,
-      render: (text: string) => <span style={{ fontFamily: 'monospace' }}>{text}</span>,
-    },
-    {
-      title: 'Preview',
-      dataIndex: 'sampleImageUrl',
-      key: 'sampleImageUrl',
-      width: 80,
-      render: (url: string) => (
-        url ? (
-          <Image
-            src={url}
-            width={50}
-            height={50}
-            style={{ objectFit: 'cover', borderRadius: 4 }}
-            fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9teleIlXQqI0bQnnfNBbiqhKKhFz0xB+z4G7SzUvBIEnHo0ox9xsMjYAChmkThGvADI8nHIwVwC0bgxyHOE3Rg5im+YjBqFvFz8A"
-          />
-        ) : (
-          <div style={{ width: 50, height: 50, background: '#f0f0f0', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
-            N/A
-          </div>
-        )
-      ),
+      render: (designId: string) => <span className='code-text'>{designId}</span>,
     },
     {
       title: 'Design Name',
       dataIndex: 'designName',
       key: 'designName',
-      width: 200,
+      render: (name: string, record: DesignPattern) => (
+        <div>
+          <div className='primary-text'>{name}</div>
+          <div className='secondary-text'>{record.designerName || '—'} • {record.season || '—'}</div>
+        </div>
+      ),
     },
     {
       title: 'Category',
       dataIndex: 'designCategory',
       key: 'designCategory',
       width: 120,
-      render: (category: string) => {
-        const categoryLabel = DESIGN_CATEGORIES.find(c => c.value === category)?.label || category;
-        return <Tag>{categoryLabel}</Tag>;
-      },
-    },
-    {
-      title: 'Designer',
-      dataIndex: 'designerName',
-      key: 'designerName',
-      width: 150,
-      render: (name: string) => name || '—',
-    },
-    {
-      title: 'Season',
-      dataIndex: 'season',
-      key: 'season',
-      width: 100,
-      render: (season: string) => season || '—',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      width: 120,
-      render: (status: string) => {
-        const statusLabel = DESIGN_STATUSES.find(s => s.value === status)?.label || status;
-        return <Tag color={getStatusColor(status)}>{statusLabel}</Tag>;
-      },
+      render: (category: string) => <Tag>{getCategoryLabel(category)}</Tag>,
     },
     {
       title: 'Colors',
@@ -233,115 +187,153 @@ export const DesignPatternsListPage: React.FC = () => {
       ),
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 120,
+      render: (status: string) => (
+        <Tag color={getStatusColor(status)}>{getStatusLabel(status)}</Tag>
+      ),
+    },
+    {
+      title: 'Active',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 90,
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+      ),
+    },
+    {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      render: (_: any, record: DesignPattern) => (
-        <Space>
-          <Tooltip title="Edit">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
+      width: 80,
+      render: (_: any, record: DesignPattern) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditDesign(record),
+            disabled: isEmployee,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            danger: true,
+            onClick: () => handleDeleteDesign(record),
+            disabled: isEmployee,
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  return (
-    <div className="page-container">
-      <PageHeader
-        title="Design & Patterns"
-        subtitle="Manage design patterns and collections"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            Add Design
-          </Button>
-        }
-      />
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage design patterns.</div>
+      </MainLayout>
+    );
+  }
 
-      <Card>
-        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-          <Col xs={24} sm={12} md={8}>
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Design & Patterns
+          </Heading>
+        </div>
+
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search by design name..."
+              placeholder='Search designs...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={handleSearch}
+              onChange={e => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={12} md={4}>
             <Select
-              placeholder="Category"
-              value={filters.designCategory}
-              onChange={(value) => handleFilterChange('designCategory', value)}
+              placeholder='Category'
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              style={{ width: 150 }}
               allowClear
-              style={{ width: '100%' }}
             >
               {DESIGN_CATEGORIES.map(cat => (
-                <Option key={cat.value} value={cat.value}>{cat.label}</Option>
+                <Select.Option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={4}>
             <Select
-              placeholder="Status"
-              value={filters.status}
-              onChange={(value) => handleFilterChange('status', value)}
+              placeholder='Status'
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 150 }}
               allowClear
-              style={{ width: '100%' }}
             >
               {DESIGN_STATUSES.map(status => (
-                <Option key={status.value} value={status.value}>{status.label}</Option>
+                <Select.Option key={status.value} value={status.value}>
+                  {status.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={4}>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => fetchDesigns(pagination.current, pagination.pageSize)}
-            >
-              Refresh
-            </Button>
-          </Col>
-        </Row>
+          </Space>
+        </div>
 
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `Total ${total} records`,
-          }}
-          onChange={handleTableChange}
-          scroll={{ x: 1200 }}
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : designs.length === 0 ? (
+            <Empty description='No design patterns found'>
+              <GradientButton
+                size='small'
+                onClick={handleAddDesign}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
+                Create First Design
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={designs}
+              rowKey={record => record.id}
+              loading={tableLoading}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} records`,
+              }}
+              className='textile-table'
+            />
+          )}
+        </div>
+      </div>
 
       <DesignPatternDrawer
-        visible={drawerVisible}
-        mode={drawerMode}
-        designId={selectedDesignId}
-        onClose={handleDrawerClose}
-        onSuccess={handleDrawerSuccess}
+        visible={drawerOpen}
+        mode={editingDesign ? 'edit' : 'create'}
+        designId={editingDesign?.id}
+        onClose={() => handleDrawerClose(false)}
+        onSuccess={() => handleDrawerClose(true)}
       />
-    </div>
+    </MainLayout>
   );
-};
+}
 
-export default DesignPatternsListPage;
+export { DesignPatternsListPage };

@@ -1,143 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Card, Button, Input, Space, Tag, Row, Col, Select, DatePicker, Tooltip, App } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  Dropdown,
+  message,
+  Empty,
+  Spin,
+  Input,
+  Space,
+  Select,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import useAuth from '../../contexts/AuthContext';
+import { useHeader } from '../../contexts/HeaderContext';
 import { yarnManufacturingService, YarnManufacturing, YARN_TYPES, QUALITY_GRADES, YARN_PROCESSES } from '../../services/textileService';
+import { MainLayout } from '../../components/layout';
+import { Heading } from '../../components/Heading';
+import { GradientButton } from '../../components/ui';
 import { YarnManufacturingDrawer } from '../../components/textile/YarnManufacturingDrawer';
-import { PageHeader } from '../../components/layout/PageHeader';
-import dayjs from 'dayjs';
-import { useDebounce } from '../../hooks/useDebounce';
+import './TextileListPage.scss';
 
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-export const YarnManufacturingListPage: React.FC = () => {
-  const { message, modal } = App.useApp();
+export default function YarnManufacturingListPage() {
+  const { currentCompany } = useAuth();
+  const { setHeaderActions } = useHeader();
+  const [yarns, setYarns] = useState<YarnManufacturing[]>([]);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<YarnManufacturing[]>([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingYarn, setEditingYarn] = useState<YarnManufacturing | undefined>(undefined);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState({
-    yarnType: undefined as string | undefined,
-    processType: undefined as string | undefined,
-    qualityGrade: undefined as string | undefined,
-    startDate: undefined as string | undefined,
-    endDate: undefined as string | undefined,
-  });
+  const [yarnTypeFilter, setYarnTypeFilter] = useState<string | undefined>(undefined);
+  const [qualityGradeFilter, setQualityGradeFilter] = useState<string | undefined>(undefined);
+  const fetchInProgressRef = useRef(false);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedYarnId, setSelectedYarnId] = useState<string | undefined>(undefined);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
+  useEffect(() => {
+    const isEmployee = currentCompany?.role === 'EMPLOYEE';
+    setHeaderActions(
+      <GradientButton
+        onClick={handleAddYarn}
+        size='small'
+        disabled={isEmployee}
+      >
+        New Production
+      </GradientButton>
+    );
 
-  const debouncedSearch = useDebounce(searchText, 500);
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, currentCompany?.role]);
 
-  const fetchYarns = async (page = 1, pageSize = 10) => {
-    setLoading(true);
+  useEffect(() => {
+    if (currentCompany) {
+      fetchYarns();
+    }
+  }, [currentCompany, searchText, yarnTypeFilter, qualityGradeFilter]);
+
+  const fetchYarns = async () => {
+    if (fetchInProgressRef.current) return;
+
     try {
-      const queryParams: any = {
-        page,
-        limit: pageSize,
-        search: debouncedSearch,
-        ...filters,
+      fetchInProgressRef.current = true;
+      setLoading(true);
+      const filters: any = {
+        search: searchText || undefined,
+        yarnType: yarnTypeFilter,
+        qualityGrade: qualityGradeFilter,
       };
-
-      // Remove undefined values
-      Object.keys(queryParams).forEach(key => 
-        queryParams[key] === undefined && delete queryParams[key]
-      );
-
-      const response = await yarnManufacturingService.getYarnManufacturing(queryParams);
-      
-      if (Array.isArray(response)) {
-          setData(response);
-          setPagination({ ...pagination, current: page, pageSize, total: response.length });
-      } else if ((response as any).data) {
-           setData((response as any).data);
-           setPagination({
-               current: (response as any).pagination?.page || 1,
-               pageSize: (response as any).pagination?.limit || 10,
-               total: (response as any).pagination?.total || 0
-           });
-      }
-      
+      const result = await yarnManufacturingService.getYarnManufacturing(filters);
+      setYarns(Array.isArray(result) ? result : []);
     } catch (error) {
       console.error('Error fetching yarns:', error);
-      message.error('Failed to load yarn manufacturing records');
+      message.error('Failed to fetch yarn manufacturing records');
     } finally {
       setLoading(false);
+      fetchInProgressRef.current = false;
     }
   };
 
-  useEffect(() => {
-    fetchYarns(pagination.current, pagination.pageSize);
-  }, [debouncedSearch, filters, pagination.current, pagination.pageSize]);
-
-  const handleTableChange = (newPagination: any) => {
-    setPagination(newPagination);
+  const handleAddYarn = () => {
+    setEditingYarn(undefined);
+    setDrawerOpen(true);
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    setPagination({ ...pagination, current: 1 });
+  const handleEditYarn = (yarn: YarnManufacturing) => {
+    setEditingYarn(yarn);
+    setDrawerOpen(true);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDeleteYarn = async (yarn: YarnManufacturing) => {
+    try {
+      setTableLoading(true);
+      await yarnManufacturingService.deleteYarnManufacturing(yarn.id);
+      message.success('Yarn manufacturing deleted successfully');
+      fetchYarns();
+    } catch (error) {
+      console.error('Error deleting yarn:', error);
+      message.error('Failed to delete yarn manufacturing');
+    } finally {
+      setTableLoading(false);
+    }
   };
 
-  const handleDateRangeChange = (dates: any, dateStrings: [string, string]) => {
-    setFilters(prev => ({
-      ...prev,
-      startDate: dateStrings[0] || undefined,
-      endDate: dateStrings[1] || undefined,
-    }));
-    setPagination({ ...pagination, current: 1 });
+  const handleDrawerClose = (shouldRefresh?: boolean) => {
+    setDrawerOpen(false);
+    setEditingYarn(undefined);
+    if (shouldRefresh) {
+      fetchYarns();
+    }
   };
 
-  const handleCreate = () => {
-    setSelectedYarnId(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
+  const getQualityGradeLabel = (grade: string) => {
+    const found = QUALITY_GRADES.find(g => g.value === grade);
+    return found ? found.label : grade;
   };
 
-  const handleEdit = (record: YarnManufacturing) => {
-    setSelectedYarnId(record.id);
-    setDrawerMode('edit');
-    setDrawerVisible(true);
+  const getYarnTypeLabel = (type: string) => {
+    const found = YARN_TYPES.find(t => t.value === type);
+    return found ? found.label : type;
   };
 
-  const handleDelete = (record: YarnManufacturing) => {
-    modal.confirm({
-      title: 'Delete Yarn Production',
-      content: `Are you sure you want to delete ${record.yarnType} ${record.yarnCount} (${record.batchNumber})?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          await yarnManufacturingService.deleteYarnManufacturing(record.id);
-          message.success('Record deleted successfully');
-          fetchYarns(pagination.current, pagination.pageSize);
-        } catch (error) {
-          message.error('Failed to delete record');
-        }
-      },
-    });
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setSelectedYarnId(undefined);
-  };
-
-  const handleFormSuccess = () => {
-    setDrawerVisible(false);
-    fetchYarns(pagination.current, pagination.pageSize);
+  const getProcessLabel = (process: string) => {
+    const found = YARN_PROCESSES.find(p => p.value === process);
+    return found ? found.label : process;
   };
 
   const columns = [
@@ -146,17 +135,16 @@ export const YarnManufacturingListPage: React.FC = () => {
       dataIndex: 'yarnId',
       key: 'yarnId',
       width: 120,
-      render: (text: string) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      render: (yarnId: string) => <span className='code-text'>{yarnId}</span>,
     },
     {
-      title: 'Type / Count',
-      key: 'typeCount',
-      render: (_: any, record: YarnManufacturing) => (
+      title: 'Yarn Details',
+      dataIndex: 'yarnType',
+      key: 'yarnType',
+      render: (_: string, record: YarnManufacturing) => (
         <div>
-          <div style={{ fontWeight: 500 }}>
-             {YARN_TYPES.find(t => t.value === record.yarnType)?.label || record.yarnType}
-          </div>
-          <div style={{ fontSize: '12px', color: '#888' }}>{record.yarnCount} • {record.ply} Ply</div>
+          <div className='primary-text'>{getYarnTypeLabel(record.yarnType)} - {record.yarnCount}</div>
+          <div className='secondary-text'>{record.ply} Ply • {record.color}</div>
         </div>
       ),
     },
@@ -170,18 +158,16 @@ export const YarnManufacturingListPage: React.FC = () => {
       title: 'Process',
       dataIndex: 'processType',
       key: 'processType',
-      width: 120,
-      render: (type: string) => (
-        <Tag color="blue">{YARN_PROCESSES.find(p => p.value === type)?.label || type}</Tag>
-      ),
+      width: 100,
+      render: (process: string) => getProcessLabel(process),
     },
     {
       title: 'Quantity',
       dataIndex: 'quantityKg',
       key: 'quantityKg',
-      width: 120,
+      width: 100,
       align: 'right' as const,
-      render: (qty: number) => `${qty.toLocaleString()} kg`,
+      render: (qty: number) => `${qty?.toLocaleString() || 0} kg`,
     },
     {
       title: 'Grade',
@@ -189,151 +175,155 @@ export const YarnManufacturingListPage: React.FC = () => {
       key: 'qualityGrade',
       width: 100,
       render: (grade: string) => {
-        let color = 'default';
-        if (grade === 'A_GRADE') color = 'success';
-        if (grade === 'B_GRADE') color = 'warning';
-        if (grade === 'REJECT') color = 'error';
-        return <Tag color={color}>{QUALITY_GRADES.find(g => g.value === grade)?.label || grade}</Tag>;
+        const color = grade === 'A_GRADE' ? 'green' : grade === 'B_GRADE' ? 'blue' : grade === 'C_GRADE' ? 'orange' : 'red';
+        return <Tag color={color}>{getQualityGradeLabel(grade)}</Tag>;
       },
     },
     {
       title: 'Date',
       dataIndex: 'productionDate',
       key: 'productionDate',
-      width: 120,
-      render: (date: string) => dayjs(date).format('DD MMM YYYY'),
+      width: 110,
+      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
     },
     {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
-      width: 100,
+      width: 90,
       render: (isActive: boolean) => (
-        <Tag color={isActive ? 'success' : 'default'}>
-          {isActive ? 'Active' : 'Inactive'}
-        </Tag>
+        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
-      align: 'center' as const,
-      render: (_: any, record: YarnManufacturing) => (
-        <Space size="small">
-          <Tooltip title="Edit">
-            <Button 
-              type="text" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEdit(record)} 
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />} 
-              onClick={() => handleDelete(record)} 
-            />
-          </Tooltip>
-        </Space>
-      ),
+      width: 80,
+      render: (_: any, record: YarnManufacturing) => {
+        const isEmployee = currentCompany?.role === 'EMPLOYEE';
+        const menuItems = [
+          {
+            key: 'edit',
+            icon: <EditOutlined />,
+            label: 'Edit',
+            onClick: () => handleEditYarn(record),
+            disabled: isEmployee,
+          },
+          { type: 'divider' as const },
+          {
+            key: 'delete',
+            icon: <DeleteOutlined />,
+            label: 'Delete',
+            danger: true,
+            onClick: () => handleDeleteYarn(record),
+            disabled: isEmployee,
+          },
+        ];
+
+        return (
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement='bottomRight'>
+            <Button type='text' icon={<MoreOutlined />} />
+          </Dropdown>
+        );
+      },
     },
   ];
 
-  return (
-    <div className="yarn-manufacturing-list-page">
-      <PageHeader
-        title="Yarn Manufacturing"
-        subtitle="Manage yarn production, spinning, and processing"
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            New Production
-          </Button>
-        }
-      />
+  if (!currentCompany) {
+    return (
+      <MainLayout>
+        <div className='no-company-message'>Please select a company to manage yarn manufacturing.</div>
+      </MainLayout>
+    );
+  }
 
-      <Card bordered={false} className="filter-card" style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={8} md={6}>
+  return (
+    <MainLayout>
+      <div className='page-container'>
+        <div className='page-header-section'>
+          <Heading level={2} className='page-title'>
+            Yarn Manufacturing
+          </Heading>
+        </div>
+
+        <div className='filters-section'>
+          <Space size='middle'>
             <Input
-              placeholder="Search yarn, batch, or count..."
+              placeholder='Search yarns...'
               prefix={<SearchOutlined />}
               value={searchText}
-              onChange={handleSearch}
+              onChange={e => setSearchText(e.target.value)}
+              style={{ width: 250 }}
               allowClear
             />
-          </Col>
-          <Col xs={24} sm={8} md={4}>
             <Select
-              placeholder="Yarn Type"
-              style={{ width: '100%' }}
+              placeholder='Yarn Type'
+              value={yarnTypeFilter}
+              onChange={setYarnTypeFilter}
+              style={{ width: 150 }}
               allowClear
-              value={filters.yarnType}
-              onChange={(val) => handleFilterChange('yarnType', val)}
             >
               {YARN_TYPES.map(type => (
-                <Option key={type.value} value={type.value}>{type.label}</Option>
+                <Select.Option key={type.value} value={type.value}>
+                  {type.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={8} md={4}>
             <Select
-              placeholder="Process"
-              style={{ width: '100%' }}
+              placeholder='Quality Grade'
+              value={qualityGradeFilter}
+              onChange={setQualityGradeFilter}
+              style={{ width: 150 }}
               allowClear
-              value={filters.processType}
-              onChange={(val) => handleFilterChange('processType', val)}
             >
-              {YARN_PROCESSES.map(proc => (
-                <Option key={proc.value} value={proc.value}>{proc.label}</Option>
+              {QUALITY_GRADES.map(grade => (
+                <Select.Option key={grade.value} value={grade.value}>
+                  {grade.label}
+                </Select.Option>
               ))}
             </Select>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <RangePicker 
-              style={{ width: '100%' }} 
-              onChange={handleDateRangeChange}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={4} style={{ textAlign: 'right' }}>
-            <Space>
-              <Button 
-                icon={<ReloadOutlined />} 
-                onClick={() => fetchYarns(pagination.current, pagination.pageSize)}
-              >
-                Refresh
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Card>
+          </Space>
+        </div>
 
-      <Card bordered={false} className="table-card">
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="id"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} items`,
-          }}
-          loading={loading}
-          onChange={handleTableChange}
-          scroll={{ x: 1000 }}
-        />
-      </Card>
+        <div className='table-container'>
+          {loading ? (
+            <div className='loading-container'>
+              <Spin size='large' />
+            </div>
+          ) : yarns.length === 0 ? (
+            <Empty description='No yarn manufacturing records found'>
+              <GradientButton
+                size='small'
+                onClick={handleAddYarn}
+                disabled={currentCompany?.role === 'EMPLOYEE'}
+              >
+                Create First Production
+              </GradientButton>
+            </Empty>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={yarns}
+              rowKey={record => record.id}
+              loading={tableLoading}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total) => `Total ${total} records`,
+              }}
+              className='textile-table'
+            />
+          )}
+        </div>
+      </div>
 
       <YarnManufacturingDrawer
-        open={drawerVisible}
-        onClose={handleDrawerClose}
-        onSuccess={handleFormSuccess}
-        mode={drawerMode}
-        yarnId={selectedYarnId}
+        open={drawerOpen}
+        onClose={() => handleDrawerClose(false)}
+        onSuccess={() => handleDrawerClose(true)}
+        initialData={editingYarn}
       />
-    </div>
+    </MainLayout>
   );
-};
+}
 
-export default YarnManufacturingListPage;
+export { YarnManufacturingListPage };
