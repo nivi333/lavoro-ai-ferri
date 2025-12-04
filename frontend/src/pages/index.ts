@@ -6,7 +6,7 @@ export { default as RegisterPage } from './auth/RegisterPage';
 export { default as ForgotPasswordPage } from './auth/ForgotPasswordPage';
 
 // Dashboard
-export { default as DashboardPage } from './dashboard/DashboardPage';
+export { DashboardPage } from './dashboard';
 
 // Company Management
 export { default as CompaniesListPage } from './company/CompaniesListPage';

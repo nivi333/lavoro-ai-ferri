@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import { BrandLogo } from '../BrandLogo';
 import { useHeader } from '../../contexts/HeaderContext';
 import useAuth from '../../contexts/AuthContext';
-import { UserAvatar } from '../ui';
+import { UserAvatar, ThemeToggle } from '../ui';
 import './MainLayout.scss';
 
 const { Header, Content } = Layout;
@@ -34,6 +34,7 @@ function MainLayoutContent({ children }: MainLayoutProps) {
         <div className='header-content'>
           <BrandLogo width={120} height={28} />
           <div className='header-actions'>
+            <ThemeToggle />
             {headerActions}
             <Button
               type='default'

@@ -19,7 +19,6 @@ import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
 import {
-  LOCATION_STATUS_COLORS,
   LOCATION_TABLE_CONFIG,
   LOCATION_EMPTY_STATE,
   LOCATION_SUCCESS_MESSAGES,
@@ -217,9 +216,7 @@ export default function LocationListPage() {
       key: 'status',
       width: 100,
       render: (record: Location) => (
-        <Tag
-          color={record.isActive ? LOCATION_STATUS_COLORS.ACTIVE : LOCATION_STATUS_COLORS.INACTIVE}
-        >
+        <Tag color={record.isActive ? 'success' : 'default'}>
           {record.isActive ? 'Active' : 'Inactive'}
         </Tag>
       ),

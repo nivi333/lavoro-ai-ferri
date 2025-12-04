@@ -224,7 +224,12 @@ export default function CompanyDetailPage() {
       items: [
         { label: 'Industry', value: extendedCompany.industry },
         { label: 'Country', value: extendedCompany.country },
-        { label: 'Primary Contact', value: inferredEmail || inferredPhone },
+        { label: 'Primary Contact', value: (
+          <>
+            {inferredEmail && <div>{inferredEmail}</div>}
+            {inferredPhone && <div>{inferredPhone}</div>}
+          </>
+        ) },
         { label: 'Role', value: extendedCompany.role },
       ],
     },
@@ -334,7 +339,7 @@ export default function CompanyDetailPage() {
               </div>
             </Space>
             {extendedCompany.slug && (
-              <div className='company-profile-code'>
+              <div className='company-profile-code' style={{ textAlign: 'left' }}>
                 <Text type='secondary'>Company Code</Text>
                 <div className='company-profile-code-value'>{extendedCompany.slug.toUpperCase()}</div>
               </div>

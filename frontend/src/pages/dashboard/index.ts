@@ -1,2 +1,4 @@
-export { default } from './DashboardPage';
-export { default as DashboardPage } from './DashboardPage';
+import DashboardPage from './DashboardPage';
+
+export default DashboardPage;
+export { DashboardPage };

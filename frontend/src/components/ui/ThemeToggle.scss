@@ -1,0 +1,13 @@
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+  
+  &-switch {
+    background-color: #7b5fc9;
+    
+    &.ant-switch-checked {
+      background-color: #a2d8e5;
+    }
+  }
+}

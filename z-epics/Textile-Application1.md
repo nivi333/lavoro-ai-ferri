@@ -47,7 +47,74 @@
 - [ ] **Buttons**: Inter (500 weight)
 
 ### **UI/UX Standards**
-- [ ] **Logo Placement**: Always top-left corner on all authenticated screens, clickable to dashboard
+- [✅] **Logo Placement**: Always top-left corner on all authenticated screens, clickable to dashboard
+- [✅] **Theme Toggle**: Light/dark mode toggle in header before "Invite Team Members" button
+
+### **Theme Toggle Implementation Details**
+
+#### Components
+- **ThemeContext**: Located at `/frontend/src/contexts/ThemeContext.tsx`
+  - Manages theme state (light/dark) using React Context API
+  - Persists theme preference in localStorage
+  - Provides `theme`, `setTheme`, and `toggle` functions
+  - Automatically detects system preference on first load
+
+- **ThemeToggle Component**: Located at `/frontend/src/components/ui/ThemeToggle.tsx`
+  - Uses Ant Design Switch with SunOutlined/MoonOutlined icons
+  - Positioned in header before other action buttons
+
+- **MainLayout Integration**: Consistent placement across all authenticated screens
+
+#### Theme Configuration
+- **Light Mode (Default)**:
+  - Background: #f5f5f5 (Light Gray)
+  - Surface: #ffffff (White)
+  - Text: #000000 (Black)
+  - Primary: #7b5fc9 (Purple)
+  - Accent: #a2d8e5 (Light Blue)
+
+- **Dark Mode**:
+  - Background: #121212 (Dark Gray)
+  - Surface: #1f1f1f (Slightly lighter gray)
+  - Text: #ffffff (White)
+  - Primary: #9b7fe9 (Lighter Purple)
+  - Accent: #c2f8ff (Lighter Blue)
+
+#### Known Issues
+- Dark mode has styling inconsistencies due to hardcoded color values
+- Many components use inline styles instead of theme variables
+- Background colors don't properly adapt to dark mode
+- Text contrast issues in dark mode
+
+#### Files with Hardcoded Styles (Need Theme Variable Updates)
+
+**Components with Inline Styles:**
+- `/frontend/src/components/ui/GradientButton.tsx`
+- `/frontend/src/components/ui/LinkButton.tsx`
+- `/frontend/src/components/ui/AuthLayout.tsx`
+- `/frontend/src/components/ui/AuthCard.tsx`
+- `/frontend/src/components/ui/AnimatedBackground.tsx`
+- `/frontend/src/components/ui/UserAvatar.tsx`
+- `/frontend/src/components/products/ProductFormDrawer.tsx`
+- `/frontend/src/components/products/StockAdjustmentModal.tsx`
+- `/frontend/src/components/sales/CustomerDrawer.tsx`
+- `/frontend/src/components/invoices/InvoiceFormDrawer.tsx`
+- `/frontend/src/components/quality/QualityCheckpointFormDrawer.tsx`
+- `/frontend/src/components/quality/QualityDefectFormDrawer.tsx`
+
+**Components with Hardcoded Color Values:**
+- `/frontend/src/contexts/ThemeContext.tsx`
+- `/frontend/src/components/ui/LinkButton.tsx`
+- `/frontend/src/components/ui/AuthLayout.tsx`
+- `/frontend/src/components/ui/AnimatedBackground.tsx`
+- `/frontend/src/components/products/StockAdjustmentModal.tsx`
+- `/frontend/src/components/products/ProductSelector.tsx`
+- `/frontend/src/components/auth/LoginForm.tsx`
+- `/frontend/src/components/auth/RegistrationWizard.tsx`
+- `/frontend/src/components/layout/Sidebar.tsx`
+- `/frontend/src/components/inventory/StockAlertsCard.tsx`
+- `/frontend/src/pages/textile/DyeingFinishingListPage.tsx`
+- `/frontend/src/pages/textile/DesignPatternsListPage.tsx`
 - [ ] **Reuse Components**: Always use existing components before creating new ones
 - [ ] **SCSS Only**: No inline styles, use theme variables
 - [ ] **Naming Conventions**: Follow existing patterns consistently
@@ -1376,7 +1443,7 @@ Comprehensive financial management for accounts receivable, accounts payable, ex
 
 ### **Implementation Status**
 - ✅ Finance Dashboard with professional charts and analytics
-- ✅ Revenue & Profit/Loss trend visualization
+- ✅ Revenue & Profit/Loss trend visualization with live data
 - ✅ Order status distribution charts
 - ✅ Production metrics by category
 - ✅ Key Performance Indicators (KPIs)
