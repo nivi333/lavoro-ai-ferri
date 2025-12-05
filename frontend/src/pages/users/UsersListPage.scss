@@ -117,3 +117,47 @@
     }
   }
 }
+
+// Dark mode support
+[data-theme='dark'] {
+  .users-list-page {
+    background: $dark-bg-primary;
+
+    .page-header {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+    }
+
+    .page-content {
+      background: $dark-bg-primary;
+
+      .page-container {
+        background: $dark-bg-surface;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        .page-header-section {
+          border-bottom-color: $dark-border;
+        }
+
+        .table-container {
+          .users-table {
+            .ant-table-thead > tr > th {
+              background: $dark-bg-tertiary;
+              border-bottom-color: $dark-border;
+            }
+
+            .ant-table-tbody > tr {
+              &:hover > td {
+                background: $dark-bg-tertiary;
+              }
+
+              > td {
+                border-bottom-color: $dark-border;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

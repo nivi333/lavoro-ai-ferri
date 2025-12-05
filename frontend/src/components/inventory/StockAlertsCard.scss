@@ -1,0 +1,82 @@
+@import '../../index.scss';
+
+// Stock Alerts Card Styles
+.stock-alerts-card {
+  .alerts-header {
+    background-color: $bg-secondary;
+    border: 1px solid $border-light;
+    padding: 12px 16px;
+    border-radius: $border-radius-base;
+    margin-bottom: 12px;
+  }
+
+  .alert-item {
+    padding: 12px;
+    border-bottom: 1px solid $border-light;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .alert-product-image {
+    width: 40px;
+    height: 40px;
+    background-color: $bg-tertiary;
+    color: $tertiary-text-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-base;
+  }
+
+  .alert-meta {
+    font-size: 11px;
+    color: $tertiary-text-color;
+  }
+
+  .success-icon {
+    color: $success-color;
+  }
+
+  .error-badge {
+    background-color: $error-color;
+  }
+
+  .warning-badge {
+    background-color: $warning-color;
+  }
+
+  .alerts-footer {
+    padding-top: 8px;
+    border-top: 1px solid $border-light;
+    text-align: center;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .stock-alerts-card {
+    .alerts-header {
+      background-color: $dark-bg-tertiary;
+      border-color: $dark-border;
+    }
+
+    .alert-item {
+      border-bottom-color: $dark-border;
+    }
+
+    .alert-product-image {
+      background-color: $dark-bg-elevated;
+      color: $dark-text-tertiary;
+    }
+
+    .alert-meta {
+      color: $dark-text-tertiary;
+    }
+
+    .alerts-footer {
+      border-top-color: $dark-border;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+
+// Apply global styles
+.invoices-table {
+  .invoice-id {
+    @extend .table-cell-primary;
+  }
+  .customer-name {
+    @extend .table-cell-primary;
+  }
+  .invoice-date {
+    @extend .table-cell-secondary;
+  }
+  .invoice-amount {
+    @extend .table-cell-primary;
+    font-weight: 600;
+  }
+}

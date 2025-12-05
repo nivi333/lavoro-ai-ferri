@@ -1,21 +1,21 @@
 @import '../../index.scss';
 
-.orders-list-page {
-  .orders-table {
+.purchase-orders-list-page {
+  .purchase-orders-table {
     .ant-table-tbody > tr > td {
       padding-top: 12px;
       padding-bottom: 12px;
     }
 
-    .order-id {
+    .po-id {
       @extend .table-cell-primary;
     }
 
-    .customer-name {
+    .supplier-name {
       @extend .table-cell-primary;
     }
 
-    .order-date {
+    .po-date {
       @extend .table-cell-secondary;
     }
 
@@ -40,7 +40,7 @@
 
 // Dark mode support
 [data-theme='dark'] {
-  .orders-list-page {
+  .purchase-orders-list-page {
     background: $dark-bg-primary;
 
     .page-header-section {
@@ -48,7 +48,7 @@
     }
 
     .table-container {
-      .orders-table {
+      .purchase-orders-table {
         .ant-table-thead > tr > th {
           background: $dark-bg-tertiary;
           border-bottom-color: $dark-border;

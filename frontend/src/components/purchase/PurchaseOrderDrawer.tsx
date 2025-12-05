@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Form, Input, DatePicker, Select, Button, Divider, InputNumber, message, Row, Col, Switch } from 'antd';
+import {
+  Drawer,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Button,
+  Divider,
+  InputNumber,
+  message,
+  Row,
+  Col,
+  Switch,
+} from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { GradientButton } from '../ui';
 import { locationService, Location } from '../../services/locationService';
 import { supplierService, Supplier } from '../../services/supplierService';
 import { productService, ProductSummary } from '../../services/productService';
-import { purchaseOrderService, CreatePurchaseOrderRequest, PurchaseOrderDetail, PurchaseOrderItemInput } from '../../services/purchaseOrderService';
-import '../orders/OrderFormDrawer.scss';
+import {
+  purchaseOrderService,
+  CreatePurchaseOrderRequest,
+  PurchaseOrderDetail,
+  PurchaseOrderItemInput,
+} from '../../services/purchaseOrderService';
+import './PurchaseOrderDrawer.scss';
 
 const { Option } = Select;
 
@@ -84,7 +102,9 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
           locationService.getLocations(),
           fetchSuppliers(),
           fetchProducts(),
-          isEditing && editingPOId ? purchaseOrderService.getPurchaseOrderById(editingPOId) : Promise.resolve(null),
+          isEditing && editingPOId
+            ? purchaseOrderService.getPurchaseOrderById(editingPOId)
+            : Promise.resolve(null),
         ]);
 
         setLocations(locs);
@@ -217,7 +237,9 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
       supplierName: values.supplierName,
       supplierCode: values.supplierCode || undefined,
       poDate: values.poDate.toISOString(),
-      expectedDeliveryDate: values.expectedDeliveryDate ? values.expectedDeliveryDate.toISOString() : undefined,
+      expectedDeliveryDate: values.expectedDeliveryDate
+        ? values.expectedDeliveryDate.toISOString()
+        : undefined,
       currency: values.currency || 'INR',
       notes: values.notes || undefined,
       locationId: values.locationId || undefined,
@@ -256,9 +278,9 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span className='order-drawer-title'>{drawerTitle}</span>
+          <span className='po-drawer-title'>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
               onChange={checked => {
@@ -273,26 +295,26 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
       width={720}
       onClose={handleClose}
       open={visible}
-      className='order-form-drawer'
+      className='purchase-order-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
     >
-      <div className='order-drawer-content'>
+      <div className='po-drawer-content'>
         <Form<POFormValues>
           form={form}
           layout='vertical'
           onFinish={handleSubmit}
-          className='order-form'
+          className='po-form'
         >
-          <div className='order-form-content'>
+          <div className='po-form-content'>
             {/* Hidden isActive field */}
             <Form.Item name='isActive' valuePropName='checked' hidden>
               <Switch />
             </Form.Item>
 
             {/* PO Info */}
-            <div className='order-section'>
-              <div className='order-section-title'>Purchase Order Info</div>
+            <div className='po-section'>
+              <div className='po-section-title'>Purchase Order Info</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
                   <Form.Item label='PO Code' name='poCode'>
@@ -311,7 +333,9 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                       loading={loadingSuppliers}
                       onChange={handleSupplierChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {suppliers.map(supplier => (
@@ -369,11 +393,11 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
               </Row>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='po-divider' />
 
             {/* Items */}
-            <div className='order-section'>
-              <div className='order-section-title'>Items</div>
+            <div className='po-section'>
+              <div className='po-section-title'>Items</div>
 
               <Form.List
                 name='items'
@@ -392,7 +416,7 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                   <>
                     {fields.map((field, index) => (
                       <div key={field.key}>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='po-item-row' align='top'>
                           <Col span={24}>
                             <Form.Item
                               {...field}
@@ -405,9 +429,11 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                                 placeholder='Search and select product (optional)'
                                 loading={loadingProducts}
                                 allowClear
-                                onChange={(value) => handleProductChange(value, index)}
+                                onChange={value => handleProductChange(value, index)}
                                 filterOption={(input, option) =>
-                                  String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                                  String(option?.children || '')
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
                                 }
                               >
                                 {products.map(product => (
@@ -419,7 +445,7 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                             </Form.Item>
                           </Col>
                         </Row>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='po-item-row' align='top'>
                           <Col span={4}>
                             <Form.Item
                               {...field}
@@ -449,7 +475,12 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                               fieldKey={[field.fieldKey!, 'quantity']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
-                              <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
+                              <InputNumber
+                                min={0.001}
+                                step={1}
+                                style={{ width: '100%' }}
+                                placeholder='1'
+                              />
                             </Form.Item>
                           </Col>
                           <Col span={4}>
@@ -483,11 +514,11 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
                                 precision={2}
                                 style={{ width: '100%' }}
                                 placeholder='0.00'
-                                formatter={(value) => {
+                                formatter={value => {
                                   if (!value) return '';
                                   return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                 }}
-                                parser={(value) => value!.replace(/\$\s?|(,*)/g, '') as any}
+                                parser={value => value!.replace(/\$\s?|(,*)/g, '') as any}
                               />
                             </Form.Item>
                           </Col>
@@ -516,11 +547,11 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
               </Form.List>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='po-divider' />
 
             {/* Delivery Details */}
-            <div className='order-section'>
-              <div className='order-section-title'>Delivery Details</div>
+            <div className='po-section'>
+              <div className='po-section-title'>Delivery Details</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
                   <Form.Item label='Expected Delivery Date' name='expectedDeliveryDate'>
@@ -536,8 +567,8 @@ export const PurchaseOrderDrawer: React.FC<PurchaseOrderDrawerProps> = ({
             </div>
           </div>
 
-          <div className='order-actions'>
-            <Button onClick={handleClose} className='order-cancel-btn'>
+          <div className='po-actions'>
+            <Button onClick={handleClose} className='po-cancel-btn'>
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={submitting}>

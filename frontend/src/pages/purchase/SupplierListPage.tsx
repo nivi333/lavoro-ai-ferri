@@ -207,14 +207,7 @@ export default function SupplierListPage() {
       key: 'code',
       width: 120,
       render: (code: string) => (
-        <span
-          style={{
-            fontFamily: 'monospace',
-            backgroundColor: '#f5f5f5',
-            padding: '2px 6px',
-            borderRadius: '4px',
-          }}
-        >
+        <span className='table-cell-secondary' style={{ fontFamily: 'monospace' }}>
           {code}
         </span>
       ),

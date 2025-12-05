@@ -1,3 +1,5 @@
+@import '../../index.scss';
+
 .inventory-list-page {
   padding: 24px;
   background-color: #f5f5f5;
@@ -312,5 +314,49 @@
     font-size: 14px;
     color: #666;
     margin-bottom: 16px;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .inventory-list-page {
+    background: $dark-bg-primary;
+
+    .page-header {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+    }
+
+    .page-content {
+      background: $dark-bg-primary;
+
+      .page-container {
+        background: $dark-bg-surface;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        .page-header-section {
+          border-bottom-color: $dark-border;
+        }
+
+        .table-container {
+          .inventory-table {
+            .ant-table-thead > tr > th {
+              background: $dark-bg-tertiary;
+              border-bottom-color: $dark-border;
+            }
+
+            .ant-table-tbody > tr {
+              &:hover > td {
+                background: $dark-bg-tertiary;
+              }
+
+              > td {
+                border-bottom-color: $dark-border;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

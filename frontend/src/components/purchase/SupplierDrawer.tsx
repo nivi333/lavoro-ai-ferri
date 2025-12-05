@@ -176,7 +176,7 @@ export const SupplierDrawer: React.FC<SupplierDrawerProps> = ({
         <div className='drawer-header-with-switch'>
           <span>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
               onChange={checked => {

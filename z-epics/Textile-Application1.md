@@ -58,10 +58,12 @@
   - Persists theme preference in localStorage
   - Provides `theme`, `setTheme`, and `toggle` functions
   - Automatically detects system preference on first load
+  - Adds 'dark' class to body element for CSS targeting
 
 - **ThemeToggle Component**: Located at `/frontend/src/components/ui/ThemeToggle.tsx`
   - Uses Ant Design Switch with SunOutlined/MoonOutlined icons
   - Positioned in header before other action buttons
+  - Smooth transition between themes (300ms)
 
 - **MainLayout Integration**: Consistent placement across all authenticated screens
 
@@ -72,6 +74,9 @@
   - Text: #000000 (Black)
   - Primary: #7b5fc9 (Purple)
   - Accent: #a2d8e5 (Light Blue)
+  - Success: #52c41a (Green)
+  - Error: #ff4d4f (Red)
+  - Warning: #faad14 (Orange)
 
 - **Dark Mode**:
   - Background: #121212 (Dark Gray)
@@ -79,12 +84,43 @@
   - Text: #ffffff (White)
   - Primary: #9b7fe9 (Lighter Purple)
   - Accent: #c2f8ff (Lighter Blue)
+  - Success: #73d13d (Lighter Green)
+  - Error: #ff7875 (Lighter Red)
+  - Warning: #ffc53d (Lighter Orange)
+
+#### SCSS Variables Structure
+- **Base Variables**: Located at `/frontend/src/index.scss`
+  - Primary colors, text colors, background colors defined at top
+  - Dark mode variables defined with $dark- prefix
+  - Component-specific variables derived from base variables
+
+#### Dark Mode Implementation
+- **CSS Approach**: Uses CSS variables and SCSS nesting
+- **Selector Pattern**: `[data-theme='dark']` for global styles
+- **Component Patterns**:
+  - Global styles in index.scss
+  - Component-specific dark mode styles in component SCSS files
+  - Consistent use of SCSS variables for colors
+
+#### Tag Styling in Dark Mode
+- **Tag Colors**: Updated to match light mode color scheme
+  - Success tags: Green text on light green background
+  - Warning tags: Orange text on light orange background
+  - Error tags: Red text on light red background
+  - Processing tags: Purple text on light purple background
+- **Consistency**: Same color scheme in both light and dark modes
+- **Implementation**: Updated in `/frontend/src/index.scss`
+
+#### Recent Improvements
+- Fixed dark mode tag styling to use consistent colors across modes
+- Updated purchase order drawer padding to match product drawer
+- Improved drawer header styling with consistent spacing
+- Fixed text contrast issues in dark mode for better readability
 
 #### Known Issues
-- Dark mode has styling inconsistencies due to hardcoded color values
-- Many components use inline styles instead of theme variables
-- Background colors don't properly adapt to dark mode
-- Text contrast issues in dark mode
+- Some components still use inline styles instead of theme variables
+- Background colors in some components don't properly adapt to dark mode
+- Text contrast issues in specific components in dark mode
 
 #### Files with Hardcoded Styles (Need Theme Variable Updates)
 

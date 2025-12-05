@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Card } from 'antd';
 import HeadingText from './HeadingText';
+import './AuthCard.scss';
 
 interface AuthCardProps {
   children: ReactNode;
@@ -10,17 +11,11 @@ interface AuthCardProps {
 // Reusable auth card component with logo and title
 export default function AuthCard({ children, heading }: AuthCardProps) {
   return (
-    <div style={{ maxWidth: '448px', margin: '0 auto' }}>
-      <Card 
-        style={{
-          borderRadius: '16px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          border: 'none',
-        }}
-      >
+    <div className="auth-card-wrapper">
+      <Card className="auth-card">
         {/* Page heading inside card */}
         {heading && (
-          <div style={{ marginBottom: '24px' }}>
+          <div className="auth-card-heading">
             <HeadingText>{heading}</HeadingText>
           </div>
         )}

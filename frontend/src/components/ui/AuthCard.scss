@@ -1,0 +1,29 @@
+@import '../../index.scss';
+
+.auth-card-wrapper {
+  max-width: 448px;
+  margin: 0 auto;
+}
+
+.auth-card {
+  border-radius: 16px;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: none;
+  background: $bg-primary;
+}
+
+.auth-card-heading {
+  margin-bottom: 24px;
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .auth-card {
+    background: $dark-bg-surface;
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.4),
+      0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  }
+}

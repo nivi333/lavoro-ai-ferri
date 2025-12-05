@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, Button, Typography, message, Checkbox, Divider, Space } from 'antd';
-import { GoogleOutlined, FacebookOutlined, YoutubeOutlined, InstagramOutlined } from '@ant-design/icons';
+import {
+  GoogleOutlined,
+  FacebookOutlined,
+  YoutubeOutlined,
+  InstagramOutlined,
+} from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthCard, LinkButton, GradientButton } from '../ui';
@@ -30,7 +35,7 @@ export default function LoginForm() {
     if (rememberedUser) {
       form.setFieldsValue({
         emailOrPhone: rememberedUser,
-        rememberMe: true
+        rememberMe: true,
       });
     }
   }, [form]);
@@ -51,7 +56,8 @@ export default function LoginForm() {
       message.success('Login successful!');
       navigate(from, { replace: true });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed. Please try again.';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Login failed. Please try again.';
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -69,14 +75,15 @@ export default function LoginForm() {
 
       // Generate PKCE challenge
       const { verifier } = await googleAuth.generatePKCE();
-      
+
       // Store code verifier for later use
       sessionStorage.setItem('google_code_verifier', verifier);
-      
+
       // Use the initiateAuthFlow method instead of buildAuthUrl
       await googleAuth.initiateAuthFlow();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Google Sign-In failed. Please try again.';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Google Sign-In failed. Please try again.';
       message.error(errorMessage);
       setGoogleLoading(false);
     }
@@ -87,17 +94,11 @@ export default function LoginForm() {
   };
 
   return (
-    <AuthCard heading="Sign In">
-      <Form
-        form={form}
-        name="login"
-        onFinish={onFinish}
-        layout="vertical"
-        size="middle"
-      >
+    <AuthCard heading='Sign In'>
+      <Form form={form} name='login' onFinish={onFinish} layout='vertical' size='middle'>
         <Form.Item
-          name="emailOrPhone"
-          label={<span style={{ color: '#374151', fontWeight: 500, fontSize: '14px' }}>Email or Phone Number</span>}
+          name='emailOrPhone'
+          label={<span className='auth-form-label'>Email or Phone Number</span>}
           rules={[
             {
               required: true,
@@ -106,14 +107,14 @@ export default function LoginForm() {
             {
               validator: (_, value) => {
                 if (!value) return Promise.resolve();
-                
+
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-                
+
                 if (emailRegex.test(value) || phoneRegex.test(value)) {
                   return Promise.resolve();
                 }
-                
+
                 return Promise.reject(
                   new Error('Please enter a valid email address or phone number')
                 );
@@ -122,21 +123,15 @@ export default function LoginForm() {
           ]}
         >
           <Input
-            placeholder="Enter your email or phone number"
-            autoComplete="username"
-            style={{
-              height: '40px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              backgroundColor: '#f9fafb',
-              fontSize: '14px',
-            }}
+            placeholder='Enter your email or phone number'
+            autoComplete='username'
+            className='form-input-global'
           />
         </Form.Item>
 
         <Form.Item
-          name="password"
-          label={<span style={{ color: '#374151', fontWeight: 500, fontSize: '14px' }}>Password</span>}
+          name='password'
+          label={<span className='auth-form-label'>Password</span>}
           rules={[
             {
               required: true,
@@ -149,50 +144,41 @@ export default function LoginForm() {
           ]}
         >
           <Input.Password
-            placeholder="Enter your password"
-            autoComplete="current-password"
-            style={{
-              height: '40px',
-              borderRadius: '6px',
-              border: '1px solid #d1d5db',
-              backgroundColor: '#f9fafb',
-              fontSize: '14px',
-            }}
+            placeholder='Enter your password'
+            autoComplete='current-password'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Remember Me & Forgot Password */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '16px'
-        }}>
-          <Form.Item name="rememberMe" valuePropName="checked" style={{ margin: 0 }}>
-            <Checkbox style={{ color: '#374151', fontSize: '14px' }}>
-              Remember me
-            </Checkbox>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px',
+          }}
+        >
+          <Form.Item name='rememberMe' valuePropName='checked' style={{ margin: 0 }}>
+            <Checkbox style={{ color: '#374151', fontSize: '14px' }}>Remember me</Checkbox>
           </Form.Item>
-          
+
           <LinkButton onClick={() => navigate('/forgot-password')}>
             Forgot your password?
           </LinkButton>
         </div>
 
         <Form.Item style={{ marginBottom: '16px' }}>
-          <GradientButton
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            block
-          >
+          <GradientButton type='primary' htmlType='submit' loading={loading} block>
             Sign In
           </GradientButton>
         </Form.Item>
       </Form>
 
       <Divider style={{ margin: '16px 0', borderColor: '#e5e7eb' }}>
-        <Text type="secondary" style={{ fontSize: '12px' }}>OR</Text>
+        <Text type='secondary' style={{ fontSize: '12px' }}>
+          OR
+        </Text>
       </Divider>
 
       <Button
@@ -200,7 +186,7 @@ export default function LoginForm() {
         loading={googleLoading}
         onClick={handleGoogleSignIn}
         block
-        size="middle"
+        size='middle'
         style={{
           height: '40px',
           fontSize: '14px',
@@ -219,21 +205,21 @@ export default function LoginForm() {
       </Button>
 
       <div style={{ textAlign: 'center', marginTop: '16px' }}>
-        <Text type="secondary" style={{ fontSize: '12px' }}>
+        <Text type='secondary' style={{ fontSize: '12px' }}>
           Don't have an account?{' '}
-          <LinkButton onClick={() => navigate('/register')}>
-            Sign up
-          </LinkButton>
+          <LinkButton onClick={() => navigate('/register')}>Sign up</LinkButton>
         </Text>
       </div>
 
       <Divider style={{ margin: '16px 0', borderColor: '#e5e7eb' }}>
-        <Text type="secondary" style={{ fontSize: '12px' }}>Follow us</Text>
+        <Text type='secondary' style={{ fontSize: '12px' }}>
+          Follow us
+        </Text>
       </Divider>
 
-      <Space size="middle" style={{ display: 'flex', justifyContent: 'center' }}>
+      <Space size='middle' style={{ display: 'flex', justifyContent: 'center' }}>
         <Button
-          type="text"
+          type='text'
           icon={<FacebookOutlined style={{ fontSize: '18px', color: '#1877f2' }} />}
           style={{
             width: '36px',
@@ -245,10 +231,10 @@ export default function LoginForm() {
             justifyContent: 'center',
           }}
           onClick={() => handleSocialClick('Facebook', 'https://facebook.com')}
-          aria-label="Follow us on Facebook"
+          aria-label='Follow us on Facebook'
         />
         <Button
-          type="text"
+          type='text'
           icon={<YoutubeOutlined style={{ fontSize: '18px', color: '#ff0000' }} />}
           style={{
             width: '36px',
@@ -260,10 +246,10 @@ export default function LoginForm() {
             justifyContent: 'center',
           }}
           onClick={() => handleSocialClick('YouTube', 'https://youtube.com')}
-          aria-label="Follow us on YouTube"
+          aria-label='Follow us on YouTube'
         />
         <Button
-          type="text"
+          type='text'
           icon={<InstagramOutlined style={{ fontSize: '18px', color: '#e4405f' }} />}
           style={{
             width: '36px',
@@ -275,7 +261,7 @@ export default function LoginForm() {
             justifyContent: 'center',
           }}
           onClick={() => handleSocialClick('Instagram', 'https://instagram.com')}
-          aria-label="Follow us on Instagram"
+          aria-label='Follow us on Instagram'
         />
       </Space>
     </AuthCard>

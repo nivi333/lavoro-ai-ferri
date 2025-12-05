@@ -153,7 +153,7 @@
       height: 32px;
       border-radius: 50%;
       background-color: $error-color;
-      color: #fff;
+      color: $bg-primary;
       border: none;
       display: flex;
       align-items: center;
@@ -200,7 +200,7 @@
       align-items: center;
       padding: 0 7px;
       background-color: $bg-secondary;
-      border: 1px solid #d9d9d9;
+      border: 1px solid $border-color;
       border-right: none;
       border-radius: $border-radius-base 0 0 $border-radius-base;
       color: $secondary-text-color;
@@ -245,6 +245,53 @@
       .ant-drawer-content {
         width: 100% !important;
       }
+    }
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .location-drawer {
+    .ccd-content {
+      background: $dark-bg-surface;
+      color: $dark-text-secondary;
+    }
+
+    .ccd-title,
+    .ccd-section-title {
+      color: $dark-text-primary;
+    }
+
+    .ccd-divider {
+      border-color: $dark-border;
+    }
+
+    .ccd-actions {
+      background: $dark-bg-surface;
+      border-top-color: $dark-border;
+    }
+
+    .ant-upload-drag {
+      background: $dark-bg-tertiary;
+      border-color: $primary-color;
+    }
+
+    .ccd-logo-help-text {
+      color: $dark-text-tertiary;
+    }
+
+    .ccd-upload-icon {
+      color: $dark-text-tertiary;
+    }
+
+    .ccd-slug-prefix {
+      background-color: $dark-bg-tertiary !important;
+      border-color: $dark-border !important;
+      color: $dark-text-secondary !important;
+    }
+
+    .active-label {
+      color: $dark-text-primary;
     }
   }
 }

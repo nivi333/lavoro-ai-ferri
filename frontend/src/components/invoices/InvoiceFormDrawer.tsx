@@ -27,7 +27,7 @@ import {
   InvoiceItemInput,
   PaymentTerms,
 } from '../../services/invoiceService';
-import '../orders/OrderFormDrawer.scss';
+import './InvoiceFormDrawer.scss';
 
 const { Option } = Select;
 
@@ -222,7 +222,7 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
 
   const handleOrderChange = async (orderId: string | undefined) => {
     setSelectedOrderId(orderId || null);
-    
+
     if (!orderId) {
       // Clear order-related fields but keep items
       return;
@@ -414,9 +414,9 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span className='order-drawer-title'>{drawerTitle}</span>
+          <span className='invoice-drawer-title'>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
               onChange={checked => {
@@ -431,26 +431,26 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
       width={720}
       onClose={handleClose}
       open={visible}
-      className='order-form-drawer'
+      className='invoice-form-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
     >
-      <div className='order-drawer-content'>
+      <div className='invoice-drawer-content'>
         <Form<InvoiceFormValues>
           form={form}
           layout='vertical'
           onFinish={handleSubmit}
-          className='order-form'
+          className='invoice-form'
         >
-          <div className='order-form-content'>
+          <div className='invoice-form-content'>
             {/* Hidden isActive field */}
             <Form.Item name='isActive' valuePropName='checked' hidden>
               <Switch />
             </Form.Item>
 
             {/* Invoice Info */}
-            <div className='order-section'>
-              <div className='order-section-title'>Invoice Info</div>
+            <div className='invoice-section'>
+              <div className='invoice-section-title'>Invoice Info</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
                   <Form.Item label='Invoice Code' name='invoiceCode'>
@@ -471,7 +471,9 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                       loading={loadingOrders}
                       onChange={handleOrderChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {orders.map(order => (
@@ -494,7 +496,9 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                       loading={loadingCustomers}
                       onChange={handleCustomerChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {customers.map(customer => (
@@ -511,7 +515,11 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                     name='locationId'
                     rules={[{ required: true, message: 'Please select a location' }]}
                   >
-                    <Select placeholder='Select billing location' showSearch optionFilterProp='children'>
+                    <Select
+                      placeholder='Select billing location'
+                      showSearch
+                      optionFilterProp='children'
+                    >
                       {locations.map(loc => (
                         <Option key={loc.id} value={loc.id}>
                           {loc.name}
@@ -577,11 +585,11 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
               </Row>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='invoice-divider' />
 
             {/* Items */}
-            <div className='order-section'>
-              <div className='order-section-title'>
+            <div className='invoice-section'>
+              <div className='invoice-section-title'>
                 Invoice Items
                 {!selectedOrderId && (
                   <span style={{ fontSize: '12px', color: '#ff4d4f', marginLeft: '8px' }}>
@@ -607,7 +615,7 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                   <>
                     {fields.map((field, index) => (
                       <div key={field.key}>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='invoice-item-row' align='top'>
                           <Col span={24}>
                             <Form.Item
                               {...field}
@@ -644,7 +652,7 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                             </Form.Item>
                           </Col>
                         </Row>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='invoice-item-row' align='top'>
                           <Col span={4}>
                             <Form.Item
                               {...field}
@@ -671,7 +679,12 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                               name={[field.name, 'quantity']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
-                              <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
+                              <InputNumber
+                                min={0.001}
+                                step={1}
+                                style={{ width: '100%' }}
+                                placeholder='1'
+                              />
                             </Form.Item>
                           </Col>
                           <Col span={4}>
@@ -736,11 +749,11 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
               </Form.List>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='invoice-divider' />
 
             {/* Additional Details */}
-            <div className='order-section'>
-              <div className='order-section-title'>Additional Details</div>
+            <div className='invoice-section'>
+              <div className='invoice-section-title'>Additional Details</div>
               <Row gutter={[5, 10]}>
                 <Col span={24}>
                   <Form.Item label='Notes' name='notes'>
@@ -754,15 +767,19 @@ export const InvoiceFormDrawer: React.FC<InvoiceFormDrawerProps> = ({
                 </Col>
                 <Col span={24}>
                   <Form.Item label='Bank Details' name='bankDetails'>
-                    <Input.TextArea rows={2} maxLength={500} placeholder='Bank details for payment' />
+                    <Input.TextArea
+                      rows={2}
+                      maxLength={500}
+                      placeholder='Bank details for payment'
+                    />
                   </Form.Item>
                 </Col>
               </Row>
             </div>
           </div>
 
-          <div className='order-actions'>
-            <Button onClick={handleClose} className='order-cancel-btn'>
+          <div className='invoice-actions'>
+            <Button onClick={handleClose} className='invoice-cancel-btn'>
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={submitting}>

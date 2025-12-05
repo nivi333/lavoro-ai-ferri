@@ -27,7 +27,7 @@ import {
   BillItemInput,
   PaymentTerms,
 } from '../../services/billService';
-import '../orders/OrderFormDrawer.scss';
+import './BillFormDrawer.scss';
 
 const { Option } = Select;
 
@@ -221,7 +221,7 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
 
   const handlePurchaseOrderChange = async (poId: string | undefined) => {
     setSelectedPOId(poId || null);
-    
+
     if (!poId) {
       return;
     }
@@ -375,7 +375,9 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
     if (!values.purchaseOrderId) {
       for (let i = 0; i < values.items.length; i++) {
         if (!values.items[i].productId) {
-          message.error(`Product is required for item ${i + 1} when not linked to a Purchase Order`);
+          message.error(
+            `Product is required for item ${i + 1} when not linked to a Purchase Order`
+          );
           return;
         }
       }
@@ -410,9 +412,9 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
     <Drawer
       title={
         <div className='drawer-header-with-switch'>
-          <span className='order-drawer-title'>{drawerTitle}</span>
+          <span className='bill-drawer-title'>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
               onChange={checked => {
@@ -427,26 +429,26 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
       width={720}
       onClose={handleClose}
       open={visible}
-      className='order-form-drawer'
+      className='bill-form-drawer'
       styles={{ body: { padding: 0 } }}
       footer={null}
     >
-      <div className='order-drawer-content'>
+      <div className='bill-drawer-content'>
         <Form<BillFormValues>
           form={form}
           layout='vertical'
           onFinish={handleSubmit}
-          className='order-form'
+          className='bill-form'
         >
-          <div className='order-form-content'>
+          <div className='bill-form-content'>
             {/* Hidden isActive field */}
             <Form.Item name='isActive' valuePropName='checked' hidden>
               <Switch />
             </Form.Item>
 
             {/* Bill Info */}
-            <div className='order-section'>
-              <div className='order-section-title'>Bill Info</div>
+            <div className='bill-section'>
+              <div className='bill-section-title'>Bill Info</div>
               <Row gutter={[5, 10]}>
                 <Col span={12}>
                   <Form.Item label='Bill Code' name='billCode'>
@@ -467,7 +469,9 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
                       loading={loadingPOs}
                       onChange={handlePurchaseOrderChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {purchaseOrders.map(po => (
@@ -490,7 +494,9 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
                       loading={loadingSuppliers}
                       onChange={handleSupplierChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {suppliers.map(supplier => (
@@ -578,11 +584,11 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
               </Row>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='bill-divider' />
 
             {/* Items */}
-            <div className='order-section'>
-              <div className='order-section-title'>
+            <div className='bill-section'>
+              <div className='bill-section-title'>
                 Bill Items
                 {!selectedPOId && (
                   <span style={{ fontSize: '12px', color: '#ff4d4f', marginLeft: '8px' }}>
@@ -608,7 +614,7 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
                   <>
                     {fields.map((field, index) => (
                       <div key={field.key}>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='bill-item-row' align='top'>
                           <Col span={24}>
                             <Form.Item
                               {...field}
@@ -645,7 +651,7 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
                             </Form.Item>
                           </Col>
                         </Row>
-                        <Row gutter={[5, 10]} className='order-item-row' align='top'>
+                        <Row gutter={[5, 10]} className='bill-item-row' align='top'>
                           <Col span={4}>
                             <Form.Item
                               {...field}
@@ -672,7 +678,12 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
                               name={[field.name, 'quantity']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
-                              <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
+                              <InputNumber
+                                min={0.001}
+                                step={1}
+                                style={{ width: '100%' }}
+                                placeholder='1'
+                              />
                             </Form.Item>
                           </Col>
                           <Col span={4}>
@@ -737,11 +748,11 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
               </Form.List>
             </div>
 
-            <Divider className='order-divider' />
+            <Divider className='bill-divider' />
 
             {/* Additional Details */}
-            <div className='order-section'>
-              <div className='order-section-title'>Additional Details</div>
+            <div className='bill-section'>
+              <div className='bill-section-title'>Additional Details</div>
               <Row gutter={[5, 10]}>
                 <Col span={24}>
                   <Form.Item label='Notes' name='notes'>
@@ -752,8 +763,8 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
             </div>
           </div>
 
-          <div className='order-actions'>
-            <Button onClick={handleClose} className='order-cancel-btn'>
+          <div className='bill-actions'>
+            <Button onClick={handleClose} className='bill-cancel-btn'>
               Cancel
             </Button>
             <GradientButton size='small' htmlType='submit' loading={submitting}>

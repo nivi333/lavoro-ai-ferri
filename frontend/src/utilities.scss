@@ -1,0 +1,140 @@
+// Common utility classes for theme-aware styling
+@import './index.scss';
+
+// Text color utilities
+.text-error {
+  color: $error-color;
+}
+
+.text-success {
+  color: $success-color;
+}
+
+.text-warning {
+  color: $warning-color;
+}
+
+.text-info {
+  color: $info-color;
+}
+
+.text-muted {
+  color: $tertiary-text-color;
+  font-size: 12px;
+}
+
+.text-secondary {
+  color: $secondary-text-color;
+}
+
+.text-primary {
+  color: $primary-text-color;
+}
+
+// Required field indicator
+.required-indicator {
+  color: $error-color;
+  margin-left: 4px;
+}
+
+// Optional field indicator
+.optional-indicator {
+  color: $tertiary-text-color;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+// Error message
+.error-message {
+  font-size: 12px;
+  color: $error-color;
+  margin-left: 8px;
+}
+
+// Success message
+.success-message {
+  margin-top: 8px;
+  color: $success-color;
+}
+
+// Form label styles
+.form-label {
+  color: $secondary-text-color;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+// Input styles for auth forms
+.auth-input-style {
+  border: 1px solid $border-color;
+  background-color: $bg-secondary;
+  border-radius: $border-radius-base;
+  padding: 8px 12px;
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .text-error {
+    color: $dark-error-color;
+  }
+
+  .text-success {
+    color: $dark-success-color;
+  }
+
+  .text-warning {
+    color: $dark-warning-color;
+  }
+
+  .text-info {
+    color: $dark-info-color;
+  }
+
+  .text-muted {
+    color: $dark-text-muted;
+  }
+
+  .text-secondary {
+    color: $dark-text-secondary;
+  }
+
+  .text-primary {
+    color: $dark-text-primary;
+  }
+
+  .required-indicator {
+    color: $dark-error-color;
+  }
+
+  .optional-indicator {
+    color: $dark-text-muted;
+  }
+
+  .error-message {
+    color: $dark-error-text;
+  }
+
+  .success-message {
+    color: $dark-success-text;
+  }
+
+  .form-label {
+    color: $dark-text-secondary;
+  }
+
+  .auth-input-style {
+    border-color: $dark-border;
+    background-color: $dark-bg-tertiary;
+    color: $dark-text-primary;
+  }
+}
+
+// Global Active/Status Text
+.status-label-active {
+  font-weight: 500;
+  color: $primary-text-color;
+  
+  [data-theme='dark'] & {
+    color: $dark-text-primary;
+  }
+}

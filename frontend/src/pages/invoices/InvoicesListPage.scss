@@ -1,25 +1,25 @@
 @import '../../index.scss';
 
-.orders-list-page {
-  .orders-table {
+.invoices-list-page {
+  .invoices-table {
     .ant-table-tbody > tr > td {
       padding-top: 12px;
       padding-bottom: 12px;
     }
 
-    .order-id {
+    .invoice-id {
       @extend .table-cell-primary;
+    }
+
+    .invoice-number {
+      @extend .table-cell-secondary;
     }
 
     .customer-name {
       @extend .table-cell-primary;
     }
 
-    .order-date {
-      @extend .table-cell-secondary;
-    }
-
-    .delivery-date {
+    .customer-code {
       @extend .table-cell-secondary;
     }
 
@@ -27,20 +27,17 @@
       @extend .table-cell-primary;
       font-family: $font-family-monospace;
     }
+
+    .balance-due {
+      font-family: $font-family-monospace;
+      font-weight: 500;
+    }
   }
-}
-
-.orders-create-btn {
-  margin-left: 8px;
-}
-
-.no-company-message {
-  padding: 24px;
 }
 
 // Dark mode support
 [data-theme='dark'] {
-  .orders-list-page {
+  .invoices-list-page {
     background: $dark-bg-primary;
 
     .page-header-section {
@@ -48,7 +45,7 @@
     }
 
     .table-container {
-      .orders-table {
+      .invoices-table {
         .ant-table-thead > tr > th {
           background: $dark-bg-tertiary;
           border-bottom-color: $dark-border;

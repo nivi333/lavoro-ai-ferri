@@ -6,7 +6,7 @@
 
   // Full Width Header
   .app-header {
-    background: #ffffff;
+    background: $bg-primary;
     border-bottom: 1px solid $border-color;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 0;
@@ -55,14 +55,13 @@
           align-items: center;
           gap: 12px;
           padding: 6px 14px;
-
-          border: 1px solid rgba(123, 95, 201, 0.18);
+          border: 1px solid rgba($primary-color, 0.18);
           border-radius: 10px;
           line-height: 1.2;
 
           .ant-avatar {
             background: $primary-color;
-            color: #fff;
+            color: $bg-primary;
             font-weight: 600;
           }
 
@@ -131,13 +130,58 @@
 // Dark theme support
 [data-theme='dark'] {
   .main-layout {
-    background: #141414;
+    background: $dark-bg-primary;
 
-    .main-content-layout {
-      .main-content {
-        background: #141414;
+    .app-header {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+      .header-content {
+        .header-center {
+          .header-title {
+            color: $dark-text-primary;
+          }
+
+          .header-subtitle {
+            color: $dark-text-secondary;
+          }
+        }
+
+        .header-actions {
+          .header-user {
+            border-color: rgba($primary-color, 0.3);
+
+            .ant-avatar {
+              background: $primary-color;
+              color: $bg-primary;
+            }
+
+            .header-user-info {
+              .header-user-name {
+                color: $dark-text-primary;
+              }
+
+              .header-user-email {
+                color: $dark-text-secondary;
+              }
+            }
+          }
+        }
       }
     }
+
+    .content-layout {
+      .main-content {
+        background: $dark-bg-primary;
+      }
+    }
+  }
+
+  .dashboard-header {
+    background-color: $dark-bg-surface;
+    border-bottom-color: $dark-border;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 }
 

@@ -1,0 +1,57 @@
+@import '../../index.scss';
+
+// Stock Reservation Modal Styles
+.stock-reservation-modal {
+  .reservation-status-icon {
+    font-size: 20px;
+    margin-right: 8px;
+
+    &.pending {
+      color: $info-color;
+    }
+
+    &.confirmed {
+      color: $primary-color;
+    }
+
+    &.fulfilled {
+      color: $warning-color;
+    }
+
+    &.cancelled {
+      color: $success-color;
+    }
+  }
+
+  .product-details {
+    font-size: 12px;
+    color: $tertiary-text-color;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .stock-reservation-modal {
+    .reservation-status-icon {
+      &.pending {
+        color: $dark-info-color;
+      }
+
+      &.confirmed {
+        color: $primary-color;
+      }
+
+      &.fulfilled {
+        color: $dark-warning-color;
+      }
+
+      &.cancelled {
+        color: $dark-success-color;
+      }
+    }
+
+    .product-details {
+      color: $dark-text-tertiary;
+    }
+  }
+}

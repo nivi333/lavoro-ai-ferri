@@ -1,0 +1,64 @@
+@import '../../index.scss';
+
+// Textile operation drawer styles
+.textile-drawer {
+  .ifd-content {
+    padding: 24px 32px 0 32px;
+    font-family: $font-family-body;
+    font-size: 1rem;
+    color: $primary-text-color;
+    background: $bg-primary;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ifd-section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $primary-text-color;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+
+  .ifd-divider {
+    margin: 8px 0 16px 0;
+    border-color: $border-light;
+  }
+
+  .ifd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+    padding-bottom: 18px;
+    border-top: 1px solid $border-light;
+    position: sticky;
+    bottom: 0;
+    background: $bg-primary;
+    padding-top: 16px;
+    margin-top: auto;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .textile-drawer {
+    .ifd-content {
+      background: $dark-bg-surface;
+      color: $dark-text-secondary;
+    }
+
+    .ifd-section-title {
+      color: $dark-text-primary;
+    }
+
+    .ifd-divider {
+      border-color: $dark-border;
+    }
+
+    .ifd-actions {
+      background: $dark-bg-surface;
+      border-top-color: $dark-border;
+    }
+  }
+}

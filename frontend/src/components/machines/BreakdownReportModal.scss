@@ -1,3 +1,5 @@
+@import '../../index.scss';
+
 .breakdown-report-form {
   .full-width {
     width: 100%;
@@ -44,5 +46,31 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+// Dark mode support
+[data-theme='dark'] {
+  .ifd-content,
+  .ccd-content {
+    background: $dark-bg-surface;
+    color: $dark-text-secondary;
+  }
+
+  .ifd-section-title,
+  .ccd-section-title,
+  .ifd-title,
+  .ccd-title {
+    color: $dark-text-primary;
+  }
+
+  .ifd-divider,
+  .ccd-divider {
+    border-color: $dark-border;
+  }
+
+  .ifd-actions,
+  .ccd-actions {
+    background: $dark-bg-surface;
+    border-top-color: $dark-border;
   }
 }

@@ -28,7 +28,9 @@ import './CompanyCreationDrawer.scss';
 
 const { Option } = Select;
 
-type CompanyFormInitialData = Partial<Omit<CreateCompanyRequest, 'certifications'> & Omit<CompanyDetails, 'certifications'>> & {
+type CompanyFormInitialData = Partial<
+  Omit<CreateCompanyRequest, 'certifications'> & Omit<CompanyDetails, 'certifications'>
+> & {
   id?: string;
   defaultLocation?: string;
   contactInfo?: string;
@@ -136,7 +138,10 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
 
     // Validate file type
     const isValidType =
-      file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/svg+xml';
+      file.type === 'image/jpeg' ||
+      file.type === 'image/png' ||
+      file.type === 'image/jpg' ||
+      file.type === 'image/svg+xml';
     if (!isValidType) {
       message.error('You can only upload JPG/PNG/SVG files!');
       return;
@@ -185,9 +190,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
       if (isEditing && companyId) {
         // Convert certifications string to array (handle both string and array)
         const certificationsArray = values.certifications
-          ? (Array.isArray(values.certifications) 
-              ? values.certifications 
-              : values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean))
+          ? Array.isArray(values.certifications)
+            ? values.certifications
+            : values.certifications
+                .split(',')
+                .map((cert: string) => cert.trim())
+                .filter(Boolean)
           : [];
 
         const updatePayload: UpdateCompanyRequest = {
@@ -205,7 +213,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           pincode: values.pincode,
           establishedDate: values.establishedDate?.format('YYYY-MM-DD'),
           businessType: values.businessType,
-          certifications: certificationsArray.length > 0 ? certificationsArray.join(',') : undefined,
+          certifications:
+            certificationsArray.length > 0 ? certificationsArray.join(',') : undefined,
           contactInfo: values.contactInfo,
           website: values.website,
           taxId: values.taxId,
@@ -220,9 +229,12 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
       } else {
         // Convert certifications string to array (handle both string and array)
         const certificationsArray = values.certifications
-          ? (Array.isArray(values.certifications) 
-              ? values.certifications 
-              : values.certifications.split(',').map((cert: string) => cert.trim()).filter(Boolean))
+          ? Array.isArray(values.certifications)
+            ? values.certifications
+            : values.certifications
+                .split(',')
+                .map((cert: string) => cert.trim())
+                .filter(Boolean)
           : [];
 
         const companyData: CreateCompanyRequest = {
@@ -331,10 +343,10 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
         <div className='drawer-header-with-switch'>
           <span className='ccd-title'>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
-              onChange={(checked) => {
+              onChange={checked => {
                 setIsActive(checked);
                 form.setFieldsValue({ isActive: checked });
               }}
@@ -443,7 +455,9 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
                     ]}
                   >
                     <Space.Compact block className='ccd-slug-compact'>
-                      <span className='ccd-slug-prefix' aria-hidden='true'>lavoro.ai/</span>
+                      <span className='ccd-slug-prefix' aria-hidden='true'>
+                        lavoro.ai/
+                      </span>
                       <Input
                         value={form.getFieldValue('slug') || ''}
                         maxLength={32}
@@ -705,7 +719,6 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           </div>
         </Form>
       </div>
-
     </Drawer>
   );
 };

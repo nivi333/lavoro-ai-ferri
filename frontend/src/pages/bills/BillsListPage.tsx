@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Table, Tag, Space, Button, Dropdown, Empty, Spin, message, Modal } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { MainLayout } from '../../components/layout';
@@ -69,7 +74,7 @@ export default function BillsListPage() {
         disabled={isEmployee}
       >
         Create Bill
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -209,10 +214,8 @@ export default function BillsListPage() {
       key: 'billId',
       render: (value: string, record: BillSummary) => (
         <div>
-          <div className='customer-name'>{value}</div>
-          {record.billNumber && (
-            <div className='customer-code'>#{record.billNumber}</div>
-          )}
+          <div className='bill-id'>{value}</div>
+          {record.billNumber && <div className='bill-number'>#{record.billNumber}</div>}
         </div>
       ),
     },
@@ -222,10 +225,8 @@ export default function BillsListPage() {
       key: 'supplierName',
       render: (value: string, record: BillSummary) => (
         <div>
-          <div className='customer-name'>{value}</div>
-          {record.supplierCode && (
-            <div className='customer-code'>{record.supplierCode}</div>
-          )}
+          <div className='supplier-name'>{value}</div>
+          {record.supplierCode && <div className='supplier-code'>{record.supplierCode}</div>}
         </div>
       ),
     },
@@ -234,7 +235,9 @@ export default function BillsListPage() {
       dataIndex: 'status',
       key: 'status',
       render: (status: BillStatus) => (
-        <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+        <Tag color={STATUS_COLORS[status]} className='status-tag'>
+          {getStatusLabel(status)}
+        </Tag>
       ),
     },
     {
@@ -249,7 +252,8 @@ export default function BillsListPage() {
       key: 'dueDate',
       render: (value: string, record: BillSummary) => {
         const dueDate = new Date(value);
-        const isOverdue = record.status !== 'PAID' && record.status !== 'CANCELLED' && dueDate < new Date();
+        const isOverdue =
+          record.status !== 'PAID' && record.status !== 'CANCELLED' && dueDate < new Date();
         return (
           <span style={{ color: isOverdue ? '#ff4d4f' : undefined }}>
             {dueDate.toLocaleDateString()}
@@ -271,7 +275,7 @@ export default function BillsListPage() {
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
-          <span>
+          <span className='total-amount'>
             {record.currency} {amount.toFixed(2)}
           </span>
         );
@@ -284,9 +288,16 @@ export default function BillsListPage() {
       align: 'right' as const,
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
-        const isOverdue = record.status === 'OVERDUE' || (amount > 0 && new Date(record.dueDate) < new Date());
+        const isOverdue =
+          record.status === 'OVERDUE' || (amount > 0 && new Date(record.dueDate) < new Date());
         return (
-          <span style={{ color: isOverdue ? '#ff4d4f' : amount > 0 ? '#faad14' : '#52c41a', fontWeight: 600 }}>
+          <span
+            className='balance-due'
+            style={{
+              color: isOverdue ? '#ff4d4f' : amount > 0 ? '#faad14' : '#52c41a',
+              fontWeight: 600,
+            }}
+          >
             {record.currency} {amount.toFixed(2)}
           </span>
         );
@@ -300,7 +311,7 @@ export default function BillsListPage() {
         const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const statusItems = getStatusMenuItems(record);
         const canDelete = record.status === 'DRAFT';
-        
+
         const menuItems = [
           {
             key: 'edit',
@@ -347,7 +358,7 @@ export default function BillsListPage() {
 
   return (
     <MainLayout>
-      <div className='customer-list-page'>
+      <div className='bills-list-page'>
         <div className='page-container'>
           <div className='page-header-section'>
             <Heading level={2} className='page-title'>
@@ -374,10 +385,10 @@ export default function BillsListPage() {
               <Table
                 columns={columns}
                 dataSource={bills}
-                rowKey={(record) => record.id || record.billId}
+                rowKey={record => record.id || record.billId}
                 loading={tableLoading}
                 pagination={{ pageSize: 10, showSizeChanger: true }}
-                className='customers-table'
+                className='bills-table'
               />
             )}
           </div>

@@ -230,3 +230,83 @@
     }
   }
 }
+// Dark mode support
+[data-theme='dark'] {
+  .companies-root {
+    background: $dark-bg-primary;
+
+    .page-header {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+    }
+
+    .page-content {
+      background: $dark-bg-primary;
+
+      .page-container {
+        background: $dark-bg-surface;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+        .page-header-section {
+          border-bottom-color: $dark-border;
+        }
+
+        .table-container {
+          .companies-table {
+            .ant-table-thead > tr > th {
+              background: $dark-bg-tertiary;
+              border-bottom-color: $dark-border;
+            }
+
+            .ant-table-tbody > tr {
+              &:hover > td {
+                background: $dark-bg-tertiary;
+              }
+
+              > td {
+                border-bottom-color: $dark-border;
+              }
+            }
+          }
+        }
+      }
+    }
+    .companies-card {
+      background: $dark-bg-surface;
+      border-bottom-color: $dark-border;
+
+      .companies-card-title {
+        color: $dark-text-primary;
+      }
+
+      .companies-card-industry {
+        color: $dark-text-tertiary;
+      }
+
+      .companies-card-desc {
+        color: $dark-text-secondary;
+      }
+
+      .companies-card-icon {
+        border-color: $dark-text-disabled;
+        color: $dark-text-tertiary;
+      }
+
+      .companies-card-logo {
+        border-color: $dark-border;
+      }
+    }
+
+    .companies-empty {
+      color: $dark-text-tertiary;
+    }
+
+    .companies-tab {
+      color: $dark-text-secondary;
+
+      &.active {
+        color: $dark-warning-text;
+      }
+    }
+  }
+}

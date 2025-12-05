@@ -30,19 +30,19 @@ export default function RegistrationWizard() {
         firstName: values.firstName,
         lastName: values.lastName,
         password: values.password,
-        ...(emailRegex.test(values.emailOrPhone || '') 
-          ? { email: values.emailOrPhone } 
-          : { phone: values.emailOrPhone }
-        )
+        ...(emailRegex.test(values.emailOrPhone || '')
+          ? { email: values.emailOrPhone }
+          : { phone: values.emailOrPhone }),
       };
-      
+
       // Call register function with the structured values
       await register(registrationData);
-      
+
       message.success('Registration successful! Please check your email to verify your account.');
       navigate('/login');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Registration failed. Please try again.';
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -53,36 +53,33 @@ export default function RegistrationWizard() {
     if (!value) {
       return Promise.reject(new Error('Please enter your email or phone number!'));
     }
-    
+
     // Check if it's a valid email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailRegex.test(value)) {
       return Promise.resolve();
     }
-    
+
     // Check if it's a valid phone number (with country code)
     const phoneRegex = /^\+?[1-9]\d{1,14}$/;
     if (phoneRegex.test(value)) {
       return Promise.resolve();
     }
-    
+
     return Promise.reject(
-      new Error('Please enter a valid email address or phone number (with country code, e.g., +1234567890)')
+      new Error(
+        'Please enter a valid email address or phone number (with country code, e.g., +1234567890)'
+      )
     );
   };
 
   return (
-    <AuthCard heading="Register">
-      <Form
-        form={form}
-        layout="vertical"
-        size="middle"
-        onFinish={onFinish}
-      >
+    <AuthCard heading='Register'>
+      <Form form={form} layout='vertical' size='middle' onFinish={onFinish}>
         {/* First Name */}
         <Form.Item
-          name="firstName"
-          label={<span className="auth-form-label">First Name</span>}
+          name='firstName'
+          label={<span className='auth-form-label'>First Name</span>}
           rules={[
             {
               required: true,
@@ -101,15 +98,15 @@ export default function RegistrationWizard() {
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder="Enter your first name"
-            className="auth-form-input"
+            placeholder='Enter your first name'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Last Name */}
         <Form.Item
-          name="lastName"
-          label={<span className="auth-form-label">Last Name</span>}
+          name='lastName'
+          label={<span className='auth-form-label'>Last Name</span>}
           rules={[
             {
               required: true,
@@ -128,15 +125,15 @@ export default function RegistrationWizard() {
         >
           <Input
             prefix={<UserOutlined />}
-            placeholder="Enter your last name"
-            className="auth-form-input"
+            placeholder='Enter your last name'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Email or Phone (Combined Field) */}
         <Form.Item
-          name="emailOrPhone"
-          label={<span className="auth-form-label">Email or Phone Number</span>}
+          name='emailOrPhone'
+          label={<span className='auth-form-label'>Email or Phone Number</span>}
           rules={[
             {
               validator: validateEmailOrPhone,
@@ -144,22 +141,23 @@ export default function RegistrationWizard() {
           ]}
         >
           <Input
-            placeholder="Enter your email or phone number (e.g., +1234567890)"
-            className="auth-form-input"
+            placeholder='Enter your email or phone number (e.g., +1234567890)'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Help Text */}
         <div style={{ marginBottom: '8px', marginTop: '-8px' }}>
-          <Text type="secondary" className="auth-help-text">
-            Enter your email address or phone number with country code (e.g., +1 for US, +91 for India)
+          <Text type='secondary' className='auth-help-text'>
+            Enter your email address or phone number with country code (e.g., +1 for US, +91 for
+            India)
           </Text>
         </div>
 
         {/* Password */}
         <Form.Item
-          name="password"
-          label={<span className="auth-form-label">Password</span>}
+          name='password'
+          label={<span className='auth-form-label'>Password</span>}
           rules={[
             {
               required: true,
@@ -171,21 +169,22 @@ export default function RegistrationWizard() {
             },
             {
               pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-              message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+              message:
+                'Password must contain at least one uppercase letter, one lowercase letter, and one number',
             },
           ]}
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Create a strong password"
-            className="auth-form-input"
+            placeholder='Create a strong password'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Confirm Password */}
         <Form.Item
-          name="confirmPassword"
-          label={<span className="auth-form-label">Confirm Password</span>}
+          name='confirmPassword'
+          label={<span className='auth-form-label'>Confirm Password</span>}
           dependencies={['password']}
           rules={[
             {
@@ -206,33 +205,31 @@ export default function RegistrationWizard() {
         >
           <Input.Password
             prefix={<LockOutlined />}
-            placeholder="Confirm your password"
-            className="auth-form-input"
+            placeholder='Confirm your password'
+            className='form-input-global'
           />
         </Form.Item>
 
         {/* Terms and Conditions */}
         <Form.Item
-          name="agreeToTerms"
-          valuePropName="checked"
+          name='agreeToTerms'
+          valuePropName='checked'
           rules={[
             {
               validator: (_, value) =>
                 value
                   ? Promise.resolve()
-                  : Promise.reject(
-                      new Error('Please accept the terms and conditions')
-                    ),
+                  : Promise.reject(new Error('Please accept the terms and conditions')),
             },
           ]}
         >
           <Checkbox style={{ color: '#374151', fontSize: '14px' }}>
             I agree to the{' '}
-            <LinkButton href="#" target="_blank">
+            <LinkButton href='#' target='_blank'>
               Terms and Conditions
             </LinkButton>{' '}
             and{' '}
-            <LinkButton href="#" target="_blank">
+            <LinkButton href='#' target='_blank'>
               Privacy Policy
             </LinkButton>
           </Checkbox>
@@ -240,12 +237,7 @@ export default function RegistrationWizard() {
 
         {/* Submit Button */}
         <Form.Item style={{ marginBottom: '16px' }}>
-          <GradientButton
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            block
-          >
+          <GradientButton type='primary' htmlType='submit' loading={loading} block>
             Create Account
           </GradientButton>
         </Form.Item>
@@ -253,11 +245,9 @@ export default function RegistrationWizard() {
 
       {/* Sign In Link */}
       <div style={{ textAlign: 'center', marginTop: '16px' }}>
-        <Text type="secondary" className="auth-link-text">
+        <Text type='secondary' className='auth-link-text'>
           Already have an account?{' '}
-          <LinkButton onClick={() => navigate('/login')}>
-            Sign in
-          </LinkButton>
+          <LinkButton onClick={() => navigate('/login')}>Sign in</LinkButton>
         </Text>
       </div>
     </AuthCard>

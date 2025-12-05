@@ -28,6 +28,7 @@ const createProductSchema = Joi.object({
 
 const updateProductSchema = Joi.object({
   categoryId: Joi.string().optional().allow('', null),
+  productCode: Joi.string().optional().allow('', null), // Allow productCode for edit
   name: Joi.string().min(1).max(255).optional(),
   description: Joi.string().max(1000).optional().allow('', null),
   productType: Joi.string().valid('OWN_MANUFACTURE', 'VENDOR_SUPPLIED', 'OUTSOURCED', 'RAW_MATERIAL', 'FINISHED_GOODS', 'SEMI_FINISHED').optional().allow(null),

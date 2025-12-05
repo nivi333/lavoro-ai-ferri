@@ -1,3 +1,5 @@
+@import '../../index.scss';
+
 .stock-adjustment-modal {
   .current-stock-section {
     background: #f5f5f5;
@@ -28,5 +30,32 @@
     margin-top: 16px;
     color: #0050b3;
     font-weight: 500;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .ifd-content,
+  .ccd-content {
+    background: $dark-bg-surface;
+    color: $dark-text-secondary;
+  }
+
+  .ifd-section-title,
+  .ccd-section-title,
+  .ifd-title,
+  .ccd-title {
+    color: $dark-text-primary;
+  }
+
+  .ifd-divider,
+  .ccd-divider {
+    border-color: $dark-border;
+  }
+
+  .ifd-actions,
+  .ccd-actions {
+    background: $dark-bg-surface;
+    border-top-color: $dark-border;
   }
 }

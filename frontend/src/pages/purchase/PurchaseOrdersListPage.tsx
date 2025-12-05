@@ -7,7 +7,11 @@ import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
 import { locationService, Location } from '../../services/locationService';
-import { purchaseOrderService, PurchaseOrderSummary, POStatus } from '../../services/purchaseOrderService';
+import {
+  purchaseOrderService,
+  PurchaseOrderSummary,
+  POStatus,
+} from '../../services/purchaseOrderService';
 import '../../pages/sales/CustomerListPage.scss';
 import { PurchaseOrderDrawer } from '@/components/purchase/PurchaseOrderDrawer';
 
@@ -62,14 +66,14 @@ export default function PurchaseOrdersListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton 
-        onClick={handleCreatePurchaseOrder} 
-        size='small' 
+      <GradientButton
+        onClick={handleCreatePurchaseOrder}
+        size='small'
         className='orders-create-btn'
         disabled={isEmployee}
       >
         Create Purchase Order
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -173,31 +177,39 @@ export default function PurchaseOrdersListPage() {
       title: 'PO ID',
       dataIndex: 'poId',
       key: 'poId',
+      render: (value: string) => <div className='po-id'>{value}</div>,
     },
     {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'supplierName',
+      render: (value: string) => <div className='supplier-name'>{value}</div>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status: POStatus) => (
-        <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+        <Tag color={STATUS_COLORS[status]} className='status-tag'>
+          {getStatusLabel(status)}
+        </Tag>
       ),
     },
     {
       title: 'PO Date',
       dataIndex: 'poDate',
       key: 'poDate',
-      render: (value: string) => new Date(value).toLocaleDateString(),
+      render: (value: string) => (
+        <div className='po-date'>{new Date(value).toLocaleDateString()}</div>
+      ),
     },
     {
       title: 'Expected Delivery',
       dataIndex: 'expectedDeliveryDate',
       key: 'expectedDeliveryDate',
-      render: (value?: string) => (value ? new Date(value).toLocaleDateString() : '—'),
+      render: (value?: string) => (
+        <div className='delivery-date'>{value ? new Date(value).toLocaleDateString() : '—'}</div>
+      ),
     },
     {
       title: 'Location',
@@ -213,7 +225,7 @@ export default function PurchaseOrdersListPage() {
       render: (value: number, record: PurchaseOrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
-          <span>
+          <span className='total-amount'>
             {record.currency} {amount.toFixed(2)}
           </span>
         );
@@ -260,7 +272,7 @@ export default function PurchaseOrdersListPage() {
 
   return (
     <MainLayout>
-      <div className='customer-list-page'>
+      <div className='purchase-orders-list-page'>
         <div className='page-container'>
           <div className='page-header-section'>
             <Heading level={2} className='page-title'>
@@ -275,8 +287,8 @@ export default function PurchaseOrdersListPage() {
               </div>
             ) : purchaseOrders.length === 0 ? (
               <Empty description='No purchase orders found'>
-                <GradientButton 
-                  size='small' 
+                <GradientButton
+                  size='small'
                   onClick={handleCreatePurchaseOrder}
                   disabled={currentCompany?.role === 'EMPLOYEE'}
                 >
@@ -287,10 +299,10 @@ export default function PurchaseOrdersListPage() {
               <Table
                 columns={columns}
                 dataSource={purchaseOrders}
-                rowKey={(record) => record.id || record.poId}
+                rowKey={record => record.id || record.poId}
                 loading={tableLoading}
                 pagination={{ pageSize: 10, showSizeChanger: true }}
-                className='customers-table'
+                className='purchase-orders-table'
               />
             )}
           </div>

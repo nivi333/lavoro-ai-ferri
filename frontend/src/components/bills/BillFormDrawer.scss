@@ -1,7 +1,9 @@
 @import '../../index.scss';
 
-.order-form-drawer {
-  .order-drawer-content {
+@import '../../index.scss';
+
+.bill-form-drawer {
+  .bill-drawer-content {
     padding: 24px 32px 0 32px;
     font-family: $font-family-body;
     font-size: 1rem;
@@ -12,7 +14,7 @@
     flex-direction: column;
   }
 
-  .order-drawer-title {
+  .bill-drawer-title {
     font-family: $font-family-heading;
     font-size: 1.5rem;
     font-weight: 600;
@@ -20,12 +22,12 @@
     margin-bottom: 0;
   }
 
-  .order-section {
+  .bill-section {
     margin-bottom: 0;
     padding-bottom: 0;
   }
 
-  .order-section-title {
+  .bill-section-title {
     font-size: 1rem;
     font-weight: 500;
     color: $primary-text-color;
@@ -33,7 +35,7 @@
     margin-top: 0;
   }
 
-  .order-divider {
+  .bill-divider {
     margin: 8px 0 16px 0;
     border-color: $border-light;
   }
@@ -51,7 +53,7 @@
     border-radius: 6px;
   }
 
-  .order-actions {
+  .bill-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -65,46 +67,48 @@
     margin-top: auto;
   }
 
-  .order-cancel-btn {
+  .bill-cancel-btn {
     margin-right: $spacing-sm;
   }
 
-  .order-form {
+  .bill-form {
     display: flex;
     flex-direction: column;
     height: 100%;
     flex: 1;
   }
 
-  .order-form-content {
+  .bill-form-content {
     flex: 1;
     overflow-y: auto;
     padding-bottom: 16px;
   }
 
-  .order-item-row {
+  .bill-item-row {
     margin-bottom: 0;
   }
 }
 
 // Dark mode support
 [data-theme='dark'] {
-  .order-drawer-content {
-    background: $dark-bg-surface;
-    color: $dark-text-secondary;
-  }
+  .bill-form-drawer {
+    .bill-drawer-content {
+      background: $dark-bg-surface;
+      color: $dark-text-secondary;
+    }
 
-  .order-section-title,
-  .order-drawer-title {
-    color: $dark-text-primary;
-  }
+    .bill-section-title,
+    .bill-drawer-title {
+      color: $dark-text-primary;
+    }
 
-  .order-divider {
-    border-color: $dark-border;
-  }
+    .bill-divider {
+      border-color: $dark-border;
+    }
 
-  .order-actions {
-    background: $dark-bg-surface;
-    border-top-color: $dark-border;
+    .bill-actions {
+      background: $dark-bg-surface;
+      border-top-color: $dark-border;
+    }
   }
 }

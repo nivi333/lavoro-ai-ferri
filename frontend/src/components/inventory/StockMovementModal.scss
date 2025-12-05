@@ -1,0 +1,113 @@
+@import '../../index.scss';
+
+// Stock Movement Modal Styles
+.stock-movement-modal {
+  .movement-type-icon {
+    font-size: 20px;
+    margin-right: 8px;
+
+    &.in {
+      color: $success-color;
+    }
+
+    &.out {
+      color: $error-color;
+    }
+
+    &.transfer {
+      color: $info-color;
+    }
+
+    &.adjustment {
+      color: $warning-color;
+    }
+
+    &.production {
+      color: $success-color;
+    }
+
+    &.return {
+      color: $error-color;
+    }
+
+    &.reserved {
+      color: $primary-color;
+    }
+
+    &.released {
+      color: lighten($primary-color, 20%);
+    }
+
+    &.allocated {
+      color: $info-color;
+    }
+
+    &.damaged {
+      color: $error-color;
+    }
+
+    &.expired {
+      color: darken($error-color, 10%);
+    }
+  }
+
+  .product-details {
+    font-size: 12px;
+    color: $tertiary-text-color;
+  }
+}
+
+// Dark mode support
+[data-theme='dark'] {
+  .stock-movement-modal {
+    .movement-type-icon {
+      &.in {
+        color: $dark-success-color;
+      }
+
+      &.out {
+        color: $dark-error-color;
+      }
+
+      &.transfer {
+        color: $dark-info-color;
+      }
+
+      &.adjustment {
+        color: $dark-warning-color;
+      }
+
+      &.production {
+        color: $dark-success-color;
+      }
+
+      &.return {
+        color: $dark-error-color;
+      }
+
+      &.reserved {
+        color: $primary-color;
+      }
+
+      &.released {
+        color: lighten($primary-color, 20%);
+      }
+
+      &.allocated {
+        color: $dark-info-color;
+      }
+
+      &.damaged {
+        color: $dark-error-color;
+      }
+
+      &.expired {
+        color: darken($dark-error-color, 10%);
+      }
+    }
+
+    .product-details {
+      color: $dark-text-tertiary;
+    }
+  }
+}

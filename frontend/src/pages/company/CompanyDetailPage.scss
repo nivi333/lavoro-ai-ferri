@@ -188,3 +188,79 @@
   align-items: center;
   justify-content: center;
 }
+
+// Dark mode support
+[data-theme='dark'] {
+  .company-detail-page {
+    background: $dark-bg-primary;
+  }
+
+  .ghost-button {
+    border-color: $dark-border;
+    color: $dark-text-primary;
+
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+  }
+
+  .company-profile-card {
+    background-color: $dark-bg-surface;
+    border-color: rgba($primary-color, 0.2);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .company-profile-avatar {
+    background: $dark-bg-tertiary;
+    border-color: rgba($primary-color, 0.3);
+  }
+
+  .company-profile-name {
+    color: $dark-text-primary;
+  }
+
+  .company-profile-contact-item {
+    background: $dark-bg-tertiary;
+    color: $dark-text-secondary;
+
+    svg {
+      color: $primary-color;
+    }
+  }
+
+  .company-profile-code-value {
+    background: rgba($primary-color, 0.2);
+    color: $primary-color;
+  }
+
+  .profile-section {
+    &:not(:last-of-type) {
+      border-bottom-color: $dark-border;
+    }
+  }
+
+  .profile-section-title {
+    color: $dark-text-primary;
+  }
+
+  .profile-info-label {
+    color: $dark-text-muted;
+  }
+
+  .profile-info-value {
+    color: $dark-text-primary;
+  }
+
+  .profile-info-empty {
+    color: $dark-text-disabled;
+  }
+
+  .profile-notes-card {
+    background: $dark-bg-tertiary;
+  }
+
+  .profile-notes-text {
+    color: $dark-text-secondary;
+  }
+}

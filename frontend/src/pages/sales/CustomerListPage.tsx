@@ -42,7 +42,9 @@ export default function CustomerListPage() {
   const [tableLoading, setTableLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [customerTypeFilter, setCustomerTypeFilter] = useState<string | undefined>(undefined);
-  const [customerCategoryFilter, setCustomerCategoryFilter] = useState<string | undefined>(undefined);
+  const [customerCategoryFilter, setCustomerCategoryFilter] = useState<string | undefined>(
+    undefined
+  );
   const [paymentTermsFilter, setPaymentTermsFilter] = useState<string | undefined>(undefined);
   const [activeStatusFilter, setActiveStatusFilter] = useState<boolean | undefined>(undefined);
   const fetchInProgressRef = useRef(false);
@@ -69,7 +71,14 @@ export default function CustomerListPage() {
     if (currentCompany) {
       fetchCustomers();
     }
-  }, [currentCompany, searchText, customerTypeFilter, customerCategoryFilter, paymentTermsFilter, activeStatusFilter]);
+  }, [
+    currentCompany,
+    searchText,
+    customerTypeFilter,
+    customerCategoryFilter,
+    paymentTermsFilter,
+    activeStatusFilter,
+  ]);
 
   const fetchCustomers = async () => {
     if (fetchInProgressRef.current) {
@@ -197,7 +206,7 @@ export default function CustomerListPage() {
       key: 'code',
       width: 120,
       render: (code: string) => (
-        <span style={{ fontFamily: 'monospace', backgroundColor: '#f5f5f5', padding: '2px 6px', borderRadius: '4px' }}>
+        <span className='table-cell-secondary' style={{ fontFamily: 'monospace' }}>
           {code}
         </span>
       ),
@@ -362,8 +371,16 @@ export default function CustomerListPage() {
             </Select>
             <Select
               placeholder='Status'
-              value={activeStatusFilter !== undefined ? (activeStatusFilter ? 'true' : 'false') : undefined}
-              onChange={value => setActiveStatusFilter(value !== undefined ? value === 'true' : undefined)}
+              value={
+                activeStatusFilter !== undefined
+                  ? activeStatusFilter
+                    ? 'true'
+                    : 'false'
+                  : undefined
+              }
+              onChange={value =>
+                setActiveStatusFilter(value !== undefined ? value === 'true' : undefined)
+              }
               style={{ width: 100 }}
               allowClear
             >

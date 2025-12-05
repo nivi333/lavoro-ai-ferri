@@ -66,14 +66,14 @@ export default function OrdersListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton 
-        onClick={handleCreateOrder} 
-        size='small' 
+      <GradientButton
+        onClick={handleCreateOrder}
+        size='small'
         className='orders-create-btn'
         disabled={isEmployee}
       >
         Create Order
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -177,31 +177,39 @@ export default function OrdersListPage() {
       title: 'Order ID',
       dataIndex: 'orderId',
       key: 'orderId',
+      render: (value: string) => <div className='order-id'>{value}</div>,
     },
     {
       title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
+      render: (value: string) => <div className='customer-name'>{value}</div>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status: OrderStatus) => (
-        <Tag color={STATUS_COLORS[status]}>{getStatusLabel(status)}</Tag>
+        <Tag color={STATUS_COLORS[status]} className='status-tag'>
+          {getStatusLabel(status)}
+        </Tag>
       ),
     },
     {
       title: 'Order Date',
       dataIndex: 'orderDate',
       key: 'orderDate',
-      render: (value: string) => new Date(value).toLocaleDateString(),
+      render: (value: string) => (
+        <div className='order-date'>{new Date(value).toLocaleDateString()}</div>
+      ),
     },
     {
       title: 'Delivery Date',
       dataIndex: 'deliveryDate',
       key: 'deliveryDate',
-      render: (value?: string) => (value ? new Date(value).toLocaleDateString() : '—'),
+      render: (value?: string) => (
+        <div className='delivery-date'>{value ? new Date(value).toLocaleDateString() : '—'}</div>
+      ),
     },
     {
       title: 'Location',
@@ -217,7 +225,7 @@ export default function OrdersListPage() {
       render: (value: number, record: OrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
-          <span>
+          <span className='total-amount'>
             {record.currency} {amount.toFixed(2)}
           </span>
         );
@@ -264,7 +272,7 @@ export default function OrdersListPage() {
 
   return (
     <MainLayout>
-      <div className='customer-list-page'>
+      <div className='orders-list-page'>
         <div className='page-container'>
           <div className='page-header-section'>
             <Heading level={2} className='page-title'>
@@ -279,8 +287,8 @@ export default function OrdersListPage() {
               </div>
             ) : orders.length === 0 ? (
               <Empty description='No orders found'>
-                <GradientButton 
-                  size='small' 
+                <GradientButton
+                  size='small'
                   onClick={handleCreateOrder}
                   disabled={currentCompany?.role === 'EMPLOYEE'}
                 >
@@ -291,10 +299,10 @@ export default function OrdersListPage() {
               <Table
                 columns={columns}
                 dataSource={orders}
-                rowKey={(record) => record.id || record.orderId}
+                rowKey={record => record.id || record.orderId}
                 loading={tableLoading}
                 pagination={{ pageSize: 10, showSizeChanger: true }}
-                className='customers-table'
+                className='orders-table'
               />
             )}
           </div>

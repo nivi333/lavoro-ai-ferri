@@ -241,7 +241,7 @@ class CustomerService {
     const { companyId, ...updateData } = data;
 
     // Build the where clause
-    const whereClause: any = { customer_id: customerId };
+    const whereClause: any = { id: customerId };
     if (companyId) {
       whereClause.company_id = companyId;
     }

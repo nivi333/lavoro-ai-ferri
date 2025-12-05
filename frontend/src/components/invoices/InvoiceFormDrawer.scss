@@ -1,7 +1,9 @@
 @import '../../index.scss';
 
-.order-form-drawer {
-  .order-drawer-content {
+@import '../../index.scss';
+
+.invoice-form-drawer {
+  .invoice-drawer-content {
     padding: 24px 32px 0 32px;
     font-family: $font-family-body;
     font-size: 1rem;
@@ -12,7 +14,7 @@
     flex-direction: column;
   }
 
-  .order-drawer-title {
+  .invoice-drawer-title {
     font-family: $font-family-heading;
     font-size: 1.5rem;
     font-weight: 600;
@@ -20,12 +22,12 @@
     margin-bottom: 0;
   }
 
-  .order-section {
+  .invoice-section {
     margin-bottom: 0;
     padding-bottom: 0;
   }
 
-  .order-section-title {
+  .invoice-section-title {
     font-size: 1rem;
     font-weight: 500;
     color: $primary-text-color;
@@ -33,7 +35,7 @@
     margin-top: 0;
   }
 
-  .order-divider {
+  .invoice-divider {
     margin: 8px 0 16px 0;
     border-color: $border-light;
   }
@@ -51,7 +53,7 @@
     border-radius: 6px;
   }
 
-  .order-actions {
+  .invoice-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -65,46 +67,48 @@
     margin-top: auto;
   }
 
-  .order-cancel-btn {
+  .invoice-cancel-btn {
     margin-right: $spacing-sm;
   }
 
-  .order-form {
+  .invoice-form {
     display: flex;
     flex-direction: column;
     height: 100%;
     flex: 1;
   }
 
-  .order-form-content {
+  .invoice-form-content {
     flex: 1;
     overflow-y: auto;
     padding-bottom: 16px;
   }
 
-  .order-item-row {
+  .invoice-item-row {
     margin-bottom: 0;
   }
 }
 
 // Dark mode support
 [data-theme='dark'] {
-  .order-drawer-content {
-    background: $dark-bg-surface;
-    color: $dark-text-secondary;
-  }
+  .invoice-form-drawer {
+    .invoice-drawer-content {
+      background: $dark-bg-surface;
+      color: $dark-text-secondary;
+    }
 
-  .order-section-title,
-  .order-drawer-title {
-    color: $dark-text-primary;
-  }
+    .invoice-section-title,
+    .invoice-drawer-title {
+      color: $dark-text-primary;
+    }
 
-  .order-divider {
-    border-color: $dark-border;
-  }
+    .invoice-divider {
+      border-color: $dark-border;
+    }
 
-  .order-actions {
-    background: $dark-bg-surface;
-    border-top-color: $dark-border;
+    .invoice-actions {
+      background: $dark-bg-surface;
+      border-top-color: $dark-border;
+    }
   }
 }

@@ -174,3 +174,87 @@
     }
   }
 }
+
+// Dark mode support
+[data-theme='dark'] {
+  .dashboard-container {
+    .kpi-card {
+      background-color: $dark-bg-surface;
+      border-color: $dark-border;
+
+      .ant-statistic-title {
+        color: $dark-text-secondary;
+      }
+
+      .ant-statistic-content {
+        color: $dark-text-primary;
+      }
+
+      .kpi-trend {
+        color: $dark-text-secondary;
+
+        &.positive {
+          color: $dark-success-color;
+        }
+
+        &.negative {
+          color: $dark-error-color;
+        }
+      }
+    }
+
+    .chart-card {
+      background-color: $dark-bg-surface;
+      border-color: $dark-border;
+
+      .ant-card-head {
+        background-color: $dark-bg-secondary;
+        border-bottom-color: $dark-border;
+
+        .ant-card-head-title {
+          color: $dark-text-primary;
+        }
+      }
+
+      .ant-card-body {
+        color: $dark-text-secondary;
+      }
+    }
+
+    .dashboard-action-card {
+      background-color: $dark-bg-surface;
+      border-color: $dark-border;
+
+      &:hover {
+        background-color: $dark-bg-elevated;
+      }
+
+      .dashboard-action-content {
+        h4 {
+          color: $dark-text-primary;
+        }
+
+        p {
+          color: $dark-text-secondary;
+        }
+      }
+    }
+
+    .dashboard-activity-card {
+      background-color: $dark-bg-surface;
+      border-color: $dark-border;
+    }
+
+    .dashboard-empty-state {
+      color: $dark-text-secondary;
+
+      p {
+        color: $dark-text-primary;
+      }
+
+      span {
+        color: $dark-text-tertiary;
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+
+// Apply global styles
+.bills-table {
+  .bill-id {
+    @extend .table-cell-primary;
+  }
+  .vendor-name {
+    @extend .table-cell-primary;
+  }
+  .bill-date {
+    @extend .table-cell-secondary;
+  }
+  .bill-amount {
+    @extend .table-cell-primary;
+    font-weight: 600;
+  }
+}

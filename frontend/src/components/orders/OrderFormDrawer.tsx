@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Drawer, Form, Input, DatePicker, Select, Button, Divider, InputNumber, message, Row, Col, Switch } from 'antd';
+import {
+  Drawer,
+  Form,
+  Input,
+  DatePicker,
+  Select,
+  Button,
+  Divider,
+  InputNumber,
+  message,
+  Row,
+  Col,
+  Switch,
+} from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { GradientButton } from '../ui';
 import { locationService, Location } from '../../services/locationService';
 import { customerService, Customer } from '../../services/customerService';
 import { productService, ProductSummary } from '../../services/productService';
-import { orderService, CreateOrderRequest, OrderDetail, OrderItemInput } from '../../services/orderService';
+import {
+  orderService,
+  CreateOrderRequest,
+  OrderDetail,
+  OrderItemInput,
+} from '../../services/orderService';
 import './OrderFormDrawer.scss';
 
 const { Option } = Select;
@@ -88,7 +106,9 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
           locationService.getLocations(),
           fetchCustomers(),
           fetchProducts(),
-          isEditing && editingOrderId ? orderService.getOrderById(editingOrderId) : Promise.resolve(null),
+          isEditing && editingOrderId
+            ? orderService.getOrderById(editingOrderId)
+            : Promise.resolve(null),
         ]);
 
         setLocations(locs);
@@ -235,7 +255,9 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
       deliveryWindowStart: values.deliveryWindowStart
         ? values.deliveryWindowStart.toISOString()
         : undefined,
-      deliveryWindowEnd: values.deliveryWindowEnd ? values.deliveryWindowEnd.toISOString() : undefined,
+      deliveryWindowEnd: values.deliveryWindowEnd
+        ? values.deliveryWindowEnd.toISOString()
+        : undefined,
       items,
     };
   };
@@ -272,7 +294,7 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
         <div className='drawer-header-with-switch'>
           <span className='order-drawer-title'>{drawerTitle}</span>
           <div className='header-switch'>
-            <span className='switch-label'>Active</span>
+            <span className='switch-label status-label-active'>Active</span>
             <Switch
               checked={isActive}
               onChange={checked => {
@@ -325,7 +347,9 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                       loading={loadingCustomers}
                       onChange={handleCustomerChange}
                       filterOption={(input, option) =>
-                        String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                        String(option?.children || '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
                       }
                     >
                       {customers.map(customer => (
@@ -418,9 +442,11 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                                 placeholder='Search and select product (optional)'
                                 loading={loadingProducts}
                                 allowClear
-                                onChange={(value) => handleProductChange(value, index)}
+                                onChange={value => handleProductChange(value, index)}
                                 filterOption={(input, option) =>
-                                  String(option?.children || '').toLowerCase().includes(input.toLowerCase())
+                                  String(option?.children || '')
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
                                 }
                               >
                                 {products.map(product => (
@@ -459,7 +485,12 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                               name={[field.name, 'quantity']}
                               rules={[{ required: true, message: 'Required' }]}
                             >
-                              <InputNumber min={0.001} step={1} style={{ width: '100%' }} placeholder='1' />
+                              <InputNumber
+                                min={0.001}
+                                step={1}
+                                style={{ width: '100%' }}
+                                placeholder='1'
+                              />
                             </Form.Item>
                           </Col>
                           <Col span={4}>
@@ -491,11 +522,11 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                                 precision={2}
                                 style={{ width: '100%' }}
                                 placeholder='0.00'
-                                formatter={(value) => {
+                                formatter={value => {
                                   if (!value) return '';
                                   return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                                 }}
-                                parser={(value) => value!.replace(/\$\s?|(,*)/g, '') as any}
+                                parser={value => value!.replace(/\$\s?|(,*)/g, '') as any}
                               />
                             </Form.Item>
                           </Col>
@@ -552,7 +583,11 @@ export const OrderFormDrawer: React.FC<OrderFormDrawerProps> = ({
                 </Col>
                 <Col span={12}>
                   <Form.Item label='Delivery Window Start' name='deliveryWindowStart'>
-                    <DatePicker style={{ width: '100%' }} showTime placeholder='Start date & time' />
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      showTime
+                      placeholder='Start date & time'
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>

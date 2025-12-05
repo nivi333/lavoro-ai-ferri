@@ -228,7 +228,7 @@ class SupplierService {
     const { companyId, ...updateData } = data;
 
     // Build the where clause
-    const whereClause: any = { supplier_id: supplierId };
+    const whereClause: any = { id: supplierId };
     if (companyId) {
       whereClause.company_id = companyId;
     }
