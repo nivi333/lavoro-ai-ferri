@@ -1,0 +1,185 @@
+@import '../../index.scss';
+
+.reports-page {
+  .page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .page-header-section {
+    margin-bottom: $spacing-lg;
+
+    .page-description {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      margin-top: $spacing-xs;
+      margin-bottom: 0;
+    }
+  }
+
+  .report-categories {
+    margin-bottom: $spacing-lg;
+  }
+
+  .report-category-card {
+    border-radius: $border-radius-base;
+    border: 1px solid $border-light;
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+      border-color: $primary-color;
+    }
+
+    .ant-card-body {
+      padding: $spacing-lg;
+    }
+
+    .category-icon {
+      font-size: 36px;
+      margin-bottom: $spacing-sm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+    }
+
+    .category-content {
+      text-align: center;
+
+      .category-title {
+        font-size: $font-size-base;
+        font-weight: 600;
+        color: $text-primary;
+        margin-bottom: $spacing-xs;
+        font-family: $font-family-heading;
+      }
+
+      .category-description {
+        color: $text-secondary;
+        font-size: $font-size-xs;
+        margin-bottom: $spacing-md;
+        min-height: 32px;
+        line-height: 1.4;
+      }
+
+      .category-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: $spacing-sm;
+        border-top: 1px solid $border-light;
+
+        .report-count {
+          color: $text-secondary;
+          font-size: $font-size-xs;
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+        }
+
+        .view-link {
+          color: $primary-color;
+          font-weight: 500;
+          font-size: $font-size-xs;
+        }
+      }
+    }
+  }
+
+  .coming-soon-section {
+    margin-top: $spacing-lg;
+
+    .ant-card {
+      border-radius: $border-radius-lg;
+      border: 2px dashed $border-light;
+      background: $bg-tertiary;
+
+      .ant-empty-description {
+        h3 {
+          font-size: $font-size-lg;
+          font-weight: 600;
+          color: $text-primary;
+          margin-bottom: $spacing-xs;
+        }
+
+        p {
+          color: $text-secondary;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+// Dark mode styles
+[data-theme='dark'] {
+  .reports-page {
+    .report-category-card {
+      background: $dark-bg-surface;
+      border-color: $dark-border;
+
+      &:hover {
+        border-color: $primary-color;
+        background: lighten($dark-bg-surface, 2%);
+      }
+
+      .category-content {
+        .category-title {
+          color: $dark-text-primary;
+        }
+
+        .category-description {
+          color: $dark-text-secondary;
+        }
+
+        .category-footer {
+          border-top-color: $dark-border;
+
+          .report-count {
+            color: $dark-text-secondary;
+          }
+        }
+      }
+    }
+
+    .coming-soon-section {
+      .ant-card {
+        background: $dark-bg-tertiary;
+        border-color: $dark-border;
+
+        .ant-empty-description {
+          h3 {
+            color: $dark-text-primary;
+          }
+
+          p {
+            color: $dark-text-secondary;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .reports-page {
+    .page-container {
+      padding: $spacing-md;
+    }
+
+    .report-category-card {
+      .ant-card-body {
+        padding: $spacing-lg;
+      }
+
+      .category-icon {
+        font-size: 32px;
+        height: 40px;
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+@import '../../index.scss';
+
+.page-breadcrumb {
+  margin-bottom: $spacing-md;
+  padding: $spacing-xs 0;
+
+  .breadcrumb-link {
+    color: $primary-color;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    &:hover {
+      color: darken($primary-color, 10%);
+      text-decoration: none;
+    }
+  }
+
+  .breadcrumb-current {
+    color: $text-secondary;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  .breadcrumb-icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: $font-size-sm;
+  }
+
+  // Ant Design breadcrumb overrides
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+
+  .ant-breadcrumb-separator {
+    margin: 0 $spacing-xs;
+  }
+}
+
+// Dark mode styles
+[data-theme='dark'] {
+  .page-breadcrumb {
+    .breadcrumb-link {
+      color: $primary-color;
+
+      &:hover {
+        color: lighten($primary-color, 10%);
+      }
+    }
+
+    .breadcrumb-current {
+      color: $dark-text-secondary;
+    }
+
+    .ant-breadcrumb-link,
+    .ant-breadcrumb-separator {
+      color: $dark-text-secondary;
+    }
+  }
+}
