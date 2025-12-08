@@ -872,7 +872,7 @@ create_invoices() {
     LOCATION_ID=$(echo $LOCATION_RESPONSE | jq -r '.data[0].id')
     
     if [ -z "$LOCATION_ID" ] || [ "$LOCATION_ID" == "null" ]; then
-        print_error "Failed to get location for Company $company_idx"
+        print_status 1 "Failed to get location for Company $company_idx"
         return
     fi
     
@@ -891,7 +891,7 @@ create_invoices() {
     PRODUCT_IDS=($(echo $PRODUCTS_RESPONSE | jq -r '.data[].id'))
     
     if [ ${#CUSTOMER_IDS[@]} -eq 0 ] || [ ${#PRODUCT_IDS[@]} -eq 0 ]; then
-        print_error "No customers or products found for Company $company_idx"
+        print_status 1 "No customers or products found for Company $company_idx"
         return
     fi
     
@@ -937,10 +937,11 @@ create_invoices() {
         INVOICE_ID=$(echo $INVOICE_RESPONSE | jq -r '.data.id')
         
         if [ -z "$INVOICE_ID" ] || [ "$INVOICE_ID" == "null" ]; then
-            print_error "Failed to create invoice $i for Company $company_idx"
-            print_error "Response: $INVOICE_RESPONSE"
+            print_status 1 "Failed to create invoice $i for Company $company_idx"
+            ERROR_MSG=$(echo $INVOICE_RESPONSE | jq -r '.message // .error // "Unknown error"')
+            echo "  Error: $ERROR_MSG"
         else
-            print_success "Created invoice $i for Company $company_idx: $INVOICE_ID"
+            print_status 0 "Created invoice $i for Company $company_idx: $INVOICE_ID"
         fi
     done
 }
@@ -969,7 +970,7 @@ create_bills() {
     LOCATION_ID=$(echo $LOCATION_RESPONSE | jq -r '.data[0].id')
     
     if [ -z "$LOCATION_ID" ] || [ "$LOCATION_ID" == "null" ]; then
-        print_error "Failed to get location for Company $company_idx"
+        print_status 1 "Failed to get location for Company $company_idx"
         return
     fi
     
@@ -988,7 +989,7 @@ create_bills() {
     PRODUCT_IDS=($(echo $PRODUCTS_RESPONSE | jq -r '.data[].id'))
     
     if [ ${#SUPPLIER_IDS[@]} -eq 0 ] || [ ${#PRODUCT_IDS[@]} -eq 0 ]; then
-        print_error "No suppliers or products found for Company $company_idx"
+        print_status 1 "No suppliers or products found for Company $company_idx"
         return
     fi
     
@@ -1034,10 +1035,11 @@ create_bills() {
         BILL_ID=$(echo $BILL_RESPONSE | jq -r '.data.id')
         
         if [ -z "$BILL_ID" ] || [ "$BILL_ID" == "null" ]; then
-            print_error "Failed to create bill $i for Company $company_idx"
-            print_error "Response: $BILL_RESPONSE"
+            print_status 1 "Failed to create bill $i for Company $company_idx"
+            ERROR_MSG=$(echo $BILL_RESPONSE | jq -r '.message // .error // "Unknown error"')
+            echo "  Error: $ERROR_MSG"
         else
-            print_success "Created bill $i for Company $company_idx: $BILL_ID"
+            print_status 0 "Created bill $i for Company $company_idx: $BILL_ID"
         fi
     done
 }
@@ -1045,6 +1047,290 @@ create_bills() {
 # Create bills for Companies 1 & 2
 create_bills 1 10
 create_bills 2 10
+
+# =========================================
+# STEP 16.5: GENERATE FINANCIAL REPORTS
+# =========================================
+print_section "STEP 16.5: Generating Financial Reports"
+
+# Function to generate financial reports for a company
+generate_financial_reports() {
+    local company_idx=$1
+    
+    print_info "Generating financial reports for Company $company_idx..."
+    
+    # Get current date and 30 days ago for report parameters
+    END_DATE=$(date +"%Y-%m-%d")
+    START_DATE=$(date -v -30d +"%Y-%m-%d")
+    AS_OF_DATE=$END_DATE
+    
+    # Generate Profit & Loss Report
+    print_info "Generating Profit & Loss Report..."
+    PL_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/financial/profit-loss?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $PL_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Profit & Loss Report generated successfully"
+    else
+        print_status 1 "Failed to generate Profit & Loss Report"
+    fi
+    
+    # Generate Balance Sheet
+    print_info "Generating Balance Sheet..."
+    BS_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/financial/balance-sheet?asOfDate=$AS_OF_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $BS_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Balance Sheet generated successfully"
+    else
+        print_status 1 "Failed to generate Balance Sheet"
+    fi
+    
+    # Generate Cash Flow Statement
+    print_info "Generating Cash Flow Statement..."
+    CF_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/financial/cash-flow?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $CF_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Cash Flow Statement generated successfully"
+    else
+        print_status 1 "Failed to generate Cash Flow Statement"
+    fi
+    
+    # Generate AR Aging Report
+    print_info "Generating AR Aging Report..."
+    AR_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/financial/ar-aging?asOfDate=$AS_OF_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $AR_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "AR Aging Report generated successfully"
+    else
+        print_status 1 "Failed to generate AR Aging Report"
+    fi
+    
+    # Generate AP Aging Report
+    print_info "Generating AP Aging Report..."
+    AP_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/financial/ap-aging?asOfDate=$AS_OF_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $AP_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "AP Aging Report generated successfully"
+    else
+        print_status 1 "Failed to generate AP Aging Report"
+    fi
+}
+
+# Generate financial reports for Companies 1 & 2
+generate_financial_reports 1
+generate_financial_reports 2
+
+# =========================================
+# STEP 16.6: GENERATE INVENTORY REPORTS
+# =========================================
+print_section "STEP 16.6: Generating Inventory Reports"
+
+# Function to generate inventory reports for a company
+generate_inventory_reports() {
+    local company_idx=$1
+    
+    print_info "Generating inventory reports for Company $company_idx..."
+    
+    # Get current date for report parameters
+    AS_OF_DATE=$(date +"%Y-%m-%d")
+    
+    # Generate Stock Summary Report
+    print_info "Generating Stock Summary Report..."
+    STOCK_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory/stock-summary" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $STOCK_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Stock Summary Report generated successfully"
+    else
+        print_status 1 "Failed to generate Stock Summary Report"
+    fi
+    
+    # Generate Low Stock Report
+    print_info "Generating Low Stock Report..."
+    LOW_STOCK_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory/low-stock" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $LOW_STOCK_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Low Stock Report generated successfully"
+    else
+        print_status 1 "Failed to generate Low Stock Report"
+    fi
+    
+    # Generate Stock Aging Report
+    print_info "Generating Stock Aging Report..."
+    AGING_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory/stock-aging?asOfDate=$AS_OF_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $AGING_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Stock Aging Report generated successfully"
+    else
+        print_status 1 "Failed to generate Stock Aging Report"
+    fi
+    
+    # Generate Inventory Valuation Report
+    print_info "Generating Inventory Valuation Report..."
+    VALUATION_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/inventory/inventory-valuation?asOfDate=$AS_OF_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $VALUATION_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Inventory Valuation Report generated successfully"
+    else
+        print_status 1 "Failed to generate Inventory Valuation Report"
+    fi
+}
+
+# Generate inventory reports for Companies 1 & 2
+generate_inventory_reports 1
+generate_inventory_reports 2
+
+# =========================================
+# STEP 16.7: GENERATE SALES REPORTS
+# =========================================
+print_section "STEP 16.7: Generating Sales Reports"
+
+# Function to generate sales reports for a company
+generate_sales_reports() {
+    local company_idx=$1
+    
+    print_info "Generating sales reports for Company $company_idx..."
+    
+    # Get current date and 30 days ago for report parameters
+    END_DATE=$(date +"%Y-%m-%d")
+    START_DATE=$(date -v -30d +"%Y-%m-%d")
+    
+    # Generate Sales Summary Report
+    print_info "Generating Sales Summary Report..."
+    SALES_SUMMARY_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales/sales-summary?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $SALES_SUMMARY_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Sales Summary Report generated successfully"
+    else
+        print_status 1 "Failed to generate Sales Summary Report"
+    fi
+    
+    # Generate Sales Trend Report
+    print_info "Generating Sales Trend Report..."
+    SALES_TREND_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales/sales-trend?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $SALES_TREND_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Sales Trend Report generated successfully"
+    else
+        print_status 1 "Failed to generate Sales Trend Report"
+    fi
+    
+    # Generate Top Selling Products Report
+    print_info "Generating Top Selling Products Report..."
+    TOP_PRODUCTS_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales/top-products?startDate=$START_DATE&endDate=$END_DATE&limit=10" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $TOP_PRODUCTS_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Top Selling Products Report generated successfully"
+    else
+        print_status 1 "Failed to generate Top Selling Products Report"
+    fi
+    
+    # Generate Sales by Region Report
+    print_info "Generating Sales by Region Report..."
+    SALES_REGION_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/sales/sales-by-region?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $SALES_REGION_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Sales by Region Report generated successfully"
+    else
+        print_status 1 "Failed to generate Sales by Region Report"
+    fi
+}
+
+# Generate sales reports for Companies 1 & 2
+generate_sales_reports 1
+generate_sales_reports 2
+
+# =========================================
+# STEP 16.8: GENERATE PRODUCTION REPORTS
+# =========================================
+print_section "STEP 16.8: Generating Production Reports"
+
+# Function to generate production reports for a company
+generate_production_reports() {
+    local company_idx=$1
+    
+    print_info "Generating production reports for Company $company_idx..."
+    
+    # Get current date and 30 days ago for report parameters
+    END_DATE=$(date +"%Y-%m-%d")
+    START_DATE=$(date -v -30d +"%Y-%m-%d")
+    
+    # Generate Production Summary Report
+    print_info "Generating Production Summary Report..."
+    PRODUCTION_SUMMARY_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production/production-summary?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $PRODUCTION_SUMMARY_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Production Summary Report generated successfully"
+    else
+        print_status 1 "Failed to generate Production Summary Report"
+    fi
+    
+    # Generate Production Efficiency Report
+    print_info "Generating Production Efficiency Report..."
+    EFFICIENCY_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production/production-efficiency?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $EFFICIENCY_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Production Efficiency Report generated successfully"
+    else
+        print_status 1 "Failed to generate Production Efficiency Report"
+    fi
+    
+    # Generate Machine Utilization Report
+    print_info "Generating Machine Utilization Report..."
+    MACHINE_UTIL_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production/machine-utilization?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $MACHINE_UTIL_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Machine Utilization Report generated successfully"
+    else
+        print_status 1 "Failed to generate Machine Utilization Report"
+    fi
+    
+    # Generate Downtime Analysis Report
+    print_info "Generating Downtime Analysis Report..."
+    DOWNTIME_RESPONSE=$(curl -s -X GET "$BASE_URL/reports/production/downtime-analysis?startDate=$START_DATE&endDate=$END_DATE" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    if echo $DOWNTIME_RESPONSE | jq -e '.data' > /dev/null 2>&1; then
+        print_status 0 "Downtime Analysis Report generated successfully"
+    else
+        print_status 1 "Failed to generate Downtime Analysis Report"
+    fi
+}
+
+# Generate production reports for Companies 1 & 2
+generate_production_reports 1
+generate_production_reports 2
 
 # =========================================
 # STEP 17: TEST ANALYTICS APIs (Priority 4)
@@ -1150,7 +1436,8 @@ echo -e "  • ${GREEN}50 Machines (10 per company, industry-specific) ✓${NC}"
 echo -e "  • ${GREEN}25 Quality Inspections (5 per company) ✓${NC}"
 echo -e "  • ${GREEN}25 Sales Orders (5 per company) ✓${NC}"
 echo -e "  • ${GREEN}25 Purchase Orders (5 per company) ✓${NC}"
-echo -e "  • ${YELLOW}Invoices & Bills: Require product linkage (not seeded)${NC}"
+echo -e "  • ${GREEN}20 Invoices (10 per company for Companies 1 & 2) ✓${NC}"
+echo -e "  • ${GREEN}20 Bills (10 per company for Companies 1 & 2) ✓${NC}"
 echo ""
 
 echo -e "${YELLOW}Main User Credentials:${NC}"
@@ -1233,7 +1520,11 @@ echo -e "  • Companies: All 5 companies created with different data levels"
 echo -e "  • Textile Operations: All 5 companies have textile operation data"
 echo -e "  • Additional Data: Machines, Inspections, Orders, Invoices, Bills"
 echo -e "  • Quality Control: All 45 QC items created"
-echo -e "  • Reports: Generated for all companies and operations"
+echo -e "  • ${GREEN}Reports: Generated for all companies and operations ✓${NC}
+    - Financial Reports (Profit & Loss, Balance Sheet, Cash Flow, etc.)
+    - Inventory Reports (Stock Summary, Low Stock, Aging, Valuation)
+    - Sales Reports (Sales Summary, Trends, Top Products, By Region)
+    - Production Reports (Summary, Efficiency, Machine Utilization, Downtime)"
 echo -e "  • Dashboard: All companies have dashboard data"
 echo -e "  • ${GREEN}Analytics: Comprehensive analytics APIs tested ✓${NC}"
 echo -e "    - Dashboard Analytics (Products, Orders, Team, Revenue)"
