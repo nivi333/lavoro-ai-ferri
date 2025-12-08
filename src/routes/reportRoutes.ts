@@ -7,6 +7,46 @@ const router = express.Router();
 // All routes require authentication and tenant context
 router.use(tenantIsolationMiddleware);
 
+// Profit & Loss Report (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required)
+router.get(
+  '/profit-loss',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getProfitLossReport
+);
+
+// Balance Sheet Report (OWNER, ADMIN, MANAGER can view)
+// Query params: asOfDate (optional, defaults to today)
+router.get(
+  '/balance-sheet',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getBalanceSheet
+);
+
+// Cash Flow Statement (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required)
+router.get(
+  '/cash-flow',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getCashFlowStatement
+);
+
+// Trial Balance Report (OWNER, ADMIN, MANAGER can view)
+// Query params: asOfDate (optional, defaults to today)
+router.get(
+  '/trial-balance',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getTrialBalance
+);
+
+// GST Report (OWNER, ADMIN, MANAGER can view)
+// Query params: period (required)
+router.get(
+  '/gst',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getGSTReport
+);
+
 // Sales Summary Report (OWNER, ADMIN, MANAGER can view)
 // Query params: startDate, endDate (required)
 router.get(
