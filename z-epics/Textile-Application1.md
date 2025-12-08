@@ -734,6 +734,137 @@
 
 #### **2.3 Order Management** ✅
 
+#### **2.4 Reports Management** 🔄 IN PROGRESS
+
+**Current Implementation Issues:**
+- Reports are currently accessed via cards with "Generate Report" buttons
+- Clicking a report opens a popup with date range selection
+- No ability to view historical reports or save report configurations
+- No table view of generated reports for comparison
+- Poor navigation experience with no breadcrumb trail
+
+**Improved Reports Interface Design:**
+
+**Reports Navigation Structure:**
+- Main Reports page with categories (Financial, Operational, Inventory, etc.)
+- Category pages listing available report types
+- Individual report pages with filters, table view, and export options
+- Breadcrumb navigation (e.g., Reports > Operational Reports > Production Efficiency)
+
+**Reports List Page (per category):**
+- Table layout showing:
+  - Report Name: Name of the report type
+  - Description: Brief description of report contents
+  - Last Generated: Timestamp of most recent generation
+  - Frequency: How often report is typically generated
+  - Actions: View/Configure buttons
+
+**Individual Report Page Layout:**
+- **Header Section**:
+  - Breadcrumb navigation (Reports > Category > Report Name)
+  - Title with report description
+  - Date range selector (default: last 30 days)
+  - Additional filters specific to report type
+  - "Export Report" button (PDF, Excel, CSV options)
+  - "Save Configuration" button (save filters for quick access)
+
+- **Table View Section**:
+  - Responsive data table showing report data
+  - Sortable columns with appropriate data types
+  - Pagination for large datasets
+  - Column visibility toggles
+  - Search/filter within results
+  - Row expansion for additional details
+
+- **Visualization Section** (Optional):
+  - Charts/graphs relevant to report data
+  - Toggle between table and visualization views
+  - Interactive elements (hover for details, etc.)
+
+**Saved Reports Feature:**
+- Save report configurations with custom names
+- View history of previously generated reports
+- Schedule recurring report generation
+- Email reports to specified recipients
+
+**Implementation Components:**
+
+**Backend Changes:**
+1. **ReportController Updates**:
+   - New endpoints for listing available reports by category
+   - Endpoint for retrieving saved report configurations
+   - Endpoint for saving report configurations
+   - Endpoint for retrieving report history
+
+2. **Database Schema Updates**:
+   - `report_categories` table: id, name, description, icon
+   - `report_types` table: id, category_id, name, description, endpoint
+   - `saved_reports` table: id, company_id, user_id, report_type_id, name, configuration (JSON), created_at
+   - `report_history` table: id, company_id, user_id, report_type_id, configuration (JSON), generated_at, file_path
+
+3. **ReportService Enhancements**:
+   - Method to list reports by category
+   - Method to save report configurations
+   - Method to retrieve report history
+   - Method to schedule recurring reports
+
+**Frontend Components:**
+
+1. **ReportsListPage**:
+   - Categories displayed as cards or tabs
+   - Click to navigate to category-specific report list
+
+2. **CategoryReportsListPage**:
+   - Table of available reports in selected category
+   - Quick action buttons for common operations
+
+3. **ReportViewPage**:
+   - Header with breadcrumb and actions
+   - Filters section with date range and report-specific filters
+   - Table view of report data with sorting and pagination
+   - Export options (PDF, Excel, CSV)
+
+4. **SavedReportsDrawer**:
+   - List of saved report configurations
+   - Option to load, edit, or delete configurations
+
+5. **ReportHistoryDrawer**:
+   - List of previously generated reports
+   - Download links for exported files
+
+**Data Flow:**
+1. User navigates to Reports section
+2. User selects report category
+3. User selects specific report type
+4. System loads report configuration page with default filters
+5. User adjusts filters and clicks "Generate Report"
+6. System processes report data and displays in table format
+7. User can sort, filter, and export the report data
+8. User can save the configuration for future use
+
+**Role-Based Access:**
+- OWNER/ADMIN: Access to all reports and configurations
+- MANAGER: Access to operational and inventory reports
+- EMPLOYEE: Access to basic operational reports only
+
+**Technical Implementation:**
+- Use React Table library for advanced table features
+- Implement React Context for report configuration state
+- Use React Query for data fetching and caching
+- Implement breadcrumb component for navigation
+- Use Ant Design's Table, DatePicker, and Filter components
+
+**Mobile Responsiveness:**
+- Responsive table with horizontal scrolling on small screens
+- Collapsible filters section on mobile
+- Simplified export options on mobile devices
+
+**Performance Considerations:**
+- Implement pagination for large datasets
+- Cache report data with React Query
+- Lazy load visualizations
+- Background processing for complex reports
+
 **Sales Order Creation** ✅
 - [✅] Order Information:
   - [✅] Order Number: Auto-generated (SO001, SO002, etc.)

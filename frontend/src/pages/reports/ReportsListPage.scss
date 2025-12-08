@@ -1,0 +1,54 @@
+@import '../../index.scss';
+@import '../shared/ReportStyles.scss';
+
+.reports-categories-section {
+  margin-top: $spacing-lg;
+}
+
+.report-category-card {
+  height: 100%;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-lg;
+  }
+
+  .category-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120px;
+    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
+    
+    .anticon {
+      font-size: 48px;
+      color: $bg-primary;
+    }
+  }
+
+  .ant-card-meta-title {
+    font-size: 18px;
+    margin-bottom: $spacing-sm;
+  }
+
+  .ant-card-meta-description {
+    height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  .report-count {
+    margin-top: $spacing-md;
+    color: $text-secondary;
+    font-size: 14px;
+  }
+}
+
+.breadcrumb-navigation {
+  margin-bottom: $spacing-md;
+}

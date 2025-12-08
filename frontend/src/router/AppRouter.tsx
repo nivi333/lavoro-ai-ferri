@@ -37,13 +37,14 @@ import {
   AccountsReceivablePage,
   AccountsPayablePage,
   ExpensesPage,
-  ReportsPage,
+  ReportsListPage,
   FinancialReportsPage,
   InventoryReportsPage,
   SalesReportsPage,
   ProductionReportsPage,
   QualityReportsPageReport,
   OperationalReportsPage,
+  ProductionEfficiencyReportPage,
   AnalyticsReportsPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
@@ -378,7 +379,7 @@ export default function AppRouter() {
               path='/reports'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <ReportsPage />
+                  <ReportsListPage />
                 </ProtectedRoute>
               }
             />
@@ -433,6 +434,15 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <OperationalReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/operational/production-efficiency'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <ProductionEfficiencyReportPage />
                 </ProtectedRoute>
               }
             />

@@ -182,6 +182,50 @@ export const CORE_MODULES: MenuItem[] = [
     label: 'Reports',
     icon: FileTextOutlined,
     path: '/reports',
+    children: [
+      {
+        key: 'financial-reports',
+        label: 'Financial Reports',
+        icon: DollarOutlined,
+        path: '/reports/financial',
+      },
+      {
+        key: 'operational-reports',
+        label: 'Operational Reports',
+        icon: BarChartOutlined,
+        path: '/reports/operational',
+      },
+      {
+        key: 'inventory-reports',
+        label: 'Inventory Reports',
+        icon: InboxOutlined,
+        path: '/reports/inventory',
+      },
+      {
+        key: 'sales-reports',
+        label: 'Sales Reports',
+        icon: ShoppingOutlined,
+        path: '/reports/sales',
+      },
+      {
+        key: 'production-reports',
+        label: 'Production Reports',
+        icon: AppstoreOutlined,
+        path: '/reports/production',
+      },
+      {
+        key: 'quality-reports',
+        label: 'Quality Reports',
+        icon: SafetyOutlined,
+        path: '/reports/quality',
+      },
+      {
+        key: 'analytics-reports',
+        label: 'Analytics Reports',
+        icon: BarChartOutlined,
+        path: '/reports/analytics',
+      },
+    ],
   },
 ];
 

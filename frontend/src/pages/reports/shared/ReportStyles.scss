@@ -1,0 +1,193 @@
+@import '../../../index.scss';
+
+// Common report page styles
+.filters-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.breadcrumb-navigation {
+  margin-bottom: $spacing-md;
+}
+
+// Report cards styling
+.report-card {
+  height: 100%;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-lg;
+  }
+  
+  .report-card-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    background: linear-gradient(135deg, $primary-color, lighten($primary-color, 15%));
+    color: $bg-primary;
+    font-size: 32px;
+    border-radius: $border-radius-base $border-radius-base 0 0;
+  }
+  
+  .report-card-content {
+    padding: $spacing-md;
+  }
+  
+  .report-card-title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+    margin-bottom: $spacing-xs;
+    color: $primary-text-color;
+  }
+  
+  .report-card-description {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .report-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $spacing-sm;
+  }
+  
+  .report-last-generated {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+  }
+}
+
+// Summary cards styling
+.report-summary-section {
+  margin-bottom: $spacing-lg;
+
+  .summary-card {
+    height: 100%;
+    text-align: center;
+    
+    .summary-title {
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      margin-bottom: $spacing-xs;
+    }
+    
+    .summary-value {
+      font-size: $font-size-2xl;
+      font-weight: 600;
+      color: $primary-color;
+    }
+  }
+}
+
+// Report content styling
+.report-content-section {
+  .report-data {
+    background-color: $bg-primary;
+    border-radius: $border-radius-base;
+    padding: $spacing-md;
+    box-shadow: $shadow-md;
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-xl 0;
+      
+      p {
+        margin-top: $spacing-md;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+// Table styling to match products table
+.ant-table-tbody > tr > td {
+  padding-top: $spacing-sm;
+  padding-bottom: $spacing-sm;
+}
+
+.ant-table-thead > tr > th {
+  background-color: $bg-tertiary;
+  font-weight: 500;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background-color: rgba($primary-color, 0.05);
+}
+
+// Reports grid styling
+.reports-grid {
+  margin-top: $spacing-lg;
+}
+
+// Dark theme support
+[data-theme='dark'] {
+  .report-card {
+    background-color: $dark-bg-surface;
+    border-color: $dark-border;
+    
+    .report-card-content {
+      background-color: $dark-bg-surface;
+    }
+    
+    .report-card-title {
+      color: $dark-text-primary;
+    }
+    
+    .report-card-description {
+      color: $dark-text-secondary;
+    }
+  }
+  
+  .report-data {
+    background-color: $dark-bg-surface;
+  }
+  
+  .summary-card {
+    background-color: $dark-bg-surface;
+    border-color: $dark-border;
+    
+    .summary-title {
+      color: $dark-text-secondary;
+    }
+    
+    .summary-value {
+      color: $primary-color;
+    }
+  }
+  
+  .ant-table {
+    background-color: $dark-bg-surface;
+    color: $dark-text-primary;
+    
+    .ant-table-thead > tr > th {
+      background-color: $dark-bg-tertiary;
+      color: $dark-text-primary;
+      border-bottom-color: $dark-border;
+    }
+    
+    .ant-table-tbody > tr > td {
+      border-bottom-color: $dark-border;
+    }
+    
+    .ant-table-tbody > tr:hover > td {
+      background-color: rgba($primary-color, 0.1);
+    }
+  }
+}

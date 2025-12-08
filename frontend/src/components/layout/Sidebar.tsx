@@ -155,6 +155,11 @@ export default function Sidebar() {
       return ['/textile'];
     }
 
+    // Open Reports submenu if on reports pages
+    if (path.startsWith('/reports')) {
+      return ['/reports'];
+    }
+
     return [];
   };
 
