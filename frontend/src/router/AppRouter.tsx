@@ -43,6 +43,8 @@ import {
   SalesReportsPage,
   ProductionReportsPage,
   QualityReportsPageReport,
+  OperationalReportsPage,
+  AnalyticsReportsPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -422,6 +424,24 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <QualityReportsPageReport />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/operational'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <OperationalReportsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/analytics'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <AnalyticsReportsPage />
                 </ProtectedRoute>
               }
             />

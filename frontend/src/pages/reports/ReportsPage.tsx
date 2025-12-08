@@ -8,6 +8,7 @@ import {
   SafetyOutlined,
   FileTextOutlined,
   BarChartOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useHeader } from '../../contexts/HeaderContext';
@@ -43,6 +44,24 @@ const ReportsPage: React.FC = () => {
       path: '/reports/financial',
       color: '#52c41a',
       reportCount: 8,
+    },
+    {
+      key: 'operational',
+      title: 'Operational Reports',
+      description: 'Production Efficiency, Machine Utilization, Quality Metrics',
+      icon: <AppstoreOutlined />,
+      path: '/reports/operational',
+      color: '#13c2c2',
+      reportCount: 5,
+    },
+    {
+      key: 'analytics',
+      title: 'Analytics Reports',
+      description: 'Business Intelligence, Trends, Performance Metrics',
+      icon: <BarChartOutlined />,
+      path: '/reports/analytics',
+      color: '#2f54eb',
+      reportCount: 5,
     },
     {
       key: 'inventory',

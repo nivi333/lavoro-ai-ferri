@@ -1,309 +1,27 @@
+import {
+  ProfitLossReport,
+  BalanceSheetReport,
+  CashFlowReport,
+  TrialBalanceReport,
+  GSTReport,
+  ARAgingReport,
+  APAgingReport,
+  ExpenseSummaryReport,
+  SalesSummaryReport,
+  InventorySummaryReport,
+  ProductionEfficiencyReport,
+  MachineUtilizationReport,
+  QualityMetricsReport,
+  InventoryMovementReport,
+  ProductionPlanningReport,
+  SalesTrendsReport,
+  ProductPerformanceReport,
+  CustomerInsightsReport,
+  BusinessPerformanceReport,
+  TextileAnalyticsReport
+} from './reportTypes';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
-
-// Types for Financial Reports
-export interface ProfitLossReport {
-  summary: {
-    totalRevenue: number;
-    costOfGoodsSold: number;
-    grossProfit: number;
-    operatingExpenses: number;
-    netProfit: number;
-    profitMargin: number;
-  };
-  revenueBreakdown: {
-    productId: string;
-    productName: string;
-    revenue: number;
-    percentage: number;
-  }[];
-  expenseBreakdown: {
-    category: string;
-    amount: number;
-    percentage: number;
-  }[];
-  periodComparison: {
-    period: string;
-    revenue: number;
-    expenses: number;
-    profit: number;
-  }[];
-  dateRange: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-export interface BalanceSheetReport {
-  summary: {
-    totalAssets: number;
-    totalLiabilities: number;
-    totalEquity: number;
-    asOfDate: string;
-  };
-  assets: {
-    currentAssets: {
-      category: string;
-      amount: number;
-    }[];
-    fixedAssets: {
-      category: string;
-      amount: number;
-    }[];
-    totalCurrentAssets: number;
-    totalFixedAssets: number;
-  };
-  liabilities: {
-    currentLiabilities: {
-      category: string;
-      amount: number;
-    }[];
-    longTermLiabilities: {
-      category: string;
-      amount: number;
-    }[];
-    totalCurrentLiabilities: number;
-    totalLongTermLiabilities: number;
-  };
-  equity: {
-    category: string;
-    amount: number;
-  }[];
-}
-
-export interface CashFlowReport {
-  summary: {
-    operatingCashFlow: number;
-    investingCashFlow: number;
-    financingCashFlow: number;
-    netCashFlow: number;
-    beginningCashBalance: number;
-    endingCashBalance: number;
-  };
-  operatingActivities: {
-    category: string;
-    amount: number;
-  }[];
-  investingActivities: {
-    category: string;
-    amount: number;
-  }[];
-  financingActivities: {
-    category: string;
-    amount: number;
-  }[];
-  dateRange: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-export interface TrialBalanceReport {
-  summary: {
-    totalDebits: number;
-    totalCredits: number;
-    difference: number;
-    asOfDate: string;
-  };
-  accounts: {
-    accountCode: string;
-    accountName: string;
-    debit: number;
-    credit: number;
-  }[];
-}
-
-export interface GSTReport {
-  summary: {
-    totalOutputTax: number;
-    totalInputTax: number;
-    netTaxPayable: number;
-    period: string;
-  };
-  outputTax: {
-    invoiceId: string;
-    customerName: string;
-    invoiceDate: string;
-    taxableAmount: number;
-    taxAmount: number;
-    taxRate: number;
-  }[];
-  inputTax: {
-    billId: string;
-    supplierName: string;
-    billDate: string;
-    taxableAmount: number;
-    taxAmount: number;
-    taxRate: number;
-  }[];
-}
-
-export interface ARAgingReport {
-  summary: {
-    totalOutstanding: number;
-    totalInvoices: number;
-    asOfDate: string;
-  };
-  agingBuckets: {
-    current: number; // 0-30 days
-    days31to60: number;
-    days61to90: number;
-    over90: number;
-  };
-  customerAging: {
-    customerId: string;
-    customerName: string;
-    customerCode: string | null;
-    email: string | null;
-    phone: string | null;
-    totalOutstanding: number;
-    current: number;
-    days31to60: number;
-    days61to90: number;
-    over90: number;
-    invoices: {
-      invoiceId: string;
-      invoiceDate: string;
-      dueDate: string;
-      totalAmount: number;
-      balanceDue: number;
-      daysOverdue: number;
-      status: string;
-    }[];
-  }[];
-}
-
-export interface APAgingReport {
-  summary: {
-    totalOutstanding: number;
-    totalBills: number;
-    asOfDate: string;
-  };
-  agingBuckets: {
-    current: number; // 0-30 days
-    days31to60: number;
-    days61to90: number;
-    over90: number;
-  };
-  supplierAging: {
-    supplierId: string;
-    supplierName: string;
-    supplierCode: string | null;
-    email: string | null;
-    phone: string | null;
-    totalOutstanding: number;
-    current: number;
-    days31to60: number;
-    days61to90: number;
-    over90: number;
-    bills: {
-      billId: string;
-      billDate: string;
-      dueDate: string;
-      totalAmount: number;
-      balanceDue: number;
-      daysOverdue: number;
-      status: string;
-    }[];
-  }[];
-}
-
-export interface ExpenseSummaryReport {
-  summary: {
-    totalExpenses: number;
-    totalBills: number;
-    paidBills: number;
-    totalPaid: number;
-    totalOutstanding: number;
-    averageBillValue: number;
-    paymentRate: number;
-  };
-  supplierExpenses: {
-    supplierId: string;
-    supplierName: string;
-    supplierCode: string | null;
-    totalExpenses: number;
-    billCount: number;
-  }[];
-  expensesTrend: {
-    month: string;
-    expenses: number;
-    billCount: number;
-  }[];
-  dateRange: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-export interface SalesSummaryReport {
-  summary: {
-    totalRevenue: number;
-    totalInvoices: number;
-    paidInvoices: number;
-    totalPaid: number;
-    totalOutstanding: number;
-    averageInvoiceValue: number;
-    collectionRate: number;
-  };
-  customerSales: {
-    customerId: string;
-    customerName: string;
-    customerCode: string | null;
-    totalSales: number;
-    invoiceCount: number;
-  }[];
-  productSales: {
-    productId: string;
-    productName: string;
-    productCode: string | null;
-    quantity: number;
-    revenue: number;
-  }[];
-  salesTrend: {
-    month: string;
-    revenue: number;
-    invoiceCount: number;
-  }[];
-  dateRange: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-export interface InventorySummaryReport {
-  summary: {
-    totalItems: number;
-    totalQuantity: number;
-    totalValue: number;
-    lowStockCount: number;
-  };
-  lowStockItems: {
-    productId: string;
-    productCode: string | null;
-    productName: string | null;
-    locationId: string;
-    locationName: string | null;
-    quantityOnHand: number;
-    reorderLevel: number;
-    unitOfMeasure: string | null;
-  }[];
-  stockByLocation: {
-    locationId: string;
-    locationName: string;
-    itemCount: number;
-    totalQuantity: number;
-    totalValue: number;
-  }[];
-  topProductsByValue: {
-    productId: string;
-    productCode: string | null;
-    productName: string | null;
-    quantityOnHand: number;
-    unitPrice: number;
-    totalValue: number;
-    unitOfMeasure: string | null;
-  }[];
-}
 
 class ReportService {
   private getAuthHeaders(): HeadersInit {
@@ -518,6 +236,213 @@ class ReportService {
       return result.data;
     } catch (error) {
       console.error('Error fetching inventory summary:', error);
+      throw error;
+    }
+  }
+
+  // Operational Reports
+  async getProductionEfficiencyReport(startDate: string, endDate: string): Promise<ProductionEfficiencyReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/production-efficiency?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch production efficiency report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching production efficiency report:', error);
+      throw error;
+    }
+  }
+
+  async getMachineUtilizationReport(startDate: string, endDate: string, locationId?: string): Promise<MachineUtilizationReport> {
+    try {
+      let url = `${API_BASE_URL}/reports/machine-utilization?startDate=${startDate}&endDate=${endDate}`;
+      if (locationId && locationId !== 'all') {
+        url += `&locationId=${locationId}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch machine utilization report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching machine utilization report:', error);
+      throw error;
+    }
+  }
+
+  async getQualityMetricsReport(startDate: string, endDate: string): Promise<QualityMetricsReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/quality-metrics?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch quality metrics report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching quality metrics report:', error);
+      throw error;
+    }
+  }
+
+  async getInventoryMovementReport(startDate: string, endDate: string, locationId?: string): Promise<InventoryMovementReport> {
+    try {
+      let url = `${API_BASE_URL}/reports/inventory-movement?startDate=${startDate}&endDate=${endDate}`;
+      if (locationId && locationId !== 'all') {
+        url += `&locationId=${locationId}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch inventory movement report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching inventory movement report:', error);
+      throw error;
+    }
+  }
+
+  async getProductionPlanningReport(startDate: string, endDate: string): Promise<ProductionPlanningReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/production-planning?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch production planning report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching production planning report:', error);
+      throw error;
+    }
+  }
+
+  // Analytics Reports
+  async getSalesTrendsReport(startDate: string, endDate: string, groupBy: string): Promise<SalesTrendsReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/sales-trends?startDate=${startDate}&endDate=${endDate}&groupBy=${groupBy}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch sales trends report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching sales trends report:', error);
+      throw error;
+    }
+  }
+
+  async getProductPerformanceReport(startDate: string, endDate: string, limit: number): Promise<ProductPerformanceReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/product-performance?startDate=${startDate}&endDate=${endDate}&limit=${limit}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch product performance report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching product performance report:', error);
+      throw error;
+    }
+  }
+
+  async getCustomerInsightsReport(startDate: string, endDate: string): Promise<CustomerInsightsReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/customer-insights?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer insights report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching customer insights report:', error);
+      throw error;
+    }
+  }
+
+  async getBusinessPerformanceReport(startDate: string, endDate: string): Promise<BusinessPerformanceReport> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports/business-performance?startDate=${startDate}&endDate=${endDate}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch business performance report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching business performance report:', error);
+      throw error;
+    }
+  }
+
+  async getTextileAnalyticsReport(startDate: string, endDate: string, category?: string): Promise<TextileAnalyticsReport> {
+    try {
+      let url = `${API_BASE_URL}/reports/textile-analytics?startDate=${startDate}&endDate=${endDate}`;
+      if (category && category !== 'all') {
+        url += `&category=${category}`;
+      }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch textile analytics report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching textile analytics report:', error);
       throw error;
     }
   }

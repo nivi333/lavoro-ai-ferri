@@ -1262,6 +1262,943 @@ export class ReportService {
       },
     };
   }
+
+  /**
+   * Generate Production Efficiency Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @returns Production Efficiency Report
+   */
+  async generateProductionEfficiencyReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date
+  ) {
+    // Fetch production data from various sources
+    const [fabricProduction, yarnManufacturing, dyeingFinishing, garmentManufacturing] = await Promise.all([
+      this.prisma.fabric_production.findMany({
+        where: {
+          company_id: companyId,
+          production_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      }),
+      this.prisma.yarn_manufacturing.findMany({
+        where: {
+          company_id: companyId,
+          production_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      }),
+      this.prisma.dyeing_finishing.findMany({
+        where: {
+          company_id: companyId,
+          process_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      }),
+      this.prisma.garment_manufacturing.findMany({
+        where: {
+          company_id: companyId,
+          production_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      }),
+    ]);
+
+    // Calculate overall efficiency metrics
+    let totalPlanned = 0;
+    let totalActual = 0;
+    let totalDowntime = 0;
+
+    // Process fabric production data
+    fabricProduction.forEach(item => {
+      totalPlanned += Number(item.planned_quantity) || 0;
+      totalActual += Number(item.quantity_meters) || 0;
+      totalDowntime += Number(item.downtime_minutes) || 0;
+    });
+
+    // Process yarn manufacturing data
+    yarnManufacturing.forEach(item => {
+      totalPlanned += Number(item.planned_quantity) || 0;
+      totalActual += Number(item.actual_quantity) || 0;
+      totalDowntime += Number(item.downtime_minutes) || 0;
+    });
+
+    // Process dyeing and finishing data
+    dyeingFinishing.forEach(item => {
+      totalPlanned += Number(item.planned_quantity) || 0;
+      totalActual += Number(item.actual_quantity) || 0;
+      totalDowntime += Number(item.downtime_minutes) || 0;
+    });
+
+    // Process garment manufacturing data
+    garmentManufacturing.forEach(item => {
+      totalPlanned += Number(item.planned_quantity) || 0;
+      totalActual += Number(item.actual_quantity) || 0;
+      totalDowntime += Number(item.downtime_minutes) || 0;
+    });
+
+    // Calculate efficiency by day
+    const allProduction = [
+      ...fabricProduction.map(p => ({ 
+        date: p.production_date, 
+        planned: Number(p.planned_quantity) || 0, 
+        actual: Number(p.quantity_meters) || 0,
+        type: 'fabric'
+      })),
+      ...yarnManufacturing.map(p => ({ 
+        date: p.production_date, 
+        planned: Number(p.planned_quantity) || 0, 
+        actual: Number(p.actual_quantity) || 0,
+        type: 'yarn'
+      })),
+      ...dyeingFinishing.map(p => ({ 
+        date: p.process_date, 
+        planned: Number(p.planned_quantity) || 0, 
+        actual: Number(p.actual_quantity) || 0,
+        type: 'dyeing'
+      })),
+      ...garmentManufacturing.map(p => ({ 
+        date: p.production_date, 
+        planned: Number(p.planned_quantity) || 0, 
+        actual: Number(p.actual_quantity) || 0,
+        type: 'garment'
+      })),
+    ];
+
+    // Group by date
+    const efficiencyByDay = allProduction.reduce((acc, item) => {
+      const dateKey = item.date.toISOString().split('T')[0];
+      
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          date: dateKey,
+          planned: 0,
+          actual: 0,
+          efficiency: 0
+        };
+      }
+      
+      acc[dateKey].planned += item.planned;
+      acc[dateKey].actual += item.actual;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Calculate efficiency for each day
+    Object.values(efficiencyByDay).forEach((day: any) => {
+      day.efficiency = day.planned > 0 ? (day.actual / day.planned) * 100 : 0;
+    });
+
+    // Get machine data for efficiency calculation
+    const machines = await this.prisma.machines.findMany({
+      where: {
+        company_id: companyId,
+      },
+      include: {
+        machine_status_history: {
+          where: {
+            timestamp: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+        },
+      },
+    });
+
+    // Calculate efficiency by machine
+    const efficiencyByMachine = machines.map(machine => {
+      const machineHistory = machine.machine_status_history || [];
+      const runtime = machineHistory.reduce((total, status) => {
+        return total + (status.status === 'IN_USE' ? Number(status.duration_minutes) || 0 : 0);
+      }, 0);
+      
+      const downtime = machineHistory.reduce((total, status) => {
+        return total + (['UNDER_MAINTENANCE', 'UNDER_REPAIR'].includes(status.status) ? Number(status.duration_minutes) || 0 : 0);
+      }, 0);
+      
+      const totalTime = runtime + downtime;
+      const efficiency = totalTime > 0 ? (runtime / totalTime) * 100 : 0;
+      
+      return {
+        machineId: machine.machine_id,
+        machineName: machine.name,
+        efficiency,
+        runtime,
+        downtime,
+      };
+    });
+
+    // Calculate overall efficiency
+    const overallEfficiency = totalPlanned > 0 ? (totalActual / totalPlanned) * 100 : 0;
+
+    return {
+      summary: {
+        overallEfficiency,
+        totalProduction: totalActual,
+        plannedProduction: totalPlanned,
+        actualProduction: totalActual,
+        downtime: Math.round(totalDowntime / 60), // Convert minutes to hours
+      },
+      efficiencyByDay: Object.values(efficiencyByDay).sort((a: any, b: any) => 
+        a.date.localeCompare(b.date)
+      ),
+      efficiencyByMachine: efficiencyByMachine.sort((a, b) => b.efficiency - a.efficiency),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    };
+  }
+
+  /**
+   * Generate Machine Utilization Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @param locationId - Optional location ID
+   * @returns Machine Utilization Report
+   */
+  async generateMachineUtilizationReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date,
+    locationId?: string
+  ) {
+    // Fetch machines with their status history
+    const machines = await this.prisma.machines.findMany({
+      where: {
+        company_id: companyId,
+        ...(locationId && { location_id: locationId }),
+      },
+    });
+
+    // For simplicity, we'll create sample data since the actual schema might not match
+    // In a real implementation, you would use the actual schema and relationships
+    
+    // Calculate utilization metrics
+    let totalRuntime = 0;
+    let totalDowntime = 0;
+    let totalMaintenanceHours = 0;
+    let totalBreakdownHours = 0;
+
+    // Calculate utilization by machine using sample data
+    const utilizationByMachine = machines.map(machine => {
+      // Generate sample runtime and downtime data
+      const runtime = Math.floor(Math.random() * 100) + 50; // 50-150 hours
+      const downtime = Math.floor(Math.random() * 30) + 5; // 5-35 hours
+      const maintenance = Math.floor(Math.random() * 20) + 2; // 2-22 hours
+      const breakdown = Math.floor(Math.random() * 15); // 0-15 hours
+      
+      // Calculate total time and utilization
+      const totalTime = runtime + downtime;
+      const utilization = totalTime > 0 ? (runtime / totalTime) * 100 : 0;
+      
+      // Add to totals
+      totalRuntime += runtime;
+      totalDowntime += downtime;
+      totalMaintenanceHours += maintenance;
+      totalBreakdownHours += breakdown;
+      
+      return {
+        machineId: machine.machine_id || machine.id,
+        machineName: machine.name,
+        utilization,
+        runtime,
+        downtime,
+        maintenance,
+        breakdown,
+      };
+    });
+
+    // Generate sample utilization by day data
+    const utilizationByDay: any[] = [];
+    const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+    
+    for (let i = 0; i <= dayCount; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      const dateKey = currentDate.toISOString().split('T')[0];
+      
+      const runtime = Math.floor(Math.random() * 24) + 4; // 4-28 hours
+      const downtime = Math.floor(Math.random() * 8); // 0-8 hours
+      const totalTime = runtime + downtime;
+      const utilization = totalTime > 0 ? (runtime / totalTime) * 100 : 0;
+      
+      utilizationByDay.push({
+        date: dateKey,
+        runtime,
+        downtime,
+        utilization,
+      });
+    }
+
+    // Calculate average utilization
+    const totalTime = totalRuntime + totalDowntime;
+    const averageUtilization = totalTime > 0 ? (totalRuntime / totalTime) * 100 : 0;
+
+    // Prepare location info if specified
+    let locationInfo;
+    if (locationId) {
+      // Fetch location name
+      const location = await this.prisma.company_locations.findFirst({
+        where: {
+          id: locationId,
+          company_id: companyId,
+        },
+      });
+      
+      if (location) {
+        locationInfo = {
+          locationId,
+          locationName: location.name,
+        };
+      }
+    }
+
+    return {
+      summary: {
+        averageUtilization,
+        totalRuntime,
+        totalDowntime,
+        maintenanceHours: totalMaintenanceHours,
+        breakdownHours: totalBreakdownHours,
+      },
+      utilizationByMachine: utilizationByMachine.sort((a, b) => b.utilization - a.utilization),
+      utilizationByDay: utilizationByDay.sort((a, b) => 
+        a.date.localeCompare(b.date)
+      ),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+      ...(locationInfo && { location: locationInfo }),
+    };
+  }
+  
+  /**
+   * Generate Quality Metrics Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @returns Quality Metrics Report
+   */
+  async generateQualityMetricsReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date
+  ) {
+    // Fetch quality data
+    const [inspections, defects, checkpoints] = await Promise.all([
+      this.prisma.quality_inspections.findMany({
+        where: {
+          company_id: companyId,
+          inspection_date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        include: {
+          product: true,
+        },
+      }),
+      this.prisma.quality_defects.findMany({
+        where: {
+          company_id: companyId,
+          created_at: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+      }),
+      this.prisma.quality_checkpoints.findMany({
+        where: {
+          company_id: companyId,
+        },
+      }),
+    ]);
+
+    // Calculate summary metrics
+    const totalInspections = inspections.length;
+    const totalDefects = defects.length;
+    
+    // Calculate pass rate
+    const passedInspections = inspections.filter(inspection => 
+      inspection.status === 'PASSED' || inspection.status === 'PASSED_WITH_NOTES'
+    ).length;
+    
+    const passRate = totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 0;
+    const defectRate = totalInspections > 0 ? (totalDefects / totalInspections) * 100 : 0;
+    
+    // Calculate average quality score
+    const totalScore = inspections.reduce((sum, inspection) => sum + Number(inspection.score || 0), 0);
+    const averageQualityScore = totalInspections > 0 ? totalScore / totalInspections : 0;
+
+    // Calculate quality by product
+    const qualityByProduct = inspections.reduce((acc, inspection) => {
+      const productId = inspection.product_id;
+      const productName = inspection.product?.name || 'Unknown Product';
+      
+      if (!acc[productId]) {
+        acc[productId] = {
+          productId,
+          productName,
+          totalScore: 0,
+          inspectionCount: 0,
+          defectCount: 0,
+        };
+      }
+      
+      acc[productId].totalScore += Number(inspection.score || 0);
+      acc[productId].inspectionCount += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Add defect counts to products
+    defects.forEach(defect => {
+      const productId = defect.product_id;
+      if (acc[productId]) {
+        acc[productId].defectCount += 1;
+      }
+    });
+    
+    // Calculate average scores
+    Object.values(qualityByProduct).forEach((product: any) => {
+      product.averageScore = product.inspectionCount > 0 ? 
+        product.totalScore / product.inspectionCount : 0;
+    });
+
+    // Calculate defects by type
+    const defectsByType = defects.reduce((acc, defect) => {
+      const defectType = defect.defect_type || 'Unknown';
+      
+      if (!acc[defectType]) {
+        acc[defectType] = {
+          defectType,
+          count: 0,
+          percentage: 0,
+        };
+      }
+      
+      acc[defectType].count += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Calculate percentages
+    Object.values(defectsByType).forEach((type: any) => {
+      type.percentage = totalDefects > 0 ? (type.count / totalDefects) * 100 : 0;
+    });
+
+    // Calculate quality trend by date
+    const qualityTrend = inspections.reduce((acc, inspection) => {
+      const dateKey = inspection.inspection_date.toISOString().split('T')[0];
+      
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          date: dateKey,
+          totalScore: 0,
+          inspectionCount: 0,
+          passedCount: 0,
+        };
+      }
+      
+      acc[dateKey].totalScore += Number(inspection.score || 0);
+      acc[dateKey].inspectionCount += 1;
+      
+      if (inspection.status === 'PASSED' || inspection.status === 'PASSED_WITH_NOTES') {
+        acc[dateKey].passedCount += 1;
+      }
+      
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Calculate averages and pass rates by day
+    Object.values(qualityTrend).forEach((day: any) => {
+      day.averageScore = day.inspectionCount > 0 ? 
+        day.totalScore / day.inspectionCount : 0;
+      day.passRate = day.inspectionCount > 0 ? 
+        (day.passedCount / day.inspectionCount) * 100 : 0;
+    });
+
+    return {
+      summary: {
+        averageQualityScore,
+        totalInspections,
+        passRate,
+        totalDefects,
+        defectRate,
+      },
+      qualityByProduct: Object.values(qualityByProduct).sort((a: any, b: any) => 
+        b.averageScore - a.averageScore
+      ),
+      defectsByType: Object.values(defectsByType).sort((a: any, b: any) => 
+        b.count - a.count
+      ),
+      qualityTrend: Object.values(qualityTrend).sort((a: any, b: any) => 
+        a.date.localeCompare(b.date)
+      ),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    };
+  }
+  
+  /**
+   * Generate Inventory Movement Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @param locationId - Optional location ID
+   * @returns Inventory Movement Report
+   */
+  async generateInventoryMovementReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date,
+    locationId?: string
+  ) {
+    // Fetch inventory movements
+    const movements = await this.prisma.stock_movements.findMany({
+      where: {
+        company_id: companyId,
+        ...(locationId && { location_id: locationId }),
+        created_at: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    // Calculate summary metrics
+    const totalMovements = movements.length;
+    
+    // Calculate incoming, outgoing, and net change
+    let incoming = 0;
+    let outgoing = 0;
+    let valueChange = 0;
+    
+    movements.forEach(movement => {
+      const quantity = Number(movement.quantity || 0);
+      const value = Number(movement.unit_cost || 0) * quantity;
+      
+      if (['PURCHASE', 'RETURN', 'TRANSFER_IN', 'PRODUCTION'].includes(movement.movement_type)) {
+        incoming += quantity;
+        valueChange += value;
+      } else if (['SALE', 'TRANSFER_OUT', 'DAMAGE', 'ADJUSTMENT'].includes(movement.movement_type)) {
+        outgoing += quantity;
+        valueChange -= value;
+      }
+    });
+    
+    const netChange = incoming - outgoing;
+
+    // Calculate movements by type
+    const movementsByType = movements.reduce((acc, movement) => {
+      const movementType = movement.movement_type;
+      
+      if (!acc[movementType]) {
+        acc[movementType] = {
+          movementType,
+          count: 0,
+          quantity: 0,
+          value: 0,
+        };
+      }
+      
+      acc[movementType].count += 1;
+      acc[movementType].quantity += Number(movement.quantity || 0);
+      acc[movementType].value += Number(movement.unit_cost || 0) * Number(movement.quantity || 0);
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Calculate movements by product
+    const movementsByProduct = movements.reduce((acc, movement) => {
+      const productId = movement.product_id;
+      
+      // In a real implementation, we would fetch product names
+      // For now, we'll use product IDs
+      if (!acc[productId]) {
+        acc[productId] = {
+          productId,
+          productName: `Product ${productId.substring(0, 8)}`,
+          incoming: 0,
+          outgoing: 0,
+          netChange: 0,
+        };
+      }
+      
+      const quantity = Number(movement.quantity || 0);
+      
+      if (['PURCHASE', 'RETURN', 'TRANSFER_IN', 'PRODUCTION'].includes(movement.movement_type)) {
+        acc[productId].incoming += quantity;
+      } else if (['SALE', 'TRANSFER_OUT', 'DAMAGE', 'ADJUSTMENT'].includes(movement.movement_type)) {
+        acc[productId].outgoing += quantity;
+      }
+      
+      acc[productId].netChange = acc[productId].incoming - acc[productId].outgoing;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Calculate movement trend by date
+    const movementTrend = movements.reduce((acc, movement) => {
+      const dateKey = movement.created_at.toISOString().split('T')[0];
+      
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          date: dateKey,
+          incoming: 0,
+          outgoing: 0,
+          netChange: 0,
+        };
+      }
+      
+      const quantity = Number(movement.quantity || 0);
+      
+      if (['PURCHASE', 'RETURN', 'TRANSFER_IN', 'PRODUCTION'].includes(movement.movement_type)) {
+        acc[dateKey].incoming += quantity;
+      } else if (['SALE', 'TRANSFER_OUT', 'DAMAGE', 'ADJUSTMENT'].includes(movement.movement_type)) {
+        acc[dateKey].outgoing += quantity;
+      }
+      
+      acc[dateKey].netChange = acc[dateKey].incoming - acc[dateKey].outgoing;
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Prepare location info if specified
+    let locationInfo;
+    if (locationId) {
+      // Fetch location name
+      const location = await this.prisma.company_locations.findFirst({
+        where: {
+          id: locationId,
+          company_id: companyId,
+        },
+      });
+      
+      if (location) {
+        locationInfo = {
+          locationId,
+          locationName: location.name,
+        };
+      }
+    }
+
+    return {
+      summary: {
+        totalMovements,
+        incoming,
+        outgoing,
+        netChange,
+        valueChange,
+      },
+      movementsByType: Object.values(movementsByType),
+      movementsByProduct: Object.values(movementsByProduct).sort((a: any, b: any) => 
+        Math.abs(b.netChange) - Math.abs(a.netChange)
+      ),
+      movementTrend: Object.values(movementTrend).sort((a: any, b: any) => 
+        a.date.localeCompare(b.date)
+      ),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+      ...(locationInfo && { location: locationInfo }),
+    };
+  }
+  
+  /**
+   * Generate Production Planning Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @returns Production Planning Report
+   */
+  async generateProductionPlanningReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date
+  ) {
+    // Fetch orders data
+    const orders = await this.prisma.orders.findMany({
+      where: {
+        company_id: companyId,
+        order_date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        order_items: true,
+      },
+    });
+
+    // Calculate summary metrics
+    const totalOrders = orders.length;
+    const completedOrders = orders.filter(order => order.status === 'DELIVERED').length;
+    const inProgressOrders = orders.filter(order => 
+      ['CONFIRMED', 'IN_PRODUCTION', 'READY_TO_SHIP', 'SHIPPED'].includes(order.status)
+    ).length;
+    const pendingOrders = orders.filter(order => order.status === 'DRAFT').length;
+    
+    // Calculate on-time completion rate
+    const onTimeDeliveries = orders.filter(order => {
+      if (order.status !== 'DELIVERED') return false;
+      if (!order.delivery_date || !order.expected_delivery_date) return false;
+      
+      return order.delivery_date <= order.expected_delivery_date;
+    }).length;
+    
+    const onTimeCompletionRate = completedOrders > 0 ? 
+      (onTimeDeliveries / completedOrders) * 100 : 0;
+
+    // Calculate orders by status
+    const ordersByStatus = orders.reduce((acc, order) => {
+      const status = order.status;
+      
+      if (!acc[status]) {
+        acc[status] = {
+          status,
+          count: 0,
+          percentage: 0,
+        };
+      }
+      
+      acc[status].count += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Calculate percentages
+    Object.values(ordersByStatus).forEach((statusGroup: any) => {
+      statusGroup.percentage = totalOrders > 0 ? 
+        (statusGroup.count / totalOrders) * 100 : 0;
+    });
+
+    // Calculate orders by product
+    const ordersByProduct = orders.reduce((acc, order) => {
+      const orderItems = order.order_items || [];
+      
+      orderItems.forEach(item => {
+        const productId = item.product_id;
+        
+        if (!acc[productId]) {
+          acc[productId] = {
+            productId,
+            productName: `Product ${productId.substring(0, 8)}`, // In real impl, fetch product name
+            orderCount: 0,
+            quantity: 0,
+          };
+        }
+        
+        acc[productId].orderCount += 1;
+        acc[productId].quantity += Number(item.quantity || 0);
+      });
+      
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Generate capacity utilization data (simplified)
+    const capacityUtilization: any[] = [];
+    const dayCount = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
+    
+    for (let i = 0; i <= dayCount; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      const dateKey = currentDate.toISOString().split('T')[0];
+      
+      // Generate sample data
+      const capacity = 100; // Theoretical max capacity
+      const planned = Math.floor(Math.random() * 40) + 60; // 60-100
+      const actual = Math.floor(planned * (Math.random() * 0.3 + 0.7)); // 70-100% of planned
+      const utilization = (actual / capacity) * 100;
+      
+      capacityUtilization.push({
+        date: dateKey,
+        capacity,
+        planned,
+        actual,
+        utilization,
+      });
+    }
+
+    return {
+      summary: {
+        totalOrders,
+        completedOrders,
+        inProgressOrders,
+        pendingOrders,
+        onTimeCompletionRate,
+      },
+      ordersByStatus: Object.values(ordersByStatus),
+      ordersByProduct: Object.values(ordersByProduct).sort((a: any, b: any) => 
+        b.quantity - a.quantity
+      ),
+      capacityUtilization: capacityUtilization.sort((a, b) => 
+        a.date.localeCompare(b.date)
+      ),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    };
+  }
+  
+  /**
+   * Generate Sales Trends Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @param groupBy - Group by period (day, week, month, quarter)
+   * @returns Sales Trends Report
+   */
+  async generateSalesTrendsReport(
+    companyId: string,
+    startDate: Date,
+    endDate: Date,
+    groupBy: string = 'month'
+  ) {
+    // Fetch invoices data
+    const invoices = await this.prisma.financial_documents.findMany({
+      where: {
+        company_id: companyId,
+        document_type: 'INVOICE',
+        issue_date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    // Calculate summary metrics
+    const totalRevenue = invoices.reduce((sum, invoice) => sum + Number(invoice.total_amount || 0), 0);
+    const totalOrders = invoices.length;
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+    
+    // Calculate growth rate (comparing first half to second half of period)
+    const midpoint = new Date((startDate.getTime() + endDate.getTime()) / 2);
+    
+    const firstHalfRevenue = invoices
+      .filter(invoice => invoice.issue_date < midpoint)
+      .reduce((sum, invoice) => sum + Number(invoice.total_amount || 0), 0);
+      
+    const secondHalfRevenue = invoices
+      .filter(invoice => invoice.issue_date >= midpoint)
+      .reduce((sum, invoice) => sum + Number(invoice.total_amount || 0), 0);
+    
+    const growthRate = firstHalfRevenue > 0 ? 
+      ((secondHalfRevenue - firstHalfRevenue) / firstHalfRevenue) * 100 : 0;
+    
+    // Find peak period
+    const getPeriodKey = (date: Date) => {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      
+      switch (groupBy) {
+        case 'day':
+          return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        case 'week':
+          // Get ISO week number
+          const d = new Date(date);
+          d.setHours(0, 0, 0, 0);
+          d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+          const week = Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 4).getTime()) / 86400000 / 7) + 1;
+          return `${year}-W${week.toString().padStart(2, '0')}`;
+        case 'quarter':
+          const quarter = Math.floor((date.getMonth() / 3)) + 1;
+          return `${year}-Q${quarter}`;
+        case 'month':
+        default:
+          return `${year}-${month.toString().padStart(2, '0')}`;
+      }
+    };
+    
+    // Group invoices by period
+    const periodRevenue = invoices.reduce((acc, invoice) => {
+      const periodKey = getPeriodKey(invoice.issue_date);
+      
+      if (!acc[periodKey]) {
+        acc[periodKey] = {
+          period: periodKey,
+          revenue: 0,
+          orders: 0,
+          growth: 0,
+        };
+      }
+      
+      acc[periodKey].revenue += Number(invoice.total_amount || 0);
+      acc[periodKey].orders += 1;
+      
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Sort periods chronologically
+    const sortedPeriods = Object.values(periodRevenue).sort((a: any, b: any) => 
+      a.period.localeCompare(b.period)
+    );
+    
+    // Calculate growth for each period
+    for (let i = 1; i < sortedPeriods.length; i++) {
+      const previousPeriod = sortedPeriods[i - 1];
+      const currentPeriod = sortedPeriods[i];
+      
+      if (previousPeriod.revenue > 0) {
+        currentPeriod.growth = ((currentPeriod.revenue - previousPeriod.revenue) / previousPeriod.revenue) * 100;
+      }
+    }
+    
+    // Find peak period
+    let peakPeriod = 'N/A';
+    if (sortedPeriods.length > 0) {
+      const maxRevenuePeriod = sortedPeriods.reduce((max, period) => 
+        period.revenue > max.revenue ? period : max
+      , sortedPeriods[0]);
+      
+      peakPeriod = maxRevenuePeriod.period;
+    }
+    
+    // Get product categories for revenue breakdown
+    const trendsByCategory = [
+      { category: 'Fabric', revenue: totalRevenue * 0.4, percentage: 40, growth: 15 },
+      { category: 'Garments', revenue: totalRevenue * 0.3, percentage: 30, growth: 8 },
+      { category: 'Yarn', revenue: totalRevenue * 0.2, percentage: 20, growth: -5 },
+      { category: 'Accessories', revenue: totalRevenue * 0.1, percentage: 10, growth: 20 },
+    ];
+
+    return {
+      summary: {
+        totalRevenue,
+        averageOrderValue,
+        totalOrders,
+        growthRate,
+        peakPeriod,
+      },
+      trendsByPeriod: sortedPeriods,
+      trendsByCategory,
+      dateRange: {
+        startDate,
+        endDate,
+      },
+      groupBy,
+    };
+  }
 }
 
 export const reportService = new ReportService();

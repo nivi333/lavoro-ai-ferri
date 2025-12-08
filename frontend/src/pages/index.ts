@@ -63,6 +63,8 @@ export { default as InventoryReportsPage } from './reports/InventoryReportsPage'
 export { default as SalesReportsPage } from './reports/SalesReportsPage';
 export { default as ProductionReportsPage } from './reports/ProductionReportsPage';
 export { default as QualityReportsPageReport } from './reports/QualityReportsPage';
+export { default as OperationalReportsPage } from './reports/OperationalReportsPage';
+export { default as AnalyticsReportsPage } from './reports/AnalyticsReportsPage';
 
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';

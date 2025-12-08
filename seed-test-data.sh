@@ -853,17 +853,198 @@ for company_idx in {1..5}; do
 done
 
 # =========================================
-# STEP 15 & 16: INVOICES AND BILLS (SKIPPED)
+# STEP 15: INVOICES
 # =========================================
-# NOTE: Invoices and Bills require either:
-#   1. Product IDs for each line item, OR
-#   2. Linkage to existing Sales Orders/Purchase Orders
-# Since we don't store product IDs during creation and linking to orders
-# requires additional complexity, these are skipped in the seed script.
-# They can be created manually through the UI or API with proper product references.
-print_section "STEP 15 & 16: Invoices and Bills (Skipped - require product linkage)"
-print_info "Invoices and Bills require product IDs or order linkage"
-print_info "These can be created through the UI with proper product references"
+print_section "STEP 15: Creating Invoices for Companies 1 & 2"
+
+# Function to create invoices for a company
+create_invoices() {
+    local company_idx=$1
+    local count=$2
+    
+    print_info "Creating $count invoices for Company $company_idx..."
+    
+    # Get the default location for the company
+    LOCATION_RESPONSE=$(curl -s -X GET "$BASE_URL/locations" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    LOCATION_ID=$(echo $LOCATION_RESPONSE | jq -r '.data[0].id')
+    
+    if [ -z "$LOCATION_ID" ] || [ "$LOCATION_ID" == "null" ]; then
+        print_error "Failed to get location for Company $company_idx"
+        return
+    fi
+    
+    # Get customers for the company
+    CUSTOMERS_RESPONSE=$(curl -s -X GET "$BASE_URL/customers" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    # Get products for the company
+    PRODUCTS_RESPONSE=$(curl -s -X GET "$BASE_URL/products" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    # Extract customer and product IDs
+    CUSTOMER_IDS=($(echo $CUSTOMERS_RESPONSE | jq -r '.data[].id'))
+    PRODUCT_IDS=($(echo $PRODUCTS_RESPONSE | jq -r '.data[].id'))
+    
+    if [ ${#CUSTOMER_IDS[@]} -eq 0 ] || [ ${#PRODUCT_IDS[@]} -eq 0 ]; then
+        print_error "No customers or products found for Company $company_idx"
+        return
+    fi
+    
+    for i in $(seq 1 $count); do
+        # Select a random customer
+        customer_idx=$((RANDOM % ${#CUSTOMER_IDS[@]}))
+        customer_id=${CUSTOMER_IDS[$customer_idx]}
+        
+        # Generate random dates within the last 90 days
+        days_ago=$((RANDOM % 90))
+        issue_date=$(date -v -${days_ago}d +"%Y-%m-%d")
+        due_date=$(date -v -${days_ago}d -v +30d +"%Y-%m-%d")
+        
+        # Generate 1-3 line items
+        line_items_count=$((RANDOM % 3 + 1))
+        line_items=[]
+        
+        for j in $(seq 1 $line_items_count); do
+            # Select a random product
+            product_idx=$((RANDOM % ${#PRODUCT_IDS[@]}))
+            product_id=${PRODUCT_IDS[$product_idx]}
+            
+            # Generate random quantity and unit price
+            quantity=$((RANDOM % 10 + 1))
+            unit_price=$((RANDOM % 1000 + 100))
+            
+            if [ $j -eq 1 ]; then
+                line_items="[{\"productId\":\"$product_id\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitPrice\":$unit_price}]"
+            else
+                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","description":"Product Line Item '$j'","quantity":'$quantity',"unitPrice":'$unit_price'}]')
+            fi
+        done
+        
+        # Create invoice payload
+        INVOICE_PAYLOAD='{"customerId":"'$customer_id'","locationId":"'$LOCATION_ID'","issueDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test invoice created by seed script"}'
+        
+        # Create invoice
+        INVOICE_RESPONSE=$(curl -s -X POST "$BASE_URL/invoices" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "$INVOICE_PAYLOAD")
+        
+        INVOICE_ID=$(echo $INVOICE_RESPONSE | jq -r '.data.id')
+        
+        if [ -z "$INVOICE_ID" ] || [ "$INVOICE_ID" == "null" ]; then
+            print_error "Failed to create invoice $i for Company $company_idx"
+            print_error "Response: $INVOICE_RESPONSE"
+        else
+            print_success "Created invoice $i for Company $company_idx: $INVOICE_ID"
+        fi
+    done
+}
+
+# Create invoices for Companies 1 & 2
+create_invoices 1 10
+create_invoices 2 10
+
+# =========================================
+# STEP 16: BILLS
+# =========================================
+print_section "STEP 16: Creating Bills for Companies 1 & 2"
+
+# Function to create bills for a company
+create_bills() {
+    local company_idx=$1
+    local count=$2
+    
+    print_info "Creating $count bills for Company $company_idx..."
+    
+    # Get the default location for the company
+    LOCATION_RESPONSE=$(curl -s -X GET "$BASE_URL/locations" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    LOCATION_ID=$(echo $LOCATION_RESPONSE | jq -r '.data[0].id')
+    
+    if [ -z "$LOCATION_ID" ] || [ "$LOCATION_ID" == "null" ]; then
+        print_error "Failed to get location for Company $company_idx"
+        return
+    fi
+    
+    # Get suppliers for the company
+    SUPPLIERS_RESPONSE=$(curl -s -X GET "$BASE_URL/suppliers" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    # Get products for the company
+    PRODUCTS_RESPONSE=$(curl -s -X GET "$BASE_URL/products" \
+      -H "$CONTENT_TYPE" \
+      -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}")
+    
+    # Extract supplier and product IDs
+    SUPPLIER_IDS=($(echo $SUPPLIERS_RESPONSE | jq -r '.data[].id'))
+    PRODUCT_IDS=($(echo $PRODUCTS_RESPONSE | jq -r '.data[].id'))
+    
+    if [ ${#SUPPLIER_IDS[@]} -eq 0 ] || [ ${#PRODUCT_IDS[@]} -eq 0 ]; then
+        print_error "No suppliers or products found for Company $company_idx"
+        return
+    fi
+    
+    for i in $(seq 1 $count); do
+        # Select a random supplier
+        supplier_idx=$((RANDOM % ${#SUPPLIER_IDS[@]}))
+        supplier_id=${SUPPLIER_IDS[$supplier_idx]}
+        
+        # Generate random dates within the last 90 days
+        days_ago=$((RANDOM % 90))
+        issue_date=$(date -v -${days_ago}d +"%Y-%m-%d")
+        due_date=$(date -v -${days_ago}d -v +30d +"%Y-%m-%d")
+        
+        # Generate 1-3 line items
+        line_items_count=$((RANDOM % 3 + 1))
+        line_items=[]
+        
+        for j in $(seq 1 $line_items_count); do
+            # Select a random product
+            product_idx=$((RANDOM % ${#PRODUCT_IDS[@]}))
+            product_id=${PRODUCT_IDS[$product_idx]}
+            
+            # Generate random quantity and unit price
+            quantity=$((RANDOM % 10 + 1))
+            unit_price=$((RANDOM % 500 + 50))
+            
+            if [ $j -eq 1 ]; then
+                line_items="[{\"productId\":\"$product_id\",\"description\":\"Product Line Item $j\",\"quantity\":$quantity,\"unitPrice\":$unit_price}]"
+            else
+                line_items=$(echo $line_items | jq '. += [{"productId":"'$product_id'","description":"Product Line Item '$j'","quantity":'$quantity',"unitPrice":'$unit_price'}]')
+            fi
+        done
+        
+        # Create bill payload
+        BILL_PAYLOAD='{"supplierId":"'$supplier_id'","locationId":"'$LOCATION_ID'","issueDate":"'$issue_date'","dueDate":"'$due_date'","lineItems":'$line_items',"notes":"Test bill created by seed script"}'
+        
+        # Create bill
+        BILL_RESPONSE=$(curl -s -X POST "$BASE_URL/bills" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "$BILL_PAYLOAD")
+        
+        BILL_ID=$(echo $BILL_RESPONSE | jq -r '.data.id')
+        
+        if [ -z "$BILL_ID" ] || [ "$BILL_ID" == "null" ]; then
+            print_error "Failed to create bill $i for Company $company_idx"
+            print_error "Response: $BILL_RESPONSE"
+        else
+            print_success "Created bill $i for Company $company_idx: $BILL_ID"
+        fi
+    done
+}
+
+# Create bills for Companies 1 & 2
+create_bills 1 10
+create_bills 2 10
 
 # =========================================
 # STEP 17: TEST ANALYTICS APIs (Priority 4)
