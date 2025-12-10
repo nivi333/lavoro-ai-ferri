@@ -1,223 +1,410 @@
 import React, { useState, useEffect } from 'react';
 import { useHeader } from '../../contexts/HeaderContext';
-import { Typography, Card, Row, Col, Breadcrumb, Input, Tag, Spin } from 'antd';
-import { SearchOutlined, DollarOutlined, HistoryOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Typography, Breadcrumb, Tabs, message } from 'antd';
 import MainLayout from '../../components/layout/MainLayout';
 import './shared/ReportStyles.scss';
+import { reportService } from '../../services/reportService';
+import dayjs, { Dayjs } from 'dayjs';
+import ReportFilters from './shared/ReportFilters';
+import ReportSummaryCards, { SummaryCardProps } from './shared/ReportSummaryCards';
 
-const { Title, Paragraph } = Typography;
+// Import Report Components
+import ProfitLossReport from '../../components/reports/financial/ProfitLossReport';
+import BalanceSheetReport from '../../components/reports/financial/BalanceSheetReport';
+import CashFlowReport from '../../components/reports/financial/CashFlowReport';
+import TrialBalanceReport from '../../components/reports/financial/TrialBalanceReport';
+import GSTReport from '../../components/reports/financial/GSTReport';
+import AccountsReceivableReport from '../../components/reports/financial/AccountsReceivableReport';
+import AccountsPayableReport from '../../components/reports/financial/AccountsPayableReport';
+import ExpenseSummaryReport from '../../components/reports/financial/ExpenseSummaryReport';
 
-interface ReportType {
-  id: string;
-  name: string;
-  description: string;
-  lastGenerated: string | null;
-  frequency: string;
-  path: string;
-}
+const { Title } = Typography;
 
 const FinancialReportsPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
+  const [activeTab, setActiveTab] = useState('profit-loss');
+
+  // Global Filter State
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  const [singleDate, setSingleDate] = useState<Dayjs | null>(dayjs());
   const [searchText, setSearchText] = useState('');
-  
+  const [loading, setLoading] = useState(false);
+  const [reportData, setReportData] = useState<any>(null);
+
+  // Tab-specific filters
+  const [period, setPeriod] = useState<string>('current-month'); // For GST Report
+
+  useEffect(() => {
+    const now = dayjs();
+    const firstDay = now.startOf('month');
+    const lastDay = now.endOf('month');
+    setDateRange([firstDay, lastDay]);
+  }, []);
+
   useEffect(() => {
     setHeaderActions(null);
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
-  
-  const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
-  const [loading, setLoading] = useState(false);
 
-  // Fetch financial reports from API
+  // Determine which date mode to use based on active tab
+  const isSingleDateTab = [
+    'accounts-receivable',
+    'accounts-payable',
+    'balance-sheet',
+    'trial-balance',
+  ].includes(activeTab);
+  const isGSTTab = activeTab === 'gst-reports';
+
   useEffect(() => {
-    const fetchFinancialReports = async () => {
-      setLoading(true);
-      try {
-        // In a real implementation, this would be an API call
-        // const response = await reportService.getFinancialReportsList();
-        // setReportTypes(response.data);
-        
-        // For now, we're defining the report structure but will fetch real data from API
-        setReportTypes([
-          {
-            id: 'profit-loss',
-            name: 'Profit & Loss Statement',
-            description: 'Revenue, expenses, and profit analysis',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/profit-loss'
-          },
-          {
-            id: 'balance-sheet',
-            name: 'Balance Sheet',
-            description: 'Assets, liabilities, and equity snapshot',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/balance-sheet'
-          },
-          {
-            id: 'cash-flow',
-            name: 'Cash Flow Statement',
-            description: 'Cash inflows and outflows by activity',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/cash-flow'
-          },
-          {
-            id: 'trial-balance',
-            name: 'Trial Balance',
-            description: 'Account-wise debit and credit balances',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/trial-balance'
-          },
-          {
-            id: 'gst-reports',
-            name: 'GST Reports',
-            description: 'GSTR-1, GSTR-3B, and tax summaries',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/gst-reports'
-          },
-          {
-            id: 'accounts-receivable',
-            name: 'Accounts Receivable Aging',
-            description: 'Outstanding customer invoices by age',
-            lastGenerated: null,
-            frequency: 'Weekly',
-            path: '/reports/financial/accounts-receivable'
-          },
-          {
-            id: 'accounts-payable',
-            name: 'Accounts Payable Aging',
-            description: 'Outstanding supplier bills by age',
-            lastGenerated: null,
-            frequency: 'Weekly',
-            path: '/reports/financial/accounts-payable'
-          },
-          {
-            id: 'expense-summary',
-            name: 'Expense Summary',
-            description: 'Expense breakdown by category and period',
-            lastGenerated: null,
-            frequency: 'Monthly',
-            path: '/reports/financial/expense-summary'
-          }
-        ]);
-      } catch (error) {
-        console.error('Error fetching financial reports:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchFinancialReports();
-  }, []);
+    if (isGSTTab) {
+      if (period) handleGenerateReport();
+    } else if ((!isSingleDateTab && dateRange) || (isSingleDateTab && singleDate)) {
+      handleGenerateReport();
+    }
+  }, [activeTab, dateRange, singleDate, period]);
 
-  const navigate = useNavigate();
-  
-  const filteredReports = reportTypes.filter(report => 
-    report.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    report.description.toLowerCase().includes(searchText.toLowerCase())
-  );
-  
-  const getFrequencyColor = (frequency: string) => {
-    switch (frequency) {
-      case 'Daily': return 'green';
-      case 'Weekly': return 'blue';
-      case 'Monthly': return 'purple';
-      case 'Quarterly': return 'orange';
-      case 'Yearly': return 'red';
-      default: return 'default';
+  const handleGenerateReport = async () => {
+    setLoading(true);
+    setReportData(null); // Clear previous data to avoid confusion
+    try {
+      let data: any;
+      const startDateStr = dateRange ? dateRange[0].format('YYYY-MM-DD') : '';
+      const endDateStr = dateRange ? dateRange[1].format('YYYY-MM-DD') : '';
+      const singleDateStr = singleDate ? singleDate.format('YYYY-MM-DD') : '';
+
+      switch (activeTab) {
+        case 'profit-loss':
+          data = await reportService.getProfitLossReport(startDateStr, endDateStr);
+          break;
+        case 'accounts-receivable':
+          data = await reportService.getARAgingReport(singleDateStr);
+          break;
+        case 'accounts-payable':
+          // @ts-ignore
+          if (reportService.getAPAgingReport) {
+            // @ts-ignore
+            data = await reportService.getAPAgingReport(singleDateStr);
+          }
+          break;
+        case 'balance-sheet':
+          // @ts-ignore
+          if (reportService.getBalanceSheetReport) {
+            // @ts-ignore
+            data = await reportService.getBalanceSheetReport(singleDateStr);
+          }
+          break;
+        case 'cash-flow':
+          // @ts-ignore
+          if (reportService.getCashFlowReport) {
+            // @ts-ignore
+            data = await reportService.getCashFlowReport(startDateStr, endDateStr);
+          }
+          break;
+        case 'trial-balance':
+          // @ts-ignore
+          if (reportService.getTrialBalanceReport) {
+            // @ts-ignore
+            data = await reportService.getTrialBalanceReport(singleDateStr);
+          }
+          break;
+        case 'expense-summary':
+          // @ts-ignore
+          if (reportService.getExpenseSummaryReport) {
+            // @ts-ignore
+            data = await reportService.getExpenseSummaryReport(startDateStr, endDateStr);
+          }
+          break;
+        case 'gst-reports':
+          // @ts-ignore
+          if (reportService.getGSTReport) {
+            // @ts-ignore
+            data = await reportService.getGSTReport(period);
+          }
+          break;
+        default:
+          // Fallback
+          break;
+      }
+
+      setReportData(data);
+    } catch (error) {
+      console.error('Error generating report:', error);
+      message.error('Failed to generate report');
+    } finally {
+      setLoading(false);
     }
   };
-  
-  const formatDate = (date: string | null) => {
-    if (!date) return null;
-    
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+  };
+
+  const getSummaryCards = (): SummaryCardProps[] => {
+    if (!reportData || !reportData.summary) return [];
+
+    if (activeTab === 'profit-loss') {
+      return [
+        {
+          title: 'Total Revenue',
+          value: reportData.summary.totalRevenue?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Gross Profit',
+          value: reportData.summary.grossProfit?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Net Profit',
+          value: reportData.summary.netProfit?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Profit Margin',
+          value: reportData.summary.profitMargin?.toFixed(2) || '0.00',
+          suffix: '%',
+          color: (reportData.summary.profitMargin || 0) >= 0 ? '#52c41a' : '#ff4d4f',
+        },
+      ];
+    } else if (activeTab === 'accounts-receivable') {
+      return [
+        {
+          title: 'Total Receivables',
+          value: reportData.summary.totalReceivables?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        { title: 'Current', value: reportData.summary.current?.toFixed(2) || '0.00', prefix: '₹' },
+        {
+          title: 'Overdue 90+',
+          value: reportData.summary.days90Plus?.toFixed(2) || '0.00',
+          prefix: '₹',
+          color: '#ff4d4f',
+        },
+      ];
+    } else if (activeTab === 'accounts-payable') {
+      return [
+        {
+          title: 'Total Payables',
+          value: reportData.summary.totalPayables?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        { title: 'Current', value: reportData.summary.current?.toFixed(2) || '0.00', prefix: '₹' },
+        {
+          title: 'Overdue 90+',
+          value: reportData.summary.days90Plus?.toFixed(2) || '0.00',
+          prefix: '₹',
+          color: '#ff4d4f',
+        },
+      ];
+    } else if (activeTab === 'balance-sheet') {
+      return [
+        {
+          title: 'Total Assets',
+          value: reportData.summary.totalAssets?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Total Liabilities',
+          value: reportData.summary.totalLiabilities?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Total Equity',
+          value: reportData.summary.totalEquity?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+      ];
+    } else if (activeTab === 'cash-flow') {
+      return [
+        {
+          title: 'Operating CF',
+          value: reportData.summary.operatingCashFlow?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Investing CF',
+          value: reportData.summary.investingCashFlow?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Financing CF',
+          value: reportData.summary.financingCashFlow?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Net Cash Flow',
+          value: reportData.summary.netCashFlow?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+      ];
+    } else if (activeTab === 'trial-balance') {
+      return [
+        {
+          title: 'Total Debits',
+          value: reportData.summary.totalDebits?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Total Credits',
+          value: reportData.summary.totalCredits?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Difference',
+          value: reportData.summary.difference?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+      ];
+    } else if (activeTab === 'expense-summary') {
+      return [
+        {
+          title: 'Total Expenses',
+          value: reportData.summary.totalExpenses?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        { title: 'Top Category', value: reportData.summary.topCategory || 'N/A' },
+        { title: 'Max Month', value: reportData.summary.maxMonth || 'N/A' }, // Assuming these fields exist or simplified
+      ];
+    } else if (activeTab === 'gst-reports') {
+      return [
+        {
+          title: 'Total GST Collected',
+          value: reportData.summary.totalGSTCollected?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Total GST Paid',
+          value: reportData.summary.totalGSTPaid?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+        {
+          title: 'Net Payable',
+          value: reportData.summary.netGSTPayable?.toFixed(2) || '0.00',
+          prefix: '₹',
+        },
+      ];
+    }
+
+    return [];
   };
 
   return (
     <MainLayout>
-      <div className="page-container">
-        <div className="page-header-section">
+      <div className='page-container'>
+        <div className='page-header-section'>
           <Breadcrumb
             items={[
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
-              { title: 'Financial Reports' }
+              { title: 'Financial Reports' },
             ]}
-            className="breadcrumb-navigation"
+            className='breadcrumb-navigation'
           />
           <Title level={2}>Financial Reports</Title>
-          <Paragraph>
-            View and generate financial reports for revenue, expenses, and financial performance metrics.
-          </Paragraph>
         </div>
 
-        <div className="filters-section">
-          <Input
-            placeholder="Search reports"
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={e => setSearchText(e.target.value)}
-            style={{ width: 300 }}
-            allowClear
+        <ReportFilters
+          dateRange={activeTab === 'gst-reports' ? null : dateRange}
+          setDateRange={setDateRange}
+          singleDate={singleDate}
+          setSingleDate={setSingleDate}
+          dateMode={isSingleDateTab ? 'single' : 'range'}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          onGenerate={handleGenerateReport}
+          loading={loading}
+          showPeriodSelect={activeTab === 'gst-reports'}
+          period={period}
+          setPeriod={setPeriod}
+        />
+
+        <ReportSummaryCards cards={getSummaryCards()} loading={loading} />
+
+        <div className='reports-tabs-container'>
+          <Tabs
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            type='card'
+            className='reports-tabs'
+            destroyOnHidden={true}
+            items={[
+              {
+                key: 'profit-loss',
+                label: 'Profit & Loss',
+                children: (
+                  <ProfitLossReport data={reportData} loading={loading} searchText={searchText} />
+                ),
+              },
+              {
+                key: 'balance-sheet',
+                label: 'Balance Sheet',
+                children: (
+                  <BalanceSheetReport data={reportData} loading={loading} searchText={searchText} />
+                ),
+              },
+              {
+                key: 'cash-flow',
+                label: 'Cash Flow',
+                children: (
+                  <CashFlowReport data={reportData} loading={loading} searchText={searchText} />
+                ),
+              },
+              {
+                key: 'trial-balance',
+                label: 'Trial Balance',
+                children: (
+                  <TrialBalanceReport data={reportData} loading={loading} searchText={searchText} />
+                ),
+              },
+              {
+                key: 'gst-reports',
+                label: 'GST Reports',
+                children: (
+                  <GSTReport
+                    data={reportData}
+                    loading={loading}
+                    searchText={searchText}
+                    period={period}
+                    setPeriod={setPeriod}
+                  />
+                ),
+              },
+              {
+                key: 'accounts-receivable',
+                label: 'Accounts Receivable',
+                children: (
+                  <AccountsReceivableReport
+                    data={reportData}
+                    loading={loading}
+                    searchText={searchText}
+                  />
+                ),
+              },
+              {
+                key: 'accounts-payable',
+                label: 'Accounts Payable',
+                children: (
+                  <AccountsPayableReport
+                    data={reportData}
+                    loading={loading}
+                    searchText={searchText}
+                  />
+                ),
+              },
+              {
+                key: 'expense-summary',
+                label: 'Expense Summary',
+                children: (
+                  <ExpenseSummaryReport
+                    data={reportData}
+                    loading={loading}
+                    searchText={searchText}
+                  />
+                ),
+              },
+            ]}
           />
         </div>
-
-        {loading ? (
-          <div className="loading-container">
-            <Spin size="large" />
-            <p>Loading reports...</p>
-          </div>
-        ) : (
-          <div className="reports-grid">
-            {filteredReports.length > 0 ? (
-              <Row gutter={[16, 16]}>
-                {filteredReports.map(report => (
-                  <Col xs={24} sm={12} md={8} lg={6} key={report.id}>
-                    <Card 
-                      className="report-card"
-                      hoverable
-                      onClick={() => navigate(report.path)}
-                    >
-                      <div className="report-card-icon">
-                        <DollarOutlined />
-                      </div>
-                      <div className="report-card-content">
-                        <h3 className="report-card-title">{report.name}</h3>
-                        <p className="report-card-description">{report.description}</p>
-                        <div className="report-card-footer">
-                          <Tag color={getFrequencyColor(report.frequency)}>{report.frequency}</Tag>
-                          {report.lastGenerated ? (
-                            <div className="report-last-generated">
-                              <HistoryOutlined /> {formatDate(report.lastGenerated)}
-                            </div>
-                          ) : (
-                            <Tag color="warning">Never Generated</Tag>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            ) : (
-              <div className="no-reports-found">
-                <p>No reports found matching your search.</p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </MainLayout>
   );

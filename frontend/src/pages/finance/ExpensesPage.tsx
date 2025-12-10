@@ -20,7 +20,6 @@ import {
   InputNumber,
 } from 'antd';
 import { MoreOutlined, DollarOutlined, HomeOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
 import { MainLayout } from '../../components/layout';
@@ -75,7 +74,7 @@ export default function ExpensesPage() {
   const { currentCompany } = useAuth();
   const { setHeaderActions } = useHeader();
   // Using useNavigate hook for potential future navigation needs
-  const navigate = useNavigate();
+
   const [expenses, setExpenses] = useState<ExpenseSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);

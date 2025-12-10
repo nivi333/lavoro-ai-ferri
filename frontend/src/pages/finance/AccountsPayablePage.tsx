@@ -140,7 +140,7 @@ export default function AccountsPayablePage() {
     navigate(`/bills/${billData.billId}`);
   };
 
-  const handleCreatePayment = (billData: BillSummary) => {
+  const handleCreatePayment = (_billData: BillSummary) => {
     // This would be implemented when the payment recording functionality is available
     message.info('Payment recording functionality will be implemented in a future update.');
   };

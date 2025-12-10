@@ -168,7 +168,7 @@ export default function CompanyDetailPage() {
 
   if (!company) {
     return (
-      <div className='companies-loading'>
+      <div style={{ textAlign: 'center', padding: '50px' }}>
         <Spin size='large' tip='Loading company details...' />
       </div>
     );
@@ -177,13 +177,15 @@ export default function CompanyDetailPage() {
   const isActive = extendedCompany.isActive !== false;
 
   const contactInfo = extendedCompany.contactInfo || '';
-  const inferredEmail = extendedCompany.documentsEmailRecipient
-    || (contactInfo.includes('@') ? contactInfo : undefined);
-  const inferredPhone = extendedCompany.phone
-    || (!contactInfo.includes('@') && contactInfo ? contactInfo : undefined);
+  const inferredEmail =
+    extendedCompany.documentsEmailRecipient ||
+    (contactInfo.includes('@') ? contactInfo : undefined);
+  const inferredPhone =
+    extendedCompany.phone || (!contactInfo.includes('@') && contactInfo ? contactInfo : undefined);
   const website = extendedCompany.website;
   const websiteNode = website ? (
-    <a href={website.startsWith('http') ? website : `https://${website}`}
+    <a
+      href={website.startsWith('http') ? website : `https://${website}`}
       target='_blank'
       rel='noreferrer'
       className='profile-link'
@@ -211,11 +213,12 @@ export default function CompanyDetailPage() {
       })
     : undefined;
 
-  const taxRegisteredText = extendedCompany.taxRegistered === undefined
-    ? undefined
-    : extendedCompany.taxRegistered
-      ? 'Yes'
-      : 'No';
+  const taxRegisteredText =
+    extendedCompany.taxRegistered === undefined
+      ? undefined
+      : extendedCompany.taxRegistered
+        ? 'Yes'
+        : 'No';
 
   const profileSections: ProfileSection[] = [
     {
@@ -224,12 +227,15 @@ export default function CompanyDetailPage() {
       items: [
         { label: 'Industry', value: extendedCompany.industry },
         { label: 'Country', value: extendedCompany.country },
-        { label: 'Primary Contact', value: (
-          <>
-            {inferredEmail && <div>{inferredEmail}</div>}
-            {inferredPhone && <div>{inferredPhone}</div>}
-          </>
-        ) },
+        {
+          label: 'Primary Contact',
+          value: (
+            <>
+              {inferredEmail && <div>{inferredEmail}</div>}
+              {inferredPhone && <div>{inferredPhone}</div>}
+            </>
+          ),
+        },
         { label: 'Role', value: extendedCompany.role },
       ],
     },
@@ -247,9 +253,15 @@ export default function CompanyDetailPage() {
       key: 'registration',
       title: 'Registration Information',
       items: [
-        { label: 'Registration Type', value: extendedCompany.registrationType || extendedCompany.businessType },
+        {
+          label: 'Registration Type',
+          value: extendedCompany.registrationType || extendedCompany.businessType,
+        },
         { label: 'Default Engagement Type', value: extendedCompany.defaultEngagementType },
-        { label: 'Registration Number', value: extendedCompany.registrationNumber || extendedCompany.taxId },
+        {
+          label: 'Registration Number',
+          value: extendedCompany.registrationNumber || extendedCompany.taxId,
+        },
         { label: 'Registration Date', value: formattedRegistrationDate },
       ],
     },
@@ -258,7 +270,10 @@ export default function CompanyDetailPage() {
       title: 'Tax Information',
       items: [
         { label: 'Tax Registered', value: taxRegisteredText },
-        { label: 'Tax Registration Number', value: extendedCompany.taxRegistrationNumber || extendedCompany.taxId },
+        {
+          label: 'Tax Registration Number',
+          value: extendedCompany.taxRegistrationNumber || extendedCompany.taxId,
+        },
         { label: 'Registered Date', value: extendedCompany.taxRegistrationDate },
         { label: 'Company Currency', value: extendedCompany.currency },
       ],
@@ -289,7 +304,9 @@ export default function CompanyDetailPage() {
       <div className='company-detail-page'>
         <div className='company-detail-top'>
           <div>
-            <Title level={3} className='company-detail-title'>Company Profile</Title>
+            <Title level={3} className='company-detail-title'>
+              Company Profile
+            </Title>
             <Text type='secondary'>An overview of your company information and registrations</Text>
           </div>
           <Space size={8} wrap>
@@ -320,16 +337,24 @@ export default function CompanyDetailPage() {
                 {extendedCompany.name?.charAt(0).toUpperCase()}
               </Avatar>
               <div className='company-profile-meta'>
-                <Title level={4} className='company-profile-name'>{extendedCompany.name}</Title>
+                <Title level={4} className='company-profile-name'>
+                  {extendedCompany.name}
+                </Title>
                 <div className='company-profile-tags'>
                   {extendedCompany.industry && <Tag>{extendedCompany.industry}</Tag>}
-                  <Tag color={isActive ? 'success' : 'default'}>{isActive ? 'Active' : 'Inactive'}</Tag>
+                  <Tag color={isActive ? 'success' : 'default'}>
+                    {isActive ? 'Active' : 'Inactive'}
+                  </Tag>
                   {extendedCompany.role && <Tag>{extendedCompany.role}</Tag>}
                 </div>
                 {contactPills.length > 0 && (
                   <div className='company-profile-contact'>
                     {contactPills.map(item => (
-                      <Space key={String(item.text)} size={8} className='company-profile-contact-item'>
+                      <Space
+                        key={String(item.text)}
+                        size={8}
+                        className='company-profile-contact-item'
+                      >
                         {item.icon}
                         <span>{item.text}</span>
                       </Space>
@@ -341,7 +366,9 @@ export default function CompanyDetailPage() {
             {extendedCompany.slug && (
               <div className='company-profile-code' style={{ textAlign: 'left' }}>
                 <Text type='secondary'>Company Code</Text>
-                <div className='company-profile-code-value'>{extendedCompany.slug.toUpperCase()}</div>
+                <div className='company-profile-code-value'>
+                  {extendedCompany.slug.toUpperCase()}
+                </div>
               </div>
             )}
           </div>

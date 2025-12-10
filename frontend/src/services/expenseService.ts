@@ -1,13 +1,4 @@
-import { AuthStorage } from '../utils/storage';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
-
-export type ExpenseStatus =
-  | 'PENDING'
-  | 'APPROVED'
-  | 'REJECTED'
-  | 'PAID'
-  | 'CANCELLED';
+export type ExpenseStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';
 
 export type ExpenseCategory =
   | 'RENT'
@@ -22,13 +13,7 @@ export type ExpenseCategory =
   | 'TAXES'
   | 'MISCELLANEOUS';
 
-export type PaymentMethod =
-  | 'CASH'
-  | 'CHEQUE'
-  | 'BANK_TRANSFER'
-  | 'UPI'
-  | 'CARD'
-  | 'OTHER';
+export type PaymentMethod = 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI' | 'CARD' | 'OTHER';
 
 export interface ExpenseSummary {
   id: string;
@@ -110,18 +95,6 @@ export interface ListExpensesParams {
 }
 
 class ExpenseService {
-  private getAuthHeaders() {
-    const tokens = AuthStorage.getTokens();
-    if (!tokens?.accessToken) {
-      throw new Error('No access token available');
-    }
-
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${tokens.accessToken}`,
-    };
-  }
-
   async getExpenses(params?: ListExpensesParams): Promise<ExpenseSummary[]> {
     const query = new URLSearchParams();
 
@@ -135,7 +108,7 @@ class ExpenseService {
     if (params?.minAmount !== undefined) query.append('minAmount', params.minAmount.toString());
     if (params?.maxAmount !== undefined) query.append('maxAmount', params.maxAmount.toString());
 
-    const url = `${API_BASE_URL}/expenses${query.toString() ? `?${query.toString()}` : ''}`;
+    // const url = `${API_BASE_URL}/expenses${query.toString() ? `?${query.toString()}` : ''}`;
 
     // Mock data for now - will be replaced with actual API call when backend is ready
     return this.getMockExpenses();
@@ -145,7 +118,9 @@ class ExpenseService {
     // Mock data for now - will be replaced with actual API call when backend is ready
     const mockExpense: ExpenseDetail = {
       id: Math.random().toString(36).substring(2, 15),
-      expenseId: `EXP${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      expenseId: `EXP${Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, '0')}`,
       companyId: 'COMP001',
       title: data.title,
       description: data.description,
@@ -173,7 +148,7 @@ class ExpenseService {
     // Mock data for now - will be replaced with actual API call when backend is ready
     const mockExpenses = this.getMockExpenses();
     const expense = mockExpenses.find(e => e.expenseId === expenseId);
-    
+
     if (!expense) {
       throw new Error('Expense not found');
     }
@@ -189,7 +164,7 @@ class ExpenseService {
     // Mock data for now - will be replaced with actual API call when backend is ready
     const mockExpenses = this.getMockExpenses();
     const expense = mockExpenses.find(e => e.expenseId === expenseId);
-    
+
     if (!expense) {
       throw new Error('Expense not found');
     }
@@ -205,11 +180,15 @@ class ExpenseService {
     return updatedExpense;
   }
 
-  async updateExpenseStatus(expenseId: string, status: ExpenseStatus, reason?: string): Promise<ExpenseSummary> {
+  async updateExpenseStatus(
+    expenseId: string,
+    status: ExpenseStatus,
+    _reason?: string
+  ): Promise<ExpenseSummary> {
     // Mock data for now - will be replaced with actual API call when backend is ready
     const mockExpenses = this.getMockExpenses();
     const expense = mockExpenses.find(e => e.expenseId === expenseId);
-    
+
     if (!expense) {
       throw new Error('Expense not found');
     }
@@ -223,7 +202,7 @@ class ExpenseService {
     return updatedExpense;
   }
 
-  async deleteExpense(expenseId: string): Promise<void> {
+  async deleteExpense(_expenseId: string): Promise<void> {
     // Mock data for now - will be replaced with actual API call when backend is ready
     // Just return without doing anything
   }
@@ -231,18 +210,27 @@ class ExpenseService {
   // Helper method to generate mock data
   private getMockExpenses(): ExpenseSummary[] {
     const categories: ExpenseCategory[] = [
-      'RENT', 'UTILITIES', 'SALARIES', 'EQUIPMENT', 'SUPPLIES', 
-      'MAINTENANCE', 'TRAVEL', 'MARKETING', 'INSURANCE', 'TAXES', 'MISCELLANEOUS'
+      'RENT',
+      'UTILITIES',
+      'SALARIES',
+      'EQUIPMENT',
+      'SUPPLIES',
+      'MAINTENANCE',
+      'TRAVEL',
+      'MARKETING',
+      'INSURANCE',
+      'TAXES',
+      'MISCELLANEOUS',
     ];
-    
+
     const statuses: ExpenseStatus[] = ['PENDING', 'APPROVED', 'REJECTED', 'PAID', 'CANCELLED'];
-    
+
     const mockExpenses: ExpenseSummary[] = [];
-    
+
     for (let i = 1; i <= 20; i++) {
       const date = new Date();
       date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-      
+
       mockExpenses.push({
         id: `exp-${i}`,
         expenseId: `EXP${i.toString().padStart(4, '0')}`,
@@ -267,7 +255,7 @@ class ExpenseService {
         },
       });
     }
-    
+
     return mockExpenses;
   }
 }

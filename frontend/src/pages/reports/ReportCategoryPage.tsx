@@ -24,7 +24,6 @@ interface ReportCategoryPageProps {
 }
 
 const ReportCategoryPage: React.FC<ReportCategoryPageProps> = ({
-  category,
   title,
   icon,
   reports,
@@ -69,9 +68,9 @@ const ReportCategoryPage: React.FC<ReportCategoryPageProps> = ({
               <Row gutter={[16, 16]}>
                 {availableReports.map(report => (
                   <Col xs={24} sm={12} lg={8} key={report.key}>
-                    <Card 
-                      className='report-card' 
-                      hoverable 
+                    <Card
+                      className='report-card'
+                      hoverable
                       onClick={() => onReportClick && onReportClick(report)}
                     >
                       <div className='report-icon'>
@@ -79,12 +78,12 @@ const ReportCategoryPage: React.FC<ReportCategoryPageProps> = ({
                       </div>
                       <h4 className='report-title'>{report.title}</h4>
                       <p className='report-description'>{report.description}</p>
-                      <Button 
-                        type='primary' 
-                        icon={<DownloadOutlined />} 
-                        size='small' 
+                      <Button
+                        type='primary'
+                        icon={<DownloadOutlined />}
+                        size='small'
                         block
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           onReportClick && onReportClick(report);
                         }}

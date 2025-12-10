@@ -203,22 +203,19 @@ const FinanceOverviewPage: React.FC = () => {
             <div className='header-with-actions'>
               <Heading level={2}>Finance Overview</Heading>
               <Space className='header-actions'>
-                <Button 
-                  icon={<BankOutlined />} 
+                <Button
+                  icon={<BankOutlined />}
                   onClick={() => navigate('/finance/accounts-receivable')}
                 >
                   Receivables
                 </Button>
-                <Button 
-                  icon={<CreditCardOutlined />} 
+                <Button
+                  icon={<CreditCardOutlined />}
                   onClick={() => navigate('/finance/accounts-payable')}
                 >
                   Payables
                 </Button>
-                <Button 
-                  icon={<FileTextOutlined />} 
-                  onClick={() => navigate('/finance/expenses')}
-                >
+                <Button icon={<FileTextOutlined />} onClick={() => navigate('/finance/expenses')}>
                   Expenses
                 </Button>
               </Space>
@@ -228,7 +225,9 @@ const FinanceOverviewPage: React.FC = () => {
           {/* Key Financial Metrics */}
           {loading ? (
             <div className='loading-container'>
-              <Spin size='large' tip='Loading financial data...' />
+              <div style={{ textAlign: 'center', padding: '50px' }}>
+                <Spin size='large' tip='Loading financial data...' />
+              </div>
             </div>
           ) : (
             <>

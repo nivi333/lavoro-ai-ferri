@@ -207,24 +207,6 @@ export const CORE_MODULES: MenuItem[] = [
         icon: ShoppingOutlined,
         path: '/reports/sales',
       },
-      {
-        key: 'production-reports',
-        label: 'Production Reports',
-        icon: AppstoreOutlined,
-        path: '/reports/production',
-      },
-      {
-        key: 'quality-reports',
-        label: 'Quality Reports',
-        icon: SafetyOutlined,
-        path: '/reports/quality',
-      },
-      {
-        key: 'analytics-reports',
-        label: 'Analytics Reports',
-        icon: BarChartOutlined,
-        path: '/reports/analytics',
-      },
     ],
   },
 ];

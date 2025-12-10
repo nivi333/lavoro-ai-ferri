@@ -80,7 +80,9 @@ export default function CompaniesListPage() {
   if (isLoading || lazyLoading) {
     return (
       <div className='companies-loading'>
-        <Spin size='large' tip={COMPANY_TEXT.LOADING_COMPANIES} />
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <Spin size='large' tip={COMPANY_TEXT.LOADING_COMPANIES} />
+        </div>
       </div>
     );
   }
@@ -217,9 +219,9 @@ export default function CompaniesListPage() {
                             }}
                           />
                           {company.status === 'PENDING' && (
-                            <div onClick={(e) => e.stopPropagation()}>
+                            <div onClick={e => e.stopPropagation()}>
                               <GradientButton
-                                size="small"
+                                size='small'
                                 onClick={() => handleAcceptInvitation(company.invitationId!)}
                                 style={{ marginLeft: 8, fontSize: '11px', padding: '2px 8px' }}
                               >
@@ -237,7 +239,11 @@ export default function CompaniesListPage() {
             </>
           ) : (
             <div className='companies-empty-state'>
-              <Avatar size={64} style={{ border: '2px solid #b3b3b3', padding: '4px', backgroundColor: '#f0f0f0' }} icon={<BankOutlined />} />
+              <Avatar
+                size={64}
+                style={{ border: '2px solid #b3b3b3', padding: '4px', backgroundColor: '#f0f0f0' }}
+                icon={<BankOutlined />}
+              />
               <div className='companies-empty-text'>{COMPANY_TEXT.NO_COMPANY_CREATED}</div>
             </div>
           )}
