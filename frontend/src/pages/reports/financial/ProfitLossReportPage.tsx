@@ -18,11 +18,10 @@ import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icon
 import MainLayout from '../../../components/layout/MainLayout';
 import { reportService } from '../../../services/reportService';
 import '../shared/ReportStyles.scss';
-import { GradientButton } from '@/components/ui';
+import dayjs from 'dayjs';
 // Replace GradientButton with regular Button
 
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
 
 interface ProfitLossData {
   key: string;
