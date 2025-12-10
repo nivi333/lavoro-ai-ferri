@@ -8,12 +8,12 @@ import {
   Breadcrumb,
   Input,
   Button,
-  Select,
   Table,
   Space,
   Spin,
   message,
   Tag,
+  DatePicker,
 } from 'antd';
 import { SearchOutlined, FileTextOutlined, SaveOutlined, TrophyOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
@@ -52,7 +52,7 @@ const TopSellingProductsReportPage: React.FC = () => {
       try {
         const startDate = firstDay.toISOString().split('T')[0];
         const endDate = lastDay.toISOString().split('T')[0];
-        const data = await reportService.getProductPerformance(startDate, endDate);
+        const data = await reportService.getProductPerformanceReport(startDate, endDate, 'month');
         setReportData(data);
       } catch (error) {
         console.error('Error generating report:', error);
@@ -75,7 +75,7 @@ const TopSellingProductsReportPage: React.FC = () => {
     try {
       const startDate = dateRange[0].toISOString().split('T')[0];
       const endDate = dateRange[1].toISOString().split('T')[0];
-      const data = await reportService.getProductPerformance(startDate, endDate);
+      const data = await reportService.getProductPerformanceReport(startDate, endDate, 'month');
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
