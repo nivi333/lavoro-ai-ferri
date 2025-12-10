@@ -41,33 +41,33 @@ This document outlines the detailed implementation plan for refactoring the Repo
 - [x] Create StockSummaryReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/StockSummaryReportPage.tsx`
   - API: `reportService.getStockSummaryReport()`
-- [/] Create StockMovementReportPage.tsx with API integration
+- [x] Create StockMovementReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/StockMovementReportPage.tsx`
   - API: `reportService.getStockMovementReport(startDate, endDate)`
-- [ ] Create LowStockReportPage.tsx with API integration
+- [x] Create LowStockReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/LowStockReportPage.tsx`
   - API: `reportService.getLowStockReport()`
-- [ ] Create StockAgingReportPage.tsx with API integration
+- [x] Create StockAgingReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/StockAgingReportPage.tsx`
   - API: `reportService.getStockAgingReport(asOfDate)`
-- [ ] Create InventoryValuationReportPage.tsx with API integration
+- [x] Create InventoryValuationReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/inventory/InventoryValuationReportPage.tsx`
   - API: `reportService.getInventoryValuationReport(asOfDate)`
 
 ### 4. Implement API Integration for Sales Reports
-- [ ] Create SalesSummaryReportPage.tsx with API integration
+- [x] Create SalesSummaryReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/sales/SalesSummaryReportPage.tsx`
   - API: `reportService.getSalesSummaryReport(startDate, endDate)`
-- [ ] Create SalesTrendReportPage.tsx with API integration
+- [x] Create SalesTrendReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/sales/SalesTrendReportPage.tsx`
   - API: `reportService.getSalesTrendReport(startDate, endDate)`
-- [ ] Create TopSellingProductsReportPage.tsx with API integration
+- [x] Create TopSellingProductsReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/sales/TopSellingProductsReportPage.tsx`
   - API: `reportService.getTopSellingProductsReport(startDate, endDate, limit)`
-- [ ] Create CustomerPurchaseHistoryReportPage.tsx with API integration
+- [x] Create CustomerPurchaseHistoryReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/sales/CustomerPurchaseHistoryReportPage.tsx`
   - API: `reportService.getCustomerPurchaseHistoryReport(customerId, startDate, endDate)`
-- [ ] Create SalesByRegionReportPage.tsx with API integration
+- [x] Create SalesByRegionReportPage.tsx with API integration
   - Path: `/frontend/src/pages/reports/sales/SalesByRegionReportPage.tsx`
   - API: `reportService.getSalesByRegionReport(startDate, endDate)`
 
@@ -79,6 +79,7 @@ This document outlines the detailed implementation plan for refactoring the Repo
 - [x] Fixed SCSS import paths in all report pages
 - [x] Added routes for all created report pages
 - [x] Removed all dummy data from category pages
+- [x] Implemented auto-load for all report screens to show data on mount
 
 ## Backend Tasks
 

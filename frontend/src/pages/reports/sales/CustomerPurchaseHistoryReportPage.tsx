@@ -19,6 +19,7 @@ import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icon
 import MainLayout from '../../../components/layout/MainLayout';
 import '../shared/ReportStyles.scss';
 import dayjs from 'dayjs';
+import { reportService } from '../../../services/reportService';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -47,22 +48,39 @@ const CustomerPurchaseHistoryReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
   const handleGenerateReport = async () => {
     setLoading(true);
     try {
-      // TODO: Implement API call when backend endpoint is ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      message.info('Customer Purchase History Report API endpoint not yet implemented');
+      const [startDate, endDate] = dateRange;
+      const data = await reportService.getCustomerPurchaseHistoryReport(
+        customerId,
+        startDate.format('YYYY-MM-DD'),
+        endDate.format('YYYY-MM-DD')
+      );
+
+      const items = data.customerInsights.map((item: any) => ({
+        key: item.customerId,
+        customerCode: item.customerId.substring(0, 8).toUpperCase(), // Placeholder
+        customerName: item.customerName,
+        totalOrders: item.orderCount,
+        totalRevenue: item.totalSpent,
+        averageOrderValue: item.averageOrderValue,
+        lastPurchaseDate: new Date(item.lastPurchaseDate).toLocaleDateString(),
+      }));
+
+      const totalOrders = items.reduce((sum: number, item: any) => sum + item.totalOrders, 0);
+
       setReportData({
         summary: {
-          totalCustomers: 0,
-          totalRevenue: 0,
-          totalOrders: 0,
+          totalCustomers: data.summary.totalCustomers,
+          totalRevenue: data.summary.totalRevenue,
+          totalOrders: totalOrders,
         },
-        items: [],
+        items,
       });
     } catch (error) {
       console.error('Error generating report:', error);
@@ -200,16 +218,12 @@ const CustomerPurchaseHistoryReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
+            ) : (
               <Table
                 columns={columns}
-                dataSource={reportData.items}
+                dataSource={reportData?.items || []}
                 pagination={{ pageSize: 10 }}
               />
-            ) : (
-              <div className='empty-report'>
-                <p>Click "Generate Report" to view the Customer Purchase History.</p>
-              </div>
             )}
           </div>
         </div>

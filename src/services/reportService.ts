@@ -2444,6 +2444,146 @@ export class ReportService {
     // Delegate to analyticsReportService
     return analyticsReportService.generateTextileAnalyticsReport(companyId, startDate, endDate);
   }
+
+  /**
+   * Generate Stock Aging Report
+   * @param companyId - Company ID
+   * @param asOfDate - As of date
+   * @returns Stock Aging Report
+   */
+  async generateStockAgingReport(companyId: string, asOfDate: Date = new Date()) {
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
+    }
+
+    // Get all inventory items
+    const inventory = await this.prisma.location_inventory.findMany({
+      where: {
+        company_id: companyId,
+        stock_quantity: { gt: 0 },
+      },
+      include: {
+        product: true,
+        location: true,
+      },
+    });
+
+    const agingBuckets = {
+      '0-30': 0,
+      '31-60': 0,
+      '61-90': 0,
+      '91-120': 0,
+      '120+': 0,
+    };
+
+    const agingDetails = inventory.map(item => {
+      // Calculate age based on last_updated
+      const lastUpdated = item.last_updated;
+      const ageInDays = Math.floor(
+        (asOfDate.getTime() - lastUpdated.getTime()) / (1000 * 3600 * 24)
+      );
+
+      let bucket = '0-30';
+      if (ageInDays > 120) bucket = '120+';
+      else if (ageInDays > 90) bucket = '91-120';
+      else if (ageInDays > 60) bucket = '61-90';
+      else if (ageInDays > 30) bucket = '31-60';
+
+      const value = Number(item.stock_quantity) * Number(item.product?.cost_price || 0);
+      agingBuckets[bucket as keyof typeof agingBuckets] += value;
+
+      return {
+        productId: item.product_id,
+        productName: item.product?.name || 'Unknown Product',
+        locationName: item.location?.name || 'Unknown Location',
+        quantity: Number(item.stock_quantity),
+        value,
+        ageInDays,
+        bucket,
+        lastUpdated,
+      };
+    });
+
+    const totalValue = Object.values(agingBuckets).reduce((sum, val) => sum + val, 0);
+
+    return {
+      summary: {
+        totalValue,
+        asOfDate,
+      },
+      agingBuckets: Object.entries(agingBuckets).map(([bucket, value]) => ({
+        bucket,
+        value,
+        percentage: totalValue > 0 ? (value / totalValue) * 100 : 0,
+      })),
+      agingDetails: agingDetails.sort((a, b) => b.ageInDays - a.ageInDays),
+    };
+  }
+
+  /**
+   * Generate Sales by Region Report
+   * @param companyId - Company ID
+   * @param startDate - Start date
+   * @param endDate - End date
+   * @returns Sales by Region Report
+   */
+  async generateSalesByRegionReport(companyId: string, startDate: Date, endDate: Date) {
+    if (!companyId || !companyId.trim()) {
+      throw new Error('Missing required field: companyId');
+    }
+
+    // Get invoices with location data
+    const invoices = await this.prisma.invoices.findMany({
+      where: {
+        company_id: companyId,
+        is_active: true,
+        invoice_date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        location: true,
+      },
+    });
+
+    const salesByRegion: Record<string, any> = {};
+    let totalSales = 0;
+
+    invoices.forEach(inv => {
+      const region = inv.location?.name || 'Unknown Region';
+      const amount = Number(inv.total_amount);
+
+      if (!salesByRegion[region]) {
+        salesByRegion[region] = {
+          region,
+          revenue: 0,
+          orderCount: 0,
+        };
+      }
+
+      salesByRegion[region].revenue += amount;
+      salesByRegion[region].orderCount += 1;
+      totalSales += amount;
+    });
+
+    const regionData = Object.values(salesByRegion).map(item => ({
+      ...item,
+      percentage: totalSales > 0 ? (item.revenue / totalSales) * 100 : 0,
+    }));
+
+    return {
+      summary: {
+        totalSales,
+        regionCount: regionData.length,
+      },
+      salesByRegion: regionData.sort((a, b) => b.revenue - a.revenue),
+      dateRange: {
+        startDate,
+        endDate,
+      },
+    };
+  }
 }
 
 export const reportService = new ReportService();

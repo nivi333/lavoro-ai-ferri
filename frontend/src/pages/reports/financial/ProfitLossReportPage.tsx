@@ -291,7 +291,7 @@ const ProfitLossReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
+            ) : (
               <Table
                 columns={columns}
                 dataSource={getTableData()}
@@ -300,13 +300,6 @@ const ProfitLossReportPage: React.FC = () => {
                   record.category === 'Expense' ? 'expense-row' : 'revenue-row'
                 }
               />
-            ) : (
-              <div className='empty-report'>
-                <p>
-                  Select a date range and click "Generate Report" to view the Profit & Loss
-                  Statement.
-                </p>
-              </div>
             )}
           </div>
         </div>

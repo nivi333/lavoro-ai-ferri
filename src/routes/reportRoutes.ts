@@ -179,4 +179,36 @@ router.get(
   reportController.getTextileAnalyticsReport
 );
 
+// Stock Aging Report (OWNER, ADMIN, MANAGER can view)
+// Query params: asOfDate (optional)
+router.get(
+  '/stock-aging',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getStockAgingReport
+);
+
+// Sales by Region Report (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required)
+router.get(
+  '/sales-by-region',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getSalesByRegionReport
+);
+
+// Top Selling Products Report (Alias for Product Performance)
+// Query params: startDate, endDate (required), limit (optional)
+router.get(
+  '/top-selling-products',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getProductPerformanceReport
+);
+
+// Customer Purchase History Report (Alias for Customer Insights)
+// Query params: startDate, endDate (required)
+router.get(
+  '/customer-purchase-history',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getCustomerInsightsReport
+);
+
 export default router;

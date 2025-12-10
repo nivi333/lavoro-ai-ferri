@@ -573,6 +573,103 @@ class ReportService {
       throw error;
     }
   }
+  async getStockAgingReport(asOfDate?: string): Promise<any> {
+    try {
+      const url = asOfDate
+        ? `${API_BASE_URL}/reports/stock-aging?asOfDate=${asOfDate}`
+        : `${API_BASE_URL}/reports/stock-aging`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch stock aging report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching stock aging report:', error);
+      throw error;
+    }
+  }
+
+  async getTopSellingProductsReport(
+    startDate: string,
+    endDate: string,
+    limit: number = 10
+  ): Promise<any> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/reports/top-selling-products?startDate=${startDate}&endDate=${endDate}&limit=${limit}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch top selling products report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching top selling products report:', error);
+      throw error;
+    }
+  }
+
+  async getCustomerPurchaseHistoryReport(
+    customerId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<any> {
+    try {
+      let url = `${API_BASE_URL}/reports/customer-purchase-history?startDate=${startDate}&endDate=${endDate}`;
+      if (customerId && customerId !== 'all') {
+        url += `&customerId=${customerId}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer purchase history report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching customer purchase history report:', error);
+      throw error;
+    }
+  }
+
+  async getSalesByRegionReport(startDate: string, endDate: string): Promise<any> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/reports/sales-by-region?startDate=${startDate}&endDate=${endDate}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch sales by region report');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching sales by region report:', error);
+      throw error;
+    }
+  }
 }
 
 export const reportService = new ReportService();

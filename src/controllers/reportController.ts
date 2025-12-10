@@ -936,6 +936,76 @@ export class ReportController {
       });
     }
   }
+
+  /**
+   * GET /api/reports/stock-aging
+   * Generate Stock Aging Report
+   */
+  async getStockAgingReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req;
+      if (!tenantId) {
+        res.status(401).json({ success: false, message: 'Unauthorized: No tenant context' });
+        return;
+      }
+
+      const asOfDate = req.query.asOfDate ? new Date(req.query.asOfDate as string) : new Date();
+
+      const report = await reportService.generateStockAgingReport(tenantId, asOfDate);
+
+      res.status(200).json({
+        success: true,
+        data: report,
+      });
+    } catch (error: any) {
+      console.error('Error generating stock aging report:', error);
+      res.status(500).json({
+        success: false,
+        message: error?.message || 'Failed to generate stock aging report',
+      });
+    }
+  }
+
+  /**
+   * GET /api/reports/sales-by-region
+   * Generate Sales by Region Report
+   */
+  async getSalesByRegionReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { tenantId } = req;
+      if (!tenantId) {
+        res.status(401).json({ success: false, message: 'Unauthorized: No tenant context' });
+        return;
+      }
+
+      const { error, value } = dateRangeSchema.validate(req.query);
+      if (error) {
+        res.status(400).json({
+          success: false,
+          message: 'Validation error',
+          details: error.details.map(d => d.message),
+        });
+        return;
+      }
+
+      const report = await reportService.generateSalesByRegionReport(
+        tenantId,
+        new Date(value.startDate),
+        new Date(value.endDate)
+      );
+
+      res.status(200).json({
+        success: true,
+        data: report,
+      });
+    } catch (error: any) {
+      console.error('Error generating sales by region report:', error);
+      res.status(500).json({
+        success: false,
+        message: error?.message || 'Failed to generate sales by region report',
+      });
+    }
+  }
 }
 
 export const reportController = new ReportController();

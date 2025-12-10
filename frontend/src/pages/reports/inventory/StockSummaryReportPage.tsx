@@ -44,6 +44,7 @@ const StockSummaryReportPage: React.FC = () => {
   useEffect(() => {
     setHeaderActions(null);
     // Auto-load report on mount
+    setHeaderActions(null);
     handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
@@ -177,42 +178,40 @@ const StockSummaryReportPage: React.FC = () => {
           </div>
         </div>
 
-        {reportData && (
-          <div className='report-summary-section'>
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Total Products</div>
-                  <div className='summary-value'>{reportData.summary?.totalProducts || 0}</div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Total Stock Value</div>
-                  <div className='summary-value'>
-                    ₹{reportData.summary?.totalStockValue?.toFixed(2) || '0.00'}
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Low Stock Items</div>
-                  <div className='summary-value' style={{ color: '#faad14' }}>
-                    {reportData.summary?.lowStockItems || 0}
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Out of Stock</div>
-                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
-                    {reportData.summary?.outOfStockItems || 0}
-                  </div>
-                </Card>
-              </Col>
-            </Row>
-          </div>
-        )}
+        <div className='report-summary-section'>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6}>
+              <Card className='summary-card'>
+                <div className='summary-title'>Total Products</div>
+                <div className='summary-value'>{reportData.summary?.totalProducts || 0}</div>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card className='summary-card'>
+                <div className='summary-title'>Total Stock Value</div>
+                <div className='summary-value'>
+                  ₹{reportData.summary?.totalStockValue?.toFixed(2) || '0.00'}
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card className='summary-card'>
+                <div className='summary-title'>Low Stock Items</div>
+                <div className='summary-value' style={{ color: '#faad14' }}>
+                  {reportData.summary?.lowStockItems || 0}
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card className='summary-card'>
+                <div className='summary-title'>Out of Stock</div>
+                <div className='summary-value' style={{ color: '#ff4d4f' }}>
+                  {reportData.summary?.outOfStockItems || 0}
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
 
         <div className='report-content-section'>
           <div className='report-data'>
@@ -221,12 +220,8 @@ const StockSummaryReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
-              <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             ) : (
-              <div className='empty-report'>
-                <p>Click "Generate Report" to view the Stock Summary.</p>
-              </div>
+              <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             )}
           </div>
         </div>

@@ -67,6 +67,8 @@ export { default as QualityReportsPageReport } from './reports/QualityReportsPag
 export { default as OperationalReportsPage } from './reports/operational/OperationalReportsPage';
 export { default as ProductionEfficiencyReportPage } from './reports/operational/ProductionEfficiencyReportPage';
 export { default as AnalyticsReportsPage } from './reports/AnalyticsReportsPage';
+export { default as MachineUtilizationReportPage } from './reports/operational/MachineUtilizationReportPage';
+export { default as ProductionPlanningReportPage } from './reports/operational/ProductionPlanningReportPage';
 
 // Financial Report Detail Pages
 export { default as ProfitLossReportPage } from './reports/financial/ProfitLossReportPage';

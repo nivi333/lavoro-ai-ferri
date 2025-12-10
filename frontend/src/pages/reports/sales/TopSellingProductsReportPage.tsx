@@ -18,6 +18,7 @@ import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icon
 import MainLayout from '../../../components/layout/MainLayout';
 import '../shared/ReportStyles.scss';
 import dayjs from 'dayjs';
+import { reportService } from '../../../services/reportService';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -44,22 +45,47 @@ const TopSellingProductsReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
   const handleGenerateReport = async () => {
     setLoading(true);
     try {
-      // TODO: Implement API call when backend endpoint is ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      message.info('Top Selling Products Report API endpoint not yet implemented');
+      const [startDate, endDate] = dateRange;
+      const data = await reportService.getTopSellingProductsReport(
+        startDate.format('YYYY-MM-DD'),
+        endDate.format('YYYY-MM-DD'),
+        50 // Limit to top 50
+      );
+
+      const items = data.productPerformance.map((item: any, index: number) => ({
+        key: item.productId,
+        rank: index + 1,
+        productCode: item.productId.substring(0, 8).toUpperCase(), // Placeholder
+        productName: item.productName,
+        quantitySold: item.salesQuantity,
+        revenue: item.revenue,
+        averagePrice: item.salesQuantity > 0 ? item.revenue / item.salesQuantity : 0,
+      }));
+
+      // Sort by Revenue descending for "Top Selling"
+      items.sort((a: any, b: any) => b.revenue - a.revenue);
+
+      // Update ranks after sort
+      items.forEach((item: any, index: number) => {
+        item.rank = index + 1;
+      });
+
+      const totalQuantity = items.reduce((sum: number, item: any) => sum + item.quantitySold, 0);
+
       setReportData({
         summary: {
-          totalProducts: 0,
-          totalRevenue: 0,
-          totalQuantity: 0,
+          totalProducts: data.summary.productCount,
+          totalRevenue: data.summary.totalRevenue,
+          totalQuantity: totalQuantity,
         },
-        items: [],
+        items,
       });
     } catch (error) {
       console.error('Error generating report:', error);
@@ -190,16 +216,12 @@ const TopSellingProductsReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
+            ) : (
               <Table
                 columns={columns}
-                dataSource={reportData.items}
+                dataSource={reportData?.items || []}
                 pagination={{ pageSize: 10 }}
               />
-            ) : (
-              <div className='empty-report'>
-                <p>Click "Generate Report" to view the Top Selling Products.</p>
-              </div>
             )}
           </div>
         </div>

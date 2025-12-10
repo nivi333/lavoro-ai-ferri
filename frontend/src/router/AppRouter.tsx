@@ -46,6 +46,9 @@ import {
   OperationalReportsPage,
   ProductionEfficiencyReportPage,
   AnalyticsReportsPage,
+  // New Operational Reports
+  MachineUtilizationReportPage,
+  ProductionPlanningReportPage,
   // Financial Report Detail Pages
   ProfitLossReportPage,
   BalanceSheetReportPage,

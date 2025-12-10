@@ -4,12 +4,30 @@
   display: flex;
   align-items: center;
   margin-right: 12px;
-  
+
   &-switch {
     background-color: #7b5fc9;
-    
+
     &.ant-switch-checked {
       background-color: #a2d8e5;
     }
   }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Ensure the new view sits on top during the transition */
+::view-transition-new(root) {
+  z-index: 2147483646;
+}
+::view-transition-old(root) {
+  z-index: 2147483646;
+}
+
+.dark::view-transition-old(root) {
+  z-index: 2147483647;
 }

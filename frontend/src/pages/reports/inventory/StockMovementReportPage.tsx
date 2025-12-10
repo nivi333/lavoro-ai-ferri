@@ -251,12 +251,8 @@ const StockMovementReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
-              <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             ) : (
-              <div className='empty-report'>
-                <p>Select filters and click "Generate Report" to view Stock Movement.</p>
-              </div>
+              <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             )}
           </div>
         </div>

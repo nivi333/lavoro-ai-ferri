@@ -18,6 +18,7 @@ import {
 import { SearchOutlined, FileTextOutlined, SaveOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
 import '../shared/ReportStyles.scss';
+import { reportService } from '../../../services/reportService';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -41,22 +42,52 @@ const StockAgingReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
   const handleGenerateReport = async () => {
     setLoading(true);
     try {
-      // TODO: Implement API call when backend endpoint is ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      message.info('Stock Aging Report API endpoint not yet implemented');
+      const data = await reportService.getStockAgingReport();
+
+      // Calculate summary metrics
+      const totalProducts = data.agingDetails.length;
+      const slowMovingItems = data.agingDetails.filter((item: any) => item.ageInDays > 90).length;
+      const averageAge =
+        totalProducts > 0
+          ? Math.round(
+              data.agingDetails.reduce((sum: number, item: any) => sum + item.ageInDays, 0) /
+                totalProducts
+            )
+          : 0;
+
+      // Map items
+      const items = data.agingDetails.map((item: any) => {
+        let status = 'Fast Moving';
+        if (item.ageInDays > 120) status = 'Dead Stock';
+        else if (item.ageInDays > 90) status = 'Very Slow Moving';
+        else if (item.ageInDays > 60) status = 'Slow Moving';
+        else if (item.ageInDays > 30) status = 'Normal';
+
+        return {
+          key: item.productId,
+          product: item.productName,
+          location: item.locationName,
+          stockQuantity: item.quantity,
+          lastMovementDate: new Date(item.lastUpdated).toLocaleDateString(),
+          ageDays: item.ageInDays,
+          status,
+        };
+      });
+
       setReportData({
         summary: {
-          totalProducts: 0,
-          slowMovingItems: 0,
-          averageAge: 0,
+          totalProducts,
+          slowMovingItems,
+          averageAge,
         },
-        items: [],
+        items,
       });
     } catch (error) {
       console.error('Error generating report:', error);
@@ -192,16 +223,12 @@ const StockAgingReportPage: React.FC = () => {
                 <Spin size='large' />
                 <p>Generating report...</p>
               </div>
-            ) : reportData ? (
+            ) : (
               <Table
                 columns={columns}
-                dataSource={reportData.items}
+                dataSource={reportData?.items || []}
                 pagination={{ pageSize: 10 }}
               />
-            ) : (
-              <div className='empty-report'>
-                <p>Click "Generate Report" to view the Stock Aging Report.</p>
-              </div>
             )}
           </div>
         </div>
