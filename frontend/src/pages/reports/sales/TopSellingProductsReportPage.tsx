@@ -8,19 +8,14 @@ import {
   Breadcrumb,
   Input,
   Button,
-  DatePicker,
   Select,
   Table,
   Space,
   Spin,
   message,
+  Tag,
 } from 'antd';
-import {
-  SearchOutlined,
-  FileTextOutlined,
-  SaveOutlined,
-  LineChartOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined, FileTextOutlined, SaveOutlined, TrophyOutlined } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
 import { reportService } from '../../../services/reportService';
 import '../shared/ReportStyles.scss';
@@ -28,23 +23,21 @@ import dayjs from 'dayjs';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
-const { Option } = Select;
 
-interface SalesTrendData {
+interface TopProductData {
   key: string;
-  period: string;
-  sales: number;
+  product: string;
+  quantitySold: number;
+  revenue: number;
   orders: number;
-  avgOrderValue: number;
-  growth: number;
+  avgPrice: number;
 }
 
-const SalesTrendReportPage: React.FC = () => {
+const TopSellingProductsReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState<[Date, Date] | null>(null);
-  const [groupBy, setGroupBy] = useState<string>('month');
   const [reportData, setReportData] = useState<any>(null);
 
   useEffect(() => {
@@ -59,7 +52,7 @@ const SalesTrendReportPage: React.FC = () => {
       try {
         const startDate = firstDay.toISOString().split('T')[0];
         const endDate = lastDay.toISOString().split('T')[0];
-        const data = await reportService.getSalesSummary(startDate, endDate);
+        const data = await reportService.getProductPerformance(startDate, endDate);
         setReportData(data);
       } catch (error) {
         console.error('Error generating report:', error);
@@ -82,7 +75,7 @@ const SalesTrendReportPage: React.FC = () => {
     try {
       const startDate = dateRange[0].toISOString().split('T')[0];
       const endDate = dateRange[1].toISOString().split('T')[0];
-      const data = await reportService.getSalesSummary(startDate, endDate);
+      const data = await reportService.getProductPerformance(startDate, endDate);
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
@@ -94,60 +87,70 @@ const SalesTrendReportPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Period',
-      dataIndex: 'period',
-      key: 'period',
-      sorter: (a: SalesTrendData, b: SalesTrendData) => {
-        const aVal = a.period || '';
-        const bVal = b.period || '';
-        return aVal.localeCompare(bVal);
-      },
+      title: 'Rank',
+      key: 'rank',
+      render: (_: any, __: any, index: number) => (
+        <Tag color={index < 3 ? 'gold' : 'default'}>
+          {index < 3 && <TrophyOutlined />} #{index + 1}
+        </Tag>
+      ),
+      width: 80,
     },
     {
-      title: 'Sales (₹)',
-      dataIndex: 'sales',
-      key: 'sales',
-      render: (sales: number) => (sales || 0).toFixed(2),
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.sales || 0) - (b.sales || 0),
+      title: 'Product',
+      dataIndex: 'product',
+      key: 'product',
+      sorter: (a: TopProductData, b: TopProductData) => {
+        const aVal = a.product || '';
+        const bVal = b.product || '';
+        return aVal.localeCompare(bVal);
+      },
+      filteredValue: searchText ? [searchText] : null,
+      onFilter: (value: any, record: TopProductData) =>
+        (record.product || '').toLowerCase().includes(String(value).toLowerCase()),
+    },
+    {
+      title: 'Quantity Sold',
+      dataIndex: 'quantitySold',
+      key: 'quantitySold',
+      sorter: (a: TopProductData, b: TopProductData) =>
+        (a.quantitySold || 0) - (b.quantitySold || 0),
+    },
+    {
+      title: 'Revenue (₹)',
+      dataIndex: 'revenue',
+      key: 'revenue',
+      render: (revenue: number) => (revenue || 0).toFixed(2),
+      sorter: (a: TopProductData, b: TopProductData) => (a.revenue || 0) - (b.revenue || 0),
     },
     {
       title: 'Orders',
       dataIndex: 'orders',
       key: 'orders',
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.orders || 0) - (b.orders || 0),
+      sorter: (a: TopProductData, b: TopProductData) => (a.orders || 0) - (b.orders || 0),
     },
     {
-      title: 'Avg Order Value (₹)',
-      dataIndex: 'avgOrderValue',
-      key: 'avgOrderValue',
-      render: (value: number) => (value || 0).toFixed(2),
-      sorter: (a: SalesTrendData, b: SalesTrendData) =>
-        (a.avgOrderValue || 0) - (b.avgOrderValue || 0),
-    },
-    {
-      title: 'Growth (%)',
-      dataIndex: 'growth',
-      key: 'growth',
-      render: (growth: number) => {
-        const val = growth || 0;
-        const color = val >= 0 ? '#52c41a' : '#ff4d4f';
-        return <span style={{ color }}>{val.toFixed(2)}%</span>;
-      },
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.growth || 0) - (b.growth || 0),
+      title: 'Avg Price (₹)',
+      dataIndex: 'avgPrice',
+      key: 'avgPrice',
+      render: (price: number) => (price || 0).toFixed(2),
+      sorter: (a: TopProductData, b: TopProductData) => (a.avgPrice || 0) - (b.avgPrice || 0),
     },
   ] as any;
 
   const getTableData = () => {
-    if (!reportData || !reportData.trends) return [];
+    if (!reportData || !reportData.products) return [];
 
-    return reportData.trends.map((item: any, index: number) => ({
-      key: `trend-${index}`,
-      period: item.period || item.date || 'N/A',
-      sales: item.totalSales || item.sales || 0,
-      orders: item.totalOrders || item.orders || 0,
-      avgOrderValue: item.averageOrderValue || item.avgOrderValue || 0,
-      growth: item.growthRate || item.growth || 0,
-    }));
+    return reportData.products
+      .sort((a: any, b: any) => (b.revenue || 0) - (a.revenue || 0))
+      .map((item: any, index: number) => ({
+        key: `product-${index}`,
+        product: item.productName || item.product || item.name || 'Unknown',
+        quantitySold: item.quantitySold || item.quantity || 0,
+        revenue: item.revenue || item.totalRevenue || 0,
+        orders: item.orderCount || item.orders || 0,
+        avgPrice: item.averagePrice || item.avgPrice || 0,
+      }));
   };
 
   return (
@@ -159,12 +162,12 @@ const SalesTrendReportPage: React.FC = () => {
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
               { title: 'Sales Reports', href: '/reports/sales' },
-              { title: 'Sales Trend Analysis' },
+              { title: 'Top Selling Products' },
             ]}
             className='breadcrumb-navigation'
           />
           <Title level={2}>
-            <LineChartOutlined /> Sales Trend Analysis
+            <TrophyOutlined /> Top Selling Products
           </Title>
         </div>
 
@@ -181,14 +184,8 @@ const SalesTrendReportPage: React.FC = () => {
                   }
                 }}
               />
-              <Select value={groupBy} onChange={setGroupBy} style={{ width: 150 }}>
-                <Option value='day'>Daily</Option>
-                <Option value='week'>Weekly</Option>
-                <Option value='month'>Monthly</Option>
-                <Option value='quarter'>Quarterly</Option>
-              </Select>
               <Input
-                placeholder='Search periods'
+                placeholder='Search products'
                 prefix={<SearchOutlined />}
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
@@ -213,36 +210,31 @@ const SalesTrendReportPage: React.FC = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Sales</div>
-                  <div className='summary-value'>
-                    ₹{reportData.summary?.totalSales?.toFixed(2) || '0.00'}
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Total Orders</div>
-                  <div className='summary-value'>{reportData.summary?.totalOrders || 0}</div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Average Growth</div>
-                  <div
-                    className='summary-value'
-                    style={{
-                      color: (reportData.summary?.avgGrowth || 0) >= 0 ? '#52c41a' : '#ff4d4f',
-                    }}
-                  >
-                    {reportData.summary?.avgGrowth?.toFixed(2) || '0.00'}%
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Peak Period</div>
+                  <div className='summary-title'>Top Product</div>
                   <div className='summary-value' style={{ fontSize: '16px' }}>
-                    {reportData.summary?.peakPeriod || 'N/A'}
+                    {getTableData()[0]?.product || 'N/A'}
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Top Revenue</div>
+                  <div className='summary-value'>
+                    ₹{getTableData()[0]?.revenue?.toFixed(2) || '0.00'}
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Total Products</div>
+                  <div className='summary-value'>{getTableData().length}</div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Total Revenue</div>
+                  <div className='summary-value'>
+                    ₹{reportData.summary?.totalRevenue?.toFixed(2) || '0.00'}
                   </div>
                 </Card>
               </Col>
@@ -261,7 +253,7 @@ const SalesTrendReportPage: React.FC = () => {
               <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             ) : (
               <div className='empty-report'>
-                <p>Select a date range and click "Generate Report" to view Sales Trends.</p>
+                <p>Select a date range and click "Generate Report" to view Top Selling Products.</p>
               </div>
             )}
           </div>
@@ -271,4 +263,4 @@ const SalesTrendReportPage: React.FC = () => {
   );
 };
 
-export default SalesTrendReportPage;
+export default TopSellingProductsReportPage;

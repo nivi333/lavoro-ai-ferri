@@ -9,17 +9,17 @@ import {
   Input,
   Button,
   DatePicker,
-  Select,
   Table,
   Space,
   Spin,
   message,
+  Tag,
 } from 'antd';
 import {
   SearchOutlined,
   FileTextOutlined,
   SaveOutlined,
-  LineChartOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 import MainLayout from '../../../components/layout/MainLayout';
 import { reportService } from '../../../services/reportService';
@@ -27,24 +27,22 @@ import '../shared/ReportStyles.scss';
 import dayjs from 'dayjs';
 
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
-const { Option } = Select;
 
-interface SalesTrendData {
+interface QualityData {
   key: string;
-  period: string;
-  sales: number;
-  orders: number;
-  avgOrderValue: number;
-  growth: number;
+  inspectionId: string;
+  product: string;
+  date: string;
+  result: string;
+  defects: number;
+  inspector: string;
 }
 
-const SalesTrendReportPage: React.FC = () => {
+const InspectionSummaryReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [dateRange, setDateRange] = useState<[Date, Date] | null>(null);
-  const [groupBy, setGroupBy] = useState<string>('month');
   const [reportData, setReportData] = useState<any>(null);
 
   useEffect(() => {
@@ -59,7 +57,7 @@ const SalesTrendReportPage: React.FC = () => {
       try {
         const startDate = firstDay.toISOString().split('T')[0];
         const endDate = lastDay.toISOString().split('T')[0];
-        const data = await reportService.getSalesSummary(startDate, endDate);
+        const data = await reportService.getQualityMetrics(startDate, endDate);
         setReportData(data);
       } catch (error) {
         console.error('Error generating report:', error);
@@ -82,7 +80,7 @@ const SalesTrendReportPage: React.FC = () => {
     try {
       const startDate = dateRange[0].toISOString().split('T')[0];
       const endDate = dateRange[1].toISOString().split('T')[0];
-      const data = await reportService.getSalesSummary(startDate, endDate);
+      const data = await reportService.getQualityMetrics(startDate, endDate);
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
@@ -94,59 +92,71 @@ const SalesTrendReportPage: React.FC = () => {
 
   const columns = [
     {
-      title: 'Period',
-      dataIndex: 'period',
-      key: 'period',
-      sorter: (a: SalesTrendData, b: SalesTrendData) => {
-        const aVal = a.period || '';
-        const bVal = b.period || '';
+      title: 'Inspection ID',
+      dataIndex: 'inspectionId',
+      key: 'inspectionId',
+    },
+    {
+      title: 'Product',
+      dataIndex: 'product',
+      key: 'product',
+      sorter: (a: QualityData, b: QualityData) => {
+        const aVal = a.product || '';
+        const bVal = b.product || '';
+        return aVal.localeCompare(bVal);
+      },
+      filteredValue: searchText ? [searchText] : null,
+      onFilter: (value: any, record: QualityData) =>
+        (record.product || '').toLowerCase().includes(String(value).toLowerCase()) ||
+        (record.inspectionId || '').toLowerCase().includes(String(value).toLowerCase()),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+      sorter: (a: QualityData, b: QualityData) => {
+        const aVal = a.date || '';
+        const bVal = b.date || '';
         return aVal.localeCompare(bVal);
       },
     },
     {
-      title: 'Sales (₹)',
-      dataIndex: 'sales',
-      key: 'sales',
-      render: (sales: number) => (sales || 0).toFixed(2),
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.sales || 0) - (b.sales || 0),
-    },
-    {
-      title: 'Orders',
-      dataIndex: 'orders',
-      key: 'orders',
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.orders || 0) - (b.orders || 0),
-    },
-    {
-      title: 'Avg Order Value (₹)',
-      dataIndex: 'avgOrderValue',
-      key: 'avgOrderValue',
-      render: (value: number) => (value || 0).toFixed(2),
-      sorter: (a: SalesTrendData, b: SalesTrendData) =>
-        (a.avgOrderValue || 0) - (b.avgOrderValue || 0),
-    },
-    {
-      title: 'Growth (%)',
-      dataIndex: 'growth',
-      key: 'growth',
-      render: (growth: number) => {
-        const val = growth || 0;
-        const color = val >= 0 ? '#52c41a' : '#ff4d4f';
-        return <span style={{ color }}>{val.toFixed(2)}%</span>;
+      title: 'Result',
+      dataIndex: 'result',
+      key: 'result',
+      render: (result: string) => {
+        const color = result === 'Pass' ? 'green' : result === 'Fail' ? 'red' : 'orange';
+        return (
+          <Tag color={color} icon={result === 'Pass' ? <CheckCircleOutlined /> : null}>
+            {result}
+          </Tag>
+        );
       },
-      sorter: (a: SalesTrendData, b: SalesTrendData) => (a.growth || 0) - (b.growth || 0),
+    },
+    {
+      title: 'Defects',
+      dataIndex: 'defects',
+      key: 'defects',
+      sorter: (a: QualityData, b: QualityData) => (a.defects || 0) - (b.defects || 0),
+    },
+    {
+      title: 'Inspector',
+      dataIndex: 'inspector',
+      key: 'inspector',
     },
   ] as any;
 
   const getTableData = () => {
-    if (!reportData || !reportData.trends) return [];
+    if (!reportData || !reportData.inspections) return [];
 
-    return reportData.trends.map((item: any, index: number) => ({
-      key: `trend-${index}`,
-      period: item.period || item.date || 'N/A',
-      sales: item.totalSales || item.sales || 0,
-      orders: item.totalOrders || item.orders || 0,
-      avgOrderValue: item.averageOrderValue || item.avgOrderValue || 0,
-      growth: item.growthRate || item.growth || 0,
+    return reportData.inspections.map((item: any, index: number) => ({
+      key: `inspection-${index}`,
+      inspectionId: item.inspectionId || item.id || `INS-${index + 1}`,
+      product: item.productName || item.product || 'N/A',
+      date: item.inspectionDate || item.date || new Date().toISOString().split('T')[0],
+      result: item.result || item.status || 'Pending',
+      defects: item.defectCount || item.defects || 0,
+      inspector: item.inspectorName || item.inspector || 'N/A',
     }));
   };
 
@@ -158,20 +168,20 @@ const SalesTrendReportPage: React.FC = () => {
             items={[
               { title: 'Home', href: '/' },
               { title: 'Reports', href: '/reports' },
-              { title: 'Sales Reports', href: '/reports/sales' },
-              { title: 'Sales Trend Analysis' },
+              { title: 'Quality Reports', href: '/reports/quality' },
+              { title: 'Inspection Summary' },
             ]}
             className='breadcrumb-navigation'
           />
           <Title level={2}>
-            <LineChartOutlined /> Sales Trend Analysis
+            <CheckCircleOutlined /> Inspection Summary
           </Title>
         </div>
 
         <div className='filters-section'>
           <div>
             <Space size='middle'>
-              <RangePicker
+              <DatePicker.RangePicker
                 value={dateRange ? [dayjs(dateRange[0]), dayjs(dateRange[1])] : null}
                 onChange={dates => {
                   if (dates) {
@@ -181,14 +191,8 @@ const SalesTrendReportPage: React.FC = () => {
                   }
                 }}
               />
-              <Select value={groupBy} onChange={setGroupBy} style={{ width: 150 }}>
-                <Option value='day'>Daily</Option>
-                <Option value='week'>Weekly</Option>
-                <Option value='month'>Monthly</Option>
-                <Option value='quarter'>Quarterly</Option>
-              </Select>
               <Input
-                placeholder='Search periods'
+                placeholder='Search inspections'
                 prefix={<SearchOutlined />}
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
@@ -213,36 +217,31 @@ const SalesTrendReportPage: React.FC = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Card className='summary-card'>
-                  <div className='summary-title'>Total Sales</div>
+                  <div className='summary-title'>Total Inspections</div>
+                  <div className='summary-value'>{getTableData().length}</div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Pass Rate</div>
+                  <div className='summary-value' style={{ color: '#52c41a' }}>
+                    {reportData.summary?.passRate?.toFixed(2) || '0.00'}%
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Total Defects</div>
+                  <div className='summary-value' style={{ color: '#ff4d4f' }}>
+                    {reportData.summary?.totalDefects || 0}
+                  </div>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card className='summary-card'>
+                  <div className='summary-title'>Avg Defects/Inspection</div>
                   <div className='summary-value'>
-                    ₹{reportData.summary?.totalSales?.toFixed(2) || '0.00'}
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Total Orders</div>
-                  <div className='summary-value'>{reportData.summary?.totalOrders || 0}</div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Average Growth</div>
-                  <div
-                    className='summary-value'
-                    style={{
-                      color: (reportData.summary?.avgGrowth || 0) >= 0 ? '#52c41a' : '#ff4d4f',
-                    }}
-                  >
-                    {reportData.summary?.avgGrowth?.toFixed(2) || '0.00'}%
-                  </div>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card className='summary-card'>
-                  <div className='summary-title'>Peak Period</div>
-                  <div className='summary-value' style={{ fontSize: '16px' }}>
-                    {reportData.summary?.peakPeriod || 'N/A'}
+                    {reportData.summary?.avgDefects?.toFixed(2) || '0.00'}
                   </div>
                 </Card>
               </Col>
@@ -261,7 +260,7 @@ const SalesTrendReportPage: React.FC = () => {
               <Table columns={columns} dataSource={getTableData()} pagination={{ pageSize: 10 }} />
             ) : (
               <div className='empty-report'>
-                <p>Select a date range and click "Generate Report" to view Sales Trends.</p>
+                <p>Select a date range and click "Generate Report" to view Inspection Summary.</p>
               </div>
             )}
           </div>
@@ -271,4 +270,4 @@ const SalesTrendReportPage: React.FC = () => {
   );
 };
 
-export default SalesTrendReportPage;
+export default InspectionSummaryReportPage;
