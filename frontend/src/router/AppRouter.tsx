@@ -58,8 +58,10 @@ import {
   // Inventory Report Detail Pages
   StockSummaryReportPage,
   StockMovementReportPage,
+  LowStockReportPage,
   // Sales Report Detail Pages
   SalesSummaryReportPage,
+  SalesTrendReportPage,
 } from '../pages';
 import GoogleAuthCallback from '../components/auth/GoogleAuthCallback';
 
@@ -562,12 +564,30 @@ export default function AppRouter() {
               }
             />
 
+            <Route
+              path='/reports/inventory/low-stock'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <LowStockReportPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Sales Report Detail Pages */}
             <Route
               path='/reports/sales/sales-summary'
               element={
                 <ProtectedRoute requireCompany={true}>
                   <SalesSummaryReportPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/reports/sales/sales-trend'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <SalesTrendReportPage />
                 </ProtectedRoute>
               }
             />

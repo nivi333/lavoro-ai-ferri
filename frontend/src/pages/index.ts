@@ -81,9 +81,11 @@ export { default as ExpenseSummaryReportPage } from './reports/financial/Expense
 // Inventory Report Detail Pages
 export { default as StockSummaryReportPage } from './reports/inventory/StockSummaryReportPage';
 export { default as StockMovementReportPage } from './reports/inventory/StockMovementReportPage';
+export { default as LowStockReportPage } from './reports/inventory/LowStockReportPage';
 
 // Sales Report Detail Pages
 export { default as SalesSummaryReportPage } from './reports/sales/SalesSummaryReportPage';
+export { default as SalesTrendReportPage } from './reports/sales/SalesTrendReportPage';
 
 // Textile Operations
 export { default as FabricProductionListPage } from './textile/FabricProductionListPage';
