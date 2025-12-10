@@ -43,6 +43,8 @@ const StockSummaryReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    // Auto-load report on mount
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 

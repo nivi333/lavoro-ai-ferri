@@ -39,6 +39,8 @@ const GSTReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    // Auto-load report with current month
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 

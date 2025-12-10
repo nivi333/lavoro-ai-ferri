@@ -32,30 +32,76 @@ interface ProfitLossData {
   percentage: number;
 }
 
+interface ProfitLossReport {
+  summary: {
+    totalRevenue: number;
+    costOfGoodsSold: number;
+    grossProfit: number;
+    operatingExpenses: number;
+    netProfit: number;
+    profitMargin: number;
+  };
+  revenueBreakdown: Array<{
+    productName: string;
+    revenue: number;
+    percentage: number;
+  }>;
+  expenseBreakdown: Array<{
+    category: string;
+    amount: number;
+    percentage: number;
+  }>;
+}
+
 const ProfitLossReportPage: React.FC = () => {
   const { setHeaderActions } = useHeader();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [dateRange, setDateRange] = useState<[Date, Date] | null>(null);
-  const [reportData, setReportData] = useState<any>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [reportData, setReportData] = useState<ProfitLossReport | null>(null);
 
   useEffect(() => {
     setHeaderActions(null);
+    // Set default date range to current month
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    setStartDate(firstDay);
+    setEndDate(lastDay);
+
+    // Auto-load report with current month
+    const loadInitialReport = async () => {
+      setLoading(true);
+      try {
+        const startDateStr = firstDay.toISOString().split('T')[0];
+        const endDateStr = lastDay.toISOString().split('T')[0];
+        const data = await reportService.getProfitLossReport(startDateStr, endDateStr);
+        setReportData(data);
+      } catch (error) {
+        console.error('Error generating report:', error);
+        message.error('Failed to load initial report. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
   const handleGenerateReport = async () => {
-    if (!dateRange) {
-      message.error('Please select a date range');
+    if (!startDate || !endDate) {
+      message.error('Please select both start and end dates');
       return;
     }
 
     setLoading(true);
     try {
-      const startDate = dateRange[0].toISOString().split('T')[0];
-      const endDate = dateRange[1].toISOString().split('T')[0];
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
 
-      const data = await reportService.getProfitLossReport(startDate, endDate);
+      const data = await reportService.getProfitLossReport(startDateStr, endDateStr);
       setReportData(data);
     } catch (error) {
       console.error('Error generating report:', error);
@@ -164,7 +210,7 @@ const ProfitLossReportPage: React.FC = () => {
             <Space size='middle'>
               <Button icon={<SaveOutlined />}>Save Configuration</Button>
               <Button icon={<FileTextOutlined />}>PDF</Button>
-              <Button type="primary" onClick={handleGenerateReport} loading={loading}>
+              <Button type='primary' onClick={handleGenerateReport} loading={loading}>
                 Generate Report
               </Button>
             </Space>

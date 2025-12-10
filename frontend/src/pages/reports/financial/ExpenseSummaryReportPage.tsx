@@ -39,6 +39,28 @@ const ExpenseSummaryReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    // Set default date range to current month
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    setDateRange([firstDay, lastDay]);
+
+    // Auto-load report with current month
+    const loadInitialReport = async () => {
+      setLoading(true);
+      try {
+        const startDate = firstDay.toISOString().split('T')[0];
+        const endDate = lastDay.toISOString().split('T')[0];
+        const data = await reportService.getExpenseSummary(startDate, endDate);
+        setReportData(data);
+      } catch (error) {
+        console.error('Error generating report:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 

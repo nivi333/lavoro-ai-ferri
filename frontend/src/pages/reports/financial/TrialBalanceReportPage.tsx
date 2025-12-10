@@ -38,6 +38,8 @@ const TrialBalanceReportPage: React.FC = () => {
 
   useEffect(() => {
     setHeaderActions(null);
+    // Auto-load report with current date
+    handleGenerateReport();
     return () => setHeaderActions(null);
   }, [setHeaderActions]);
 
