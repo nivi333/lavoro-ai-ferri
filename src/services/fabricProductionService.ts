@@ -55,7 +55,7 @@ class FabricProductionService {
     const lastFabric = await prisma.fabric_production.findFirst({
       where: { company_id: companyId },
       orderBy: { created_at: 'desc' },
-      select: { fabric_id: true }
+      select: { fabric_id: true },
     });
 
     if (!lastFabric) {
@@ -72,7 +72,7 @@ class FabricProductionService {
     try {
       // Validate company exists
       const company = await prisma.companies.findUnique({
-        where: { id: companyId }
+        where: { id: companyId },
       });
 
       if (!company) {
@@ -84,8 +84,8 @@ class FabricProductionService {
         const location = await prisma.company_locations.findFirst({
           where: {
             id: data.locationId,
-            company_id: companyId
-          }
+            company_id: companyId,
+          },
         });
 
         if (!location) {
@@ -116,8 +116,8 @@ class FabricProductionService {
           quality_grade: data.qualityGrade as any,
           notes: data.notes,
           is_active: data.isActive ?? true,
-          updated_at: new Date()
-        }
+          updated_at: new Date(),
+        } as any,
       });
 
       return {
@@ -140,7 +140,7 @@ class FabricProductionService {
         notes: fabricProduction.notes,
         isActive: fabricProduction.is_active,
         createdAt: fabricProduction.created_at,
-        updatedAt: fabricProduction.updated_at
+        updatedAt: fabricProduction.updated_at,
       };
     } catch (error: any) {
       throw new Error(`Failed to create fabric production: ${error.message}`);
@@ -151,7 +151,7 @@ class FabricProductionService {
   async getFabricProductions(companyId: string, filters: FabricProductionFilters = {}) {
     try {
       const where: any = {
-        company_id: companyId
+        company_id: companyId,
       };
 
       if (filters.fabricType) {
@@ -175,7 +175,7 @@ class FabricProductionService {
           { fabric_name: { contains: filters.search, mode: 'insensitive' } },
           { fabric_id: { contains: filters.search, mode: 'insensitive' } },
           { batch_number: { contains: filters.search, mode: 'insensitive' } },
-          { color: { contains: filters.search, mode: 'insensitive' } }
+          { color: { contains: filters.search, mode: 'insensitive' } },
         ];
       }
 
@@ -196,11 +196,11 @@ class FabricProductionService {
             select: {
               id: true,
               name: true,
-              location_id: true
-            }
-          }
+              location_id: true,
+            },
+          },
         },
-        orderBy: { created_at: 'desc' }
+        orderBy: { created_at: 'desc' },
       });
 
       return fabricProductions.map(fp => ({
@@ -224,11 +224,13 @@ class FabricProductionService {
         isActive: fp.is_active,
         createdAt: fp.created_at,
         updatedAt: fp.updated_at,
-        location: fp.location ? {
-          id: fp.location.id,
-          name: fp.location.name,
-          locationId: fp.location.location_id
-        } : null
+        location: fp.location
+          ? {
+              id: fp.location.id,
+              name: fp.location.name,
+              locationId: fp.location.location_id,
+            }
+          : null,
       }));
     } catch (error: any) {
       throw new Error(`Failed to fetch fabric productions: ${error.message}`);
@@ -241,17 +243,17 @@ class FabricProductionService {
       const fabricProduction = await prisma.fabric_production.findFirst({
         where: {
           fabric_id: fabricId,
-          company_id: companyId
+          company_id: companyId,
         },
         include: {
           location: {
             select: {
               id: true,
               name: true,
-              location_id: true
-            }
-          }
-        }
+              location_id: true,
+            },
+          },
+        },
       });
 
       if (!fabricProduction) {
@@ -279,11 +281,13 @@ class FabricProductionService {
         isActive: fabricProduction.is_active,
         createdAt: fabricProduction.created_at,
         updatedAt: fabricProduction.updated_at,
-        location: fabricProduction.location ? {
-          id: fabricProduction.location.id,
-          name: fabricProduction.location.name,
-          locationId: fabricProduction.location.location_id
-        } : null
+        location: fabricProduction.location
+          ? {
+              id: fabricProduction.location.id,
+              name: fabricProduction.location.name,
+              locationId: fabricProduction.location.location_id,
+            }
+          : null,
       };
     } catch (error: any) {
       throw new Error(`Failed to fetch fabric production: ${error.message}`);
@@ -291,14 +295,18 @@ class FabricProductionService {
   }
 
   // Update fabric production
-  async updateFabricProduction(companyId: string, fabricId: string, data: UpdateFabricProductionData) {
+  async updateFabricProduction(
+    companyId: string,
+    fabricId: string,
+    data: UpdateFabricProductionData
+  ) {
     try {
       // Check if fabric production exists
       const existingFabric = await prisma.fabric_production.findFirst({
         where: {
           fabric_id: fabricId,
-          company_id: companyId
-        }
+          company_id: companyId,
+        },
       });
 
       if (!existingFabric) {
@@ -310,8 +318,8 @@ class FabricProductionService {
         const location = await prisma.company_locations.findFirst({
           where: {
             id: data.locationId,
-            company_id: companyId
-          }
+            company_id: companyId,
+          },
         });
 
         if (!location) {
@@ -321,7 +329,7 @@ class FabricProductionService {
 
       // Prepare update data
       const updateData: any = {
-        updated_at: new Date()
+        updated_at: new Date(),
       };
 
       if (data.fabricType !== undefined) updateData.fabric_type = data.fabricType;
@@ -348,10 +356,10 @@ class FabricProductionService {
             select: {
               id: true,
               name: true,
-              location_id: true
-            }
-          }
-        }
+              location_id: true,
+            },
+          },
+        },
       });
 
       return {
@@ -375,11 +383,13 @@ class FabricProductionService {
         isActive: fabricProduction.is_active,
         createdAt: fabricProduction.created_at,
         updatedAt: fabricProduction.updated_at,
-        location: fabricProduction.location ? {
-          id: fabricProduction.location.id,
-          name: fabricProduction.location.name,
-          locationId: fabricProduction.location.location_id
-        } : null
+        location: fabricProduction.location
+          ? {
+              id: fabricProduction.location.id,
+              name: fabricProduction.location.name,
+              locationId: fabricProduction.location.location_id,
+            }
+          : null,
       };
     } catch (error: any) {
       throw new Error(`Failed to update fabric production: ${error.message}`);
@@ -392,8 +402,8 @@ class FabricProductionService {
       const existingFabric = await prisma.fabric_production.findFirst({
         where: {
           fabric_id: fabricId,
-          company_id: companyId
-        }
+          company_id: companyId,
+        },
       });
 
       if (!existingFabric) {
@@ -401,7 +411,7 @@ class FabricProductionService {
       }
 
       await prisma.fabric_production.delete({
-        where: { id: existingFabric.id }
+        where: { id: existingFabric.id },
       });
 
       return { message: 'Fabric production deleted successfully' };

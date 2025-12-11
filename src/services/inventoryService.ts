@@ -1,4 +1,11 @@
-import { PrismaClient, StockMovementType, ReservationType, ReservationStatus, AlertType, AlertStatus } from '@prisma/client';
+import {
+  PrismaClient,
+  StockMovementType,
+  ReservationType,
+  ReservationStatus,
+  AlertType,
+  AlertStatus,
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -60,7 +67,7 @@ export interface StockAlert {
   createdAt: Date;
   product?: {
     name: string;
-    productCode: string;
+    product_code: string;
     sku: string;
   };
   location?: {
@@ -157,10 +164,7 @@ class InventoryService {
             },
           },
         },
-        orderBy: [
-          { location: { name: 'asc' } },
-          { product: { name: 'asc' } },
-        ],
+        orderBy: [{ location: { name: 'asc' } }, { product: { name: 'asc' } }],
       });
 
       return inventory.map(item => ({
@@ -486,7 +490,7 @@ class InventoryService {
 
       // Get product details separately (since we don't have direct relation)
       const alertsWithProducts = await Promise.all(
-        alerts.map(async (alert) => {
+        alerts.map(async alert => {
           const product = await this.prisma.products.findFirst({
             where: { id: alert.product_id },
             select: {
@@ -507,7 +511,10 @@ class InventoryService {
             status: alert.status,
             createdAt: alert.created_at,
             product,
-            location: alert.location,
+            location: {
+              name: alert.location.name,
+              locationId: alert.location.location_id,
+            },
           };
         })
       );
@@ -627,7 +634,13 @@ class InventoryService {
         case StockMovementType.PRODUCTION_IN:
         case StockMovementType.RETURN_IN:
           if (data.toLocationId) {
-            await this.adjustLocationStock(companyId, data.productId, data.toLocationId, data.quantity, 'ADD');
+            await this.adjustLocationStock(
+              companyId,
+              data.productId,
+              data.toLocationId,
+              data.quantity,
+              'ADD'
+            );
           }
           break;
 
@@ -638,7 +651,13 @@ class InventoryService {
         case StockMovementType.RETURN_OUT:
         case StockMovementType.DAMAGE:
           if (data.fromLocationId) {
-            await this.adjustLocationStock(companyId, data.productId, data.fromLocationId, data.quantity, 'SUBTRACT');
+            await this.adjustLocationStock(
+              companyId,
+              data.productId,
+              data.fromLocationId,
+              data.quantity,
+              'SUBTRACT'
+            );
           }
           break;
       }
@@ -676,11 +695,15 @@ class InventoryService {
         stock_quantity: Math.max(0, quantity),
         reserved_quantity: 0,
         available_quantity: Math.max(0, quantity),
-      },
+      } as any,
     });
   }
 
-  private async checkAndCreateStockAlerts(companyId: string, productId: string, locationId: string) {
+  private async checkAndCreateStockAlerts(
+    companyId: string,
+    productId: string,
+    locationId: string
+  ) {
     try {
       const inventory = await this.prisma.location_inventory.findUnique({
         where: {

@@ -8,12 +8,31 @@ const dateRangeSchema = Joi.object({
   endDate: Joi.date().required(),
 });
 
+const dateRangeWithPaginationSchema = Joi.object({
+  startDate: Joi.date().required(),
+  endDate: Joi.date().required(),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+});
+
 const asOfDateSchema = Joi.object({
   asOfDate: Joi.date().optional(),
 });
 
+const asOfDateWithPaginationSchema = Joi.object({
+  asOfDate: Joi.date().optional(),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+});
+
 const locationSchema = Joi.object({
   locationId: Joi.string().optional(),
+});
+
+const locationWithPaginationSchema = Joi.object({
+  locationId: Joi.string().optional(),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
 });
 
 export class ReportController {

@@ -133,7 +133,11 @@ const OperationalReportsPage: React.FC = () => {
           value: reportData.summary.avgUtilization?.toFixed(1) || '0.0',
           suffix: '%',
         },
-        { title: 'Active Machines', value: reportData.summary.activeMachines || 0, color: '#52c41a' },
+        {
+          title: 'Active Machines',
+          value: reportData.summary.activeMachines || 0,
+          color: '#52c41a',
+        },
         { title: 'Idle Machines', value: reportData.summary.idleMachines || 0, color: '#faad14' },
       ];
     }
@@ -200,19 +204,31 @@ const OperationalReportsPage: React.FC = () => {
             destroyInactiveTabPane={true} // Clean up DOM when switching
           >
             <TabPane tab='Production Efficiency' key='production-efficiency'>
-              <ProductionEfficiencyReport />
+              <ProductionEfficiencyReport
+                data={reportData}
+                loading={loading}
+                searchText={searchText}
+              />
             </TabPane>
 
             <TabPane tab='Machine Utilization' key='machine-utilization'>
-              <MachineUtilizationReport />
+              <MachineUtilizationReport
+                data={reportData}
+                loading={loading}
+                searchText={searchText}
+              />
             </TabPane>
 
             <TabPane tab='Production Planning' key='production-planning'>
-              <ProductionPlanningReport />
+              <ProductionPlanningReport
+                data={reportData}
+                loading={loading}
+                searchText={searchText}
+              />
             </TabPane>
 
             <TabPane tab='Quality Metrics' key='quality-metrics'>
-              <QualityMetricsReport />
+              <QualityMetricsReport data={reportData} loading={loading} searchText={searchText} />
             </TabPane>
           </Tabs>
         </div>

@@ -25,6 +25,8 @@ import paymentRoutes from './paymentRoutes';
 import pettyCashRoutes from './pettyCashRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
+import { subscriptionController } from '../../controllers/subscriptionController';
+import { subscriptionRoutes } from './subscriptionRoutes';
 import { userRateLimit } from '../../middleware/rateLimiter';
 
 const router = Router();
@@ -68,6 +70,9 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/health', healthRoutes);
 
+// Public webhook routes
+router.post('/webhooks/stripe', subscriptionController.handleWebhook);
+
 // Protected routes (authentication required)
 // Apply authentication middleware for all protected routes
 router.use(tenantIsolationMiddleware);
@@ -97,5 +102,6 @@ router.use('/payments', paymentRoutes);
 router.use('/petty-cash', pettyCashRoutes);
 router.use('/companies/:tenantId/customers', customerRoutes);
 // router.use('/production', productionRoutes);
+router.use('/subscriptions', subscriptionRoutes);
 
 export default router;

@@ -25,7 +25,6 @@ export class BillService {
    * Generate a unique bill ID (BILL001, BILL002, etc.)
    */
   private async generateBillId(companyId: string): Promise<string> {
-
     // Get the highest bill number for this company
     const lastBill = await this.prisma.bills.findFirst({
       where: { company_id: companyId },
@@ -74,7 +73,6 @@ export class BillService {
    * Create a new bill
    */
   async createBill(companyId: string, data: CreateBillData) {
-    
     // Validate company exists
     const company = await this.prisma.companies.findUnique({
       where: { id: companyId },
@@ -115,7 +113,9 @@ export class BillService {
     if (!data.purchaseOrderId) {
       for (const item of data.items) {
         if (!item.productId) {
-          throw new Error('Product is required for each line item when not linked to a Purchase Order');
+          throw new Error(
+            'Product is required for each line item when not linked to a Purchase Order'
+          );
         }
       }
     }
@@ -169,7 +169,7 @@ export class BillService {
     const balanceDue = totalAmount; // Initially, balance due equals total
 
     // Create bill with items in a transaction
-    const bill = await this.prisma.$transaction(async (tx) => {
+    const bill = await this.prisma.$transaction(async tx => {
       const newBill = await tx.bills.create({
         data: {
           id: uuidv4(),
@@ -250,9 +250,8 @@ export class BillService {
   async createBillFromPurchaseOrder(
     companyId: string,
     purchaseOrderId: string,
-    data: Partial<CreateBillData>,
+    data: Partial<CreateBillData>
   ) {
-    
     // Fetch the purchase order with items
     const po = await this.prisma.purchase_orders.findFirst({
       where: { id: purchaseOrderId, company_id: companyId },
@@ -277,6 +276,30 @@ export class BillService {
     }
 
     // Build bill data from PO
+    // Calculate items
+    const items = po.purchase_order_items.map(item => ({
+      productId: item.product_id || undefined,
+      itemCode: item.item_code,
+      description: item.description || undefined,
+      quantity: Number(item.quantity),
+      unitOfMeasure: item.unit_of_measure,
+      unitCost: Number(item.unit_cost),
+      discountPercent: Number(item.discount_percent),
+      taxRate: Number(item.tax_rate),
+      notes: item.notes || undefined,
+    }));
+
+    // Calculate totals
+    const subtotalAmount = items.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
+    const taxAmount = items.reduce((sum, item) => {
+      const gross = item.quantity * item.unitCost;
+      const discount = (gross * (item.discountPercent || 0)) / 100;
+      return sum + ((gross - discount) * (item.taxRate || 0)) / 100;
+    }, 0);
+    const shippingCharges = data.shippingCharges ?? Number(po.shipping_charges);
+    const totalAmount = subtotalAmount + taxAmount + (shippingCharges || 0);
+
+    // Build bill data from PO
     const billData: CreateBillData = {
       supplierId: po.supplier_id || undefined,
       supplierName: po.supplier_name,
@@ -288,20 +311,13 @@ export class BillService {
       dueDate: data.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default 30 days
       paymentTerms: data.paymentTerms || (po.payment_terms as any) || 'NET_30',
       currency: data.currency || po.currency,
-      shippingCharges: data.shippingCharges ?? Number(po.shipping_charges),
+      shippingCharges: shippingCharges,
       notes: data.notes,
       supplierInvoiceNo: data.supplierInvoiceNo,
-      items: po.purchase_order_items.map((item) => ({
-        productId: item.product_id || undefined,
-        itemCode: item.item_code,
-        description: item.description || undefined,
-        quantity: Number(item.quantity),
-        unitOfMeasure: item.unit_of_measure,
-        unitCost: Number(item.unit_cost),
-        discountPercent: Number(item.discount_percent),
-        taxRate: Number(item.tax_rate),
-        notes: item.notes || undefined,
-      })),
+      items: items,
+      subtotalAmount: subtotalAmount,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
     };
 
     // Validate location
@@ -323,7 +339,6 @@ export class BillService {
    * Get all bills for a company with optional filters
    */
   async getBills(companyId: string, filters?: ListBillFilters) {
-    
     const where: Prisma.billsWhereInput = {
       company_id: companyId,
       is_active: true,
@@ -372,14 +387,13 @@ export class BillService {
       orderBy: { created_at: 'desc' },
     });
 
-    return bills.map((bill) => this.toSummaryDto(bill));
+    return bills.map(bill => this.toSummaryDto(bill));
   }
 
   /**
    * Get a single bill by ID
    */
   async getBillById(companyId: string, billId: string) {
-    
     const bill = await this.prisma.bills.findFirst({
       where: {
         company_id: companyId,
@@ -436,7 +450,6 @@ export class BillService {
    * Update a bill
    */
   async updateBill(companyId: string, billId: string, data: UpdateBillData) {
-    
     // Find existing bill
     const existingBill = await this.prisma.bills.findFirst({
       where: {
@@ -529,7 +542,7 @@ export class BillService {
     }
 
     // Update bill with items in transaction
-    const updatedBill = await this.prisma.$transaction(async (tx) => {
+    const updatedBill = await this.prisma.$transaction(async tx => {
       // If items are provided, recalculate totals and replace items
       if (data.items && data.items.length > 0) {
         // Delete existing items
@@ -634,7 +647,6 @@ export class BillService {
    * Update bill status with validation
    */
   async updateBillStatus(companyId: string, billId: string, newStatus: BillStatusType) {
-    
     const bill = await this.prisma.bills.findFirst({
       where: {
         company_id: companyId,
@@ -650,7 +662,7 @@ export class BillService {
     const allowedTransitions = this.getAllowedStatusTransitions(bill.status);
     if (!allowedTransitions.includes(newStatus)) {
       throw new Error(
-        `Invalid status transition from ${bill.status} to ${newStatus}. Allowed: ${allowedTransitions.join(', ')}`,
+        `Invalid status transition from ${bill.status} to ${newStatus}. Allowed: ${allowedTransitions.join(', ')}`
       );
     }
 
@@ -701,7 +713,6 @@ export class BillService {
    * Delete a bill (soft delete - only DRAFT bills can be deleted)
    */
   async deleteBill(companyId: string, billId: string) {
-    
     const bill = await this.prisma.bills.findFirst({
       where: {
         company_id: companyId,
@@ -716,7 +727,7 @@ export class BillService {
     // Only DRAFT bills can be deleted
     if (bill.status !== 'DRAFT') {
       throw new Error(
-        `Cannot delete bill with status ${bill.status}. Only DRAFT bills can be deleted to maintain audit trail and financial records.`,
+        `Cannot delete bill with status ${bill.status}. Only DRAFT bills can be deleted to maintain audit trail and financial records.`
       );
     }
 

@@ -163,6 +163,9 @@ export interface CreatePurchaseOrderData {
   shippingMethod?: string;
   incoterms?: string;
   shippingCharges?: number;
+  subtotalAmount: number;
+  taxAmount: number;
+  totalAmount: number;
   items: PurchaseOrderItemInput[];
 }
 
@@ -184,9 +187,23 @@ export interface ListFinancialDocumentFilters {
 }
 
 // Invoice Management Types
-export type InvoiceStatusType = 'DRAFT' | 'SENT' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+export type InvoiceStatusType =
+  | 'DRAFT'
+  | 'SENT'
+  | 'PARTIALLY_PAID'
+  | 'PAID'
+  | 'OVERDUE'
+  | 'CANCELLED';
 export type PaymentMethodType = 'CASH' | 'CHEQUE' | 'BANK_TRANSFER' | 'UPI' | 'CARD' | 'OTHER';
-export type PaymentTermsType = 'IMMEDIATE' | 'NET_15' | 'NET_30' | 'NET_60' | 'NET_90' | 'ADVANCE' | 'COD' | 'CREDIT';
+export type PaymentTermsType =
+  | 'IMMEDIATE'
+  | 'NET_15'
+  | 'NET_30'
+  | 'NET_60'
+  | 'NET_90'
+  | 'ADVANCE'
+  | 'COD'
+  | 'CREDIT';
 
 export interface InvoiceItemInput {
   lineNumber?: number;
@@ -251,7 +268,13 @@ export interface ListInvoiceFilters {
 }
 
 // Bill Management Types
-export type BillStatusType = 'DRAFT' | 'RECEIVED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+export type BillStatusType =
+  | 'DRAFT'
+  | 'RECEIVED'
+  | 'PARTIALLY_PAID'
+  | 'PAID'
+  | 'OVERDUE'
+  | 'CANCELLED';
 
 export interface BillItemInput {
   lineNumber?: number;
@@ -278,6 +301,9 @@ export interface CreateBillData {
   paymentTerms?: PaymentTermsType;
   currency?: string;
   shippingCharges?: number;
+  subtotalAmount: number;
+  taxAmount: number;
+  totalAmount: number;
   notes?: string;
   supplierInvoiceNo?: string;
   items: BillItemInput[];

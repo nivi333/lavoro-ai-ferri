@@ -1,4 +1,11 @@
-import { PrismaClient, PaymentType, PaymentStatus, PaymentMethod, InvoiceStatus, BillStatus } from '@prisma/client';
+import {
+  PrismaClient,
+  PaymentType,
+  PaymentStatus,
+  PaymentMethod,
+  InvoiceStatus,
+  BillStatus,
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -100,14 +107,14 @@ export class PaymentService {
     const paymentId = await this.generatePaymentId(companyId);
 
     // Use transaction to update invoice and create payment
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async tx => {
       // Create payment record
       const payment = await tx.payments.create({
         data: {
           id: uuidv4(),
           payment_id: paymentId,
           company_id: companyId,
-          payment_type: PaymentType.INVOICE_PAYMENT,
+          payment_type: PaymentType.INVOICE,
           reference_type: 'INVOICE',
           reference_id: data.referenceId,
           amount: data.amount,
@@ -133,7 +140,7 @@ export class PaymentService {
       // Update invoice
       const newAmountPaid = Number(invoice.amount_paid) + data.amount;
       const newBalanceDue = Number(invoice.total_amount) - newAmountPaid;
-      
+
       let newStatus: InvoiceStatus;
       if (newBalanceDue <= 0) {
         newStatus = InvoiceStatus.PAID;
@@ -206,14 +213,14 @@ export class PaymentService {
     const paymentId = await this.generatePaymentId(companyId);
 
     // Use transaction to update bill and create payment
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async tx => {
       // Create payment record
       const payment = await tx.payments.create({
         data: {
           id: uuidv4(),
           payment_id: paymentId,
           company_id: companyId,
-          payment_type: PaymentType.BILL_PAYMENT,
+          payment_type: PaymentType.BILL,
           reference_type: 'BILL',
           reference_id: data.referenceId,
           amount: data.amount,
@@ -239,7 +246,7 @@ export class PaymentService {
       // Update bill
       const newAmountPaid = Number(bill.amount_paid) + data.amount;
       const newBalanceDue = Number(bill.total_amount) - newAmountPaid;
-      
+
       let newStatus: BillStatus;
       if (newBalanceDue <= 0) {
         newStatus = BillStatus.PAID;
@@ -387,7 +394,7 @@ export class PaymentService {
     }
 
     // Reverse the payment in a transaction
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async tx => {
       // Update payment status
       const updatedPayment = await tx.payments.update({
         where: { id: payment.id },
@@ -406,7 +413,7 @@ export class PaymentService {
         if (invoice) {
           const newAmountPaid = Math.max(0, Number(invoice.amount_paid) - Number(payment.amount));
           const newBalanceDue = Number(invoice.total_amount) - newAmountPaid;
-          
+
           let newStatus: InvoiceStatus;
           if (newAmountPaid === 0) {
             newStatus = InvoiceStatus.SENT;
@@ -431,7 +438,7 @@ export class PaymentService {
         if (bill) {
           const newAmountPaid = Math.max(0, Number(bill.amount_paid) - Number(payment.amount));
           const newBalanceDue = Number(bill.total_amount) - newAmountPaid;
-          
+
           let newStatus: BillStatus;
           if (newAmountPaid === 0) {
             newStatus = BillStatus.RECEIVED;
