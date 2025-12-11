@@ -55,6 +55,7 @@ export { default as FinanceOverviewPage } from './finance/FinanceOverviewPage';
 export { default as AccountsReceivablePage } from './finance/AccountsReceivablePage';
 export { default as AccountsPayablePage } from './finance/AccountsPayablePage';
 export { default as ExpensesPage } from './finance/ExpensesPage';
+export { default as PettyCashPage } from './finance/PettyCashPage';
 
 // Reports
 export { default as ReportsPage } from './reports/ReportsPage';

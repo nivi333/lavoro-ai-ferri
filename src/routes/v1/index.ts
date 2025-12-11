@@ -20,6 +20,9 @@ import supplierRoutes from './supplierRoutes';
 import userRoutes from '../userRoutes';
 import analyticsRoutes from './analyticsRoutes';
 import reportRoutes from '../reportRoutes';
+import expenseRoutes from './expenseRoutes';
+import paymentRoutes from './paymentRoutes';
+import pettyCashRoutes from './pettyCashRoutes';
 // import productionRoutes from './productionRoutes';
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { userRateLimit } from '../../middleware/rateLimiter';
@@ -52,6 +55,9 @@ router.get('/', (req, res) => {
       machines: '/machines',
       analytics: '/analytics',
       reports: '/reports',
+      expenses: '/expenses',
+      payments: '/payments',
+      pettyCash: '/petty-cash',
       production: '/production (coming soon)',
     },
     documentation: '/docs',
@@ -86,6 +92,9 @@ router.use('/machines', machineRoutes);
 router.use('/users', userRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/reports', reportRoutes);
+router.use('/expenses', expenseRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/petty-cash', pettyCashRoutes);
 router.use('/companies/:tenantId/customers', customerRoutes);
 // router.use('/production', productionRoutes);
 

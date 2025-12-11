@@ -37,6 +37,7 @@ import {
   AccountsReceivablePage,
   AccountsPayablePage,
   ExpensesPage,
+  PettyCashPage,
   ReportsListPage,
   FinancialReportsPage,
   InventoryReportsPage,
@@ -366,6 +367,15 @@ export default function AppRouter() {
               element={
                 <ProtectedRoute requireCompany={true}>
                   <ExpensesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path='/finance/petty-cash'
+              element={
+                <ProtectedRoute requireCompany={true}>
+                  <PettyCashPage />
                 </ProtectedRoute>
               }
             />

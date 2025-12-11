@@ -21,6 +21,7 @@ import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton, PageBreadcrumb } from '../../components/ui';
 import { invoiceService, InvoiceSummary, InvoiceStatus } from '../../services/invoiceService';
+import PaymentRecordingModal from '../../components/finance/PaymentRecordingModal';
 import './AccountsReceivablePage.scss';
 
 const STATUS_COLORS: Record<InvoiceStatus, string> = {
@@ -64,6 +65,8 @@ export default function AccountsReceivablePage() {
     dueIn30Days: 0,
     paidLastMonth: 0,
   });
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceSummary | null>(null);
 
   useEffect(() => {
     setHeaderActions(
@@ -140,9 +143,13 @@ export default function AccountsReceivablePage() {
     navigate(`/invoices/${invoiceData.invoiceId}`);
   };
 
-  const handleCreatePayment = (_invoiceData: InvoiceSummary) => {
-    // This would be implemented when the payment recording functionality is available
-    message.info('Payment recording functionality will be implemented in a future update.');
+  const handleCreatePayment = (invoiceData: InvoiceSummary) => {
+    setSelectedInvoice(invoiceData);
+    setPaymentModalOpen(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    fetchData();
   };
 
   const handleSendReminder = (_invoiceData: InvoiceSummary) => {
@@ -378,6 +385,24 @@ export default function AccountsReceivablePage() {
           </div>
         </div>
       </div>
+
+      {/* Payment Recording Modal */}
+      {selectedInvoice && (
+        <PaymentRecordingModal
+          open={paymentModalOpen}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setSelectedInvoice(null);
+          }}
+          onSuccess={handlePaymentSuccess}
+          referenceType='INVOICE'
+          referenceId={selectedInvoice.invoiceId}
+          partyName={selectedInvoice.customerName}
+          totalAmount={selectedInvoice.totalAmount}
+          balanceDue={selectedInvoice.balanceDue}
+          currency={selectedInvoice.currency}
+        />
+      )}
     </MainLayout>
   );
 }

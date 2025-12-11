@@ -21,6 +21,7 @@ import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton, PageBreadcrumb } from '../../components/ui';
 import { billService, BillSummary, BillStatus } from '../../services/billService';
+import PaymentRecordingModal from '../../components/finance/PaymentRecordingModal';
 import './AccountsPayablePage.scss';
 
 const STATUS_COLORS: Record<BillStatus, string> = {
@@ -64,6 +65,8 @@ export default function AccountsPayablePage() {
     dueIn30Days: 0,
     paidLastMonth: 0,
   });
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedBill, setSelectedBill] = useState<BillSummary | null>(null);
 
   useEffect(() => {
     setHeaderActions(
@@ -140,9 +143,13 @@ export default function AccountsPayablePage() {
     navigate(`/bills/${billData.billId}`);
   };
 
-  const handleCreatePayment = (_billData: BillSummary) => {
-    // This would be implemented when the payment recording functionality is available
-    message.info('Payment recording functionality will be implemented in a future update.');
+  const handleCreatePayment = (billData: BillSummary) => {
+    setSelectedBill(billData);
+    setPaymentModalOpen(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    fetchData();
   };
 
   const columns = [
@@ -364,6 +371,24 @@ export default function AccountsPayablePage() {
           </div>
         </div>
       </div>
+
+      {/* Payment Recording Modal */}
+      {selectedBill && (
+        <PaymentRecordingModal
+          open={paymentModalOpen}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setSelectedBill(null);
+          }}
+          onSuccess={handlePaymentSuccess}
+          referenceType='BILL'
+          referenceId={selectedBill.billId}
+          partyName={selectedBill.supplierName}
+          totalAmount={selectedBill.totalAmount}
+          balanceDue={selectedBill.balanceDue}
+          currency={selectedBill.currency}
+        />
+      )}
     </MainLayout>
   );
 }
