@@ -81,5 +81,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["sh", "-c", "TS_NODE_PROJECT=tsconfig.prod.json node -r tsconfig-paths/register dist/index.js"]
+# Start the application with migrations
+CMD ["sh", "-c", "npx prisma migrate deploy && TS_NODE_PROJECT=tsconfig.prod.json node -r tsconfig-paths/register dist/index.js"]
