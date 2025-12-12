@@ -13,22 +13,34 @@ export class InvoiceService {
 
   private async generateInvoiceId(companyId: string): Promise<string> {
     try {
-      const lastInvoice = await this.prisma.invoices.findFirst({
+      // Get all invoice IDs for this company and find the max numeric value
+      const invoices = await this.prisma.invoices.findMany({
         where: { company_id: companyId },
-        orderBy: { invoice_id: 'desc' },
         select: { invoice_id: true },
       });
 
-      if (!lastInvoice) {
+      if (invoices.length === 0) {
         return 'INV001';
       }
 
-      const numericPart = parseInt(lastInvoice.invoice_id.substring(3), 10);
-      const next = Number.isNaN(numericPart) ? 1 : numericPart + 1;
+      // Extract numeric parts and find the maximum
+      let maxNumber = 0;
+      for (const inv of invoices) {
+        const match = inv.invoice_id.match(/INV(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!Number.isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      }
+
+      const next = maxNumber + 1;
       return `INV${next.toString().padStart(3, '0')}`;
     } catch (error) {
       console.error('Error generating invoice ID:', error);
-      return `INV${Date.now().toString().slice(-3)}`;
+      // Use timestamp-based fallback to avoid collisions
+      return `INV${Date.now().toString().slice(-6)}`;
     }
   }
 

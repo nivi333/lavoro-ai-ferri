@@ -46,6 +46,10 @@
 // Dark mode support
 [data-theme='dark'] {
   .bills-list-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10px;
     background: $dark-bg-primary;
 
     .page-header-section {

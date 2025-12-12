@@ -198,8 +198,8 @@ export const BillFormDrawer: React.FC<BillFormDrawerProps> = ({
     try {
       setLoadingPOs(true);
       const posData = await purchaseOrderService.getPurchaseOrders();
-      // Filter to only show POs that can have bills (not cancelled or draft)
-      return posData.filter(po => po.status !== 'CANCELLED' && po.status !== 'DRAFT');
+      // Filter to only show POs that can have bills (not cancelled)
+      return posData.filter(po => po.status !== 'CANCELLED');
     } catch (error: any) {
       console.error('Error fetching purchase orders:', error);
       message.error('Failed to load purchase orders');

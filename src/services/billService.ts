@@ -25,22 +25,36 @@ export class BillService {
    * Generate a unique bill ID (BILL001, BILL002, etc.)
    */
   private async generateBillId(companyId: string): Promise<string> {
-    // Get the highest bill number for this company
-    const lastBill = await this.prisma.bills.findFirst({
-      where: { company_id: companyId },
-      orderBy: { bill_id: 'desc' },
-      select: { bill_id: true },
-    });
+    try {
+      // Get all bill IDs for this company and find the max numeric value
+      const bills = await this.prisma.bills.findMany({
+        where: { company_id: companyId },
+        select: { bill_id: true },
+      });
 
-    let nextNumber = 1;
-    if (lastBill?.bill_id) {
-      const match = lastBill.bill_id.match(/BILL(\d+)/);
-      if (match) {
-        nextNumber = parseInt(match[1], 10) + 1;
+      if (bills.length === 0) {
+        return 'BILL001';
       }
-    }
 
-    return `BILL${String(nextNumber).padStart(3, '0')}`;
+      // Extract numeric parts and find the maximum
+      let maxNumber = 0;
+      for (const bill of bills) {
+        const match = bill.bill_id.match(/BILL(\d+)/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!Number.isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      }
+
+      const next = maxNumber + 1;
+      return `BILL${String(next).padStart(3, '0')}`;
+    } catch (error) {
+      console.error('Error generating bill ID:', error);
+      // Use timestamp-based fallback to avoid collisions
+      return `BILL${Date.now().toString().slice(-6)}`;
+    }
   }
 
   /**

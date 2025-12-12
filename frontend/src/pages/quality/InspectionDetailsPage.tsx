@@ -183,7 +183,7 @@ export default function InspectionDetailsPage() {
             <span className='label'>Quality Score:</span>
             <span className='value'>
               {inspection.qualityScore !== undefined && inspection.qualityScore !== null
-                ? `${inspection.qualityScore.toFixed(1)}%`
+                ? `${Number(inspection.qualityScore).toFixed(1)}%`
                 : '-'}
             </span>
           </div>
@@ -251,7 +251,7 @@ export default function InspectionDetailsPage() {
                           <span className='label'>Quality Score:</span>
                           <span className='value'>
                             {inspection.qualityScore !== undefined && inspection.qualityScore !== null
-                              ? `${inspection.qualityScore.toFixed(1)}%`
+                              ? `${Number(inspection.qualityScore).toFixed(1)}%`
                               : '-'}
                           </span>
                         </div>

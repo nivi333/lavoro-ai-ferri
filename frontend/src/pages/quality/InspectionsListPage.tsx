@@ -200,7 +200,7 @@ export default function InspectionsListPage() {
       key: 'qualityScore',
       width: 120,
       render: score => (
-        <span>{score !== undefined && score !== null ? `${score.toFixed(1)}%` : '-'}</span>
+        <span>{score !== undefined && score !== null ? `${Number(score).toFixed(1)}%` : '-'}</span>
       ),
     },
     {

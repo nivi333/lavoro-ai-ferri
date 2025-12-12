@@ -128,9 +128,9 @@ const FinanceOverviewPage: React.FC = () => {
       title: 'Amount',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
-      render: (amount: number, record: InvoiceSummary) => (
+      render: (amount: number | string, record: InvoiceSummary) => (
         <span>
-          {record.currency} {amount.toFixed(2)}
+          {record.currency} {Number(amount).toFixed(2)}
         </span>
       ),
     },
@@ -174,9 +174,9 @@ const FinanceOverviewPage: React.FC = () => {
       title: 'Amount',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
-      render: (amount: number, record: BillSummary) => (
+      render: (amount: number | string, record: BillSummary) => (
         <span>
-          {record.currency} {amount.toFixed(2)}
+          {record.currency} {Number(amount).toFixed(2)}
         </span>
       ),
     },

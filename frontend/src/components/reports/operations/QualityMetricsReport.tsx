@@ -47,7 +47,7 @@ const QualityMetricsReport: React.FC<QualityMetricsReportProps> = ({
       title: 'Avg Score',
       dataIndex: 'averageScore',
       key: 'averageScore',
-      render: (val: number) => val.toFixed(2),
+      render: (val: number) => (val !== undefined && val !== null ? Number(val).toFixed(2) : '-'),
       sorter: (a: QualityData, b: QualityData) => a.averageScore - b.averageScore,
     },
   ] as any;
