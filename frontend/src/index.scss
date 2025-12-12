@@ -1884,3 +1884,27 @@ button {
     }
   }
 }
+
+// ============================================================================
+// GLOBAL LOADING CONTAINER - Centered spinner for all list pages
+// ============================================================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+  padding: $spacing-2xl;
+  
+  p {
+    margin-top: $spacing-md;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+// Ensure loading container works inside table-container
+.table-container .loading-container {
+  min-height: 400px;
+}

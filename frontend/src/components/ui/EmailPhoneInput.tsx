@@ -20,6 +20,7 @@ export const EmailPhoneInput: React.FC<EmailPhoneInputProps> = ({
     <Form.Item
       name={name}
       label={label}
+      required={required}
       rules={[
         {
           validator: (_, value) => {

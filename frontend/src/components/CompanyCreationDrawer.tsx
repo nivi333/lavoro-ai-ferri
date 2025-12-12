@@ -36,6 +36,8 @@ type CompanyFormInitialData = Partial<
   contactInfo?: string;
   address1?: string;
   address2?: string;
+  addressLine1?: string;
+  addressLine2?: string;
   city?: string;
   state?: string;
   pincode?: string;
@@ -294,8 +296,8 @@ export const CompanyCreationDrawer: React.FC<CompanyCreationDrawerProps> = ({
           description: initialData.description,
           country: initialData.country,
           defaultLocation: initialData.defaultLocation,
-          addressLine1: initialData.address1,
-          addressLine2: initialData.address2,
+          addressLine1: initialData.addressLine1 || initialData.address1,
+          addressLine2: initialData.addressLine2 || initialData.address2,
           city: initialData.city,
           state: initialData.state,
           pincode: initialData.pincode,
