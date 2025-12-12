@@ -134,7 +134,7 @@ export const config: Config = {
   },
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    credentials: process.env.CORS_CREDENTIALS === 'true',
+    credentials: process.env.CORS_CREDENTIALS !== 'false', // Default to true
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info',

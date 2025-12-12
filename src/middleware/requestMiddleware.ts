@@ -13,9 +13,11 @@ export const corsMiddleware = cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    const allowedOrigins = Array.isArray(config.cors.origin) 
-      ? config.cors.origin 
-      : [config.cors.origin];
+    // Parse allowed origins - support comma-separated list
+    const configOrigin = config.cors.origin;
+    const allowedOrigins = typeof configOrigin === 'string' 
+      ? configOrigin.split(',').map(o => o.trim())
+      : Array.isArray(configOrigin) ? configOrigin : [configOrigin];
 
     // Allow all origins in development
     if (config.env === 'development') {
@@ -27,7 +29,7 @@ export const corsMiddleware = cors({
       return callback(null, true);
     }
 
-    logger.warn(`CORS: Origin ${origin} not allowed`);
+    logger.warn(`CORS: Origin ${origin} not allowed. Allowed: ${allowedOrigins.join(', ')}`);
     return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: config.cors.credentials,
