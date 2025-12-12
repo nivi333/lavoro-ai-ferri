@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { URL } from 'url';
 
 dotenv.config();
 
@@ -67,10 +68,30 @@ interface Config {
   };
 }
 
+function parseRedisUrl(redisUrl: string) {
+  try {
+    const u = new URL(redisUrl);
+    const dbPath = u.pathname?.replace('/', '') ?? '0';
+    return {
+      host: u.hostname || 'localhost',
+      port: u.port ? parseInt(u.port, 10) : 6379,
+      password: u.password || undefined,
+      db: dbPath ? parseInt(dbPath, 10) : 0,
+    };
+  } catch {
+    return {
+      host: 'localhost',
+      port: 6379,
+      password: undefined,
+      db: 0,
+    };
+  }
+}
+
 export const config: Config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3000', 10),
-  host: process.env.HOST || 'localhost',
+  host: process.env.HOST || '0.0.0.0',
   database: {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -83,12 +104,18 @@ export const config: Config = {
     idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT || '30000', 10),
     connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '5000', 10),
   },
-  redis: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    password: process.env.REDIS_PASSWORD || undefined,
-    db: parseInt(process.env.REDIS_DB || '0', 10),
-  },
+  redis: (() => {
+    const url = process.env.REDIS_URL;
+    if (url) {
+      return parseRedisUrl(url);
+    }
+    return {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || '0', 10),
+    };
+  })(),
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret-key',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret',

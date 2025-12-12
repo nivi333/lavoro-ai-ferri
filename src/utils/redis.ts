@@ -7,16 +7,21 @@ class RedisManager {
   private isConnected: boolean = false;
 
   constructor() {
-    const clientConfig: any = {
-      socket: {
-        host: config.redis.host,
-        port: config.redis.port,
-      },
-      database: config.redis.db,
-    };
-    
-    if (config.redis.password) {
-      clientConfig.password = config.redis.password;
+    let clientConfig: any;
+    if (process.env.REDIS_URL) {
+      clientConfig = { url: process.env.REDIS_URL };
+    } else {
+      clientConfig = {
+        socket: {
+          host: config.redis.host,
+          port: config.redis.port,
+          tls: process.env.REDIS_TLS === 'true',
+        },
+        database: config.redis.db,
+      };
+      if (config.redis.password) {
+        clientConfig.password = config.redis.password;
+      }
     }
 
     this.client = createClient(clientConfig);
