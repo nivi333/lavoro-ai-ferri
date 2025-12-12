@@ -55,6 +55,7 @@ const updateInvoiceSchema = Joi.object({
   customerId: Joi.string().optional().allow('', null),
   customerName: Joi.string().optional(),
   customerCode: Joi.string().optional().allow('', null),
+  orderId: Joi.string().optional().allow('', null),
   locationId: Joi.string().optional(),
   invoiceNumber: Joi.string().optional().allow('', null),
   invoiceDate: Joi.date().optional(),

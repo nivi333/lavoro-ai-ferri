@@ -113,7 +113,8 @@ export class BillService {
       }
     }
 
-    // Validate purchase order if provided
+    // Validate purchase order if provided and get its UUID
+    let purchaseOrderUuid: string | null = null;
     if (data.purchaseOrderId) {
       // Try to find by po_id first (e.g., "PO002"), then by id (UUID)
       const po = await this.prisma.purchase_orders.findFirst({
@@ -124,10 +125,13 @@ export class BillService {
             { id: data.purchaseOrderId },
           ],
         },
+        select: { id: true },
       });
       if (!po) {
         throw new Error('Invalid purchase order');
       }
+      // Store the UUID for the foreign key
+      purchaseOrderUuid = po.id;
     }
 
     // Validate items - product is required if no PO reference
@@ -199,7 +203,7 @@ export class BillService {
           supplier_id: data.supplierId || null,
           supplier_name: data.supplierName,
           supplier_code: data.supplierCode || null,
-          purchase_order_id: data.purchaseOrderId || null,
+          purchase_order_id: purchaseOrderUuid,
           location_id: data.locationId,
           bill_number: data.billNumber || null,
           bill_date: new Date(data.billDate),

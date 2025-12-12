@@ -350,6 +350,7 @@ const UsersListPage: React.FC = () => {
       title: 'User',
       key: 'user',
       width: 280,
+      sorter: (a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`),
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Avatar 
@@ -373,6 +374,7 @@ const UsersListPage: React.FC = () => {
       dataIndex: 'role',
       key: 'role',
       width: 120,
+      sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
       render: (role: string) => (
         <Tag color={getRoleBadgeColor(role)}>{role}</Tag>
       ),
@@ -382,6 +384,7 @@ const UsersListPage: React.FC = () => {
       dataIndex: 'isActive',
       key: 'status',
       width: 100,
+      sorter: (a, b) => (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0),
       render: (isActive: boolean) => getStatusTag(isActive),
     },
     {
@@ -389,6 +392,7 @@ const UsersListPage: React.FC = () => {
       dataIndex: 'lastActive',
       key: 'lastActive',
       width: 150,
+      sorter: (a, b) => new Date(a.lastActive || 0).getTime() - new Date(b.lastActive || 0).getTime(),
       render: (date: string) => (
         <span className="last-active">{formatLastActive(date)}</span>
       ),

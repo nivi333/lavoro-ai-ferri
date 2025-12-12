@@ -235,6 +235,7 @@ export default function MachineListPage() {
       title: 'Machine',
       key: 'machine',
       width: 300,
+      sorter: (a: Machine, b: Machine) => (a.name || '').localeCompare(b.name || ''),
       render: (record: Machine) => (
         <div className='machine-info'>
           <Avatar src={record.imageUrl} icon={<ToolOutlined />} className='location-avatar'>
@@ -252,6 +253,7 @@ export default function MachineListPage() {
       dataIndex: 'machineType',
       key: 'machineType',
       width: 150,
+      sorter: (a: Machine, b: Machine) => (a.machineType || '').localeCompare(b.machineType || ''),
       render: (machineType?: string) => machineType || '—',
     },
     {
@@ -259,6 +261,7 @@ export default function MachineListPage() {
       dataIndex: 'purchaseDate',
       key: 'purchaseDate',
       width: 120,
+      sorter: (a: Machine, b: Machine) => new Date(a.purchaseDate || 0).getTime() - new Date(b.purchaseDate || 0).getTime(),
       render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
@@ -266,12 +269,14 @@ export default function MachineListPage() {
       dataIndex: 'warrantyExpiry',
       key: 'warrantyExpiry',
       width: 130,
+      sorter: (a: Machine, b: Machine) => new Date(a.warrantyExpiry || 0).getTime() - new Date(b.warrantyExpiry || 0).getTime(),
       render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Location',
       key: 'location',
       width: 150,
+      sorter: (a: Machine, b: Machine) => (a.location?.name || '').localeCompare(b.location?.name || ''),
       render: (record: Machine) =>
         record.location?.name || getLocationName(record.locationId) || '—',
     },
@@ -300,6 +305,7 @@ export default function MachineListPage() {
       dataIndex: 'operationalStatus',
       key: 'operationalStatus',
       width: 140,
+      sorter: (a: Machine, b: Machine) => (a.operationalStatus || '').localeCompare(b.operationalStatus || ''),
       render: (status: string) => (
         <Tag color={getOperationalStatusColor(status)}>{status || 'Unknown'}</Tag>
       ),
@@ -309,6 +315,7 @@ export default function MachineListPage() {
       dataIndex: 'status',
       key: 'status',
       width: 150,
+      sorter: (a: Machine, b: Machine) => (a.status || '').localeCompare(b.status || ''),
       render: (status: string) => (
         <Tag color={getStatusColor(status)}>{status?.replace('_', ' ') || 'Unknown'}</Tag>
       ),

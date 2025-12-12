@@ -202,17 +202,17 @@ class MachineService {
           machine_id: machineId,
           machine_code: machineCode,
           company_id: companyId,
-          location_id: data.locationId,
+          location_id: data.locationId || null,
           name: data.name,
-          machine_type: data.machineType,
-          model: data.model,
-          manufacturer: data.manufacturer,
-          serial_number: data.serialNumber,
-          purchase_date: data.purchaseDate,
-          warranty_expiry: data.warrantyExpiry,
-          specifications: data.specifications,
-          image_url: data.imageUrl,
-          current_operator_id: data.currentOperatorId,
+          machine_type: data.machineType || null,
+          model: data.model || null,
+          manufacturer: data.manufacturer || null,
+          serial_number: data.serialNumber || null,
+          purchase_date: data.purchaseDate || null,
+          warranty_expiry: data.warrantyExpiry || null,
+          specifications: data.specifications || null,
+          image_url: data.imageUrl || null,
+          current_operator_id: data.currentOperatorId || null,
           operational_status: data.operationalStatus as any || 'FREE',
           is_active: data.isActive ?? true,
           updated_at: new Date(),
@@ -371,25 +371,29 @@ class MachineService {
         throw new Error('Machine not found');
       }
 
+      // Build update data, converting empty strings to null
+      const updateData: any = {
+        updated_at: new Date(),
+      };
+      
+      if (data.name !== undefined) updateData.name = data.name;
+      if (data.machineType !== undefined) updateData.machine_type = data.machineType || null;
+      if (data.model !== undefined) updateData.model = data.model || null;
+      if (data.manufacturer !== undefined) updateData.manufacturer = data.manufacturer || null;
+      if (data.serialNumber !== undefined) updateData.serial_number = data.serialNumber || null;
+      if (data.purchaseDate !== undefined) updateData.purchase_date = data.purchaseDate || null;
+      if (data.warrantyExpiry !== undefined) updateData.warranty_expiry = data.warrantyExpiry || null;
+      if (data.specifications !== undefined) updateData.specifications = data.specifications || null;
+      if (data.imageUrl !== undefined) updateData.image_url = data.imageUrl || null;
+      if (data.locationId !== undefined) updateData.location_id = data.locationId || null;
+      if (data.currentOperatorId !== undefined) updateData.current_operator_id = data.currentOperatorId || null;
+      if (data.operationalStatus !== undefined) updateData.operational_status = data.operationalStatus;
+      if (data.status !== undefined) updateData.status = data.status;
+      if (data.isActive !== undefined) updateData.is_active = data.isActive;
+
       const machine = await prisma.machines.update({
         where: { id: machineId },
-        data: {
-          name: data.name,
-          machine_type: data.machineType,
-          model: data.model,
-          manufacturer: data.manufacturer,
-          serial_number: data.serialNumber,
-          purchase_date: data.purchaseDate,
-          warranty_expiry: data.warrantyExpiry,
-          specifications: data.specifications,
-          image_url: data.imageUrl,
-          location_id: data.locationId,
-          current_operator_id: data.currentOperatorId,
-          operational_status: data.operationalStatus as any,
-          status: data.status as any,
-          is_active: data.isActive,
-          updated_at: new Date(),
-        },
+        data: updateData,
         include: {
           location: true,
           current_operator: {

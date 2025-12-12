@@ -197,12 +197,14 @@ export default function ProductsListPage() {
       dataIndex: 'productCode',
       key: 'productCode',
       width: 120,
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.productCode || '').localeCompare(b.productCode || ''),
       render: (productCode: string) => <div className='product-code'>{productCode}</div>,
     },
     {
       title: 'Product Name',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: ProductSummary) => (
         <div>
           <div className='product-name'>{name}</div>
@@ -215,6 +217,7 @@ export default function ProductsListPage() {
       dataIndex: 'barcode',
       key: 'barcode',
       width: 120,
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.barcode || '').localeCompare(b.barcode || ''),
       render: (barcode?: string) => <div className='product-barcode'>{barcode || '—'}</div>,
     },
     {
@@ -228,6 +231,7 @@ export default function ProductsListPage() {
       dataIndex: 'stockQuantity',
       key: 'stockQuantity',
       align: 'right' as const,
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.stockQuantity || 0) - (b.stockQuantity || 0),
       render: (stockQuantity: number, record: ProductSummary) => {
         const status = getStockStatus(record);
         return (
@@ -247,6 +251,7 @@ export default function ProductsListPage() {
       dataIndex: 'sellingPrice',
       key: 'sellingPrice',
       align: 'right' as const,
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.sellingPrice || 0) - (b.sellingPrice || 0),
       render: (sellingPrice: number, record: ProductSummary) => (
         <div>
           <div className='selling-price'>₹{sellingPrice.toFixed(2)}</div>
@@ -260,6 +265,7 @@ export default function ProductsListPage() {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
+      sorter: (a: ProductSummary, b: ProductSummary) => (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0),
       render: (isActive: boolean) => (
         <Tag color={isActive ? 'green' : 'orange'}>{isActive ? 'Active' : 'Inactive'}</Tag>
       ),

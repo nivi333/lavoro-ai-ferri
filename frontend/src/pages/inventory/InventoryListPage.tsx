@@ -183,6 +183,7 @@ const InventoryListPage: React.FC = () => {
       title: 'Product',
       key: 'product',
       width: 300,
+      sorter: (a, b) => (a.product.name || '').localeCompare(b.product.name || ''),
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Avatar
@@ -209,6 +210,7 @@ const InventoryListPage: React.FC = () => {
       title: 'Location',
       key: 'location',
       width: 200,
+      sorter: (a, b) => (a.location.name || '').localeCompare(b.location.name || ''),
       render: (_, record) => (
         <div>
           <div style={{ fontWeight: 500, fontSize: '14px' }}>{record.location.name}</div>
@@ -224,6 +226,7 @@ const InventoryListPage: React.FC = () => {
       key: 'stockQuantity',
       width: 120,
       align: 'right',
+      sorter: (a, b) => (a.stockQuantity || 0) - (b.stockQuantity || 0),
       render: (_, record) => (
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontWeight: 600, fontSize: '16px' }}>{record.stockQuantity}</div>
@@ -236,6 +239,7 @@ const InventoryListPage: React.FC = () => {
       key: 'reservedQuantity',
       width: 100,
       align: 'right',
+      sorter: (a, b) => (a.reservedQuantity || 0) - (b.reservedQuantity || 0),
       render: (_, record) => (
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontWeight: 500, fontSize: '14px', color: '#fa8c16' }}>
@@ -250,6 +254,7 @@ const InventoryListPage: React.FC = () => {
       key: 'availableQuantity',
       width: 120,
       align: 'right',
+      sorter: (a, b) => (a.availableQuantity || 0) - (b.availableQuantity || 0),
       render: (_, record) => {
         const status = getStockStatus(record);
         return (
@@ -281,6 +286,7 @@ const InventoryListPage: React.FC = () => {
       key: 'reorderLevel',
       width: 120,
       align: 'right',
+      sorter: (a, b) => (a.reorderLevel || 0) - (b.reorderLevel || 0),
       render: (_, record) => (
         <div style={{ textAlign: 'right' }}>
           {record.reorderLevel ? (

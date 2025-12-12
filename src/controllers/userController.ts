@@ -33,11 +33,11 @@ const bulkInviteSchema = Joi.object({
 const updateUserSchema = Joi.object({
   firstName: Joi.string().optional().min(2).max(50),
   lastName: Joi.string().optional().min(2).max(50),
-  email: Joi.string().email().optional(),
-  phone: Joi.string().optional(),
+  email: Joi.string().email().optional().allow('', null),
+  phone: Joi.string().optional().allow('', null),
   role: Joi.string().valid('OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE').optional(),
-  department: Joi.string().optional(),
-  locationId: Joi.string().optional(),
+  department: Joi.string().optional().allow('', null),
+  locationId: Joi.string().optional().allow('', null),
   isActive: Joi.boolean().optional(),
 });
 

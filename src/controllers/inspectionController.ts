@@ -23,6 +23,13 @@ const createInspectionSchema = Joi.object({
 });
 
 const updateInspectionSchema = Joi.object({
+  inspectionType: Joi.string().valid('INCOMING_MATERIAL', 'IN_PROCESS', 'FINAL_PRODUCT', 'RANDOM_CHECK').optional(),
+  referenceType: Joi.string().valid('PRODUCT', 'ORDER', 'BATCH').optional(),
+  referenceId: Joi.string().optional(),
+  locationId: Joi.string().optional().allow('', null),
+  inspectorId: Joi.string().optional().allow('', null),
+  templateId: Joi.string().optional().allow('', null),
+  scheduledDate: Joi.date().optional().allow(null),
   status: Joi.string().valid('PENDING', 'IN_PROGRESS', 'PASSED', 'FAILED', 'CONDITIONAL').optional().allow(null),
   startedAt: Joi.date().optional().allow(null),
   completedAt: Joi.date().optional().allow(null),

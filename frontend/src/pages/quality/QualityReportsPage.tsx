@@ -311,7 +311,7 @@ const QualityReportsPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <div className="page-header-section">
+      <div className="page-header-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading level={2} className="page-title">
           Quality Reports
         </Heading>
