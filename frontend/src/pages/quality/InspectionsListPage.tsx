@@ -178,6 +178,12 @@ export default function InspectionsListPage() {
         <span
           className='text-sm font-medium'
           title={`${record.referenceType}: ${record.referenceId}`}
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: 'block',
+          }}
         >
           {record.referenceType}: {record.referenceId}
         </span>
@@ -228,7 +234,9 @@ export default function InspectionsListPage() {
       key: 'nextInspectionDate',
       width: 120,
       render: (_, record) => {
-        return record.nextInspectionDate ? dayjs(record.nextInspectionDate).format('DD MMM YYYY') : '-';
+        return record.nextInspectionDate
+          ? dayjs(record.nextInspectionDate).format('DD MMM YYYY')
+          : '-';
       },
     },
     {

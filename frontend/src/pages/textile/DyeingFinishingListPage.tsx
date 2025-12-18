@@ -1,16 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Dropdown,
-  message,
-  Empty,
-  Spin,
-  Input,
-  Space,
-  Select,
-} from 'antd';
+import { Table, Button, Tag, Dropdown, message, Empty, Spin, Input, Space, Select } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -21,7 +10,11 @@ import {
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
-import { dyeingFinishingService, DyeingFinishing, DYEING_PROCESSES } from '../../services/textileService';
+import {
+  dyeingFinishingService,
+  DyeingFinishing,
+  DYEING_PROCESSES,
+} from '../../services/textileService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
@@ -43,11 +36,7 @@ export default function DyeingFinishingListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton
-        onClick={handleAddProcess}
-        size='small'
-        disabled={isEmployee}
-      >
+      <GradientButton onClick={handleAddProcess} size='small' disabled={isEmployee}>
         New Process
       </GradientButton>
     );
@@ -131,8 +120,9 @@ export default function DyeingFinishingListPage() {
       title: 'Color',
       dataIndex: 'colorName',
       key: 'colorName',
+      ellipsis: true,
       render: (colorName: string, record: DyeingFinishing) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
           <div
             style={{
               width: 20,
@@ -140,11 +130,22 @@ export default function DyeingFinishingListPage() {
               backgroundColor: record.colorCode,
               borderRadius: 4,
               border: '1px solid #d9d9d9',
+              flexShrink: 0,
             }}
           />
-          <div>
-            <div className='primary-text'>{colorName}</div>
-            <div className='secondary-text'>{record.colorCode}</div>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='primary-text'
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {colorName}
+            </div>
+            <div
+              className='secondary-text'
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {record.colorCode}
+            </div>
           </div>
         </div>
       ),
@@ -154,12 +155,14 @@ export default function DyeingFinishingListPage() {
       dataIndex: 'batchNumber',
       key: 'batchNumber',
       width: 120,
+      ellipsis: true,
     },
     {
       title: 'Process',
       dataIndex: 'processType',
       key: 'processType',
       width: 100,
+      ellipsis: true,
       render: (type: string) => <Tag>{getProcessTypeLabel(type)}</Tag>,
     },
     {
@@ -175,20 +178,23 @@ export default function DyeingFinishingListPage() {
       dataIndex: 'qualityCheck',
       key: 'qualityCheck',
       width: 100,
-      render: (passed: boolean) => (
+      render: (passed: boolean) =>
         passed ? (
-          <Tag icon={<CheckCircleOutlined />} color='success'>Passed</Tag>
+          <Tag icon={<CheckCircleOutlined />} color='success'>
+            Passed
+          </Tag>
         ) : (
-          <Tag icon={<CloseCircleOutlined />} color='error'>Failed</Tag>
-        )
-      ),
+          <Tag icon={<CloseCircleOutlined />} color='error'>
+            Failed
+          </Tag>
+        ),
     },
     {
       title: 'Date',
       dataIndex: 'processDate',
       key: 'processDate',
       width: 110,
-      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
+      render: (date: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Status',
@@ -236,7 +242,9 @@ export default function DyeingFinishingListPage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage dyeing & finishing.</div>
+        <div className='no-company-message'>
+          Please select a company to manage dyeing & finishing.
+        </div>
       </MainLayout>
     );
   }
@@ -299,7 +307,7 @@ export default function DyeingFinishingListPage() {
               loading={tableLoading}
               pagination={{
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} records`,
+                showTotal: total => `Total ${total} records`,
               }}
               className='textile-table'
             />

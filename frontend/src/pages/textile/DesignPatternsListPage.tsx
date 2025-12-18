@@ -1,25 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Dropdown,
-  message,
-  Empty,
-  Spin,
-  Input,
-  Space,
-  Select,
-} from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { Table, Button, Tag, Dropdown, message, Empty, Spin, Input, Space, Select } from 'antd';
+import { EditOutlined, DeleteOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
-import { designPatternService, DesignPattern, DESIGN_CATEGORIES, DESIGN_STATUSES } from '../../services/textileService';
+import {
+  designPatternService,
+  DesignPattern,
+  DESIGN_CATEGORIES,
+  DESIGN_STATUSES,
+} from '../../services/textileService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
@@ -42,11 +31,7 @@ export default function DesignPatternsListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton
-        onClick={handleAddDesign}
-        size='small'
-        disabled={isEmployee}
-      >
+      <GradientButton onClick={handleAddDesign} size='small' disabled={isEmployee}>
         New Design
       </GradientButton>
     );
@@ -148,10 +133,21 @@ export default function DesignPatternsListPage() {
       title: 'Design Name',
       dataIndex: 'designName',
       key: 'designName',
+      ellipsis: true,
       render: (name: string, record: DesignPattern) => (
-        <div>
-          <div className='primary-text'>{name}</div>
-          <div className='secondary-text'>{record.designerName || '—'} • {record.season || '—'}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='primary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {name}
+          </div>
+          <div
+            className='secondary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {record.designerName || '—'} • {record.season || '—'}
+          </div>
         </div>
       ),
     },
@@ -160,6 +156,7 @@ export default function DesignPatternsListPage() {
       dataIndex: 'designCategory',
       key: 'designCategory',
       width: 120,
+      ellipsis: true,
       render: (category: string) => <Tag>{getCategoryLabel(category)}</Tag>,
     },
     {
@@ -317,7 +314,7 @@ export default function DesignPatternsListPage() {
               loading={tableLoading}
               pagination={{
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} records`,
+                showTotal: total => `Total ${total} records`,
               }}
               className='textile-table'
             />

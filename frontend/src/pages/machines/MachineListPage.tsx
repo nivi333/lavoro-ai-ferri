@@ -1,5 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { Table, Tag, Button, Dropdown, Empty, Spin, message, Input, Select, Avatar, Space, Tooltip, Modal } from 'antd';
+import {
+  Table,
+  Tag,
+  Button,
+  Dropdown,
+  Empty,
+  Spin,
+  message,
+  Input,
+  Select,
+  Avatar,
+  Space,
+  Tooltip,
+  Modal,
+} from 'antd';
 import {
   MoreOutlined,
   EditOutlined,
@@ -44,9 +58,9 @@ export default function MachineListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton 
-        onClick={handleCreateMachine} 
-        size='small' 
+      <GradientButton
+        onClick={handleCreateMachine}
+        size='small'
         className='machines-create-btn'
         disabled={isEmployee}
       >
@@ -132,9 +146,13 @@ export default function MachineListPage() {
       icon: <ExclamationCircleOutlined />,
       content: (
         <div>
-          <p>Are you sure you want to delete machine <strong>{machine.name}</strong> ({machine.machineCode})?</p>
+          <p>
+            Are you sure you want to delete machine <strong>{machine.name}</strong> (
+            {machine.machineCode})?
+          </p>
           <p style={{ color: '#ff4d4f', fontSize: '12px' }}>
-            This will decommission the machine and mark it as inactive. This action cannot be undone.
+            This will decommission the machine and mark it as inactive. This action cannot be
+            undone.
           </p>
         </div>
       ),
@@ -232,18 +250,41 @@ export default function MachineListPage() {
 
   const columns = [
     {
+      title: 'Code',
+      dataIndex: 'machineCode',
+      key: 'machineCode',
+      width: 120,
+      fixed: 'left' as const,
+      sorter: (a: Machine, b: Machine) => (a.machineCode || '').localeCompare(b.machineCode || ''),
+      render: (code: string) => (
+        <span className='code-text' style={{ fontFamily: 'monospace' }}>
+          {code}
+        </span>
+      ),
+    },
+    {
       title: 'Machine',
       key: 'machine',
-      width: 300,
+      width: 250,
+      fixed: 'left' as const,
       sorter: (a: Machine, b: Machine) => (a.name || '').localeCompare(b.name || ''),
       render: (record: Machine) => (
         <div className='machine-info'>
-          <Avatar src={record.imageUrl} icon={<ToolOutlined />} className='location-avatar'>
+          <Avatar
+            src={record.imageUrl}
+            icon={<ToolOutlined />}
+            className='location-avatar'
+            style={{ flexShrink: 0, backgroundColor: '#df005c' }}
+          >
             {record.name.charAt(0)}
           </Avatar>
-          <div className='machine-details'>
-            <div className='machine-name'>{record.name}</div>
-            <div className='machine-meta'>{record.machineCode} </div>
+          <div className='machine-details' style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='machine-name'
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {record.name}
+            </div>
           </div>
         </div>
       ),
@@ -261,7 +302,8 @@ export default function MachineListPage() {
       dataIndex: 'purchaseDate',
       key: 'purchaseDate',
       width: 120,
-      sorter: (a: Machine, b: Machine) => new Date(a.purchaseDate || 0).getTime() - new Date(b.purchaseDate || 0).getTime(),
+      sorter: (a: Machine, b: Machine) =>
+        new Date(a.purchaseDate || 0).getTime() - new Date(b.purchaseDate || 0).getTime(),
       render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
@@ -269,14 +311,16 @@ export default function MachineListPage() {
       dataIndex: 'warrantyExpiry',
       key: 'warrantyExpiry',
       width: 130,
-      sorter: (a: Machine, b: Machine) => new Date(a.warrantyExpiry || 0).getTime() - new Date(b.warrantyExpiry || 0).getTime(),
+      sorter: (a: Machine, b: Machine) =>
+        new Date(a.warrantyExpiry || 0).getTime() - new Date(b.warrantyExpiry || 0).getTime(),
       render: (date?: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Location',
       key: 'location',
       width: 150,
-      sorter: (a: Machine, b: Machine) => (a.location?.name || '').localeCompare(b.location?.name || ''),
+      sorter: (a: Machine, b: Machine) =>
+        (a.location?.name || '').localeCompare(b.location?.name || ''),
       render: (record: Machine) =>
         record.location?.name || getLocationName(record.locationId) || '—',
     },
@@ -305,7 +349,8 @@ export default function MachineListPage() {
       dataIndex: 'operationalStatus',
       key: 'operationalStatus',
       width: 140,
-      sorter: (a: Machine, b: Machine) => (a.operationalStatus || '').localeCompare(b.operationalStatus || ''),
+      sorter: (a: Machine, b: Machine) =>
+        (a.operationalStatus || '').localeCompare(b.operationalStatus || ''),
       render: (status: string) => (
         <Tag color={getOperationalStatusColor(status)}>{status || 'Unknown'}</Tag>
       ),
@@ -443,8 +488,8 @@ export default function MachineListPage() {
             </div>
           ) : machines.length === 0 ? (
             <Empty description='No machines found'>
-              <GradientButton 
-                size='small' 
+              <GradientButton
+                size='small'
                 onClick={handleCreateMachine}
                 disabled={currentCompany?.role === 'EMPLOYEE'}
               >

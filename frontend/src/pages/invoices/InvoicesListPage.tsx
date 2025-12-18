@@ -212,7 +212,8 @@ export default function InvoicesListPage() {
       title: 'Invoice ID',
       dataIndex: 'invoiceId',
       key: 'invoiceId',
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => (a.invoiceId || '').localeCompare(b.invoiceId || ''),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        (a.invoiceId || '').localeCompare(b.invoiceId || ''),
       render: (value: string, record: InvoiceSummary) => (
         <div>
           <div className='invoice-id'>{value}</div>
@@ -224,11 +225,25 @@ export default function InvoicesListPage() {
       title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => (a.customerName || '').localeCompare(b.customerName || ''),
+      ellipsis: true,
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        (a.customerName || '').localeCompare(b.customerName || ''),
       render: (value: string, record: InvoiceSummary) => (
-        <div>
-          <div className='customer-name'>{value}</div>
-          {record.customerCode && <div className='customer-code'>{record.customerCode}</div>}
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='customer-name'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {value}
+          </div>
+          {record.customerCode && (
+            <div
+              className='customer-code'
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {record.customerCode}
+            </div>
+          )}
         </div>
       ),
     },
@@ -236,7 +251,8 @@ export default function InvoicesListPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => (a.status || '').localeCompare(b.status || ''),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        (a.status || '').localeCompare(b.status || ''),
       render: (status: InvoiceStatus) => (
         <Tag color={STATUS_COLORS[status]} className='status-tag'>
           {getStatusLabel(status)}
@@ -247,14 +263,16 @@ export default function InvoicesListPage() {
       title: 'Invoice Date',
       dataIndex: 'invoiceDate',
       key: 'invoiceDate',
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => new Date(a.invoiceDate).getTime() - new Date(b.invoiceDate).getTime(),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        new Date(a.invoiceDate).getTime() - new Date(b.invoiceDate).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString(),
     },
     {
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
       render: (value: string, record: InvoiceSummary) => {
         const dueDate = new Date(value);
         const isOverdue =
@@ -277,7 +295,8 @@ export default function InvoicesListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: InvoiceSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
@@ -292,7 +311,8 @@ export default function InvoicesListPage() {
       dataIndex: 'balanceDue',
       key: 'balanceDue',
       align: 'right' as const,
-      sorter: (a: InvoiceSummary, b: InvoiceSummary) => Number(a.balanceDue || 0) - Number(b.balanceDue || 0),
+      sorter: (a: InvoiceSummary, b: InvoiceSummary) =>
+        Number(a.balanceDue || 0) - Number(b.balanceDue || 0),
       render: (value: number, record: InvoiceSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         const isOverdue =

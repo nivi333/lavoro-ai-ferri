@@ -182,33 +182,56 @@ export default function ProductsListPage() {
 
   const columns = [
     {
-      title: 'Image',
-      dataIndex: 'imageUrl',
-      key: 'imageUrl',
-      width: 80,
-      render: (imageUrl: string | undefined, record: ProductSummary) => (
-        <Avatar src={imageUrl} icon={<AppstoreOutlined />} style={{ flexShrink: 0 }}>
-          {record.name.charAt(0)}
-        </Avatar>
-      ),
-    },
-    {
       title: 'Product Code',
       dataIndex: 'productCode',
       key: 'productCode',
       width: 120,
-      sorter: (a: ProductSummary, b: ProductSummary) => (a.productCode || '').localeCompare(b.productCode || ''),
+      fixed: 'left' as const,
+      sorter: (a: ProductSummary, b: ProductSummary) =>
+        (a.productCode || '').localeCompare(b.productCode || ''),
       render: (productCode: string) => <div className='product-code'>{productCode}</div>,
     },
     {
       title: 'Product Name',
       dataIndex: 'name',
       key: 'name',
+      fixed: 'left' as const,
       sorter: (a: ProductSummary, b: ProductSummary) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: ProductSummary) => (
-        <div>
-          <div className='product-name'>{name}</div>
-          <div className='product-sku'>SKU: {record.sku}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Avatar
+            src={record.imageUrl}
+            icon={<AppstoreOutlined />}
+            style={{ flexShrink: 0, backgroundColor: '#df005c' }}
+          >
+            {name.charAt(0)}
+          </Avatar>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='product-name'
+              style={{
+                fontWeight: 500,
+                marginBottom: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {name}
+            </div>
+            <div
+              className='product-sku'
+              style={{
+                color: '#666',
+                fontSize: '12px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              SKU: {record.sku}
+            </div>
+          </div>
         </div>
       ),
     },
@@ -217,7 +240,8 @@ export default function ProductsListPage() {
       dataIndex: 'barcode',
       key: 'barcode',
       width: 120,
-      sorter: (a: ProductSummary, b: ProductSummary) => (a.barcode || '').localeCompare(b.barcode || ''),
+      sorter: (a: ProductSummary, b: ProductSummary) =>
+        (a.barcode || '').localeCompare(b.barcode || ''),
       render: (barcode?: string) => <div className='product-barcode'>{barcode || '—'}</div>,
     },
     {
@@ -231,7 +255,8 @@ export default function ProductsListPage() {
       dataIndex: 'stockQuantity',
       key: 'stockQuantity',
       align: 'right' as const,
-      sorter: (a: ProductSummary, b: ProductSummary) => (a.stockQuantity || 0) - (b.stockQuantity || 0),
+      sorter: (a: ProductSummary, b: ProductSummary) =>
+        (a.stockQuantity || 0) - (b.stockQuantity || 0),
       render: (stockQuantity: number, record: ProductSummary) => {
         const status = getStockStatus(record);
         return (
@@ -251,7 +276,8 @@ export default function ProductsListPage() {
       dataIndex: 'sellingPrice',
       key: 'sellingPrice',
       align: 'right' as const,
-      sorter: (a: ProductSummary, b: ProductSummary) => (a.sellingPrice || 0) - (b.sellingPrice || 0),
+      sorter: (a: ProductSummary, b: ProductSummary) =>
+        (a.sellingPrice || 0) - (b.sellingPrice || 0),
       render: (sellingPrice: number, record: ProductSummary) => (
         <div>
           <div className='selling-price'>₹{sellingPrice.toFixed(2)}</div>
@@ -274,6 +300,7 @@ export default function ProductsListPage() {
       title: 'Actions',
       key: 'actions',
       width: 100,
+      fixed: 'right' as const,
       render: (_: any, record: ProductSummary) => {
         const isEmployee = currentCompany?.role === 'EMPLOYEE';
         const menuItems = [
@@ -398,6 +425,7 @@ export default function ProductsListPage() {
                   setPagination({ ...pagination, page, limit: pageSize || 10 });
                 },
               }}
+              scroll={{ x: 'max-content' }}
               className='products-table'
             />
           )}

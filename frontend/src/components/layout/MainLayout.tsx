@@ -32,7 +32,7 @@ function MainLayoutContent({ children }: MainLayoutProps) {
       {/* Full Width Header */}
       <Header className='app-header'>
         <div className='header-content'>
-          <BrandLogo width={120} height={28} />
+          <BrandLogo width={70} height={60} />
           <div className='header-actions'>
             <ThemeToggle />
             {headerActions}

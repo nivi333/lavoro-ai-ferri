@@ -1,16 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Dropdown,
-  message,
-  Empty,
-  Spin,
-  Input,
-  Space,
-  Select,
-} from 'antd';
+import { Table, Button, Tag, Dropdown, message, Empty, Spin, Input, Space, Select } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -21,7 +10,12 @@ import {
 } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
-import { garmentManufacturingService, GarmentManufacturing, GARMENT_TYPES, PRODUCTION_STAGES } from '../../services/textileService';
+import {
+  garmentManufacturingService,
+  GarmentManufacturing,
+  GARMENT_TYPES,
+  PRODUCTION_STAGES,
+} from '../../services/textileService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
@@ -44,11 +38,7 @@ export default function GarmentManufacturingListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton
-        onClick={handleAddGarment}
-        size='small'
-        disabled={isEmployee}
-      >
+      <GradientButton onClick={handleAddGarment} size='small' disabled={isEmployee}>
         New Garment
       </GradientButton>
     );
@@ -149,10 +139,21 @@ export default function GarmentManufacturingListPage() {
       title: 'Style',
       dataIndex: 'styleNumber',
       key: 'styleNumber',
+      ellipsis: true,
       render: (style: string, record: GarmentManufacturing) => (
-        <div>
-          <div className='primary-text'>{style}</div>
-          <div className='secondary-text'>{getGarmentTypeLabel(record.garmentType)} • {record.size} • {record.color}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='primary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {style}
+          </div>
+          <div
+            className='secondary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {getGarmentTypeLabel(record.garmentType)} • {record.size} • {record.color}
+          </div>
         </div>
       ),
     },
@@ -169,31 +170,31 @@ export default function GarmentManufacturingListPage() {
       dataIndex: 'productionStage',
       key: 'productionStage',
       width: 120,
-      render: (stage: string) => (
-        <Tag color={getStageColor(stage)}>{getStageLabel(stage)}</Tag>
-      ),
+      ellipsis: true,
+      render: (stage: string) => <Tag color={getStageColor(stage)}>{getStageLabel(stage)}</Tag>,
     },
     {
       title: 'Quality',
       dataIndex: 'qualityPassed',
       key: 'qualityPassed',
       width: 100,
-      render: (passed: boolean) => (
+      render: (passed: boolean) =>
         passed ? (
-          <Tag icon={<CheckCircleOutlined />} color='success'>Passed</Tag>
+          <Tag icon={<CheckCircleOutlined />} color='success'>
+            Passed
+          </Tag>
         ) : (
-          <Tag icon={<CloseCircleOutlined />} color='error'>Failed</Tag>
-        )
-      ),
+          <Tag icon={<CloseCircleOutlined />} color='error'>
+            Failed
+          </Tag>
+        ),
     },
     {
       title: 'Defects',
       dataIndex: 'defectCount',
       key: 'defectCount',
       width: 80,
-      render: (count: number) => (
-        <Tag color={count > 0 ? 'red' : 'green'}>{count}</Tag>
-      ),
+      render: (count: number) => <Tag color={count > 0 ? 'red' : 'green'}>{count}</Tag>,
     },
     {
       title: 'Status',
@@ -241,7 +242,9 @@ export default function GarmentManufacturingListPage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage garment manufacturing.</div>
+        <div className='no-company-message'>
+          Please select a company to manage garment manufacturing.
+        </div>
       </MainLayout>
     );
   }
@@ -317,7 +320,7 @@ export default function GarmentManufacturingListPage() {
               loading={tableLoading}
               pagination={{
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} records`,
+                showTotal: total => `Total ${total} records`,
               }}
               className='textile-table'
             />

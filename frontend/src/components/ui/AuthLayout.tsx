@@ -36,7 +36,7 @@ export default function AuthLayout({
         left: '24px',
         zIndex: 10
       }}>
-        <BrandLogo width={170} height={40} />
+      <BrandLogo width={70} height={60} />
       </div>
       
       {/* Background decoration */}

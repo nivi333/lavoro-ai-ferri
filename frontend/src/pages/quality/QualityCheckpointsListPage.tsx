@@ -121,16 +121,29 @@ export default function QualityCheckpointsListPage() {
       dataIndex: 'checkpointId',
       key: 'checkpointId',
       width: 140,
+      fixed: 'left',
       render: (checkpointId: string) => <span className='checkpoint-id'>{checkpointId}</span>,
     },
     {
       title: 'Checkpoint Name',
       dataIndex: 'checkpointName',
       key: 'checkpointName',
+      fixed: 'left',
+      ellipsis: true,
       render: (name: string, record: QualityCheckpoint) => (
-        <div>
-          <div className='checkpoint-name'>{name}</div>
-          <div className='checkpoint-type'>{record.checkpointType}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='checkpoint-name'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {name}
+          </div>
+          <div
+            className='checkpoint-type'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {record.checkpointType}
+          </div>
         </div>
       ),
     },
@@ -139,6 +152,7 @@ export default function QualityCheckpointsListPage() {
       dataIndex: 'inspectorName',
       key: 'inspectorName',
       width: 150,
+      ellipsis: true,
     },
     {
       title: 'Inspection Date',
@@ -175,6 +189,7 @@ export default function QualityCheckpointsListPage() {
       title: 'Actions',
       key: 'actions',
       width: 100,
+      fixed: 'right',
       render: (_: any, record: QualityCheckpoint) => {
         const menuItems = [
           {
@@ -269,6 +284,7 @@ export default function QualityCheckpointsListPage() {
           showSizeChanger: true,
           showTotal: total => `Total ${total} checkpoints`,
         }}
+        scroll={{ x: 'max-content' }}
       />
 
       <QualityCheckpointFormDrawer

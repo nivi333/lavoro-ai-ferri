@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Table, Tag, Space, Button, Dropdown, Empty, message, Input, Select } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, SearchOutlined, FileTextOutlined } from '@ant-design/icons';
+import {
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  FileTextOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import useAuth from '../../contexts/AuthContext';
@@ -38,7 +44,7 @@ export default function ComplianceReportsListPage() {
     setHeaderActions(
       <GradientButton onClick={handleCreateReport} size='small'>
         Create Report
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -125,9 +131,19 @@ export default function ComplianceReportsListPage() {
       dataIndex: 'reportTitle',
       key: 'reportTitle',
       render: (title: string, record: ComplianceReport) => (
-        <div>
-          <div className='report-title'>{title}</div>
-          <div className='report-type'>{record.reportType}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='report-title'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {title}
+          </div>
+          <div
+            className='report-type'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {record.reportType}
+          </div>
         </div>
       ),
     },
@@ -206,7 +222,7 @@ export default function ComplianceReportsListPage() {
             placeholder='Search reports...'
             prefix={<SearchOutlined />}
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={e => setSearchText(e.target.value)}
             style={{ width: 250 }}
             allowClear
           />
@@ -245,16 +261,13 @@ export default function ComplianceReportsListPage() {
         className='reports-table'
         locale={{
           emptyText: (
-            <Empty
-              description='No compliance reports found'
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
+            <Empty description='No compliance reports found' image={Empty.PRESENTED_IMAGE_SIMPLE} />
           ),
         }}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} reports`,
+          showTotal: total => `Total ${total} reports`,
         }}
       />
 

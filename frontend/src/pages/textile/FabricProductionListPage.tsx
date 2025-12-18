@@ -1,25 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  Table,
-  Button,
-  Tag,
-  Dropdown,
-  message,
-  Empty,
-  Spin,
-  Input,
-  Space,
-  Select,
-} from 'antd';
-import {
-  EditOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { Table, Button, Tag, Dropdown, message, Empty, Spin, Input, Space, Select } from 'antd';
+import { EditOutlined, DeleteOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
 import useAuth from '../../contexts/AuthContext';
 import { useHeader } from '../../contexts/HeaderContext';
-import { fabricProductionService, FabricProduction, FABRIC_TYPES, QUALITY_GRADES } from '../../services/textileService';
+import {
+  fabricProductionService,
+  FabricProduction,
+  FABRIC_TYPES,
+  QUALITY_GRADES,
+} from '../../services/textileService';
 import { MainLayout } from '../../components/layout';
 import { Heading } from '../../components/Heading';
 import { GradientButton } from '../../components/ui';
@@ -42,11 +31,7 @@ export default function FabricProductionListPage() {
   useEffect(() => {
     const isEmployee = currentCompany?.role === 'EMPLOYEE';
     setHeaderActions(
-      <GradientButton
-        onClick={handleAddFabric}
-        size='small'
-        disabled={isEmployee}
-      >
+      <GradientButton onClick={handleAddFabric} size='small' disabled={isEmployee}>
         New Production
       </GradientButton>
     );
@@ -136,10 +121,21 @@ export default function FabricProductionListPage() {
       title: 'Fabric Name',
       dataIndex: 'fabricName',
       key: 'fabricName',
+      ellipsis: true,
       render: (name: string, record: FabricProduction) => (
-        <div>
-          <div className='primary-text'>{name}</div>
-          <div className='secondary-text'>{record.composition}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='primary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {name}
+          </div>
+          <div
+            className='secondary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {record.composition}
+          </div>
         </div>
       ),
     },
@@ -148,12 +144,14 @@ export default function FabricProductionListPage() {
       dataIndex: 'batchNumber',
       key: 'batchNumber',
       width: 120,
+      ellipsis: true,
     },
     {
       title: 'Type',
       dataIndex: 'fabricType',
       key: 'fabricType',
       width: 100,
+      ellipsis: true,
       render: (type: string) => getFabricTypeLabel(type),
     },
     {
@@ -170,7 +168,14 @@ export default function FabricProductionListPage() {
       key: 'qualityGrade',
       width: 100,
       render: (grade: string) => {
-        const color = grade === 'A_GRADE' ? 'green' : grade === 'B_GRADE' ? 'blue' : grade === 'C_GRADE' ? 'orange' : 'red';
+        const color =
+          grade === 'A_GRADE'
+            ? 'green'
+            : grade === 'B_GRADE'
+              ? 'blue'
+              : grade === 'C_GRADE'
+                ? 'orange'
+                : 'red';
         return <Tag color={color}>{getQualityGradeLabel(grade)}</Tag>;
       },
     },
@@ -179,7 +184,7 @@ export default function FabricProductionListPage() {
       dataIndex: 'productionDate',
       key: 'productionDate',
       width: 110,
-      render: (date: string) => date ? new Date(date).toLocaleDateString() : '—',
+      render: (date: string) => (date ? new Date(date).toLocaleDateString() : '—'),
     },
     {
       title: 'Status',
@@ -227,7 +232,9 @@ export default function FabricProductionListPage() {
   if (!currentCompany) {
     return (
       <MainLayout>
-        <div className='no-company-message'>Please select a company to manage fabric production.</div>
+        <div className='no-company-message'>
+          Please select a company to manage fabric production.
+        </div>
       </MainLayout>
     );
   }
@@ -303,7 +310,7 @@ export default function FabricProductionListPage() {
               loading={tableLoading}
               pagination={{
                 showSizeChanger: true,
-                showTotal: (total) => `Total ${total} records`,
+                showTotal: total => `Total ${total} records`,
               }}
               className='textile-table'
             />

@@ -201,7 +201,7 @@ export default function CustomerListPage() {
 
   const columns = [
     {
-      title: 'Customer Code',
+      title: 'Code',
       dataIndex: 'code',
       key: 'code',
       width: 120,
@@ -216,19 +216,38 @@ export default function CustomerListPage() {
       title: 'Customer Name',
       dataIndex: 'name',
       key: 'name',
-      width: 200,
+      width: 250,
+      ellipsis: true,
       sorter: (a: Customer, b: Customer) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Customer) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#df005c' }}>
             {name.charAt(0)}
           </Avatar>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div className='customer-name' style={{ fontWeight: 500, marginBottom: 2 }}>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='customer-name'
+              style={{
+                fontWeight: 500,
+                marginBottom: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {name}
             </div>
             {record.companyName && (
-              <div className='company-name' style={{ color: '#666', fontSize: '12px' }}>
+              <div
+                className='company-name'
+                style={{
+                  color: '#666',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {record.companyName}
               </div>
             )}
@@ -241,6 +260,7 @@ export default function CustomerListPage() {
       dataIndex: 'email',
       key: 'email',
       width: 200,
+      ellipsis: true,
       sorter: (a: Customer, b: Customer) => (a.email || '').localeCompare(b.email || ''),
       render: (email: string) => email || '—',
     },
@@ -248,7 +268,8 @@ export default function CustomerListPage() {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
-      width: 120,
+      width: 150,
+      ellipsis: true,
       sorter: (a: Customer, b: Customer) => (a.phone || '').localeCompare(b.phone || ''),
       render: (phone: string) => phone || '—',
     },
@@ -257,7 +278,8 @@ export default function CustomerListPage() {
       dataIndex: 'customerType',
       key: 'customerType',
       width: 100,
-      sorter: (a: Customer, b: Customer) => (a.customerType || '').localeCompare(b.customerType || ''),
+      sorter: (a: Customer, b: Customer) =>
+        (a.customerType || '').localeCompare(b.customerType || ''),
       render: (type: string) => {
         const colorMap: Record<string, string> = {
           INDIVIDUAL: 'blue',

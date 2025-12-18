@@ -137,8 +137,7 @@ export default function CompaniesListPage() {
   return (
     <div className='companies-root'>
       <div className='companies-top-bar'>
-        {/* <BrandLogo width={150} height={36} /> */}
-        <BrandLogo width={150} height={36} />
+        <BrandLogo width={70} height={60} />
         <div className='companies-top-bar-actions'>
           <AddNewButton
             size='middle'

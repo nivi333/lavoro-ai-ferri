@@ -217,19 +217,38 @@ export default function SupplierListPage() {
       title: 'Supplier Name',
       dataIndex: 'name',
       key: 'name',
-      width: 200,
+      width: 250,
+      ellipsis: true,
       sorter: (a: Supplier, b: Supplier) => (a.name || '').localeCompare(b.name || ''),
       render: (name: string, record: Supplier) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Avatar icon={<UserOutlined />} style={{ flexShrink: 0, backgroundColor: '#df005c' }}>
             {name.charAt(0)}
           </Avatar>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div className='supplier-name' style={{ fontWeight: 500, marginBottom: 2 }}>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='supplier-name'
+              style={{
+                fontWeight: 500,
+                marginBottom: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {name}
             </div>
             {record.companyRegNo && (
-              <div className='company-reg' style={{ color: '#666', fontSize: '12px' }}>
+              <div
+                className='company-reg'
+                style={{
+                  color: '#666',
+                  fontSize: '12px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 Reg: {record.companyRegNo}
               </div>
             )}
@@ -242,23 +261,35 @@ export default function SupplierListPage() {
       dataIndex: 'email',
       key: 'email',
       width: 200,
+      ellipsis: true,
       sorter: (a: Supplier, b: Supplier) => (a.email || '').localeCompare(b.email || ''),
-      render: (email: string) => email || '—',
+      render: (email: string) => (
+        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {email || '—'}
+        </div>
+      ),
     },
     {
       title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
-      width: 120,
+      width: 150,
+      ellipsis: true,
       sorter: (a: Supplier, b: Supplier) => (a.phone || '').localeCompare(b.phone || ''),
-      render: (phone: string) => phone || '—',
+      render: (phone: string) => (
+        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {phone || '—'}
+        </div>
+      ),
     },
     {
       title: 'Type',
       dataIndex: 'supplierType',
       key: 'supplierType',
-      width: 120,
-      sorter: (a: Supplier, b: Supplier) => (a.supplierType || '').localeCompare(b.supplierType || ''),
+      width: 150,
+      ellipsis: true,
+      sorter: (a: Supplier, b: Supplier) =>
+        (a.supplierType || '').localeCompare(b.supplierType || ''),
       render: (type: string) => {
         const colorMap: Record<string, string> = {
           MANUFACTURER: 'blue',

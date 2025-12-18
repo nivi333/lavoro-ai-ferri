@@ -127,12 +127,19 @@ export default function YarnManufacturingListPage() {
       title: 'Yarn Details',
       dataIndex: 'yarnType',
       key: 'yarnType',
+      ellipsis: true,
       render: (_: string, record: YarnManufacturing) => (
-        <div>
-          <div className='primary-text'>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='primary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             {getYarnTypeLabel(record.yarnType)} - {record.yarnCount}
           </div>
-          <div className='secondary-text'>
+          <div
+            className='secondary-text'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             {record.ply} Ply • {record.color}
           </div>
         </div>
@@ -143,12 +150,14 @@ export default function YarnManufacturingListPage() {
       dataIndex: 'batchNumber',
       key: 'batchNumber',
       width: 120,
+      ellipsis: true,
     },
     {
       title: 'Process',
       dataIndex: 'processType',
       key: 'processType',
       width: 100,
+      ellipsis: true,
       render: (process: string) => getProcessLabel(process),
     },
     {

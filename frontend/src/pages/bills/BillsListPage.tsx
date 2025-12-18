@@ -224,11 +224,25 @@ export default function BillsListPage() {
       title: 'Supplier',
       dataIndex: 'supplierName',
       key: 'supplierName',
-      sorter: (a: BillSummary, b: BillSummary) => (a.supplierName || '').localeCompare(b.supplierName || ''),
+      ellipsis: true,
+      sorter: (a: BillSummary, b: BillSummary) =>
+        (a.supplierName || '').localeCompare(b.supplierName || ''),
       render: (value: string, record: BillSummary) => (
-        <div>
-          <div className='supplier-name'>{value}</div>
-          {record.supplierCode && <div className='supplier-code'>{record.supplierCode}</div>}
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='supplier-name'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {value}
+          </div>
+          {record.supplierCode && (
+            <div
+              className='supplier-code'
+              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {record.supplierCode}
+            </div>
+          )}
         </div>
       ),
     },
@@ -247,14 +261,16 @@ export default function BillsListPage() {
       title: 'Bill Date',
       dataIndex: 'billDate',
       key: 'billDate',
-      sorter: (a: BillSummary, b: BillSummary) => new Date(a.billDate).getTime() - new Date(b.billDate).getTime(),
+      sorter: (a: BillSummary, b: BillSummary) =>
+        new Date(a.billDate).getTime() - new Date(b.billDate).getTime(),
       render: (value: string) => new Date(value).toLocaleDateString(),
     },
     {
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      sorter: (a: BillSummary, b: BillSummary) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
+      sorter: (a: BillSummary, b: BillSummary) =>
+        new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
       render: (value: string, record: BillSummary) => {
         const dueDate = new Date(value);
         const isOverdue =
@@ -277,7 +293,8 @@ export default function BillsListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
-      sorter: (a: BillSummary, b: BillSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
+      sorter: (a: BillSummary, b: BillSummary) =>
+        Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (
@@ -292,7 +309,8 @@ export default function BillsListPage() {
       dataIndex: 'balanceDue',
       key: 'balanceDue',
       align: 'right' as const,
-      sorter: (a: BillSummary, b: BillSummary) => Number(a.balanceDue || 0) - Number(b.balanceDue || 0),
+      sorter: (a: BillSummary, b: BillSummary) =>
+        Number(a.balanceDue || 0) - Number(b.balanceDue || 0),
       render: (value: number, record: BillSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         const isOverdue =

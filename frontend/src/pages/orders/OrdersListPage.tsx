@@ -177,15 +177,25 @@ export default function OrdersListPage() {
       title: 'Order ID',
       dataIndex: 'orderId',
       key: 'orderId',
-      sorter: (a: OrderSummary, b: OrderSummary) => (a.orderId || '').localeCompare(b.orderId || ''),
+      sorter: (a: OrderSummary, b: OrderSummary) =>
+        (a.orderId || '').localeCompare(b.orderId || ''),
       render: (value: string) => <div className='order-id'>{value}</div>,
     },
     {
       title: 'Customer',
       dataIndex: 'customerName',
       key: 'customerName',
-      sorter: (a: OrderSummary, b: OrderSummary) => (a.customerName || '').localeCompare(b.customerName || ''),
-      render: (value: string) => <div className='customer-name'>{value}</div>,
+      ellipsis: true,
+      sorter: (a: OrderSummary, b: OrderSummary) =>
+        (a.customerName || '').localeCompare(b.customerName || ''),
+      render: (value: string) => (
+        <div
+          className='customer-name'
+          style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
+          {value}
+        </div>
+      ),
     },
     {
       title: 'Status',
@@ -202,7 +212,8 @@ export default function OrdersListPage() {
       title: 'Order Date',
       dataIndex: 'orderDate',
       key: 'orderDate',
-      sorter: (a: OrderSummary, b: OrderSummary) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
+      sorter: (a: OrderSummary, b: OrderSummary) =>
+        new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
       render: (value: string) => (
         <div className='order-date'>{new Date(value).toLocaleDateString()}</div>
       ),
@@ -211,7 +222,8 @@ export default function OrdersListPage() {
       title: 'Delivery Date',
       dataIndex: 'deliveryDate',
       key: 'deliveryDate',
-      sorter: (a: OrderSummary, b: OrderSummary) => new Date(a.deliveryDate || 0).getTime() - new Date(b.deliveryDate || 0).getTime(),
+      sorter: (a: OrderSummary, b: OrderSummary) =>
+        new Date(a.deliveryDate || 0).getTime() - new Date(b.deliveryDate || 0).getTime(),
       render: (value?: string) => (
         <div className='delivery-date'>{value ? new Date(value).toLocaleDateString() : '—'}</div>
       ),
@@ -227,7 +239,8 @@ export default function OrdersListPage() {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right' as const,
-      sorter: (a: OrderSummary, b: OrderSummary) => Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
+      sorter: (a: OrderSummary, b: OrderSummary) =>
+        Number(a.totalAmount || 0) - Number(b.totalAmount || 0),
       render: (value: number, record: OrderSummary) => {
         const amount = typeof value === 'number' ? value : parseFloat(value || '0');
         return (

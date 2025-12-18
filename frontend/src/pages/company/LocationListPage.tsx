@@ -145,16 +145,36 @@ export default function LocationListPage() {
       width: 300,
       render: (record: Location) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Avatar src={record.imageUrl} icon={<EnvironmentOutlined />} style={{ flexShrink: 0 }}>
+          <Avatar
+            src={record.imageUrl}
+            icon={<EnvironmentOutlined />}
+            style={{ flexShrink: 0, backgroundColor: '#df005c' }}
+          >
             {record.name.charAt(0)}
           </Avatar>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div className='location-name' style={{ fontWeight: 500, marginBottom: 2 }}>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='location-name'
+              style={{
+                fontWeight: 500,
+                marginBottom: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {record.name}
             </div>
             <div
               className='location-address'
-              style={{ color: '#666', fontSize: '12px', lineHeight: '1.4' }}
+              style={{
+                color: '#666',
+                fontSize: '12px',
+                lineHeight: '1.4',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
             >
               {record.addressLine1}
               {record.addressLine2 ? `, ${record.addressLine2}` : ''}, {record.city}, {record.state}

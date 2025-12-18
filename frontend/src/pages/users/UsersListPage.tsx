@@ -78,7 +78,7 @@ const UsersListPage: React.FC = () => {
     setHeaderActions(
       <GradientButton onClick={() => setInviteDrawerVisible(true)} size='small'>
         Invite User
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -138,16 +138,18 @@ const UsersListPage: React.FC = () => {
       title: 'Change User Role',
       content: (
         <div>
-          <p>Change role for {user.firstName} {user.lastName}:</p>
+          <p>
+            Change role for {user.firstName} {user.lastName}:
+          </p>
           <Select
             defaultValue={user.role}
             style={{ width: '100%', marginTop: 16 }}
-            id="role-select"
+            id='role-select'
           >
-            <Option value="OWNER">Owner</Option>
-            <Option value="ADMIN">Admin</Option>
-            <Option value="MANAGER">Manager</Option>
-            <Option value="EMPLOYEE">Employee</Option>
+            <Option value='OWNER'>Owner</Option>
+            <Option value='ADMIN'>Admin</Option>
+            <Option value='MANAGER'>Manager</Option>
+            <Option value='EMPLOYEE'>Employee</Option>
           </Select>
         </div>
       ),
@@ -187,13 +189,13 @@ const UsersListPage: React.FC = () => {
         <div>
           <p>Change role for {selectedRowKeys.length} selected users:</p>
           <Select
-            placeholder="Select new role"
+            placeholder='Select new role'
             style={{ width: '100%', marginTop: 16 }}
-            id="bulk-role-select"
+            id='bulk-role-select'
           >
-            <Option value="ADMIN">Admin</Option>
-            <Option value="MANAGER">Manager</Option>
-            <Option value="EMPLOYEE">Employee</Option>
+            <Option value='ADMIN'>Admin</Option>
+            <Option value='MANAGER'>Manager</Option>
+            <Option value='EMPLOYEE'>Employee</Option>
           </Select>
         </div>
       ),
@@ -319,11 +321,7 @@ const UsersListPage: React.FC = () => {
   };
 
   const getStatusTag = (isActive: boolean) => {
-    return isActive ? (
-      <Tag color="success">Active</Tag>
-    ) : (
-      <Tag color="error">Inactive</Tag>
-    );
+    return isActive ? <Tag color='success'>Active</Tag> : <Tag color='error'>Inactive</Tag>;
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -350,21 +348,42 @@ const UsersListPage: React.FC = () => {
       title: 'User',
       key: 'user',
       width: 280,
-      sorter: (a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`),
+      sorter: (a, b) =>
+        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`),
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Avatar 
-            size={40} 
-            src={record.avatarUrl} 
+          <Avatar
+            size={40}
+            src={record.avatarUrl}
             style={{ backgroundColor: record.avatarUrl ? 'transparent' : '#df005c', flexShrink: 0 }}
           >
             {!record.avatarUrl && getInitials(record.firstName, record.lastName)}
           </Avatar>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div className="user-name" style={{ fontWeight: 500, marginBottom: 2 }}>
+          <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+            <div
+              className='user-name'
+              style={{
+                fontWeight: 500,
+                marginBottom: 2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {record.firstName} {record.lastName}
             </div>
-            <div className="user-email" style={{ color: '#666', fontSize: '12px' }}>{record.email}</div>
+            <div
+              className='user-email'
+              style={{
+                color: '#666',
+                fontSize: '12px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {record.email}
+            </div>
           </div>
         </div>
       ),
@@ -375,9 +394,7 @@ const UsersListPage: React.FC = () => {
       key: 'role',
       width: 120,
       sorter: (a, b) => (a.role || '').localeCompare(b.role || ''),
-      render: (role: string) => (
-        <Tag color={getRoleBadgeColor(role)}>{role}</Tag>
-      ),
+      render: (role: string) => <Tag color={getRoleBadgeColor(role)}>{role}</Tag>,
     },
     {
       title: 'Status',
@@ -392,10 +409,9 @@ const UsersListPage: React.FC = () => {
       dataIndex: 'lastActive',
       key: 'lastActive',
       width: 150,
-      sorter: (a, b) => new Date(a.lastActive || 0).getTime() - new Date(b.lastActive || 0).getTime(),
-      render: (date: string) => (
-        <span className="last-active">{formatLastActive(date)}</span>
-      ),
+      sorter: (a, b) =>
+        new Date(a.lastActive || 0).getTime() - new Date(b.lastActive || 0).getTime(),
+      render: (date: string) => <span className='last-active'>{formatLastActive(date)}</span>,
     },
     {
       title: 'Actions',
@@ -404,7 +420,7 @@ const UsersListPage: React.FC = () => {
       align: 'center',
       render: (_, record) => (
         <Dropdown menu={getActionMenu(record)} trigger={['click']}>
-          <Button type="text" icon={<MoreOutlined />} />
+          <Button type='text' icon={<MoreOutlined />} />
         </Dropdown>
       ),
     },
@@ -445,7 +461,7 @@ const UsersListPage: React.FC = () => {
               prefix={<SearchOutlined />}
               style={{ width: 300 }}
               allowClear
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={e => handleSearch(e.target.value)}
             />
             <Select
               placeholder='Filter by role'
@@ -473,9 +489,7 @@ const UsersListPage: React.FC = () => {
         {selectedRowKeys.length > 0 && (
           <div className='bulk-actions'>
             <Space>
-              <span className='selected-count'>
-                {selectedRowKeys.length} users selected
-              </span>
+              <span className='selected-count'>{selectedRowKeys.length} users selected</span>
               <Button size='small' onClick={handleBulkRoleChange}>
                 Change Role
               </Button>

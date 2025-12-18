@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Table, Tag, Space, Button, Dropdown, Empty, message, Input, Select } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined, SearchOutlined, CheckOutlined } from '@ant-design/icons';
+import {
+  MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  CheckOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import useAuth from '../../contexts/AuthContext';
@@ -40,7 +46,7 @@ export default function QualityDefectsListPage() {
     setHeaderActions(
       <GradientButton onClick={handleCreateDefect} size='small'>
         Report Defect
-      </GradientButton>,
+      </GradientButton>
     );
 
     return () => setHeaderActions(null);
@@ -137,16 +143,29 @@ export default function QualityDefectsListPage() {
       dataIndex: 'defectId',
       key: 'defectId',
       width: 120,
+      fixed: 'left',
       render: (defectId: string) => <span className='defect-id'>{defectId}</span>,
     },
     {
       title: 'Defect Type',
       dataIndex: 'defectType',
       key: 'defectType',
+      fixed: 'left',
+      ellipsis: true,
       render: (type: string, record: QualityDefect) => (
-        <div>
-          <div className='defect-type'>{type}</div>
-          <div className='defect-category'>{record.defectCategory}</div>
+        <div style={{ overflow: 'hidden' }}>
+          <div
+            className='defect-type'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {type}
+          </div>
+          <div
+            className='defect-category'
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
+            {record.defectCategory}
+          </div>
         </div>
       ),
     },
@@ -182,6 +201,7 @@ export default function QualityDefectsListPage() {
       title: 'Actions',
       key: 'actions',
       width: 100,
+      fixed: 'right',
       render: (_: any, record: QualityDefect) => {
         const menuItems = [
           {
@@ -237,7 +257,7 @@ export default function QualityDefectsListPage() {
             placeholder='Search defects...'
             prefix={<SearchOutlined />}
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={e => setSearchText(e.target.value)}
             style={{ width: 250 }}
             allowClear
           />
@@ -276,17 +296,15 @@ export default function QualityDefectsListPage() {
         className='defects-table'
         locale={{
           emptyText: (
-            <Empty
-              description='No quality defects found'
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
+            <Empty description='No quality defects found' image={Empty.PRESENTED_IMAGE_SIMPLE} />
           ),
         }}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} defects`,
+          showTotal: total => `Total ${total} defects`,
         }}
+        scroll={{ x: 'max-content' }}
       />
 
       <QualityDefectFormDrawer

@@ -180,9 +180,22 @@ const InventoryListPage: React.FC = () => {
   // Table columns
   const columns: ColumnsType<LocationInventory> = [
     {
+      title: 'Code',
+      key: 'code',
+      width: 120,
+      fixed: 'left',
+      sorter: (a, b) => (a.product.productCode || '').localeCompare(b.product.productCode || ''),
+      render: (_, record) => (
+        <div className='code-text' style={{ fontFamily: 'monospace' }}>
+          {record.product.productCode}
+        </div>
+      ),
+    },
+    {
       title: 'Product',
       key: 'product',
-      width: 300,
+      width: 250,
+      fixed: 'left',
       sorter: (a, b) => (a.product.name || '').localeCompare(b.product.name || ''),
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -191,16 +204,22 @@ const InventoryListPage: React.FC = () => {
             src={record.product.imageUrl}
             icon={<AppstoreOutlined />}
             style={{
-              backgroundColor: record.product.imageUrl ? undefined : '#f0f0f0',
-              color: '#666',
+              backgroundColor: record.product.imageUrl ? undefined : '#df005c',
+              flexShrink: 0,
             }}
           />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: '14px', marginBottom: '2px' }}>
+          <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: '14px',
+                marginBottom: '2px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {record.product.name}
-            </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {record.product.productCode} • {record.product.sku}
             </div>
           </div>
         </div>
@@ -318,6 +337,7 @@ const InventoryListPage: React.FC = () => {
       title: 'Actions',
       key: 'actions',
       width: 80,
+      fixed: 'right',
       align: 'center',
       render: (_, record) => {
         const isEmployee = currentCompany?.role === 'EMPLOYEE';
@@ -503,7 +523,7 @@ const InventoryListPage: React.FC = () => {
                 showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
               }}
-              scroll={{ x: 1200 }}
+              scroll={{ x: 'max-content' }}
               size='middle'
               className='inventory-table'
             />
