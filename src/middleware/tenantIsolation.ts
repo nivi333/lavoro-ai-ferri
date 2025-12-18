@@ -34,7 +34,7 @@ export const tenantIsolationMiddleware = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({ success: false, message: 'Authorization token required' });
       return;
@@ -42,23 +42,23 @@ export const tenantIsolationMiddleware = async (
 
     const token = authHeader.substring(7);
     const decoded = jwt.verify(token, config.jwt.secret) as JWTPayload;
-    
+
     req.userId = decoded.userId;
-    
+
     if (decoded.tenantId) {
       req.tenantId = decoded.tenantId;
       req.userRole = decoded.role;
-      
+
       const isValidTenant = await validateTenantAccess(decoded.userId, decoded.tenantId);
       if (!isValidTenant) {
         res.status(403).json({ success: false, message: 'Access denied to tenant' });
         return;
       }
-      
+
       req.tenantPrisma = databaseManager.getTenantPrisma(decoded.tenantId);
       logger.debug(`Tenant context set: ${decoded.tenantId}`);
     }
-    
+
     next();
   } catch (error) {
     logger.error('Tenant isolation error:', error);
@@ -69,11 +69,7 @@ export const tenantIsolationMiddleware = async (
 /**
  * Middleware that requires tenant context (for tenant-specific routes)
  */
-export const requireTenantContext = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const requireTenantContext = (req: Request, res: Response, next: NextFunction): void => {
   if (!req.tenantId) {
     res.status(400).json({ success: false, message: 'Tenant context required' });
     return;
@@ -89,18 +85,18 @@ export const requireRole = (allowedRoles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     // First check if user has a tenant context
     if (!req.tenantId) {
-      res.status(400).json({ 
-        success: false, 
-        message: 'Company context required. Please switch to a company first.' 
+      res.status(400).json({
+        success: false,
+        message: 'Company context required. Please switch to a company first.',
       });
       return;
     }
-    
+
     // Then check if user has the required role
     if (!req.userRole || !allowedRoles.includes(req.userRole)) {
-      res.status(403).json({ 
-        success: false, 
-        message: `Insufficient permissions. Required role: ${allowedRoles.join(' or ')}` 
+      res.status(403).json({
+        success: false,
+        message: `Insufficient permissions. Required role: ${allowedRoles.join(' or ')}`,
       });
       return;
     }
@@ -114,16 +110,45 @@ export const requireRole = (allowedRoles: string[]) => {
 async function validateTenantAccess(userId: string, tenantId: string): Promise<boolean> {
   try {
     logger.debug(`Validating tenant access: user ${userId} -> tenant ${tenantId}`);
+
     const access = await globalPrisma.user_companies.findFirst({
       where: {
         user_id: userId,
         company_id: tenantId,
         is_active: true,
-        companies: { is_active: true }
       },
-      include: { companies: true }
+      include: {
+        companies: {
+          select: {
+            id: true,
+            name: true,
+            is_active: true,
+          },
+        },
+      },
     });
-    return !!access;
+
+    if (!access) {
+      logger.warn(
+        `Access denied: No user_companies record found for user ${userId} and tenant ${tenantId}`
+      );
+      return false;
+    }
+
+    if (!access.companies) {
+      logger.warn(`Access denied: Company ${tenantId} not found`);
+      return false;
+    }
+
+    if (!access.companies.is_active) {
+      logger.warn(`Access denied: Company ${tenantId} is inactive`);
+      return false;
+    }
+
+    logger.debug(
+      `Access granted: user ${userId} has ${access.role} role in company ${access.companies.name}`
+    );
+    return true;
   } catch (error) {
     logger.error('Error validating tenant access:', error);
     return false;
@@ -133,11 +158,7 @@ async function validateTenantAccess(userId: string, tenantId: string): Promise<b
 /**
  * Middleware to log tenant operations for audit trail
  */
-export const auditMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const auditMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   res.on('finish', () => {
     logger.info('Tenant Operation', {
       userId: req.userId,

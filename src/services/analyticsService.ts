@@ -171,20 +171,28 @@ class AnalyticsService {
           where: { company_id: companyId, is_active: true },
         }),
 
-        // Textile operations data
+        // Textile operations data (wrapped in try-catch to handle connection pool issues)
         Promise.all([
-          globalPrisma.fabric_production.count({
-            where: { company_id: companyId, is_active: true },
-          }),
-          globalPrisma.yarn_manufacturing.count({
-            where: { company_id: companyId, is_active: true },
-          }),
-          globalPrisma.dyeing_finishing.count({
-            where: { company_id: companyId, is_active: true },
-          }),
-          globalPrisma.garment_manufacturing.count({
-            where: { company_id: companyId, is_active: true },
-          }),
+          globalPrisma.fabric_production
+            .count({
+              where: { company_id: companyId, is_active: true },
+            })
+            .catch(() => 0),
+          globalPrisma.yarn_manufacturing
+            .count({
+              where: { company_id: companyId, is_active: true },
+            })
+            .catch(() => 0),
+          globalPrisma.dyeing_finishing
+            .count({
+              where: { company_id: companyId, is_active: true },
+            })
+            .catch(() => 0),
+          globalPrisma.garment_manufacturing
+            .count({
+              where: { company_id: companyId, is_active: true },
+            })
+            .catch(() => 0),
         ]),
       ]);
 
