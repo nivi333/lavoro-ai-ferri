@@ -104,198 +104,207 @@ class CompanyService {
 
     try {
       // Use database transaction for data consistency
-      const result = await globalPrisma.$transaction(async prisma => {
-        // Generate slug if not provided
-        let baseSlug =
-          companyData.slug && companyData.slug.trim().length > 0
-            ? companyData.slug.trim().toLowerCase()
-            : companyData.name
-                .toLowerCase()
-                .trim()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+      // Increased timeout to 15 seconds to handle large base64 image uploads
+      const result = await globalPrisma.$transaction(
+        async prisma => {
+          // Generate slug if not provided
+          let baseSlug =
+            companyData.slug && companyData.slug.trim().length > 0
+              ? companyData.slug.trim().toLowerCase()
+              : companyData.name
+                  .toLowerCase()
+                  .trim()
+                  .replace(/[^a-z0-9\s-]/g, '')
+                  .replace(/\s+/g, '-')
+                  .replace(/-+/g, '-');
 
-        // Ensure uniqueness of slug
-        let uniqueSlug = baseSlug;
-        let counter = 1;
-        while (true) {
-          const exists = await prisma.companies.findUnique({ where: { slug: uniqueSlug } });
-          if (!exists) break;
-          uniqueSlug = `${baseSlug}-${counter++}`;
-        }
+          // Ensure uniqueness of slug
+          let uniqueSlug = baseSlug;
+          let counter = 1;
+          while (true) {
+            const exists = await prisma.companies.findUnique({ where: { slug: uniqueSlug } });
+            if (!exists) break;
+            uniqueSlug = `${baseSlug}-${counter++}`;
+          }
 
-        const companyId = await generateCompanyId();
-        const locationId = await generateLocationId();
-        const defaultLocation = companyData.defaultLocation || `${companyData.name} Headquarters`;
+          const companyId = await generateCompanyId();
+          const locationId = await generateLocationId();
+          const defaultLocation = companyData.defaultLocation || `${companyData.name} Headquarters`;
 
-        // CRITICAL: Validate generated IDs before proceeding
-        if (!companyId || typeof companyId !== 'string' || companyId.trim().length === 0) {
-          throw new Error('Failed to generate companyId');
-        }
+          // CRITICAL: Validate generated IDs before proceeding
+          if (!companyId || typeof companyId !== 'string' || companyId.trim().length === 0) {
+            throw new Error('Failed to generate companyId');
+          }
 
-        if (!locationId || typeof locationId !== 'string' || locationId.trim().length === 0) {
-          throw new Error('Failed to generate locationId');
-        }
+          if (!locationId || typeof locationId !== 'string' || locationId.trim().length === 0) {
+            throw new Error('Failed to generate locationId');
+          }
 
-        const tenantId = uuidv4(); // Generate UUID for company (this becomes tenantId)
+          const tenantId = uuidv4(); // Generate UUID for company (this becomes tenantId)
 
-        const newCompany = await prisma.companies.create({
-          data: {
-            id: tenantId,
-            company_id: companyId,
-            name: companyData.name,
-            slug: uniqueSlug,
-            industry: industryToEnum(companyData.industry) as any,
-            description: companyData.description,
-            logo_url: companyData.logoUrl,
-            website: companyData.website,
-            tax_id: companyData.taxId,
-            email: companyData.email,
-            phone: companyData.phone,
-            address_line_1: companyData.addressLine1,
-            address_line_2: companyData.addressLine2,
-            city: companyData.city,
-            state: companyData.state,
-            country: companyData.country,
-            pincode: companyData.pincode,
-            contact_info: companyData.contactInfo,
-            established_date: companyData.establishedDate,
-            business_type: companyData.businessType,
-            certifications: companyData.certifications || [],
-            default_location: defaultLocation,
-            is_active: companyData.isActive !== undefined ? companyData.isActive : true, // Default to true
-            updated_at: new Date(),
-          },
-        });
-
-        // CRITICAL: Validate company was created with valid tenantId (UUID)
-        if (!newCompany || !newCompany.id) {
-          throw new Error('Failed to create company - Missing company ID (tenantId)');
-        }
-
-        if (!uuidRegex.test(newCompany.id)) {
-          throw new Error('Invalid tenantId: Company ID must be a valid UUID format');
-        }
-
-        const ownerLink = await prisma.user_companies.create({
-          data: {
-            id: uuidv4(),
-            user_id: userId,
-            company_id: newCompany.id,
-            role: 'OWNER',
-            updated_at: new Date(),
-          },
-        });
-
-        // Validation: Ensure user-company relationship was created successfully
-        if (!ownerLink || !ownerLink.id) {
-          throw new Error('Failed to create user-company relationship');
-        }
-
-        // CRITICAL: Create headquarters location with same address and contact info as company
-        // All required fields MUST be present (validated above)
-        let headquartersLocation;
-        try {
-          const locationUuid = uuidv4(); // Generate UUID for location
-
-          headquartersLocation = await prisma.company_locations.create({
+          const newCompany = await prisma.companies.create({
             data: {
-              id: locationUuid,
-              location_id: locationId,
-              company_id: newCompany.id,
-              name: defaultLocation,
-              // Required fields - copied from company
-              address_line_1: newCompany.address_line_1!, // Required
-              city: newCompany.city!, // Required
-              state: newCompany.state!, // Required
-              country: newCompany.country!, // Required
-              contact_info: newCompany.contact_info, // Required (JSON)
-              // Optional fields - copied from company
-              address_line_2: newCompany.address_line_2,
-              email: newCompany.email,
-              phone: newCompany.phone,
-              pincode: newCompany.pincode,
-              // Location metadata
-              is_default: true,
-              is_headquarters: true,
-              location_type: 'BRANCH',
-              is_active: true,
+              id: tenantId,
+              company_id: companyId,
+              name: companyData.name,
+              slug: uniqueSlug,
+              industry: industryToEnum(companyData.industry) as any,
+              description: companyData.description,
+              logo_url: companyData.logoUrl,
+              website: companyData.website,
+              tax_id: companyData.taxId,
+              email: companyData.email,
+              phone: companyData.phone,
+              address_line_1: companyData.addressLine1,
+              address_line_2: companyData.addressLine2,
+              city: companyData.city,
+              state: companyData.state,
+              country: companyData.country,
+              pincode: companyData.pincode,
+              contact_info: companyData.contactInfo,
+              established_date: companyData.establishedDate,
+              business_type: companyData.businessType,
+              certifications: companyData.certifications || [],
+              default_location: defaultLocation,
+              is_active: companyData.isActive !== undefined ? companyData.isActive : true, // Default to true
               updated_at: new Date(),
             },
           });
 
-          // CRITICAL VALIDATION: Ensure location was created successfully
-          if (!headquartersLocation || !headquartersLocation.id) {
-            throw new Error('Failed to create default location - Location object is invalid');
+          // CRITICAL: Validate company was created with valid tenantId (UUID)
+          if (!newCompany || !newCompany.id) {
+            throw new Error('Failed to create company - Missing company ID (tenantId)');
           }
 
-          // Validate location UUID format
-          if (!uuidRegex.test(headquartersLocation.id)) {
-            throw new Error('Invalid location UUID: Location ID must be a valid UUID format');
+          if (!uuidRegex.test(newCompany.id)) {
+            throw new Error('Invalid tenantId: Company ID must be a valid UUID format');
           }
 
-          // Validate locationId was set correctly
+          const ownerLink = await prisma.user_companies.create({
+            data: {
+              id: uuidv4(),
+              user_id: userId,
+              company_id: newCompany.id,
+              role: 'OWNER',
+              updated_at: new Date(),
+            },
+          });
+
+          // Validation: Ensure user-company relationship was created successfully
+          if (!ownerLink || !ownerLink.id) {
+            throw new Error('Failed to create user-company relationship');
+          }
+
+          // CRITICAL: Create headquarters location with same address and contact info as company
+          // All required fields MUST be present (validated above)
+          let headquartersLocation;
+          try {
+            const locationUuid = uuidv4(); // Generate UUID for location
+
+            headquartersLocation = await prisma.company_locations.create({
+              data: {
+                id: locationUuid,
+                location_id: locationId,
+                company_id: newCompany.id,
+                name: defaultLocation,
+                // Required fields - copied from company
+                address_line_1: newCompany.address_line_1!, // Required
+                city: newCompany.city!, // Required
+                state: newCompany.state!, // Required
+                country: newCompany.country!, // Required
+                contact_info: newCompany.contact_info, // Required (JSON)
+                // Optional fields - copied from company
+                address_line_2: newCompany.address_line_2,
+                email: newCompany.email,
+                phone: newCompany.phone,
+                pincode: newCompany.pincode,
+                // Location metadata
+                is_default: true,
+                is_headquarters: true,
+                location_type: 'BRANCH',
+                is_active: true,
+                updated_at: new Date(),
+              },
+            });
+
+            // CRITICAL VALIDATION: Ensure location was created successfully
+            if (!headquartersLocation || !headquartersLocation.id) {
+              throw new Error('Failed to create default location - Location object is invalid');
+            }
+
+            // Validate location UUID format
+            if (!uuidRegex.test(headquartersLocation.id)) {
+              throw new Error('Invalid location UUID: Location ID must be a valid UUID format');
+            }
+
+            // Validate locationId was set correctly
+            if (
+              !headquartersLocation.location_id ||
+              headquartersLocation.location_id !== locationId
+            ) {
+              throw new Error('Failed to create default location - locationId mismatch');
+            }
+          } catch (locationError: any) {
+            console.error('Location creation error:', locationError);
+            // Throw specific error for location creation failure
+            throw new Error(
+              `Issue in Create default Location: ${locationError.message || 'Unknown error'}`
+            );
+          }
+
+          // Additional validation: Verify location exists and has all required fields
+          const locationCheck = await prisma.company_locations.findUnique({
+            where: { id: headquartersLocation.id },
+          });
+
+          if (!locationCheck) {
+            throw new Error('Issue in Create default Location - Location verification failed');
+          }
+
+          // Validate all required fields are present in created location
           if (
-            !headquartersLocation.location_id ||
-            headquartersLocation.location_id !== locationId
+            !locationCheck.address_line_1 ||
+            !locationCheck.city ||
+            !locationCheck.state ||
+            !locationCheck.country
           ) {
-            throw new Error('Failed to create default location - locationId mismatch');
+            throw new Error(
+              'Issue in Create default Location - Required address fields are missing'
+            );
           }
-        } catch (locationError: any) {
-          console.error('Location creation error:', locationError);
-          // Throw specific error for location creation failure
-          throw new Error(
-            `Issue in Create default Location: ${locationError.message || 'Unknown error'}`
-          );
+
+          return {
+            id: newCompany.id,
+            companyId: newCompany.company_id,
+            name: newCompany.name,
+            slug: newCompany.slug,
+            industry: industryToDisplay(newCompany.industry),
+            description: newCompany.description,
+            logoUrl: newCompany.logo_url,
+            website: newCompany.website,
+            taxId: newCompany.tax_id,
+            email: newCompany.email,
+            phone: newCompany.phone,
+            addressLine1: newCompany.address_line_1,
+            addressLine2: newCompany.address_line_2,
+            city: newCompany.city,
+            state: newCompany.state,
+            country: newCompany.country,
+            pincode: newCompany.pincode,
+            contactInfo: newCompany.contact_info,
+            establishedDate: newCompany.established_date,
+            businessType: newCompany.business_type,
+            certifications: newCompany.certifications,
+            defaultLocation: newCompany.default_location,
+            role: ownerLink.role,
+            joinedAt: ownerLink.created_at,
+          };
+        },
+        {
+          maxWait: 15000, // Maximum time to wait for a transaction slot (15 seconds)
+          timeout: 15000, // Maximum time the transaction can run (15 seconds)
         }
-
-        // Additional validation: Verify location exists and has all required fields
-        const locationCheck = await prisma.company_locations.findUnique({
-          where: { id: headquartersLocation.id },
-        });
-
-        if (!locationCheck) {
-          throw new Error('Issue in Create default Location - Location verification failed');
-        }
-
-        // Validate all required fields are present in created location
-        if (
-          !locationCheck.address_line_1 ||
-          !locationCheck.city ||
-          !locationCheck.state ||
-          !locationCheck.country
-        ) {
-          throw new Error('Issue in Create default Location - Required address fields are missing');
-        }
-
-        return {
-          id: newCompany.id,
-          companyId: newCompany.company_id,
-          name: newCompany.name,
-          slug: newCompany.slug,
-          industry: industryToDisplay(newCompany.industry),
-          description: newCompany.description,
-          logoUrl: newCompany.logo_url,
-          website: newCompany.website,
-          taxId: newCompany.tax_id,
-          email: newCompany.email,
-          phone: newCompany.phone,
-          addressLine1: newCompany.address_line_1,
-          addressLine2: newCompany.address_line_2,
-          city: newCompany.city,
-          state: newCompany.state,
-          country: newCompany.country,
-          pincode: newCompany.pincode,
-          contactInfo: newCompany.contact_info,
-          establishedDate: newCompany.established_date,
-          businessType: newCompany.business_type,
-          certifications: newCompany.certifications,
-          defaultLocation: newCompany.default_location,
-          role: ownerLink.role,
-          joinedAt: ownerLink.created_at,
-        };
-      });
+      );
 
       // FINAL VALIDATION: Verify both company and location exist in database after transaction
       const [companyExists, locationExists] = await Promise.all([
