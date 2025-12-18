@@ -23,7 +23,7 @@
     gap: 10px;
     padding: 10px;
     cursor: pointer;
-    border-bottom: 1px solid $border-light;
+    border-bottom: 1px solid var(--color-border-secondary);
 
     .company-details {
       flex: 1;
@@ -56,33 +56,7 @@
     align-items: center;
     gap: 10px;
     padding: 16px;
-    border-top: 1px solid $border-light;
+    border-top: 1px solid var(--color-border-secondary);
     background: var(--color-bg-layout);
-  }
-}
-
-// Dark mode support
-[data-theme='dark'] {
-  .app-sidebar {
-    background: $dark-bg-primary;
-    border-right-color: $dark-border;
-
-    .sidebar-header {
-      border-bottom-color: $dark-border;
-
-      .company-name {
-        color: $dark-text-primary;
-      }
-
-      .company-industry,
-      .dropdown-icon {
-        color: $dark-text-tertiary;
-      }
-    }
-
-    .sidebar-footer {
-      border-top-color: $dark-border;
-      background: $dark-bg-secondary;
-    }
   }
 }

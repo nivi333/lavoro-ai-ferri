@@ -2,10 +2,10 @@
 
 .dashboard-container {
   .kpi-card {
-    border-radius: $border-radius-base;
+    border-radius: var(--border-radius-base);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
 
     &:hover {
       box-shadow: var(--box-shadow-secondary);
@@ -13,20 +13,20 @@
     }
 
     .ant-statistic-title {
-      font-size: $font-size-sm;
+      font-size: var(--font-size-sm);
       color: var(--color-text-secondary);
       margin-bottom: var(--padding-xxs);
       font-weight: 500;
     }
 
     .ant-statistic-content {
-      font-size: $font-size-2xl;
+      font-size: var(--font-size-2xl);
       font-weight: 600;
     }
 
     .kpi-trend {
       margin-top: var(--padding-xs);
-      font-size: $font-size-xs;
+      font-size: var(--font-size-xs);
       color: var(--color-text-secondary);
       font-weight: 500;
 
@@ -41,16 +41,16 @@
   }
 
   .chart-card {
-    border-radius: $border-radius-base;
+    border-radius: var(--border-radius-base);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
     height: 100%;
 
     .ant-card-head {
-      border-bottom: 1px solid $border-light;
-      
+      border-bottom: 1px solid var(--color-border-secondary);
+
       .ant-card-head-title {
-        font-size: $font-size-lg;
+        font-size: var(--font-size-lg);
         font-weight: 600;
         color: var(--color-text);
       }
@@ -67,7 +67,7 @@
 
   .kpi-trend-icon {
     font-size: 14px;
-    
+
     &.positive {
       color: var(--color-success);
     }
@@ -78,7 +78,7 @@
   }
 
   .dashboard-quick-actions {
-    margin-top: $spacing-2xl;
+    margin-top: var(--padding-xl);
     margin-bottom: var(--padding-xl);
 
     h3 {
@@ -88,9 +88,9 @@
 
   .dashboard-action-card {
     text-align: center;
-    border-radius: $border-radius-lg;
+    border-radius: var(--border-radius-lg);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
     transition: all 0.2s ease;
     cursor: pointer;
 
@@ -126,14 +126,14 @@
   }
 
   .dashboard-activity-card {
-    border-radius: $border-radius-lg;
+    border-radius: var(--border-radius-lg);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid $border-light;
+    border: 1px solid var(--color-border-secondary);
   }
 
   .dashboard-empty-state {
     text-align: center;
-    padding: $spacing-2xl;
+    padding: var(--padding-xl);
     color: var(--color-text-secondary);
 
     p {
@@ -171,90 +171,6 @@
 
     .dashboard-action-card {
       margin-bottom: var(--padding-xs);
-    }
-  }
-}
-
-// Dark mode support
-[data-theme='dark'] {
-  .dashboard-container {
-    .kpi-card {
-      background-color: $dark-bg-surface;
-      border-color: $dark-border;
-
-      .ant-statistic-title {
-        color: $dark-text-secondary;
-      }
-
-      .ant-statistic-content {
-        color: $dark-text-primary;
-      }
-
-      .kpi-trend {
-        color: $dark-text-secondary;
-
-        &.positive {
-          color: $dark-success-color;
-        }
-
-        &.negative {
-          color: $dark-error-color;
-        }
-      }
-    }
-
-    .chart-card {
-      background-color: $dark-bg-surface;
-      border-color: $dark-border;
-
-      .ant-card-head {
-        background-color: $dark-bg-secondary;
-        border-bottom-color: $dark-border;
-
-        .ant-card-head-title {
-          color: $dark-text-primary;
-        }
-      }
-
-      .ant-card-body {
-        color: $dark-text-secondary;
-      }
-    }
-
-    .dashboard-action-card {
-      background-color: $dark-bg-surface;
-      border-color: $dark-border;
-
-      &:hover {
-        background-color: $dark-bg-elevated;
-      }
-
-      .dashboard-action-content {
-        h4 {
-          color: $dark-text-primary;
-        }
-
-        p {
-          color: $dark-text-secondary;
-        }
-      }
-    }
-
-    .dashboard-activity-card {
-      background-color: $dark-bg-surface;
-      border-color: $dark-border;
-    }
-
-    .dashboard-empty-state {
-      color: $dark-text-secondary;
-
-      p {
-        color: $dark-text-primary;
-      }
-
-      span {
-        color: $dark-text-tertiary;
-      }
     }
   }
 }

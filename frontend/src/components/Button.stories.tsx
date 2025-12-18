@@ -9,9 +9,12 @@ const meta: Meta<typeof Button> = {
   },
   tags: ['autodocs'],
   argTypes: {
-    variant: {
+    type: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'danger'],
+      options: ['primary', 'default', 'dashed', 'link', 'text'],
+    },
+    danger: {
+      control: { type: 'boolean' },
     },
     size: {
       control: { type: 'select' },
@@ -31,28 +34,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    variant: 'primary',
+    type: 'primary',
     children: 'Primary Button',
   },
 };
 
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
+    type: 'default',
     children: 'Secondary Button',
   },
 };
 
 export const Danger: Story = {
   args: {
-    variant: 'danger',
+    type: 'primary',
+    danger: true,
     children: 'Danger Button',
   },
 };
 
 export const Large: Story = {
   args: {
-    variant: 'primary',
+    type: 'primary',
     size: 'large',
     children: 'Large Button',
   },
@@ -60,7 +64,7 @@ export const Large: Story = {
 
 export const Small: Story = {
   args: {
-    variant: 'primary',
+    type: 'primary',
     size: 'small',
     children: 'Small Button',
   },
@@ -68,7 +72,7 @@ export const Small: Story = {
 
 export const Loading: Story = {
   args: {
-    variant: 'primary',
+    type: 'primary',
     loading: true,
     children: 'Loading Button',
   },
@@ -76,7 +80,7 @@ export const Loading: Story = {
 
 export const Disabled: Story = {
   args: {
-    variant: 'primary',
+    type: 'primary',
     disabled: true,
     children: 'Disabled Button',
   },

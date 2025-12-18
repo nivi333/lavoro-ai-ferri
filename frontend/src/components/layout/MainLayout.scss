@@ -131,64 +131,6 @@
   }
 }
 
-// Dark theme support
-[data-theme='dark'] {
-  .main-layout {
-    background: $dark-bg-primary;
-
-    .app-header {
-      background: $dark-bg-surface;
-      border-bottom-color: $dark-border;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-
-      .header-content {
-        .header-center {
-          .header-title {
-            color: $dark-text-primary;
-          }
-
-          .header-subtitle {
-            color: $dark-text-secondary;
-          }
-        }
-
-        .header-actions {
-          .header-user {
-            border-color: rgba(var(--color-primary), 0.3);
-
-            .ant-avatar {
-              background: var(--color-primary);
-              color: var(--color-bg-container);
-            }
-
-            .header-user-info {
-              .header-user-name {
-                color: $dark-text-primary;
-              }
-
-              .header-user-email {
-                color: $dark-text-secondary;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .content-layout {
-      .main-content {
-        background: $dark-bg-primary;
-      }
-    }
-  }
-
-  .dashboard-header {
-    background-color: $dark-bg-surface;
-    border-bottom-color: $dark-border;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-}
-
 // Responsive design
 @media (max-width: 768px) {
   .main-layout {

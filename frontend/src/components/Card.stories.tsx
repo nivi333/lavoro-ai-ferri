@@ -34,7 +34,11 @@ export const Default: Story = {
 export const WithActions: Story = {
   args: {
     title: 'Card with Actions',
-    extra: <Button variant="primary" size="small">Action</Button>,
+    extra: (
+      <Button type='primary' size='small'>
+        Action
+      </Button>
+    ),
     children: 'This card has an action button in the header.',
   },
 };
@@ -70,9 +74,11 @@ export const TextileExample: Story = {
     children: (
       <div>
         <p>Fabric production, yarn manufacturing, dyeing & finishing</p>
-        <div className="mt-4">
-          <Button variant="primary" className="mr-2">View Details</Button>
-          <Button variant="secondary">Edit</Button>
+        <div className='mt-4'>
+          <Button type='primary' className='mr-2'>
+            View Details
+          </Button>
+          <Button type='default'>Edit</Button>
         </div>
       </div>
     ),

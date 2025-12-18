@@ -11,7 +11,27 @@ $font-family-body:
   -apple-system,
   BlinkMacSystemFont,
   'Segoe UI',
+  'Segoe UI',
   sans-serif;
+
+:root {
+  --border-radius-base: 6px;
+  --border-radius-lg: 8px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+
+  --padding-xxs: 4px;
+  --padding-xs: 8px;
+  --padding: 16px;
+  --padding-lg: 24px;
+  --padding-xl: 32px;
+
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --box-shadow-secondary: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
 
 // ============================================================================
 // TABLE CELL UTILITY CLASSES
