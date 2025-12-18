@@ -1,7 +1,6 @@
-databases:
-  - name: lavoro-postgres
-    databaseName: lavoro_ai_ferri
-    plan: starter
+# Supabase Database Configuration
+# Note: Database is hosted on Supabase, not Render
+# Configure DATABASE_URL and DIRECT_URL in Render Dashboard Environment Variables
 
 services:
   - type: redis
@@ -24,10 +23,23 @@ services:
         value: production
       - key: PORT
         value: 3000
+      - key: HOST
+        value: 0.0.0.0
+      # Supabase Database URLs - Set these in Render Dashboard
+      # DATABASE_URL: Use Transaction Pooler (port 6543)
+      # postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
       - key: DATABASE_URL
-        fromDatabase:
-          name: lavoro-postgres
-          property: connectionString
+        sync: false
+      # DIRECT_URL: Use Direct Connection (port 5432) for migrations
+      # postgresql://postgres.[PROJECT-REF]:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require
+      - key: DIRECT_URL
+        sync: false
+      - key: DB_MAX_CONNECTIONS
+        value: 20
+      - key: DB_IDLE_TIMEOUT
+        value: 30000
+      - key: DB_CONNECTION_TIMEOUT
+        value: 5000
       - key: REDIS_URL
         fromService:
           name: lavoro-redis
@@ -37,5 +49,13 @@ services:
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
       - key: CORS_ORIGIN
         value: https://YOUR-NETLIFY-SUBDOMAIN.netlify.app
+      - key: API_VERSION
+        value: v1
+      - key: API_PREFIX
+        value: /api
+      - key: BCRYPT_ROUNDS
+        value: 12
