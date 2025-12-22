@@ -193,63 +193,63 @@
 > - **Outer Padding**: Consistent across all tables screens
 
 ### 2.1 Create Global Components File (`/src/components/globalComponents.tsx`)
-- [ ] Create `globalComponents.tsx` for all reusable styled components
-- [ ] Import theme values from `frontend-new/theme`
-- [ ] Use CVA (class-variance-authority) for component variants
-- [ ] Export all global components for reuse
+- [✓] Create `globalComponents.tsx` for all reusable styled components
+- [✓] Import theme values from `frontend-new/theme`
+- [✓] Use CVA (class-variance-authority) for component variants
+- [✓] Export all global components for reuse
 
 ### 2.2 Button Components (All Variants in One File)
 Create all button variants in `globalComponents.tsx`:
-- [ ] **PrimaryButton** - Gradient primary button (matches `.gradient-primary-btn` from base.scss)
+- [✓] **PrimaryButton** - Gradient primary button (matches `.gradient-primary-btn` from base.scss)
   - Background: `linear-gradient(135deg, primary 0%, #c10351 50%, #ab0d4f 100%)`
   - Hover effect with shimmer animation
   - Box shadow with primary color
   
-- [ ] **SecondaryButton** - Gradient secondary button (matches `.gradient-secondary-btn`)
+- [✓] **SecondaryButton** - Gradient secondary button (matches `.gradient-secondary-btn`)
   - Background: `linear-gradient(135deg, #ffc53d 0%, warning 50%, warning 100%)`
   - Hover effect with shimmer animation
   
-- [ ] **OutlinedButton** - Border only, no background
+- [✓] **OutlinedButton** - Border only, no background
   - Border color from theme
   - Hover: background fill with primary/10
   
-- [ ] **GhostButton** - No border, transparent background
+- [✓] **GhostButton** - No border, transparent background
   - Hover: background with primary/10
   
-- [ ] **NoBorderButton** - Text only button
+- [✓] **NoBorderButton** - Text only button
   - Underline on hover
   
-- [ ] **WhiteBgButton** - White background button
+- [✓] **WhiteBgButton** - White background button
   - Border from theme
   - Hover: slight shadow
   
-- [ ] **AlertButton** / **DangerButton** - Destructive action
+- [✓] **AlertButton** / **DangerButton** - Destructive action
   - Background: error color from theme
   - Hover: darker error shade
   
-- [ ] **IconButton** - Square button for icons only
+- [✓] **IconButton** - Square button for icons only
   - Padding: equal on all sides
   - Hover: background change
 
 ### 2.3 Input Components (All Variants)
 Create all input variants in `globalComponents.tsx`:
-- [ ] **TextInput** - Standard text input
+- [✓] **TextInput** - Standard text input
   - Height: 40px (from `.auth-form-input`)
   - Border radius from theme
   - Font size from theme
   
-- [ ] **PasswordInput** - Password with toggle visibility
+- [✓] **PasswordInput** - Password with toggle visibility
   - Same as TextInput with eye icon
   
-- [ ] **SearchInput** - Input with search icon
+- [✓] **SearchInput** - Input with search icon
   - Search icon on left
   - Clear button on right when has value
   
-- [ ] **TextArea** - Multi-line text input
+- [✓] **TextArea** - Multi-line text input
   - Resizable
   - Min height from theme
   
-- [ ] **NumberInput** - Numeric input with increment/decrement
+- [✓] **NumberInput** - Numeric input with increment/decrement
   - Arrow buttons on right
 
 ### 2.4 Select/Dropdown Components
@@ -373,14 +373,14 @@ Create all input variants in `globalComponents.tsx`:
   - Display: block
 
 ### 2.12 Copy Services & Utilities from `frontend`
-- [ ] Copy all services from `frontend/src/services/` to `frontend-new/src/services/`
-- [ ] Copy all types from `frontend/src/types/` to `frontend-new/src/types/`
-- [ ] Copy all utils from `frontend/src/utils/` to `frontend-new/src/utils/`
-- [ ] Copy contexts from `frontend/src/contexts/` to `frontend-new/src/contexts/`
-- [ ] Copy router from `frontend/src/router/` to `frontend-new/src/router/`
-- [ ] Copy config from `frontend/src/config/` to `frontend-new/src/config/`
-- [ ] Copy constants from `frontend/src/constants/` to `frontend-new/src/constants/`
-- [ ] Copy assets from `frontend/src/assets/` to `frontend-new/src/assets/`
+- [✓] Copy all services from `frontend/src/services/` to `frontend-new/src/services/`
+- [✓] Copy all types from `frontend/src/types/` to `frontend-new/src/types/`
+- [✓] Copy all utils from `frontend/src/utils/` to `frontend-new/src/utils/`
+- [✓] Copy contexts from `frontend/src/contexts/` to `frontend-new/src/contexts/`
+- [✓] Copy router from `frontend/src/router/` to `frontend-new/src/router/`
+- [✓] Copy config from `frontend/src/config/` to `frontend-new/src/config/`
+- [✓] Copy constants from `frontend/src/constants/` to `frontend-new/src/constants/`
+- [✓] Copy assets from `frontend/src/assets/` to `frontend-new/src/assets/`
 
 ### 2.13 Create Layout Structure
 - [ ] Create `MainLayout.tsx` - Main app layout
