@@ -19,7 +19,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-gradient-to-r from-primary via-[#c10351] to-[#ab0d4f] text-white shadow-primary hover:shadow-primary-hover hover:scale-[1.02] active:scale-[0.98]',
+          'bg-gradient-to-r from-primary via-[#c10351] to-[#ab0d4f] text-white hover:scale-[1.02] active:scale-[0.98]',
         secondary:
           'bg-gradient-to-r from-[#ffc53d] via-warning to-warning text-white shadow-base hover:shadow-secondary hover:scale-[1.02] active:scale-[0.98]',
         outlined: 'border border-input bg-transparent hover:bg-primary/10 hover:border-primary',
@@ -621,3 +621,297 @@ export const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
   }
 );
 Separator.displayName = 'Separator';
+
+// ============================================================================
+// TABLE COMPONENTS
+// ============================================================================
+
+export interface DataTableProps extends React.HTMLAttributes<HTMLTableElement> {}
+
+export const DataTable = forwardRef<HTMLTableElement, DataTableProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div className='relative w-full overflow-auto'>
+        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props}>
+          {children}
+        </table>
+      </div>
+    );
+  }
+);
+DataTable.displayName = 'DataTable';
+
+export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
+
+export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <thead
+        ref={ref}
+        className={cn('sticky top-0 bg-muted/50 backdrop-blur z-10', className)}
+        {...props}
+      >
+        {children}
+      </thead>
+    );
+  }
+);
+TableHeader.displayName = 'TableHeader';
+
+export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
+}
+
+export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
+  ({ className, variant = 'default', children, ...props }, ref) => {
+    const variantClasses = {
+      default: '',
+      primary: 'text-primary font-medium',
+      secondary: 'text-muted-foreground',
+      success: 'text-success font-medium',
+      warning: 'text-warning font-medium',
+      error: 'text-error font-medium',
+    };
+
+    return (
+      <td
+        ref={ref}
+        className={cn('p-2.5 align-middle', variantClasses[variant], className)}
+        {...props}
+      >
+        {children}
+      </td>
+    );
+  }
+);
+TableCell.displayName = 'TableCell';
+
+// ============================================================================
+// SHEET/DRAWER COMPONENTS
+// ============================================================================
+
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader as ShadcnSheetHeader,
+  SheetTitle,
+  SheetFooter as ShadcnSheetFooter,
+} from '@/components/ui/sheet';
+
+export interface FormSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}
+
+export const FormSheet = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  footer,
+}: FormSheetProps) => {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className='w-full sm:max-w-[600px] overflow-y-auto'>
+        <ShadcnSheetHeader className='border-b pb-4 mb-4'>
+          <SheetTitle>{title}</SheetTitle>
+          {description && <SheetDescription>{description}</SheetDescription>}
+        </ShadcnSheetHeader>
+
+        <div className='py-4'>{children}</div>
+
+        {footer && <ShadcnSheetFooter className='border-t pt-4 mt-4'>{footer}</ShadcnSheetFooter>}
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+export interface SheetHeaderProps {
+  title: string;
+  description?: string;
+}
+
+export const SheetHeaderComponent = ({ title, description }: SheetHeaderProps) => {
+  return (
+    <ShadcnSheetHeader className='border-b pb-4'>
+      <SheetTitle>{title}</SheetTitle>
+      {description && <SheetDescription>{description}</SheetDescription>}
+    </ShadcnSheetHeader>
+  );
+};
+
+export interface SheetFooterProps {
+  onCancel?: () => void;
+  onSave?: () => void;
+  cancelText?: string;
+  saveText?: string;
+  saveLoading?: boolean;
+  saveDisabled?: boolean;
+}
+
+export const SheetFooterComponent = ({
+  onCancel,
+  onSave,
+  cancelText = 'Cancel',
+  saveText = 'Save',
+  saveLoading = false,
+  saveDisabled = false,
+}: SheetFooterProps) => {
+  return (
+    <ShadcnSheetFooter className='border-t pt-4 flex gap-2'>
+      {onCancel && (
+        <OutlinedButton onClick={onCancel} type='button'>
+          {cancelText}
+        </OutlinedButton>
+      )}
+      {onSave && (
+        <PrimaryButton
+          onClick={onSave}
+          loading={saveLoading}
+          disabled={saveDisabled || saveLoading}
+          type='button'
+        >
+          {saveText}
+        </PrimaryButton>
+      )}
+    </ShadcnSheetFooter>
+  );
+};
+
+// ============================================================================
+// DIALOG/MODAL COMPONENTS
+// ============================================================================
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
+import { AlertTriangle } from 'lucide-react';
+
+export interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'danger';
+}
+
+export const ConfirmDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  onConfirm,
+  onCancel,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  variant = 'default',
+}: ConfirmDialogProps) => {
+  const handleConfirm = () => {
+    onConfirm();
+    onOpenChange(false);
+  };
+
+  const handleCancel = () => {
+    if (onCancel) onCancel();
+    onOpenChange(false);
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className='flex items-center gap-3'>
+            <div
+              className={cn(
+                'flex h-10 w-10 items-center justify-center rounded-full',
+                variant === 'danger' ? 'bg-error/10 text-error' : 'bg-primary/10 text-primary'
+              )}
+            >
+              <AlertTriangle className='h-5 w-5' />
+            </div>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+          </div>
+          <AlertDialogDescription className='mt-2'>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleCancel}>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className={variant === 'danger' ? 'bg-error hover:bg-error-hover' : ''}
+          >
+            {confirmText}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
+export interface FormDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+export const FormDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  footer,
+  maxWidth = 'md',
+}: FormDialogProps) => {
+  const maxWidthClasses = {
+    sm: 'sm:max-w-sm',
+    md: 'sm:max-w-md',
+    lg: 'sm:max-w-lg',
+    xl: 'sm:max-w-xl',
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className={cn(maxWidthClasses[maxWidth])}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+
+        <div className='py-4'>{children}</div>
+
+        {footer && <DialogFooter>{footer}</DialogFooter>}
+      </DialogContent>
+    </Dialog>
+  );
+};

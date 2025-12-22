@@ -94,14 +94,10 @@ export default function RegisterPage() {
       <Card className='w-full max-w-md'>
         {/* Logo and Title */}
         <div className='mb-8 text-center'>
-          <img
-            src='/src/assets/lavoro-ai-ferri.png'
-            alt='Lavoro ai Ferri'
-            className='mx-auto mb-4 h-12'
-          />
+          <img src='/src/assets/brand-logo.png' alt='Ayphen' className='mx-auto mb-4 h-12' />
           <h1 className='text-heading-2 font-heading font-semibold'>Create Account</h1>
           <p className='mt-2 text-sm text-muted-foreground'>
-            Sign up to get started with Lavoro ai Ferri
+            Sign up to get started with Ayphen
           </p>
         </div>
 
@@ -222,7 +218,7 @@ export default function RegisterPage() {
                 type='checkbox'
                 checked={formData.acceptTerms}
                 onChange={e => setFormData({ ...formData, acceptTerms: e.target.checked })}
-                className='mt-1 h-4 w-4 rounded border-input'
+                className='h-4 w-4 rounded border-input'
                 disabled={isLoading}
               />
               <span className='text-sm text-muted-foreground'>

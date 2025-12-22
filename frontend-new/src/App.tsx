@@ -5,7 +5,6 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
 import './index.css';
 
 function App() {
@@ -27,7 +26,6 @@ function App() {
             }
           >
             <Route index element={<Navigate to='/dashboard' replace />} />
-            <Route path='dashboard' element={<DashboardPage />} />
             {/* Add more protected routes here */}
           </Route>
 

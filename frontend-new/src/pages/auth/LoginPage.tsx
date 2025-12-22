@@ -50,11 +50,11 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className='mb-8 text-center'>
           <img
-            src='/src/assets/lavoro-ai-ferri.png'
-            alt='Lavoro ai Ferri'
+            src='/src/assets/brand-logo.png'
+            alt='Ayphen'
             className='mx-auto mb-4 h-12'
           />
-          <h1 className='text-heading-2 font-heading font-semibold'>Welcome Back</h1>
+          <h1 className='text-heading-2 font-heading font-semibold'>Welcome</h1>
           <p className='mt-2 text-sm text-muted-foreground'>Sign in to your account to continue</p>
         </div>
 

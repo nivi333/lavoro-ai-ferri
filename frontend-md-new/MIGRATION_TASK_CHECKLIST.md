@@ -320,27 +320,27 @@ Create all input variants in `globalComponents.tsx`:
   - Margin bottom from theme
 
 ### 2.8 Sheet/Drawer Components
-- [ ] **FormSheet** - Sheet for forms (replaces Drawer)
+- [✓] **FormSheet** - Sheet for forms (replaces Drawer)
   - Width: 600px
   - Overflow-y: auto
   - Padding from theme
   
-- [ ] **SheetHeader** - Sheet header with title
+- [✓] **SheetHeader** - Sheet header with title
   - Border bottom from theme
   - Padding from theme
   
-- [ ] **SheetFooter** - Sheet footer with actions
+- [✓] **SheetFooter** - Sheet footer with actions
   - Border top from theme
   - Padding from theme
   - Buttons: Cancel (outlined) + Save (primary)
 
 ### 2.9 Dialog/Modal Components
-- [ ] **ConfirmDialog** - Confirmation dialog
+- [✓] **ConfirmDialog** - Confirmation dialog
   - Alert icon
   - Title + description
   - Cancel + Confirm buttons
   
-- [ ] **FormDialog** - Dialog for forms
+- [✓] **FormDialog** - Dialog for forms
   - Similar to FormSheet but centered
   - Max width from theme
 
