@@ -1,8 +1,3 @@
-/**
- * Register Page
- * New user registration
- */
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '@/contexts/AuthContext';
@@ -13,6 +8,7 @@ import {
   Label,
   Card,
 } from '@/components/globalComponents';
+import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
 
 export default function RegisterPage() {
@@ -82,23 +78,26 @@ export default function RegisterPage() {
         password: formData.password,
       });
 
-      toast.success('Registration successful! Please login to continue.');
+      toast.success('Registration successful!', {
+        description: 'Please login to continue.',
+        duration: 3000,
+      });
       navigate('/login');
     } catch (err: any) {
-      toast.error(err.message || 'Registration failed. Please try again.');
+      toast.error('Registration failed', {
+        description: err.message || 'Please try again.',
+        duration: 4000,
+      });
     }
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-background p-4'>
-      <Card className='w-full max-w-md'>
-        {/* Logo and Title */}
+    <AuthLayout animated={true} animationVariant='register'>
+      <Card className='w-full'>
+        {/* Header - Logo is in AuthLayout top-left */}
         <div className='mb-8 text-center'>
-          <img src='/src/assets/brand-logo.png' alt='Ayphen' className='mx-auto mb-4 h-12' />
           <h1 className='text-heading-2 font-heading font-semibold'>Create Account</h1>
-          <p className='mt-2 text-sm text-muted-foreground'>
-            Sign up to get started with Ayphen
-          </p>
+          <p className='mt-2 text-sm text-muted-foreground'>Sign up to get started with Ayphen</p>
         </div>
 
         {/* Error Message */}
@@ -250,6 +249,6 @@ export default function RegisterPage() {
           </Link>
         </div>
       </Card>
-    </div>
+    </AuthLayout>
   );
 }
