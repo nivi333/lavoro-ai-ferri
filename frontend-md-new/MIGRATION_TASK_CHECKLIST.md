@@ -96,11 +96,11 @@
 - [✓] Install @hookform/resolvers
 
 ### 1.3 Install Tailwind CSS & PostCSS
-- [ ] Install `tailwindcss`, `postcss`, `autoprefixer`
-- [ ] Run `npx tailwindcss init -p`
-- [ ] Configure `tailwind.config.js` with custom theme
-- [ ] Create `src/index.css` with Tailwind directives
-- [ ] Import Tailwind CSS in `main.tsx`
+- [✓] Install `tailwindcss`, `postcss`, `autoprefixer`
+- [✓] Run `npx tailwindcss init -p`
+- [✓] Configure `tailwind.config.js` with custom theme
+- [✓] Create `src/index.css` with Tailwind directives
+- [✓] Import Tailwind CSS in `main.tsx`
 
 ### 1.4 Install shadcn/ui & Radix UI Primitives
 - [ ] Run `npx shadcn-ui@latest init`
