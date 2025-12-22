@@ -1,3 +1,7 @@
+import { getTailwindConfig } from './theme/src/lib/tailwind-config';
+
+const themeConfig = getTailwindConfig();
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
@@ -13,12 +17,7 @@ export default {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: '#df005c',
-          hover: '#eb2671',
-          active: '#b80053',
-          foreground: '#ffffff',
-        },
+        primary: themeConfig.colors.primary,
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
@@ -43,68 +42,19 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        success: {
-          DEFAULT: '#52c41a',
-          hover: '#73d13d',
-          active: '#389e0d',
-          foreground: '#ffffff',
-        },
-        warning: {
-          DEFAULT: '#faad14',
-          hover: '#ffc53d',
-          active: '#d48806',
-          foreground: '#ffffff',
-        },
-        error: {
-          DEFAULT: '#ff4d4f',
-          hover: '#ff7875',
-          active: '#d9363e',
-          foreground: '#ffffff',
-        },
-        info: {
-          DEFAULT: '#1677ff',
-          hover: '#4096ff',
-          active: '#0958d9',
-          foreground: '#ffffff',
-        },
+        success: themeConfig.colors.success,
+        warning: themeConfig.colors.warning,
+        error: themeConfig.colors.error,
+        info: themeConfig.colors.info,
       },
-      fontFamily: {
-        heading: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      },
-      fontSize: {
-        xs: '10px',
-        sm: '12px',
-        base: '13px',
-        lg: '16px',
-        xl: '20px',
-        '2xl': '24px',
-        '3xl': '30px',
-        'heading-1': '38px',
-        'heading-2': '30px',
-        'heading-3': '24px',
-      },
-      spacing: {
-        xxs: '4px',
-        xs: '8px',
-        sm: '12px',
-        md: '16px',
-        lg: '24px',
-        xl: '32px',
-        xxl: '48px',
-      },
-      borderRadius: {
-        base: '6px',
-        lg: '8px',
-        md: '6px',
-        sm: '4px',
-      },
-      boxShadow: {
-        base: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        secondary: '0 2px 8px rgba(0, 0, 0, 0.06)',
-        primary: '0 4px 6px -1px rgba(223, 0, 92, 0.3)',
-        'primary-hover': '0 6px 8px -1px rgba(223, 0, 92, 0.4)',
-      },
+      fontFamily: themeConfig.fontFamily,
+      fontSize: themeConfig.fontSize,
+      spacing: themeConfig.spacing,
+      borderRadius: themeConfig.borderRadius,
+      boxShadow: themeConfig.boxShadow,
+      screens: themeConfig.screens,
+      transitionTimingFunction: themeConfig.transitionTimingFunction,
+      transitionDuration: themeConfig.transitionDuration,
       keyframes: {
         'accordion-down': {
           from: { height: 0 },

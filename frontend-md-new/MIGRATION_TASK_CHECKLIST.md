@@ -155,28 +155,28 @@
 - [✓] `npx shadcn-ui@latest add calendar`
 
 ### 1.7 Adapt Theme Package (`frontend-new/theme`)
-- [ ] Update `theme/package.json` - remove Ant Design dependencies
-- [ ] Convert theme colors to Tailwind CSS variables
-- [ ] Extract spacing values from `base.scss` (--padding-xxs, --padding-xs, etc.)
-- [ ] Extract font sizes from `base.scss` (--font-size-xs, --font-size-sm, etc.)
-- [ ] Extract border radius values
-- [ ] Extract box shadow values
-- [ ] Create `theme/src/lib/tailwind-theme.ts` with all theme values
-- [ ] Create `theme/src/lib/css-variables.ts` for CSS custom properties
-- [ ] Export theme configuration for Tailwind config
+- [✓] Update `theme/package.json` - remove Ant Design dependencies
+- [✓] Convert theme colors to Tailwind CSS variables
+- [✓] Extract spacing values from `base.scss` (--padding-xxs, --padding-xs, etc.)
+- [✓] Extract font sizes from `base.scss` (--font-size-xs, --font-size-sm, etc.)
+- [✓] Extract border radius values
+- [✓] Extract box shadow values
+- [✓] Create `theme/src/lib/tailwind-theme.ts` with all theme values
+- [✓] Create `theme/src/lib/css-variables.ts` for CSS custom properties
+- [✓] Export theme configuration for Tailwind config
 
 ### 1.8 Configure Tailwind with Theme Values
-- [ ] Import theme from `frontend-new/theme` in `tailwind.config.js`
-- [ ] Add primary color (`#df005c`) and variants
-- [ ] Add semantic colors (success: `#52c41a`, warning: `#faad14`, error: `#ff4d4f`, info: `#1677ff`)
-- [ ] Configure font families (heading: Poppins, body: Inter)
-- [ ] Set up font sizes from theme (xs: 10px, sm: 12px, base: 13px, lg: 16px, xl: 20px, 2xl: 24px, 3xl: 30px)
-- [ ] Configure spacing scale from theme (xxs: 4px, xs: 8px, base: 16px, lg: 24px, xl: 32px, xxl: 48px)
-- [ ] Add border radius values (base: 6px, lg: 8px)
-- [ ] Add box shadow values
-- [ ] Set up breakpoints for responsive design (sm: 576px, md: 768px, lg: 992px, xl: 1200px, 2xl: 1440px)
-- [ ] Configure dark mode with `class` strategy
-- [ ] Add custom CSS variables to `index.css`
+- [✓] Import theme from `frontend-new/theme` in `tailwind.config.js`
+- [✓] Add primary color (`#df005c`) and variants
+- [✓] Add semantic colors (success: `#52c41a`, warning: `#faad14`, error: `#ff4d4f`, info: `#1677ff`)
+- [✓] Configure font families (heading: Poppins, body: Inter)
+- [✓] Set up font sizes from theme (xs: 10px, sm: 12px, base: 13px, lg: 16px, xl: 20px, 2xl: 24px, 3xl: 30px)
+- [✓] Configure spacing scale from theme (xxs: 4px, xs: 8px, base: 16px, lg: 24px, xl: 32px, xxl: 48px)
+- [✓] Add border radius values (base: 6px, lg: 8px)
+- [✓] Add box shadow values
+- [✓] Set up breakpoints for responsive design (sm: 576px, md: 768px, lg: 992px, xl: 1200px, 2xl: 1440px)
+- [✓] Configure dark mode with `class` strategy
+- [✓] Add custom CSS variables to `index.css`
 
 ---
 
@@ -186,11 +186,11 @@
 > **No Hardcoded Values**: All styling must come from `frontend-new/theme`. No hardcoded colors, spacing, or typography values allowed.
 
 > [!NOTE]
-> **Screen Layout Pattern** (Standard for all main screens):
+> **Screen Layout Pattern** (Standard for all main screens and refer 'frontend screens for reference'):
 > - **Line 1**: Page Title (left) + Primary Create Button (right)
 > - **Line 2**: Search Bar + Filter + Other Actions (left side)
 > - **Line 3**: Table
-> - **Outer Padding**: Consistent across all screens
+> - **Outer Padding**: Consistent across all tables screens
 
 ### 2.1 Create Global Components File (`/src/components/globalComponents.tsx`)
 - [ ] Create `globalComponents.tsx` for all reusable styled components
