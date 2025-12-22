@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* CSS Variables for shadcn/ui */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 339 100% 44%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 339 100% 44%;
+    --radius: 0.5rem;
+
+    /* Custom spacing variables from base.scss */
+    --padding-xxs: 4px;
+    --padding-xs: 8px;
+    --padding: 16px;
+    --padding-lg: 24px;
+    --padding-xl: 32px;
+    --padding-xxl: 48px;
+
+    /* Font sizes from base.scss */
+    --font-size-xs: 10px;
+    --font-size-sm: 12px;
+    --font-size-base: 13px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 30px;
+
+    /* Border radius */
+    --border-radius-base: 6px;
+    --border-radius-lg: 8px;
+
+    /* Box shadows */
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --box-shadow-secondary: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 339 100% 44%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 339 100% 44%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-family-body);
+    margin: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-family-heading);
+  }
+
+  h2 {
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  /* Table cell utilities from base.scss */
+  .table-cell-primary {
+    @apply font-medium text-foreground;
+  }
+
+  .table-cell-secondary {
+    @apply text-muted-foreground;
+  }
+
+  .table-cell-success {
+    @apply text-success font-medium;
+  }
+
+  /* No border link utility */
+  .no-border-link:hover,
+  .no-border-link:focus {
+    @apply border-none shadow-none underline;
+  }
+
+  /* Auth form utilities */
+  .auth-form-label {
+    @apply font-medium text-sm block;
+  }
+
+  .auth-form-input {
+    @apply h-10 rounded-base text-sm;
+  }
+
+  .auth-help-text {
+    @apply text-xs;
+  }
+
+  .auth-link-text {
+    @apply text-xs;
+  }
+}
