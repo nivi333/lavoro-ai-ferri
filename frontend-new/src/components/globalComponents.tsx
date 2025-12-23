@@ -628,11 +628,25 @@ Separator.displayName = 'Separator';
 
 export interface DataTableProps extends React.HTMLAttributes<HTMLTableElement> {}
 
+/**
+ * DataTable - Standard data table wrapper
+ * - Border from theme
+ * - Padding: 10px per cell (from .ant-table-cell)
+ * - Hover row effect
+ */
 export const DataTable = forwardRef<HTMLTableElement, DataTableProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div className='relative w-full overflow-auto'>
-        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props}>
+        <table
+          ref={ref}
+          className={cn(
+            'w-full caption-bottom text-sm border-collapse',
+            'border border-border rounded-base',
+            className
+          )}
+          {...props}
+        >
           {children}
         </table>
       </div>
@@ -643,6 +657,12 @@ DataTable.displayName = 'DataTable';
 
 export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
 
+/**
+ * TableHeader - Sticky table header
+ * - Background from theme
+ * - Font weight: 500
+ * - White-space: nowrap
+ */
 export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className, children, ...props }, ref) => {
     return (
@@ -658,10 +678,72 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
 );
 TableHeader.displayName = 'TableHeader';
 
+export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
+
+export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props}>
+        {children}
+      </tbody>
+    );
+  }
+);
+TableBody.displayName = 'TableBody';
+
+export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {}
+
+export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <tr
+        ref={ref}
+        className={cn(
+          'border-b border-border transition-colors',
+          'hover:bg-muted/50 data-[state=selected]:bg-muted',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </tr>
+    );
+  }
+);
+TableRow.displayName = 'TableRow';
+
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
+
+export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <th
+        ref={ref}
+        className={cn(
+          'h-12 px-[10px] text-left align-middle',
+          'font-medium text-muted-foreground',
+          'whitespace-nowrap',
+          '[&:has([role=checkbox])]:pr-0',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </th>
+    );
+  }
+);
+TableHead.displayName = 'TableHead';
+
 export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
 }
 
+/**
+ * TableCell - Standard table cell
+ * - Padding from theme (10px)
+ * - Text color variants (primary, secondary, success)
+ */
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ className, variant = 'default', children, ...props }, ref) => {
     const variantClasses = {
@@ -676,7 +758,12 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
     return (
       <td
         ref={ref}
-        className={cn('p-2.5 align-middle', variantClasses[variant], className)}
+        className={cn(
+          'px-[10px] py-[10px] align-middle',
+          '[&:has([role=checkbox])]:pr-0',
+          variantClasses[variant],
+          className
+        )}
         {...props}
       >
         {children}

@@ -265,21 +265,21 @@ Create all input variants in `globalComponents.tsx`:
   - Clear filter option
 
 ### 2.5 Table Components
-- [ ] **DataTable** - Standard data table wrapper
+- [✓] **DataTable** - Standard data table wrapper
   - Border from theme
   - Padding: 10px per cell (from `.ant-table-cell`)
   - Hover row effect
   
-- [ ] **TableCard** - Table with card wrapper
+- [✓] **TableCard** - Table with card wrapper
   - Card padding from theme
   - Box shadow from theme
   
-- [ ] **TableHeader** - Sticky table header
+- [✓] **TableHeader** - Sticky table header
   - Background from theme
   - Font weight: 500
   - White-space: nowrap
   
-- [ ] **TableCell** - Standard table cell
+- [✓] **TableCell** - Standard table cell
   - Padding from theme
   - Text color variants (primary, secondary, success)
 
@@ -469,13 +469,25 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Tag with Badge for stock status
   - Keep same data display and filters
   - Keep same API integration (`inventoryService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/inventory` - List all inventory items
+    - GET `/api/v1/inventory/location/{locationId}` - Get inventory by location
+    - GET `/api/v1/inventory/alerts` - Get low stock alerts
 
 - [ ] **Components (`/src/components/inventory/`)**
   - [ ] `InventoryTable.tsx` → use shadcn/ui Table
   - [ ] `StockAdjustmentDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: POST `/api/v1/inventory/adjust` - Adjust stock levels
   - [ ] `StockMovementDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/inventory/movement` - Create stock movement
+      - GET `/api/v1/inventory/movements` - Get movement history
   - [ ] `StockReservationDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/inventory/reserve` - Reserve stock
+      - DELETE `/api/v1/inventory/reserve/{id}` - Release reservation
   - [ ] `StockAlertsList.tsx` → use shadcn/ui components
+    - [ ] **API Integration**: GET `/api/v1/inventory/alerts` - Get stock alerts
   - [ ] `LocationInventoryCard.tsx` → use Card
   - [ ] `InventoryFilters.tsx` → use Select, Input
   - [ ] `StockLevelIndicator.tsx` → use Badge
@@ -488,9 +500,17 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Tag with Badge for order status
   - Keep same data display
   - Keep same API integration (`orderService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/orders` - List all orders
+    - GET `/api/v1/orders/{id}` - Get order details
+    - DELETE `/api/v1/orders/{id}` - Delete order
 
 - [ ] **Components (`/src/components/orders/`)**
   - [ ] `OrderFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/orders` - Create new order
+      - PUT `/api/v1/orders/{id}` - Update order
+      - PATCH `/api/v1/orders/{id}/status` - Update order status
   - [ ] `OrderTable.tsx` → use shadcn/ui Table
 
 ### Priority 6: Quality Control (`/src/pages/quality/`)
@@ -499,33 +519,59 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Drawer with Sheet
   - Keep same data display
   - Keep same API integration (`inspectionService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/quality/inspections` - List all inspections
+    - DELETE `/api/v1/quality/inspections/{id}` - Delete inspection
 
 - [ ] **InspectionDetailsPage.tsx**
   - Replace Ant Design Descriptions with custom layout
   - Replace Timeline with custom component
   - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/quality/inspections/{id}` - Get inspection details
 
 - [ ] **QualityCheckpointsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`qualityService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/quality/checkpoints` - List all checkpoints
+    - DELETE `/api/v1/quality/checkpoints/{id}` - Delete checkpoint
 
 - [ ] **QualityDefectsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`qualityService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/quality/defects` - List all defects
+    - DELETE `/api/v1/quality/defects/{id}` - Delete defect
 
 - [ ] **ComplianceReportsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`qualityService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/quality/compliance` - List compliance reports
+    - DELETE `/api/v1/quality/compliance/{id}` - Delete report
 
 - [ ] **QualityReportsPage.tsx**
   - Replace charts with Recharts
   - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/quality/reports` - Get quality metrics and reports
 
 - [ ] **Components (`/src/components/quality/`)**
   - [ ] `InspectionFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/quality/inspections` - Create inspection
+      - PUT `/api/v1/quality/inspections/{id}` - Update inspection
   - [ ] `CheckpointFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/quality/checkpoints` - Create checkpoint
+      - PUT `/api/v1/quality/checkpoints/{id}` - Update checkpoint
   - [ ] `DefectFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/quality/defects` - Create defect
+      - PUT `/api/v1/quality/defects/{id}` - Update defect
   - [ ] `ComplianceFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/quality/compliance` - Create compliance report
+      - PUT `/api/v1/quality/compliance/{id}` - Update compliance report
   - [ ] `InspectionStatusBadge.tsx` → use Badge
   - [ ] `QualityMetricsCard.tsx` → use Card
   - [ ] `DefectChart.tsx` → use Recharts
@@ -536,57 +582,102 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Drawer with Sheet
   - Replace Tag with Badge for machine status
   - Keep same API integration (`machineService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/machines` - List all machines
+    - GET `/api/v1/machines/{id}` - Get machine details
+    - DELETE `/api/v1/machines/{id}` - Delete machine
 
 - [ ] **Components (`/src/components/machines/`)**
   - [ ] `MachineFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/machines` - Create machine
+      - PUT `/api/v1/machines/{id}` - Update machine
   - [ ] `BreakdownFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/machines/{id}/breakdown` - Report breakdown
+      - GET `/api/v1/machines/{id}/breakdowns` - Get breakdown history
   - [ ] `MaintenanceScheduleDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/machines/{id}/maintenance/schedule` - Schedule maintenance
+      - PUT `/api/v1/machines/maintenance/{id}` - Update schedule
   - [ ] `MaintenanceRecordDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/machines/{id}/maintenance/record` - Record maintenance
+      - GET `/api/v1/machines/{id}/maintenance` - Get maintenance history
   - [ ] `MachineStatusBadge.tsx` → use Badge
   - [ ] `MachineUtilizationChart.tsx` → use Recharts
+    - [ ] **API Integration**: GET `/api/v1/machines/utilization` - Get utilization data
 
 ### Priority 8: Finance Module (`/src/pages/finance/`)
 - [ ] **FinanceOverviewPage.tsx**
   - Replace Ant Design Card with shadcn/ui Card
   - Replace charts with Recharts
   - Keep same metrics display
+  - [ ] **API Integration**: GET `/api/v1/finance/overview` - Get finance overview metrics
 
 - [ ] **ExpensesPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`expenseService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/expenses` - List all expenses
+    - DELETE `/api/v1/expenses/{id}` - Delete expense
 
 - [ ] **AccountsPayablePage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/finance/accounts-payable` - Get payables
 
 - [ ] **AccountsReceivablePage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/finance/accounts-receivable` - Get receivables
 
 - [ ] **PettyCashPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`pettyCashService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/petty-cash` - List petty cash transactions
+    - DELETE `/api/v1/petty-cash/{id}` - Delete transaction
 
 - [ ] **Components (`/src/components/finance/`)**
   - [ ] `ExpenseFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/expenses` - Create expense
+      - PUT `/api/v1/expenses/{id}` - Update expense
 
 ### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
 - [ ] **InvoicesListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`invoiceService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/invoices` - List all invoices
+    - GET `/api/v1/invoices/{id}` - Get invoice details
+    - DELETE `/api/v1/invoices/{id}` - Delete invoice
+    - PATCH `/api/v1/invoices/{id}/status` - Update invoice status
 
 - [ ] **BillsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`billService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/bills` - List all bills
+    - GET `/api/v1/bills/{id}` - Get bill details
+    - DELETE `/api/v1/bills/{id}` - Delete bill
+    - PATCH `/api/v1/bills/{id}/status` - Update bill status
 
 - [ ] **Components**
   - [ ] `/src/components/invoices/InvoiceFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/invoices` - Create invoice
+      - PUT `/api/v1/invoices/{id}` - Update invoice
   - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table
   - [ ] `/src/components/bills/BillFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/bills` - Create bill
+      - PUT `/api/v1/bills/{id}` - Update bill
   - [ ] `/src/components/bills/BillTable.tsx` → use Table
 
 ### Priority 10: Purchase Orders & Suppliers (`/src/pages/purchase/`)
@@ -594,15 +685,30 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`purchaseOrderService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/purchase-orders` - List all purchase orders
+    - GET `/api/v1/purchase-orders/{id}` - Get PO details
+    - DELETE `/api/v1/purchase-orders/{id}` - Delete PO
+    - PATCH `/api/v1/purchase-orders/{id}/status` - Update PO status
 
 - [ ] **SupplierListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`supplierService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/suppliers` - List all suppliers
+    - GET `/api/v1/suppliers/{id}` - Get supplier details
+    - DELETE `/api/v1/suppliers/{id}` - Delete supplier
 
 - [ ] **Components (`/src/components/purchase/`)**
   - [ ] `PurchaseOrderFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/purchase-orders` - Create purchase order
+      - PUT `/api/v1/purchase-orders/{id}` - Update purchase order
   - [ ] `SupplierFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/suppliers` - Create supplier
+      - PUT `/api/v1/suppliers/{id}` - Update supplier
   - [ ] `PurchaseOrderTable.tsx` → use Table
   - [ ] `SupplierTable.tsx` → use Table
 
@@ -611,9 +717,16 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`customerService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/customers` - List all customers
+    - GET `/api/v1/customers/{id}` - Get customer details
+    - DELETE `/api/v1/customers/{id}` - Delete customer
 
 - [ ] **Components (`/src/components/sales/`)**
   - [ ] `CustomerFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/customers` - Create customer
+      - PUT `/api/v1/customers/{id}` - Update customer
 
 ### Priority 12: Reports Module (`/src/pages/reports/`)
 - [ ] **ReportsPage.tsx**
@@ -632,21 +745,41 @@ Create all input variants in `globalComponents.tsx`:
   - Replace DatePicker with shadcn/ui DatePicker
   - Replace charts with Recharts
   - Keep same report generation logic
+  - [ ] **API Integration**: 
+    - GET `/api/v1/reports/profit-loss` - Profit & Loss report
+    - GET `/api/v1/reports/balance-sheet` - Balance Sheet report
+    - GET `/api/v1/reports/cash-flow` - Cash Flow report
+    - GET `/api/v1/reports/trial-balance` - Trial Balance report
+    - GET `/api/v1/reports/gst` - GST report
+    - GET `/api/v1/reports/accounts-payable` - Accounts Payable report
+    - GET `/api/v1/reports/expense-summary` - Expense Summary report
 
 - [ ] **InventoryReportsPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace charts with Recharts
   - Keep same report generation logic
+  - [ ] **API Integration**: 
+    - GET `/api/v1/reports/stock-summary` - Stock Summary report
+    - GET `/api/v1/reports/stock-aging` - Stock Aging report
+    - GET `/api/v1/reports/inventory-valuation` - Inventory Valuation report
 
 - [ ] **OperationalReportsPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace charts with Recharts
   - Keep same report generation logic
+  - [ ] **API Integration**: 
+    - GET `/api/v1/reports/production-efficiency` - Production Efficiency report
+    - GET `/api/v1/reports/machine-utilization` - Machine Utilization report
+    - GET `/api/v1/reports/quality-metrics` - Quality Metrics report
 
 - [ ] **SalesReportsPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace charts with Recharts
   - Keep same report generation logic
+  - [ ] **API Integration**: 
+    - GET `/api/v1/reports/top-selling-products` - Top Selling Products report
+    - GET `/api/v1/reports/customer-purchase-history` - Customer Purchase History
+    - GET `/api/v1/reports/sales-by-region` - Sales by Region report
 
 - [ ] **Components (`/src/components/reports/`)**
   - [ ] `ReportFilters.tsx` → use shadcn/ui components
@@ -661,31 +794,61 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/textile/fabric-production` - List fabric production records
+    - DELETE `/api/v1/textile/fabric-production/{id}` - Delete record
 
 - [ ] **YarnManufacturingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/textile/yarn-manufacturing` - List yarn manufacturing records
+    - DELETE `/api/v1/textile/yarn-manufacturing/{id}` - Delete record
 
 - [ ] **DyeingFinishingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/textile/dyeing-finishing` - List dyeing/finishing records
+    - DELETE `/api/v1/textile/dyeing-finishing/{id}` - Delete record
 
 - [ ] **GarmentManufacturingListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`textileService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/textile/garment-manufacturing` - List garment manufacturing records
+    - DELETE `/api/v1/textile/garment-manufacturing/{id}` - Delete record
 
 - [ ] **DesignPatternsListPage.tsx**
   - Replace Ant Design components with shadcn/ui
+  - [ ] **API Integration**: 
+    - GET `/api/v1/textile/design-patterns` - List design patterns
+    - DELETE `/api/v1/textile/design-patterns/{id}` - Delete pattern
 
 - [ ] **Components (`/src/components/textile/`)**
   - [ ] `FabricProductionFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/textile/fabric-production` - Create record
+      - PUT `/api/v1/textile/fabric-production/{id}` - Update record
   - [ ] `YarnManufacturingFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/textile/yarn-manufacturing` - Create record
+      - PUT `/api/v1/textile/yarn-manufacturing/{id}` - Update record
   - [ ] `DyeingFinishingFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/textile/dyeing-finishing` - Create record
+      - PUT `/api/v1/textile/dyeing-finishing/{id}` - Update record
   - [ ] `GarmentManufacturingFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/textile/garment-manufacturing` - Create record
+      - PUT `/api/v1/textile/garment-manufacturing/{id}` - Update record
   - [ ] `DesignPatternFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/textile/design-patterns` - Create pattern
+      - PUT `/api/v1/textile/design-patterns/{id}` - Update pattern
   - [ ] All table components → use shadcn/ui Table
   - [ ] All chart components → use Recharts
 
@@ -694,40 +857,74 @@ Create all input variants in `globalComponents.tsx`:
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`companyService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/companies` - List all companies
+    - GET `/api/v1/companies/{id}` - Get company details
+    - DELETE `/api/v1/companies/{id}` - Delete company
+    - POST `/api/v1/companies` - Create company
+    - PUT `/api/v1/companies/{id}` - Update company
 
 - [ ] **CompanyDetailPage.tsx**
   - Replace Ant Design Descriptions with custom layout
   - Replace Tabs with shadcn/ui Tabs
+  - [ ] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
 
 - [ ] **LocationListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`locationService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/locations` - List all locations
+    - GET `/api/v1/locations/{id}` - Get location details
+    - DELETE `/api/v1/locations/{id}` - Delete location
 
 - [ ] **Components (`/src/components/location/`)**
   - [ ] `LocationFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/locations` - Create location
+      - PUT `/api/v1/locations/{id}` - Update location
   - [ ] `LocationTable.tsx` → use Table
 
 ### Priority 15: User Management (`/src/pages/users/`)
 - [ ] **UsersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`userService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/users` - List all users
+    - GET `/api/v1/users/{id}` - Get user details
+    - DELETE `/api/v1/users/{id}` - Delete user
+    - PATCH `/api/v1/users/{id}/status` - Update user status
 
 - [ ] **UserProfilePage.tsx**
   - Replace Ant Design Form with shadcn/ui Form
   - Replace Tabs with shadcn/ui Tabs
   - Keep same API integration (`userService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/users/profile` - Get current user profile
+    - PUT `/api/v1/users/profile` - Update profile
+    - PUT `/api/v1/users/change-password` - Change password
 
 - [ ] **Components (`/src/components/users/`)**
   - [ ] `UserFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/users` - Create user
+      - PUT `/api/v1/users/{id}` - Update user
   - [ ] `UserActivityLog.tsx` → use Table
+    - [ ] **API Integration**: GET `/api/v1/users/{id}/activity` - Get activity log
   - [ ] `UserDevicesList.tsx` → use Table
+    - [ ] **API Integration**: GET `/api/v1/users/{id}/devices` - Get user devices
 
 ### Priority 16: Subscription Management (`/src/pages/subscription/`)
 - [ ] **SubscriptionPlansPage.tsx**
   - Replace Ant Design Card with shadcn/ui Card
   - Replace Modal with Dialog
   - Keep same API integration (`subscriptionService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/subscriptions/plans` - List subscription plans
+    - GET `/api/v1/subscriptions/current` - Get current subscription
+    - POST `/api/v1/subscriptions/subscribe` - Subscribe to plan
+    - POST `/api/v1/subscriptions/cancel` - Cancel subscription
+    - POST `/api/v1/subscriptions/upgrade` - Upgrade subscription
 
 - [ ] **Components (`/src/components/subscription/`)**
   - [ ] `SubscriptionPlanCard.tsx` → use Card
