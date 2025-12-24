@@ -213,7 +213,7 @@ export function LocationFormSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 py-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             {/* Section 1: Basic Information */}
             <div className='space-y-4'>
               <h3 className='text-sm font-medium'>Basic Information</h3>

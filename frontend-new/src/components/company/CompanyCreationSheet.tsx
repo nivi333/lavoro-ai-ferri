@@ -214,9 +214,9 @@ export function CompanyCreationSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 py-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             {/* Section 1: Basic Information */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Basic Information</h3>
 
               {/* Logo Upload */}
@@ -427,7 +427,7 @@ export function CompanyCreationSheet({
             <Separator />
 
             {/* Section 2: Address */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Address</h3>
 
               <div className='grid grid-cols-2 gap-4'>
@@ -510,7 +510,7 @@ export function CompanyCreationSheet({
             <Separator />
 
             {/* Section 3: Business Details */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Business Details</h3>
 
               <div className='grid grid-cols-2 gap-4'>
@@ -597,7 +597,7 @@ export function CompanyCreationSheet({
             <Separator />
 
             {/* Section 4: Contact Information */}
-            <div className='space-y-4'>
+            <div className='space-y-2'>
               <h3 className='text-sm font-medium'>Contact Information</h3>
 
               <FormField
