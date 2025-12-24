@@ -269,7 +269,7 @@ export function CompanyCreationSheet({
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company Name</FormLabel>
+                      <FormLabel required>Company Name</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -291,7 +291,7 @@ export function CompanyCreationSheet({
                   name='slug'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company Slug</FormLabel>
+                      <FormLabel required>Company Slug</FormLabel>
                       <FormControl>
                         <div className='flex'>
                           <span className='inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md'>
@@ -330,7 +330,7 @@ export function CompanyCreationSheet({
                   name='industry'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Industry</FormLabel>
+                      <FormLabel required>Industry</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -384,7 +384,7 @@ export function CompanyCreationSheet({
                   name='country'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel required>Country</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -413,7 +413,7 @@ export function CompanyCreationSheet({
                   name='defaultLocation'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Default Location Name</FormLabel>
+                      <FormLabel required>Default Location Name</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder='Enter location name' maxLength={32} />
                       </FormControl>
@@ -436,7 +436,7 @@ export function CompanyCreationSheet({
                   name='addressLine1'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address Line 1</FormLabel>
+                      <FormLabel required>Address Line 1</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder='Enter address' maxLength={64} />
                       </FormControl>
@@ -466,7 +466,7 @@ export function CompanyCreationSheet({
                   name='city'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel required>City</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder='Enter city' maxLength={32} />
                       </FormControl>
@@ -480,7 +480,7 @@ export function CompanyCreationSheet({
                   name='state'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>State</FormLabel>
+                      <FormLabel required>State</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder='Enter state' maxLength={32} />
                       </FormControl>
@@ -496,7 +496,7 @@ export function CompanyCreationSheet({
                   name='pincode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pincode</FormLabel>
+                      <FormLabel required>Pincode</FormLabel>
                       <FormControl>
                         <Input {...field} placeholder='Enter pincode' maxLength={12} />
                       </FormControl>
@@ -519,7 +519,7 @@ export function CompanyCreationSheet({
                   name='establishedDate'
                   render={({ field }) => (
                     <FormItem className='flex flex-col'>
-                      <FormLabel>Established Date</FormLabel>
+                      <FormLabel required>Established Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -555,7 +555,7 @@ export function CompanyCreationSheet({
                   name='businessType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business Type</FormLabel>
+                      <FormLabel required>Business Type</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -605,7 +605,7 @@ export function CompanyCreationSheet({
                 name='contactInfo'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contact Information</FormLabel>
+                    <FormLabel required>Contact Information</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder='Enter email or phone number' />
                     </FormControl>

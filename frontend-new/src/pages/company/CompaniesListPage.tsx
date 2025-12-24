@@ -113,8 +113,8 @@ export default function CompaniesListPage() {
   return (
     <div className='min-h-screen bg-background'>
       {/* Top Bar */}
-      <div className='border-b bg-card'>
-        <div className='px-6 py-4 flex items-center justify-between w-full'>
+      <div className='bg-card'>
+        <div className='px-6 flex items-center justify-between w-full'>
           <BrandLogo width={70} height={60} />
           <div className='flex items-center gap-3'>
             <PrimaryButton size='sm' onClick={() => setSheetOpen(true)}>
@@ -132,7 +132,7 @@ export default function CompaniesListPage() {
       </div>
 
       {/* Content */}
-      <div className='px-6 py-8 w-full'>
+      <div className='px-6 w-full'>
         <div className='w-full'>
           <h1 className='flex justify-center items-center gap-2 text-heading-3 font-heading font-semibold mb-4'>
             Select Company
@@ -140,7 +140,7 @@ export default function CompaniesListPage() {
 
           {companies && companies.length > 0 ? (
             <>
-              <div className='flex justify-center gap-2 mb-4 border-b'>
+              <div className='flex justify-center gap-2 mb-4'>
                 <button
                   onClick={() => setActiveTab('owner')}
                   className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
@@ -166,7 +166,7 @@ export default function CompaniesListPage() {
               {/* Companies List */}
               <div className='max-w-4xl mx-auto'>
                 {(activeTab === 'owner' ? ownerCompanies : roleCompanies).length === 0 ? (
-                  <div className='text-center py-12 text-muted-foreground'>No companies found</div>
+                  <div className='text-center py-2 text-muted-foreground'>No companies found</div>
                 ) : (
                   <ul className='space-y-2'>
                     {(activeTab === 'owner' ? ownerCompanies : roleCompanies).map(company => (
