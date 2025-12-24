@@ -7,6 +7,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import CompaniesListPage from './pages/company/CompaniesListPage';
+import CompanyDetailPage from './pages/company/CompanyDetailPage';
 import LocationListPage from './pages/company/LocationListPage';
 import './index.css';
 
@@ -40,6 +41,7 @@ function App() {
             }
           >
             <Route index element={<Navigate to='/companies' replace />} />
+            <Route path='company/:tenantId' element={<CompanyDetailPage />} />
             <Route path='locations' element={<LocationListPage />} />
             {/* Add more protected routes here */}
           </Route>

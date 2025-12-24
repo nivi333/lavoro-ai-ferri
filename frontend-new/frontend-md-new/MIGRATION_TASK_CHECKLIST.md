@@ -464,37 +464,37 @@ Create all input variants in `globalComponents.tsx`:
 > 
 > **This is the foundation of the entire multi-tenant system.**
 
-- [ ] **CompaniesListPage.tsx**
+- [x] **CompaniesListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`companyService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/companies` - List all companies
     - GET `/api/v1/companies/{id}` - Get company details
     - DELETE `/api/v1/companies/{id}` - Delete company
     - POST `/api/v1/companies` - Create company
     - PUT `/api/v1/companies/{id}` - Update company
 
-- [ ] **CompanyDetailPage.tsx**
+- [x] **CompanyDetailPage.tsx**
   - Replace Ant Design Descriptions with custom layout
   - Replace Tabs with shadcn/ui Tabs
-  - [ ] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
+  - [x] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
  
-- [ ] **LocationListPage.tsx**
+- [x] **LocationListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`locationService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/locations` - List all locations
     - GET `/api/v1/locations/{id}` - Get location details
     - DELETE `/api/v1/locations/{id}` - Delete location
 
-- [ ] **Components (`/src/components/location/`)**
-  - [ ] `LocationFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/location/`)**
+  - [x] `LocationFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/locations` - Create location
       - PUT `/api/v1/locations/{id}` - Update location
-  - [ ] `LocationTable.tsx` → use Table
+  - [x] `LocationTable.tsx` → use Table
 
 ### Priority 3: Dashboard (`/src/pages/dashboard/`)
 
