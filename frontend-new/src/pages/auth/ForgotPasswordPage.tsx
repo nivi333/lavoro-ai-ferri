@@ -5,14 +5,15 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '@/contexts/AuthContext';
 import { TextInput, PrimaryButton, Label, Card } from '@/components/globalComponents';
 import AuthLayout from '@/components/ui/AuthLayout';
 import { toast } from 'sonner';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const { forgotPassword, isLoading } = useAuth();
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [validationError, setValidationError] = useState('');
 
   const validateEmail = () => {
@@ -38,10 +39,8 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      // TODO: Implement forgot password API call
-      // await authService.forgotPassword(email);
+      await forgotPassword(email);
 
       toast.success('Password reset email sent!', {
         description: 'Please check your inbox for reset instructions.',
@@ -57,8 +56,6 @@ export default function ForgotPasswordPage() {
         description: error.message || 'Please try again.',
         duration: 4000,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -12,14 +12,14 @@ type AuthAction =
   | { type: 'REFRESH_COMPANIES'; payload: Company[] }
   | { type: 'REFRESH_TOKEN_SUCCESS'; payload: AuthTokens }
   | {
-    type: 'INITIALIZE_AUTH';
-    payload: {
-      user: User | null;
-      tokens: AuthTokens | null;
-      companies: Company[];
-      currentCompany: Company | null;
+      type: 'INITIALIZE_AUTH';
+      payload: {
+        user: User | null;
+        tokens: AuthTokens | null;
+        companies: Company[];
+        currentCompany: Company | null;
+      };
     };
-  };
 
 // Initial state
 const initialState: AuthState = {
@@ -96,6 +96,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (userData: any) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
   logout: () => void;
   switchCompany: (company: Company) => void;
   refreshToken: () => Promise<void>;
@@ -220,6 +221,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Forgot Password function (must call backend API)
+  const forgotPassword = async (email: string) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_ERROR', payload: null });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/forgot-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send password reset email.');
+      }
+
+      // Success - no need to handle response data
+      dispatch({ type: 'SET_LOADING', payload: false });
+    } catch (error: any) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: error.message || 'Failed to send password reset email.',
+      });
+      throw error;
+    }
+  };
+
   const logout = () => {
     AuthStorage.clearAll();
     dispatch({ type: 'LOGOUT' });
@@ -290,14 +324,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('No access token available');
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`, {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch companies');
@@ -345,9 +376,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       AuthStorage.setUser(updatedUser);
 
-      // We can reuse LOGIN_SUCCESS or create a new action. 
+      // We can reuse LOGIN_SUCCESS or create a new action.
       // Reusing LOGIN_SUCCESS requires tokens and companies which we have.
-      // Or just update the user part. 
+      // Or just update the user part.
       // Let's create a new action type UPDATE_USER or just use INITIALIZE_AUTH logic partially?
       // Actually, let's just dispatch INITIALIZE_AUTH with updated user and existing other data.
 
@@ -360,10 +391,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           user: updatedUser,
           tokens,
           companies,
-          currentCompany
+          currentCompany,
         },
       });
-
     } catch (error) {
       console.error('Error refreshing user:', error);
       // Don't throw, just log
@@ -374,6 +404,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     ...state,
     login,
     register,
+    forgotPassword,
     logout,
     switchCompany,
     refreshToken,

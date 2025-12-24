@@ -409,31 +409,98 @@ Create all input variants in `globalComponents.tsx`:
 
 ## 📱 PHASE 3: SCREEN MIGRATION (BY PRIORITY)
 
+> [!IMPORTANT]
+> **Priority Order Based on Application Flow**
+> The priorities below follow the actual user journey and data dependencies:
+> 1. **Authentication** - Users must register/login first
+> 2. **Company & Location** - Must create company and locations before accessing any other features
+> 3. **Dashboard** - Overview screen after company selection
+> 4. **Core Master Data** - Products, Customers, Suppliers (foundation for transactions)
+> 5. **Operational Modules** - Inventory, Orders, Purchase Orders, Invoices/Bills
+> 6. **Supporting Modules** - Quality, Machines, Finance, Reports, Textile Operations
+> 7. **Administrative** - User Management, Subscriptions, Legal
+
 ### Priority 1: Authentication Screens (`/src/pages/auth/`)
-- [ ] **LoginPage.tsx**
+
+> [!NOTE]
+> **Why Priority 1**: Users must be able to register and login before accessing any part of the application.
+
+> [!WARNING]
+> **Forgot Password - ON HOLD**: The forgot-password backend implementation is on hold pending email service setup (nodemailer configuration). Frontend is complete and ready for integration when backend is implemented.
+
+- [x] **LoginPage.tsx** ✅ COMPLETE
   - Replace Ant Design Form with shadcn/ui Form
   - Use shadcn/ui Input components
   - Replace message with sonner toast
   - Maintain exact same validation logic
   - Keep same API integration (`authService.login`)
-  - [ ] API Integration
+  - [x] API Integration: `POST /api/v1/auth/login` via AuthContext `login()` function
   
-- [ ] **RegisterPage.tsx**
+- [x] **RegisterPage.tsx** ✅ COMPLETE
   - Replace Ant Design Form with shadcn/ui Form
   - Use shadcn/ui Input components
   - Replace message with sonner toast
   - Keep same validation schema
   - Keep same API integration (`authService.register`)
-  - [ ] API Integration
+  - [x] API Integration: `POST /api/v1/auth/register` via AuthContext `register()` function
   
-- [ ] **ForgotPasswordPage.tsx**
+- [x] **ForgotPasswordPage.tsx** ⏸️ FRONTEND READY (Backend on hold)
   - Replace Ant Design Form with shadcn/ui Form
   - Use shadcn/ui Input for email
   - Replace message with sonner toast
   - Keep same API integration (`authService.forgotPassword`)
-  - [ ] API Integration
+  - [x] Frontend Integration: Complete via AuthContext `forgotPassword()` function
+  - [ ] Backend API: `POST /api/v1/auth/forgot-password` - **ON HOLD** (requires email service setup)
 
-### Priority 2: Dashboard (`/src/pages/dashboard/`)
+
+### Priority 2: Company & Location Management (`/src/pages/company/`)
+
+> [!IMPORTANT]
+> **Why Priority 2**: After authentication, users MUST create a company + one location before they can access any other features. All data in the application is scoped to a company. Without a company, users cannot:
+> - View the dashboard
+> - Create products, customers, suppliers
+> - Manage inventory, orders, invoices
+> - Access any operational features
+> 
+> **This is the foundation of the entire multi-tenant system.**
+
+- [ ] **CompaniesListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`companyService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/companies` - List all companies
+    - GET `/api/v1/companies/{id}` - Get company details
+    - DELETE `/api/v1/companies/{id}` - Delete company
+    - POST `/api/v1/companies` - Create company
+    - PUT `/api/v1/companies/{id}` - Update company
+
+- [ ] **CompanyDetailPage.tsx**
+  - Replace Ant Design Descriptions with custom layout
+  - Replace Tabs with shadcn/ui Tabs
+  - [ ] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
+ 
+- [ ] **LocationListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`locationService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/locations` - List all locations
+    - GET `/api/v1/locations/{id}` - Get location details
+    - DELETE `/api/v1/locations/{id}` - Delete location
+
+- [ ] **Components (`/src/components/location/`)**
+  - [ ] `LocationFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/locations` - Create location
+      - PUT `/api/v1/locations/{id}` - Update location
+  - [ ] `LocationTable.tsx` → use Table
+
+### Priority 3: Dashboard (`/src/pages/dashboard/`)
+
+> [!NOTE]
+> **Why Priority 3**: After company selection, the dashboard is the first screen users see. It provides overview metrics and navigation to other modules.
+
 - [ ] **DashboardPage.tsx**
   - Replace Ant Design Card with shadcn/ui Card
   - Replace Statistic with custom components
@@ -443,7 +510,10 @@ Create all input variants in `globalComponents.tsx`:
   - Keep same API integration (`analyticsService.getDashboardAnalytics`)
   - [ ] **API Integration**: GET `/api/v1/analytics/dashboard`
 
-### Priority 3: Product Management (`/src/pages/products/`)
+### Priority 4: Product Management (`/src/pages/products/`)
+
+> [!NOTE]
+> **Why Priority 4**: Products are the foundation for inventory, orders, and all transactions. Must be created before inventory can be tracked.
 - [ ] **ProductsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for product form
@@ -462,7 +532,48 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `CategoryManager.tsx` → use shadcn/ui components
     - [ ] **API Integration**: GET `/api/v1/categories`
 
-### Priority 4: Inventory Management (`/src/pages/inventory/`)
+### Priority 5: Customer & Supplier Management (`/src/pages/sales/`, `/src/pages/purchase/`)
+
+> [!NOTE]
+> **Why Priority 5**: Customers and suppliers are master data required for creating orders, invoices, bills, and purchase orders.
+
+**Customer Management:**
+- [ ] **CustomerListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`customerService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/customers` - List all customers
+    - GET `/api/v1/customers/{id}` - Get customer details
+    - DELETE `/api/v1/customers/{id}` - Delete customer
+
+- [ ] **Components (`/src/components/sales/`)**
+  - [ ] `CustomerFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/customers` - Create customer
+      - PUT `/api/v1/customers/{id}` - Update customer
+
+**Supplier Management:**
+- [ ] **SupplierListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`supplierService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/suppliers` - List all suppliers
+    - GET `/api/v1/suppliers/{id}` - Get supplier details
+    - DELETE `/api/v1/suppliers/{id}` - Delete supplier
+
+- [ ] **Components (`/src/components/purchase/`)**
+  - [ ] `SupplierFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/suppliers` - Create supplier
+      - PUT `/api/v1/suppliers/{id}` - Update supplier
+  - [ ] `SupplierTable.tsx` → use Table
+
+### Priority 6: Inventory Management (`/src/pages/inventory/`)
+
+> [!NOTE]
+> **Why Priority 6**: Inventory tracking requires products and locations to exist first. It's the foundation for order fulfillment.
 - [ ] **InventoryListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Tabs with shadcn/ui Tabs
@@ -493,7 +604,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `StockLevelIndicator.tsx` → use Badge
   - [ ] `InventoryChart.tsx` → use Recharts
 
-### Priority 5: Orders Management (`/src/pages/orders/`)
+### Priority 7: Orders Management (`/src/pages/orders/`)
+
+> [!NOTE]
+> **Why Priority 7**: Sales orders require products, customers, and inventory to exist. They drive the sales workflow.
 - [ ] **OrdersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for order form
@@ -513,7 +627,112 @@ Create all input variants in `globalComponents.tsx`:
       - PATCH `/api/v1/orders/{id}/status` - Update order status
   - [ ] `OrderTable.tsx` → use shadcn/ui Table
 
-### Priority 6: Quality Control (`/src/pages/quality/`)
+### Priority 8: Purchase Orders (`/src/pages/purchase/`)
+
+> [!NOTE]
+> **Why Priority 8**: Purchase orders require suppliers and products. They drive the procurement workflow.
+
+- [ ] **PurchaseOrdersListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`purchaseOrderService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/purchase-orders` - List all purchase orders
+    - GET `/api/v1/purchase-orders/{id}` - Get PO details
+    - DELETE `/api/v1/purchase-orders/{id}` - Delete PO
+    - PATCH `/api/v1/purchase-orders/{id}/status` - Update PO status
+
+- [ ] **Components (`/src/components/purchase/`)**
+  - [ ] `PurchaseOrderFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/purchase-orders` - Create purchase order
+      - PUT `/api/v1/purchase-orders/{id}` - Update purchase order
+  - [ ] `PurchaseOrderTable.tsx` → use Table
+
+### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
+
+> [!NOTE]
+> **Why Priority 9**: Invoices and bills are financial documents that require customers, suppliers, and orders to exist.
+
+- [ ] **InvoicesListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`invoiceService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/invoices` - List all invoices
+    - GET `/api/v1/invoices/{id}` - Get invoice details
+    - DELETE `/api/v1/invoices/{id}` - Delete invoice
+    - PATCH `/api/v1/invoices/{id}/status` - Update invoice status
+
+- [ ] **BillsListPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`billService`)
+  - [ ] **API Integration**: \n    - GET `/api/v1/bills` - List all bills
+    - GET `/api/v1/bills/{id}` - Get bill details
+    - DELETE `/api/v1/bills/{id}` - Delete bill
+    - PATCH `/api/v1/bills/{id}/status` - Update bill status
+
+- [ ] **Components**
+  - [ ] `/src/components/invoices/InvoiceFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/invoices` - Create invoice
+      - PUT `/api/v1/invoices/{id}` - Update invoice
+  - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table
+  - [ ] `/src/components/bills/BillFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/bills` - Create bill
+      - PUT `/api/v1/bills/{id}` - Update bill
+  - [ ] `/src/components/bills/BillTable.tsx` → use Table
+
+### Priority 10: Finance Module (`/src/pages/finance/`)
+
+> [!NOTE]
+> **Why Priority 10**: Finance module provides financial overview and expense tracking.
+
+- [ ] **FinanceOverviewPage.tsx**
+  - Replace Ant Design Card with shadcn/ui Card
+  - Replace charts with Recharts
+  - Keep same metrics display
+  - [ ] **API Integration**: GET `/api/v1/finance/overview` - Get finance overview metrics
+
+- [ ] **ExpensesPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`expenseService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/expenses` - List all expenses
+    - DELETE `/api/v1/expenses/{id}` - Delete expense
+
+- [ ] **AccountsPayablePage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/finance/accounts-payable` - Get payables
+
+- [ ] **AccountsReceivablePage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Keep same data display
+  - [ ] **API Integration**: GET `/api/v1/finance/accounts-receivable` - Get receivables
+
+- [ ] **PettyCashPage.tsx**
+  - Replace Ant Design Table with shadcn/ui Table
+  - Replace Drawer with Sheet
+  - Keep same API integration (`pettyCashService`)
+  - [ ] **API Integration**: 
+    - GET `/api/v1/petty-cash` - List petty cash transactions
+    - DELETE `/api/v1/petty-cash/{id}` - Delete transaction
+
+- [ ] **Components (`/src/components/finance/`)**
+  - [ ] `ExpenseFormDrawer.tsx` → use Sheet
+    - [ ] **API Integration**: 
+      - POST `/api/v1/expenses` - Create expense
+      - PUT `/api/v1/expenses/{id}` - Update expense
+
+### Priority 11: Quality Control (`/src/pages/quality/`)
+
+> [!NOTE]
+> **Why Priority 11**: Quality control is important but not required for basic operations.
+
 - [ ] **InspectionsListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
@@ -576,7 +795,11 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `QualityMetricsCard.tsx` → use Card
   - [ ] `DefectChart.tsx` → use Recharts
 
-### Priority 7: Machine Management (`/src/pages/machines/`)
+### Priority 12: Machine Management (`/src/pages/machines/`)
+
+> [!NOTE]
+> **Why Priority 12**: Machine management is for tracking equipment and maintenance.
+
 - [ ] **MachineListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
@@ -608,127 +831,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `MachineUtilizationChart.tsx` → use Recharts
     - [ ] **API Integration**: GET `/api/v1/machines/utilization` - Get utilization data
 
-### Priority 8: Finance Module (`/src/pages/finance/`)
-- [ ] **FinanceOverviewPage.tsx**
-  - Replace Ant Design Card with shadcn/ui Card
-  - Replace charts with Recharts
-  - Keep same metrics display
-  - [ ] **API Integration**: GET `/api/v1/finance/overview` - Get finance overview metrics
+### Priority 13: Reports Module (`/src/pages/reports/`)
 
-- [ ] **ExpensesPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`expenseService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/expenses` - List all expenses
-    - DELETE `/api/v1/expenses/{id}` - Delete expense
-
-- [ ] **AccountsPayablePage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Keep same data display
-  - [ ] **API Integration**: GET `/api/v1/finance/accounts-payable` - Get payables
-
-- [ ] **AccountsReceivablePage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Keep same data display
-  - [ ] **API Integration**: GET `/api/v1/finance/accounts-receivable` - Get receivables
-
-- [ ] **PettyCashPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`pettyCashService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/petty-cash` - List petty cash transactions
-    - DELETE `/api/v1/petty-cash/{id}` - Delete transaction
-
-- [ ] **Components (`/src/components/finance/`)**
-  - [ ] `ExpenseFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/expenses` - Create expense
-      - PUT `/api/v1/expenses/{id}` - Update expense
-
-### Priority 9: Invoices & Bills (`/src/pages/invoices/`, `/src/pages/bills/`)
-- [ ] **InvoicesListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`invoiceService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/invoices` - List all invoices
-    - GET `/api/v1/invoices/{id}` - Get invoice details
-    - DELETE `/api/v1/invoices/{id}` - Delete invoice
-    - PATCH `/api/v1/invoices/{id}/status` - Update invoice status
-
-- [ ] **BillsListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`billService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/bills` - List all bills
-    - GET `/api/v1/bills/{id}` - Get bill details
-    - DELETE `/api/v1/bills/{id}` - Delete bill
-    - PATCH `/api/v1/bills/{id}/status` - Update bill status
-
-- [ ] **Components**
-  - [ ] `/src/components/invoices/InvoiceFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/invoices` - Create invoice
-      - PUT `/api/v1/invoices/{id}` - Update invoice
-  - [ ] `/src/components/invoices/InvoiceTable.tsx` → use Table
-  - [ ] `/src/components/bills/BillFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/bills` - Create bill
-      - PUT `/api/v1/bills/{id}` - Update bill
-  - [ ] `/src/components/bills/BillTable.tsx` → use Table
-
-### Priority 10: Purchase Orders & Suppliers (`/src/pages/purchase/`)
-- [ ] **PurchaseOrdersListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`purchaseOrderService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/purchase-orders` - List all purchase orders
-    - GET `/api/v1/purchase-orders/{id}` - Get PO details
-    - DELETE `/api/v1/purchase-orders/{id}` - Delete PO
-    - PATCH `/api/v1/purchase-orders/{id}/status` - Update PO status
-
-- [ ] **SupplierListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`supplierService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/suppliers` - List all suppliers
-    - GET `/api/v1/suppliers/{id}` - Get supplier details
-    - DELETE `/api/v1/suppliers/{id}` - Delete supplier
-
-- [ ] **Components (`/src/components/purchase/`)**
-  - [ ] `PurchaseOrderFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/purchase-orders` - Create purchase order
-      - PUT `/api/v1/purchase-orders/{id}` - Update purchase order
-  - [ ] `SupplierFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/suppliers` - Create supplier
-      - PUT `/api/v1/suppliers/{id}` - Update supplier
-  - [ ] `PurchaseOrderTable.tsx` → use Table
-  - [ ] `SupplierTable.tsx` → use Table
-
-### Priority 11: Sales & Customers (`/src/pages/sales/`)
-- [ ] **CustomerListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`customerService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/customers` - List all customers
-    - GET `/api/v1/customers/{id}` - Get customer details
-    - DELETE `/api/v1/customers/{id}` - Delete customer
-
-- [ ] **Components (`/src/components/sales/`)**
-  - [ ] `CustomerFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/customers` - Create customer
-      - PUT `/api/v1/customers/{id}` - Update customer
-
-### Priority 12: Reports Module (`/src/pages/reports/`)
+> [!NOTE]
+> **Why Priority 13**: Reports provide analytics and insights after operational data exists.
 - [ ] **ReportsPage.tsx**
   - Replace Ant Design Layout with custom layout
   - Replace Tabs with shadcn/ui Tabs
@@ -789,7 +895,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] All operational report components → use Table, Recharts
   - [ ] All sales report components → use Table, Recharts
 
-### Priority 13: Textile Operations (`/src/pages/textile/`)
+### Priority 14: Textile Operations (`/src/pages/textile/`)
+
+> [!NOTE]
+> **Why Priority 14**: Textile-specific operations are industry-specific features.
 - [ ] **FabricProductionListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
@@ -852,40 +961,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] All table components → use shadcn/ui Table
   - [ ] All chart components → use Recharts
 
-### Priority 14: Company & Location Management (`/src/pages/company/`)
-- [ ] **CompaniesListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`companyService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/companies` - List all companies
-    - GET `/api/v1/companies/{id}` - Get company details
-    - DELETE `/api/v1/companies/{id}` - Delete company
-    - POST `/api/v1/companies` - Create company
-    - PUT `/api/v1/companies/{id}` - Update company
-
-- [ ] **CompanyDetailPage.tsx**
-  - Replace Ant Design Descriptions with custom layout
-  - Replace Tabs with shadcn/ui Tabs
-  - [ ] **API Integration**: GET `/api/v1/companies/{id}` - Get detailed company info
-
-- [ ] **LocationListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace Drawer with Sheet
-  - Keep same API integration (`locationService`)
-  - [ ] **API Integration**: 
-    - GET `/api/v1/locations` - List all locations
-    - GET `/api/v1/locations/{id}` - Get location details
-    - DELETE `/api/v1/locations/{id}` - Delete location
-
-- [ ] **Components (`/src/components/location/`)**
-  - [ ] `LocationFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
-      - POST `/api/v1/locations` - Create location
-      - PUT `/api/v1/locations/{id}` - Update location
-  - [ ] `LocationTable.tsx` → use Table
-
 ### Priority 15: User Management (`/src/pages/users/`)
+
+> [!NOTE]
+> **Why Priority 15**: User management is administrative and not required for core operations.
 - [ ] **UsersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`userService`)
@@ -915,6 +994,9 @@ Create all input variants in `globalComponents.tsx`:
     - [ ] **API Integration**: GET `/api/v1/users/{id}/devices` - Get user devices
 
 ### Priority 16: Subscription Management (`/src/pages/subscription/`)
+
+> [!NOTE]
+> **Why Priority 16**: Subscription management is for billing and plan management.
 - [ ] **SubscriptionPlansPage.tsx**
   - Replace Ant Design Card with shadcn/ui Card
   - Replace Modal with Dialog
@@ -930,6 +1012,9 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `SubscriptionPlanCard.tsx` → use Card
 
 ### Priority 17: Legal Pages (`/src/pages/legal/`)
+
+> [!NOTE]
+> **Why Priority 17**: Legal pages are static content pages, lowest priority for migration.
 - [ ] **LegalPage.tsx**
   - Replace Ant Design Tabs with shadcn/ui Tabs
   - Use Tailwind for content styling

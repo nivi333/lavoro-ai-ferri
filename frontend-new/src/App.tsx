@@ -5,6 +5,9 @@ import ProtectedRoute from './components/layout/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import CompaniesListPage from './pages/company/CompaniesListPage';
+import LocationListPage from './pages/company/LocationListPage';
 import './index.css';
 
 function App() {
@@ -15,8 +18,19 @@ function App() {
           {/* Public Routes */}
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
+          <Route path='/forgot-password' element={<ForgotPasswordPage />} />
 
-          {/* Protected Routes */}
+          {/* Company Selection - Protected but outside MainLayout */}
+          <Route
+            path='/companies'
+            element={
+              <ProtectedRoute>
+                <CompaniesListPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Routes with MainLayout */}
           <Route
             path='/'
             element={
@@ -25,12 +39,13 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to='/dashboard' replace />} />
+            <Route index element={<Navigate to='/companies' replace />} />
+            <Route path='locations' element={<LocationListPage />} />
             {/* Add more protected routes here */}
           </Route>
 
-          {/* Catch all - redirect to dashboard */}
-          <Route path='*' element={<Navigate to='/dashboard' replace />} />
+          {/* Catch all - redirect to companies */}
+          <Route path='*' element={<Navigate to='/companies' replace />} />
         </Routes>
       </BrowserRouter>
 
