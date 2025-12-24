@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Building2, Edit, Globe, Mail, MapPin, Phone, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2, Globe, Mail, MapPin, Phone, Loader2 } from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
-import { PrimaryButton, SecondaryButton } from '@/components/globalComponents';
-import { CompanyCreationSheet } from '@/components/company/CompanyCreationSheet';
-import { companyService, CompanyDetails } from '@/services/companyService';
+import { SecondaryButton } from '@/components/globalComponents';
+import { companyService } from '@/services/companyService';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -70,11 +69,8 @@ const getDisplayValue = (value?: ReactNode) => {
 
 export default function CompanyDetailPage() {
   const { tenantId } = useParams<{ tenantId: string }>();
-  const { currentCompany, companies, refreshCompanies } = useAuth();
+  const { currentCompany, companies } = useAuth();
   const navigate = useNavigate();
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [editingCompany, setEditingCompany] = useState<CompanyDetails | null>(null);
-  const [loadingCompany, setLoadingCompany] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loadingLogo, setLoadingLogo] = useState(false);
 
@@ -88,20 +84,20 @@ export default function CompanyDetailPage() {
     industry: company?.industry,
     logoUrl: company?.logoUrl,
     role: company?.role,
-    country: company?.country,
-    description: company?.description,
-    defaultLocation: company?.defaultLocation,
-    addressLine1: company?.addressLine1,
-    addressLine2: company?.addressLine2,
-    city: company?.city,
-    state: company?.state,
-    pincode: company?.pincode,
-    contactInfo: company?.contactInfo,
-    website: company?.website,
-    businessType: company?.businessType,
-    establishedDate: company?.establishedDate,
-    taxId: company?.taxId,
-    isActive: company?.isActive,
+    country: (company as any)?.country,
+    description: (company as any)?.description,
+    defaultLocation: (company as any)?.defaultLocation,
+    addressLine1: (company as any)?.addressLine1,
+    addressLine2: (company as any)?.addressLine2,
+    city: (company as any)?.city,
+    state: (company as any)?.state,
+    pincode: (company as any)?.pincode,
+    contactInfo: (company as any)?.contactInfo,
+    website: (company as any)?.website,
+    businessType: (company as any)?.businessType,
+    establishedDate: (company as any)?.establishedDate,
+    taxId: (company as any)?.taxId,
+    isActive: (company as any)?.isActive,
   };
 
   useEffect(() => {
@@ -117,32 +113,6 @@ export default function CompanyDetailPage() {
 
   const handleBack = () => {
     navigate('/dashboard');
-  };
-
-  const handleEditCompany = async () => {
-    if (!effectiveTenantId) return;
-
-    setLoadingCompany(true);
-    try {
-      const details = await companyService.getCompany(effectiveTenantId);
-      setEditingCompany(details);
-      setSheetOpen(true);
-    } catch (error) {
-      console.error('Failed to load company details:', error);
-    } finally {
-      setLoadingCompany(false);
-    }
-  };
-
-  const handleSheetClose = () => {
-    setSheetOpen(false);
-    setEditingCompany(null);
-  };
-
-  const handleCompanyUpdated = async () => {
-    await refreshCompanies();
-    setSheetOpen(false);
-    setEditingCompany(null);
   };
 
   const isActive = extendedCompany.isActive !== false;
@@ -262,23 +232,11 @@ export default function CompanyDetailPage() {
               An overview of your company information and registrations
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <SecondaryButton onClick={handleBack}>
-              <ArrowLeft className='h-4 w-4 mr-2' />
-              Back to Dashboard
-            </SecondaryButton>
-            <PrimaryButton
-              onClick={handleEditCompany}
-              disabled={loadingCompany || extendedCompany?.role === 'EMPLOYEE'}
-            >
-              {loadingCompany ? (
-                <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-              ) : (
-                <Edit className='h-4 w-4 mr-2' />
-              )}
-              Edit
-            </PrimaryButton>
-          </div>
+          <SecondaryButton onClick={handleBack}>
+            <ArrowLeft className='h-4 w-4 mr-2' />
+            Back to Dashboard
+          </SecondaryButton>
+        </div>
         </div>
 
         {/* Profile Card */}
@@ -372,14 +330,6 @@ export default function CompanyDetailPage() {
         </Card>
       </div>
 
-      <CompanyCreationSheet
-        open={sheetOpen}
-        onClose={handleSheetClose}
-        mode='edit'
-        companyId={effectiveTenantId}
-        initialData={editingCompany ?? undefined}
-        onCompanyUpdated={handleCompanyUpdated}
-      />
     </div>
   );
 }
