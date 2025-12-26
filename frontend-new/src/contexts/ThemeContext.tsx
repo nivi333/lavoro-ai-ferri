@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, Spin } from 'antd';
-import { ThemeProvider as AyphenThemeProvider, useGlobalTheme } from '@ayphen-web/theme';
+import { Loader2 } from 'lucide-react';
 
 export type AppTheme = 'light' | 'dark';
 
@@ -13,58 +12,45 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-import { lightColorTokens, extraColorTokensLight } from '../../theme/src/lib/color-tokens/light';
-import { darkColorTokens, extraColorTokensDark } from '../../theme/src/lib/color-tokens/dark';
+const THEME_STORAGE_KEY = 'lavoro-theme';
 
-// Helper to convert camelCase to kebab-case for CSS variables
-const toKebabCase = (str: string) =>
-  str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
-
-// Inner component that uses the Ayphen theme
-function ThemeProviderInner({ children }: { children: React.ReactNode }) {
-  const { isDarkMode, toggleTheme, antTheme } = useGlobalTheme();
+export default function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<AppTheme>(() => {
+    // Initialize from localStorage or default to light
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    return (stored as AppTheme) || 'light';
+  });
   const [isThemeSwitching, setIsThemeSwitching] = useState(false);
-
-  const theme: AppTheme = isDarkMode ? 'dark' : 'light';
 
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
+    
+    // Apply dark class for Tailwind dark mode
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
 
-    // Inject CSS variables
-    const tokens =
-      theme === 'dark'
-        ? { ...darkColorTokens, ...extraColorTokensDark }
-        : { ...lightColorTokens, ...extraColorTokensLight };
-
-    Object.entries(tokens).forEach(([key, value]) => {
-      // Handle gradients or simple color strings
-      if (typeof value === 'string') {
-        const cssVarName = `--${toKebabCase(key)}`;
-        root.style.setProperty(cssVarName, value);
-      }
-    });
+    // Save to localStorage
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
   const setTheme = (newTheme: AppTheme) => {
-    const shouldBeDark = newTheme === 'dark';
-    if (shouldBeDark === isDarkMode) return;
+    if (newTheme === theme) return;
 
-    // Show blur and loader immediately on click
+    // Show loader during theme transition
     setIsThemeSwitching(true);
-    // Use requestAnimationFrame to ensure the overlay is rendered before theme change
+    
+    // Use requestAnimationFrame for smooth transition
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        toggleTheme();
+        setThemeState(newTheme);
         // Keep loader visible during transition
         setTimeout(() => {
           setIsThemeSwitching(false);
-        }, 500);
+        }, 300);
       });
     });
   };
@@ -78,25 +64,14 @@ function ThemeProviderInner({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={ctx}>
-      <ConfigProvider theme={antTheme}>
-        {children}
-        {/* Theme switching overlay with blur effect */}
-        {isThemeSwitching && (
-          <div className='theme-switching-overlay'>
-            <Spin size='large' />
-          </div>
-        )}
-      </ConfigProvider>
+      {children}
+      {/* Theme switching overlay with blur effect */}
+      {isThemeSwitching && (
+        <div className='fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm'>
+          <Loader2 className='h-12 w-12 animate-spin text-primary' />
+        </div>
+      )}
     </ThemeContext.Provider>
-  );
-}
-
-// Main ThemeProvider that wraps with Ayphen ThemeProvider
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <AyphenThemeProvider>
-      <ThemeProviderInner>{children}</ThemeProviderInner>
-    </AyphenThemeProvider>
   );
 }
 
@@ -105,6 +80,3 @@ export function useTheme() {
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
   return ctx;
 }
-
-// Re-export Ayphen theme hook for components that need theme tokens
-export { useGlobalTheme } from '@ayphen-web/theme';

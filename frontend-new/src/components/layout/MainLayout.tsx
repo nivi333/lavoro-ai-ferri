@@ -7,10 +7,10 @@
  */
 
 import { ReactNode, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { BrandLogo } from '../BrandLogo';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { UserAvatar } from '../ui/UserAvatar';
+import { LogoutButton } from '../ui/LogoutButton';
 import useAuth from '@/contexts/AuthContext';
 import { useHeader } from '@/contexts/HeaderContext';
 import Sidebar from './Sidebar';
@@ -42,17 +42,15 @@ export default function MainLayout({ children }: MainLayoutProps) {
           <BrandLogo width={70} height={60} />
         </div>
 
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-4'>
           <ThemeToggle />
           {headerActions}
-          <Button variant='destructive' size='sm' onClick={handleLogout} disabled={logoutLoading}>
-            {logoutLoading ? 'Logging out...' : 'Logout'}
-          </Button>
+          <LogoutButton onClick={handleLogout} loading={logoutLoading} />
           {user && (
-            <div className='flex items-center gap-3'>
+            <div className='flex items-center gap-3 rounded-lg border border-primary/20 px-3.5 py-1.5'>
               <UserAvatar firstName={user.firstName} lastName={user.lastName} size={38} />
               <div className='hidden flex-col lg:flex'>
-                <span className='text-sm font-medium'>
+                <span className='text-sm font-semibold'>
                   {user.firstName} {user.lastName}
                 </span>
                 <span className='text-xs text-muted-foreground'>{user.email}</span>
@@ -68,7 +66,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-        <main className='flex-1 overflow-y-auto overflow-x-hidden bg-background'>{children}</main>
+        <main className='flex-1 overflow-y-auto overflow-x-hidden bg-background p-4'>
+          {children}
+        </main>
       </div>
     </div>
   );

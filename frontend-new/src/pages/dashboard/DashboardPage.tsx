@@ -121,7 +121,7 @@ const DashboardPage = () => {
   const growthRate = 15.8;
 
   return (
-    <div className='p-6 md:p-8 lg:p-10'>
+    <div>
       {/* Page Header */}
       <div className='mb-6'>
         <h2 className='font-heading text-heading-2 font-semibold m-0'>Dashboard</h2>
