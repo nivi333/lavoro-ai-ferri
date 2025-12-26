@@ -3,12 +3,15 @@
  * Provides the main application layout with header, sidebar, and content area
  */
 
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { ReactNode, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
-export default function MainLayout() {
+interface MainLayoutProps {
+  children: ReactNode;
+}
+
+export default function MainLayout({ children }: MainLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -25,9 +28,7 @@ export default function MainLayout() {
         <Header onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)} />
 
         {/* Page Content */}
-        <main className='flex-1 overflow-y-auto overflow-x-hidden'>
-          <Outlet />
-        </main>
+        <main className='flex-1 overflow-y-auto overflow-x-hidden'>{children}</main>
       </div>
     </div>
   );

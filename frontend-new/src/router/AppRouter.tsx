@@ -38,7 +38,6 @@ import {
   AccountsPayablePage,
   ExpensesPage,
   PettyCashPage,
-  ReportsListPage,
   FinancialReportsPage,
   InventoryReportsPage,
   SalesReportsPage,
@@ -107,7 +106,9 @@ export default function AppRouter() {
               path='/dashboard'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <DashboardPage />
+                  <MainLayout>
+                    <DashboardPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
