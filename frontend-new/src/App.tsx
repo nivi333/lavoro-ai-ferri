@@ -1,59 +1,109 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/layout/ProtectedRoute';
+import { HeaderProvider } from './contexts/HeaderContext';
+import ThemeProvider from './contexts/ThemeContext';
+import ProtectedRoute, { PublicRoute } from './components/layout/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import CompaniesListPage from './pages/company/CompaniesListPage';
 import CompanyDetailPage from './pages/company/CompanyDetailPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
 import LocationListPage from './pages/company/LocationListPage';
+import { SidebarStylesInjector } from './styles/sidebar.styles';
 import './index.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+    <ThemeProvider>
+      <SidebarStylesInjector />
+      <AuthProvider>
+        <HeaderProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Routes */}
+              <Route
+                path='/login'
+                element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path='/register'
+                element={
+                  <PublicRoute>
+                    <RegisterPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path='/forgot-password'
+                element={
+                  <PublicRoute>
+                    <ForgotPasswordPage />
+                  </PublicRoute>
+                }
+              />
 
-          {/* Company Selection - Protected but outside MainLayout */}
-          <Route
-            path='/companies'
-            element={
-              <ProtectedRoute>
-                <CompaniesListPage />
-              </ProtectedRoute>
-            }
-          />
+              {/* Company Selection - Protected but outside MainLayout */}
+              <Route
+                path='/companies'
+                element={
+                  <ProtectedRoute>
+                    <CompaniesListPage />
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Protected Routes with MainLayout */}
-          <Route
-            path='/'
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to='/companies' replace />} />
-            <Route path='company/:tenantId' element={<CompanyDetailPage />} />
-            <Route path='locations' element={<LocationListPage />} />
-            {/* Add more protected routes here */}
-          </Route>
+              {/* Protected Routes with MainLayout - Require Company */}
+              <Route
+                path='/dashboard'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <DashboardPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Catch all - redirect to companies */}
-          <Route path='*' element={<Navigate to='/companies' replace />} />
-        </Routes>
-      </BrowserRouter>
+              <Route
+                path='/company/:tenantId'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <CompanyDetailPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
 
-      {/* Toast Notifications */}
-      <Toaster position='top-right' richColors />
-    </AuthProvider>
+              <Route
+                path='/locations'
+                element={
+                  <ProtectedRoute requireCompany={true}>
+                    <MainLayout>
+                      <LocationListPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Default Redirects */}
+              <Route path='/' element={<Navigate to='/login' replace />} />
+              <Route path='*' element={<Navigate to='/login' replace />} />
+            </Routes>
+          </BrowserRouter>
+
+          {/* Toast Notifications */}
+          <Toaster position='top-right' richColors />
+        </HeaderProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
