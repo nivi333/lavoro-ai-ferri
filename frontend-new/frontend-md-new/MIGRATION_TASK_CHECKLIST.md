@@ -557,42 +557,42 @@ Create all input variants in `globalComponents.tsx`:
 > **Why Priority 5**: Customers and suppliers are master data required for creating orders, invoices, bills, and purchase orders.
 
 **Customer Management:**
-- [ ] **CustomerListPage.tsx**
+- [x] **CustomerListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`customerService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/customers` - List all customers
     - GET `/api/v1/customers/{id}` - Get customer details
     - DELETE `/api/v1/customers/{id}` - Delete customer
 
-- [ ] **Components (`/src/components/sales/`)**
-  - [ ] `CustomerFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/sales/`)**
+  - [x] `CustomerFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/customers` - Create customer
       - PUT `/api/v1/customers/{id}` - Update customer
 
 **Supplier Management:**
-- [ ] **SupplierListPage.tsx**
+- [x] **SupplierListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet
   - Keep same API integration (`supplierService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/suppliers` - List all suppliers
     - GET `/api/v1/suppliers/{id}` - Get supplier details
     - DELETE `/api/v1/suppliers/{id}` - Delete supplier
 
-- [ ] **Components (`/src/components/purchase/`)**
-  - [ ] `SupplierFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/purchase/`)**
+  - [x] `SupplierFormDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/suppliers` - Create supplier
       - PUT `/api/v1/suppliers/{id}` - Update supplier
-  - [ ] `SupplierTable.tsx` → use Table
+  - [x] `SupplierTable.tsx` → use Table
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/customers`, `/suppliers`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/customers`, `/suppliers`)
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 6: Inventory Management (`/src/pages/inventory/`)
 
@@ -629,7 +629,7 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `InventoryChart.tsx` → use Recharts
 
 - [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/inventory`)
+  - [ ] Add route to `AppRouter.tsx` (`/inventory`), `App.tsx`
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 

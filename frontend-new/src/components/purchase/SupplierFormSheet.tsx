@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,11 +29,14 @@ import {
   SheetFooter,
   SheetDescription,
 } from '@/components/ui/sheet';
-import { Loader2 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, X } from 'lucide-react';
 import { Supplier } from '@/services/supplierService';
 
 const supplierSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  code: z.string().optional(),
   supplierType: z.string().min(1, 'Type is required'),
   companyRegNo: z.string().optional(),
 
@@ -85,6 +88,7 @@ const supplierSchema = z.object({
   supplierCategory: z.string().optional(),
   assignedManager: z.string().optional(),
   notes: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -106,9 +110,10 @@ export function SupplierFormSheet({
   isSubmitting = false,
 }: SupplierFormSheetProps) {
   const form = useForm<SupplierFormValues>({
-    resolver: zodResolver(supplierSchema),
+    resolver: zodResolver(supplierSchema) as any,
     defaultValues: {
       name: '',
+      code: '',
       supplierType: '',
       companyRegNo: '',
       email: '',
@@ -136,9 +141,27 @@ export function SupplierFormSheet({
       supplierCategory: '',
       assignedManager: '',
       notes: '',
+      tags: [],
       isActive: true,
     },
   });
+
+  const [tagInput, setTagInput] = useState('');
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const value = tagInput.trim();
+      if (value && !field.value?.includes(value)) {
+        field.onChange([...(field.value || []), value]);
+        setTagInput('');
+      }
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string, field: any) => {
+    field.onChange(field.value?.filter((tag: string) => tag !== tagToRemove) || []);
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -151,6 +174,7 @@ export function SupplierFormSheet({
       Object.keys(resetData).forEach(key => {
         if (resetData[key] === null || resetData[key] === undefined) {
           if (key === 'isActive') resetData[key] = true;
+          else if (key === 'tags') resetData[key] = [];
           else resetData[key] = '';
         }
       });
@@ -213,6 +237,19 @@ export function SupplierFormSheet({
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
+                  name='code'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Supplier Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Auto-generated' disabled {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name='name'
                   render={({ field }) => (
                     <FormItem>
@@ -268,6 +305,7 @@ export function SupplierFormSheet({
               />
             </div>
 
+            <Separator />
             {/* Contact Information */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Contact Information</h3>
@@ -329,6 +367,7 @@ export function SupplierFormSheet({
               </div>
             </div>
 
+            <Separator />
             {/* Address */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Address</h3>
@@ -416,6 +455,7 @@ export function SupplierFormSheet({
               </div>
             </div>
 
+            <Separator />
             {/* Financial */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Financial Information</h3>
@@ -524,6 +564,7 @@ export function SupplierFormSheet({
               />
             </div>
 
+            <Separator />
             {/* Supply & Quality */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Supply & Quality</h3>
@@ -625,6 +666,7 @@ export function SupplierFormSheet({
               </div>
             </div>
 
+            <Separator />
             {/* Additional */}
             <div className='space-y-2'>
               <h3 className='text-sm font-medium text-muted-foreground'>Additional Information</h3>
@@ -678,6 +720,37 @@ export function SupplierFormSheet({
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
                       <Textarea placeholder='Additional notes...' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='tags'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <div className='space-y-2'>
+                        <div className='flex gap-2 flex-wrap'>
+                          {field.value?.map((tag: string) => (
+                            <Badge key={tag} variant='secondary' className='gap-1'>
+                              {tag}
+                              <X
+                                className='h-3 w-3 cursor-pointer hover:text-destructive'
+                                onClick={() => handleRemoveTag(tag, field)}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                        <Input
+                          placeholder='Add tags (Press Enter)'
+                          value={tagInput}
+                          onChange={e => setTagInput(e.target.value)}
+                          onKeyDown={e => handleAddTag(e, field)}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

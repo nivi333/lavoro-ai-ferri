@@ -60,8 +60,8 @@ export function CustomerTable({
             <TableCell>{customer.phone || '—'}</TableCell>
             <TableCell>{customer.email || '—'}</TableCell>
             <TableCell>
-              {customer.city}
-              {customer.state ? `, ${customer.state}` : ''}
+              {customer.billingCity}
+              {customer.billingState ? `, ${customer.billingState}` : ''}
             </TableCell>
             <TableCell>
               <span className='capitalize'>

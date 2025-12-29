@@ -18,7 +18,7 @@ export { default as LocationListPage } from './company/LocationListPage';
 export { default as ProductsListPage } from './products/ProductsListPage';
 
 // Inventory - TODO: Migrate these pages
-export const InventoryListPage = PlaceholderPage;
+export { default as InventoryListPage } from './inventory/InventoryListPage';
 
 // Machines - TODO: Migrate these pages
 export const MachineListPage = PlaceholderPage;

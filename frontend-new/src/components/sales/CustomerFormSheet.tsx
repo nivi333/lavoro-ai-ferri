@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,15 +29,18 @@ import {
   SheetFooter,
   SheetDescription,
 } from '@/components/ui/sheet';
-import { Loader2 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, X } from 'lucide-react';
 import { Customer } from '@/services/customerService';
 
 const customerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  code: z.string().optional(),
   customerType: z.string().min(1, 'Customer Type is required'),
   companyName: z.string().optional(),
   customerCategory: z.string().optional(),
-  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
   phone: z.string().optional(),
   alternatePhone: z.string().optional(),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -72,6 +75,7 @@ const customerSchema = z.object({
   // Additional
   assignedSalesRep: z.string().optional(),
   notes: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -93,9 +97,10 @@ export function CustomerFormSheet({
   isSubmitting = false,
 }: CustomerFormSheetProps) {
   const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(customerSchema),
+    resolver: zodResolver(customerSchema) as any,
     defaultValues: {
       name: '',
+      code: '',
       customerType: '',
       companyName: '',
       customerCategory: '',
@@ -123,6 +128,7 @@ export function CustomerFormSheet({
       panNumber: '',
       assignedSalesRep: '',
       notes: '',
+      tags: [],
       isActive: true,
     },
   });
@@ -161,6 +167,7 @@ export function CustomerFormSheet({
     if (initialData) {
       const resetData: any = {
         ...initialData,
+        tags: initialData.tags || [],
         creditLimit: initialData.creditLimit,
       };
 
@@ -177,6 +184,7 @@ export function CustomerFormSheet({
     } else {
       form.reset({
         name: '',
+        code: '',
         customerType: '',
         companyName: '',
         customerCategory: '',
@@ -204,6 +212,7 @@ export function CustomerFormSheet({
         panNumber: '',
         assignedSalesRep: '',
         notes: '',
+        tags: [],
         isActive: true,
       });
     }
@@ -211,6 +220,23 @@ export function CustomerFormSheet({
 
   const handleOpenChange = (open: boolean) => {
     if (!open) onClose();
+  };
+
+  const [tagInput, setTagInput] = useState('');
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>, field: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const value = tagInput.trim();
+      if (value && !field.value?.includes(value)) {
+        field.onChange([...(field.value || []), value]);
+        setTagInput('');
+      }
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string, field: any) => {
+    field.onChange(field.value?.filter((tag: string) => tag !== tagToRemove) || []);
   };
 
   return (
@@ -226,15 +252,30 @@ export function CustomerFormSheet({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 py-4'>
             {/* Basic Information */}
-            <div className='space-y-2'>
+            <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Basic Information</h3>
               <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='code'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Customer Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Auto-generated' disabled {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer Name</FormLabel>
+                      <FormLabel>
+                        Customer Name <span className='text-destructive'>*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder='Enter name' {...field} />
                       </FormControl>
@@ -247,7 +288,9 @@ export function CustomerFormSheet({
                   name='customerType'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Customer Type</FormLabel>
+                      <FormLabel>
+                        Customer Type <span className='text-destructive'>*</span>
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -261,6 +304,9 @@ export function CustomerFormSheet({
                         <SelectContent>
                           <SelectItem value='BUSINESS'>Business</SelectItem>
                           <SelectItem value='INDIVIDUAL'>Individual</SelectItem>
+                          <SelectItem value='DISTRIBUTOR'>Distributor</SelectItem>
+                          <SelectItem value='RETAILER'>Retailer</SelectItem>
+                          <SelectItem value='WHOLESALER'>Wholesaler</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -299,10 +345,10 @@ export function CustomerFormSheet({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value='RETAIL'>Retail</SelectItem>
-                          <SelectItem value='WHOLESALE'>Wholesale</SelectItem>
-                          <SelectItem value='DISTRIBUTOR'>Distributor</SelectItem>
-                          <SelectItem value='OTHER'>Other</SelectItem>
+                          <SelectItem value='VIP'>VIP</SelectItem>
+                          <SelectItem value='REGULAR'>Regular</SelectItem>
+                          <SelectItem value='NEW'>New</SelectItem>
+                          <SelectItem value='INACTIVE'>Inactive</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -316,7 +362,9 @@ export function CustomerFormSheet({
                   name='email'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>
+                        Email <span className='text-destructive'>*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input type='email' placeholder='Enter email' {...field} />
                       </FormControl>
@@ -368,42 +416,48 @@ export function CustomerFormSheet({
               </div>
             </div>
 
+            <Separator />
+
             {/* Billing Address */}
-            <div className='space-y-2'>
+            <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Billing Address</h3>
-              <FormField
-                control={form.control}
-                name='billingAddressLine1'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address Line 1</FormLabel>
-                    <FormControl>
-                      <Input placeholder='Street address' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='billingAddressLine2'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address Line 2</FormLabel>
-                    <FormControl>
-                      <Input placeholder='Apartment, suite, etc.' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='billingAddressLine1'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address Line 1</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Street address' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='billingAddressLine2'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address Line 2</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Apartment, suite, etc.' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='billingCity'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>
+                        City <span className='text-destructive'>*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder='City' {...field} />
                       </FormControl>
@@ -431,7 +485,9 @@ export function CustomerFormSheet({
                   name='billingCountry'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>
+                        Country <span className='text-destructive'>*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder='Country' {...field} />
                       </FormControl>
@@ -455,53 +511,58 @@ export function CustomerFormSheet({
               </div>
             </div>
 
+            <Separator />
+
             {/* Shipping Address */}
-            <div className='space-y-2'>
-              <div className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                <FormField
-                  control={form.control}
-                  name='sameAsBillingAddress'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
-                      <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                      <div className='space-y-1 leading-none'>
-                        <FormLabel>Same as billing address</FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className='space-y-4'>
+              <h3 className='text-sm font-medium text-muted-foreground'>Shipping Address</h3>
+
+              <FormField
+                control={form.control}
+                name='sameAsBillingAddress'
+                render={({ field }) => (
+                  <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className='space-y-1 leading-none'>
+                      <FormLabel>Same as billing address</FormLabel>
+                      <SheetDescription>Copy billing address to shipping address</SheetDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
 
               {!sameAsBilling && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name='shippingAddressLine1'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address Line 1</FormLabel>
-                        <FormControl>
-                          <Input placeholder='Street address' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='shippingAddressLine2'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Address Line 2</FormLabel>
-                        <FormControl>
-                          <Input placeholder='Apartment, suite, etc.' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className='space-y-4 pt-2'>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <FormField
+                      control={form.control}
+                      name='shippingAddressLine1'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address Line 1</FormLabel>
+                          <FormControl>
+                            <Input placeholder='Street address' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='shippingAddressLine2'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address Line 2</FormLabel>
+                          <FormControl>
+                            <Input placeholder='Apartment, suite, etc.' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className='grid grid-cols-2 gap-4'>
                     <FormField
                       control={form.control}
@@ -558,12 +619,14 @@ export function CustomerFormSheet({
                       )}
                     />
                   </div>
-                </>
+                </div>
               )}
             </div>
 
+            <Separator />
+
             {/* Financial Information */}
-            <div className='space-y-2'>
+            <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Financial Information</h3>
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
@@ -651,8 +714,10 @@ export function CustomerFormSheet({
               />
             </div>
 
+            <Separator />
+
             {/* Additional Information */}
-            <div className='space-y-2'>
+            <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Additional Information</h3>
               <FormField
                 control={form.control}
@@ -675,6 +740,37 @@ export function CustomerFormSheet({
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
                       <Textarea placeholder='Additional notes...' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='tags'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <div className='space-y-2'>
+                        <div className='flex gap-2 flex-wrap'>
+                          {field.value?.map((tag: string) => (
+                            <Badge key={tag} variant='secondary' className='gap-1'>
+                              {tag}
+                              <X
+                                className='h-3 w-3 cursor-pointer hover:text-destructive'
+                                onClick={() => handleRemoveTag(tag, field)}
+                              />
+                            </Badge>
+                          ))}
+                        </div>
+                        <Input
+                          placeholder='Add tags (Press Enter)'
+                          value={tagInput}
+                          onChange={e => setTagInput(e.target.value)}
+                          onKeyDown={e => handleAddTag(e, field)}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

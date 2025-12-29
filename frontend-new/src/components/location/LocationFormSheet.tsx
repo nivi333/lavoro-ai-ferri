@@ -40,6 +40,7 @@ const locationSchema = z.object({
   isActive: z.boolean().optional(),
   isDefault: z.boolean().optional(),
   isHeadquarters: z.boolean().optional(),
+  locationId: z.string().optional(),
 });
 
 type LocationFormValues = z.infer<typeof locationSchema>;
@@ -89,6 +90,7 @@ export function LocationFormSheet({
           isDefault: editingLocation.isDefault || false,
           isHeadquarters: editingLocation.isHeadquarters || false,
           isActive: editingLocation.isActive !== undefined ? editingLocation.isActive : true,
+          locationId: editingLocation.locationId,
         });
         setIsActive(editingLocation.isActive !== undefined ? editingLocation.isActive : true);
         setImageUrl(editingLocation.imageUrl || '');
@@ -97,6 +99,7 @@ export function LocationFormSheet({
           isActive: true,
           isDefault: false,
           isHeadquarters: false,
+          locationId: '',
         });
         setIsActive(true);
         setImageUrl('');
@@ -263,6 +266,24 @@ export function LocationFormSheet({
               </div>
 
               <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='locationId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location Code</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder='Auto-generated'
+                          disabled
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name='name'

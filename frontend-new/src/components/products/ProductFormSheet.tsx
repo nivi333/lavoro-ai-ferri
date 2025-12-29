@@ -24,7 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { productService, CreateProductRequest, ProductCategory } from '@/services/productService';
+import { productService, CreateProductRequest } from '@/services/productService';
 import { toast } from 'sonner';
 
 // UOM Options from legacy system
@@ -46,7 +46,6 @@ const UOM_OPTIONS = [
 
 const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
-  categoryId: z.string().optional(),
   productCode: z.string().optional(),
   barcode: z.string().optional(),
   description: z.string().optional(),
@@ -71,7 +70,6 @@ interface ProductFormSheetProps {
   onSaved: () => void;
   mode?: 'create' | 'edit';
   editingProductId?: string | null;
-  categories: ProductCategory[];
 }
 
 export function ProductFormSheet({
@@ -80,7 +78,6 @@ export function ProductFormSheet({
   onSaved,
   mode = 'create',
   editingProductId,
-  categories,
 }: ProductFormSheetProps) {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<{ url: string; name?: string } | null>(null);
@@ -122,7 +119,6 @@ export function ProductFormSheet({
         .then(product => {
           form.reset({
             name: product.name,
-            categoryId: product.categoryId,
             productCode: product.productCode,
             barcode: product.barcode,
             description: product.description,
@@ -188,7 +184,6 @@ export function ProductFormSheet({
     setLoading(true);
     try {
       const payload: CreateProductRequest = {
-        categoryId: values.categoryId,
         name: values.name,
         description: values.description,
         productType: values.productType,
@@ -286,9 +281,22 @@ export function ProductFormSheet({
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
+                  name='productCode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Auto generated' {...field} disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name='name'
                   render={({ field }) => (
-                    <FormItem className='col-span-2'>
+                    <FormItem>
                       <FormLabel required>Product Name</FormLabel>
                       <FormControl>
                         <Input placeholder='Enter product name' {...field} />
@@ -297,34 +305,9 @@ export function ProductFormSheet({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='categoryId'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select category' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories.map(cat => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              </div>
+
+              <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
                   name='productType'
@@ -354,23 +337,7 @@ export function ProductFormSheet({
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className='grid grid-cols-2 gap-4'>
-                <FormField
-                  control={form.control}
-                  name='productCode'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder='Auto generated' {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
+                  <FormField
                   control={form.control}
                   name='barcode'
                   render={({ field }) => (
@@ -384,7 +351,6 @@ export function ProductFormSheet({
                   )}
                 />
               </div>
-
               <FormField
                 control={form.control}
                 name='description'
@@ -413,7 +379,20 @@ export function ProductFormSheet({
                     <FormItem>
                       <FormLabel required>Cost Price</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.01' placeholder='0.00' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.01'
+                          placeholder='0.00'
+                          {...field}
+                          onBlur={e => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val)) {
+                              field.onChange(val.toFixed(2));
+                            }
+                            field.onBlur();
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -426,7 +405,20 @@ export function ProductFormSheet({
                     <FormItem>
                       <FormLabel required>Selling Price</FormLabel>
                       <FormControl>
-                        <Input type='number' min='0' step='0.01' placeholder='0.00' {...field} />
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.01'
+                          placeholder='0.00'
+                          {...field}
+                          onBlur={e => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val)) {
+                              field.onChange(val.toFixed(2));
+                            }
+                            field.onBlur();
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -288,8 +288,6 @@ export default function ProductsListPage() {
         onClose={() => setSheetOpen(false)}
         onSaved={handleSheetSaved}
         mode={editingProductId ? 'edit' : 'create'}
-        editingProductId={editingProductId}
-        categories={categories}
       />
 
       <StockAdjustmentDialog
