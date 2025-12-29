@@ -598,27 +598,27 @@ Create all input variants in `globalComponents.tsx`:
 
 > [!NOTE]
 > **Why Priority 6**: Inventory tracking requires products and locations to exist first. It's the foundation for order fulfillment.
-- [ ] **InventoryListPage.tsx**
+- [x] **InventoryListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Tabs with shadcn/ui Tabs
   - Replace Tag with Badge for stock status
   - Keep same data display and filters
   - Keep same API integration (`inventoryService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/inventory` - List all inventory items
     - GET `/api/v1/inventory/location/{locationId}` - Get inventory by location
     - GET `/api/v1/inventory/alerts` - Get low stock alerts
 
-- [ ] **Components (`/src/components/inventory/`)**
-  - [ ] `InventoryTable.tsx` → use shadcn/ui Table
-  - [ ] `StockAdjustmentDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: POST `/api/v1/inventory/adjust` - Adjust stock levels
-  - [ ] `StockMovementDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/inventory/`)**
+  - [x] `InventoryTable.tsx` → use shadcn/ui Table
+  - [x] `StockAdjustmentDrawer.tsx` → use Sheet
+    - [x] **API Integration**: POST `/api/v1/inventory/adjust` - Adjust stock levels
+  - [x] `StockMovementDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/inventory/movement` - Create stock movement
       - GET `/api/v1/inventory/movements` - Get movement history
-  - [ ] `StockReservationDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+  - [x] `StockReservationDrawer.tsx` → use Sheet
+    - [x] **API Integration**: 
       - POST `/api/v1/inventory/reserve` - Reserve stock
       - DELETE `/api/v1/inventory/reserve/{id}` - Release reservation
   - [ ] `StockAlertsList.tsx` → use shadcn/ui components
@@ -628,10 +628,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `StockLevelIndicator.tsx` → use Badge
   - [ ] `InventoryChart.tsx` → use Recharts
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/inventory`), `App.tsx`
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/inventory`), `App.tsx`
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 7: Orders Management (`/src/pages/orders/`)
 
