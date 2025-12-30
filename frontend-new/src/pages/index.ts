@@ -47,9 +47,9 @@ export const ComplianceReportsListPage = PlaceholderPage;
 export const InspectionsListPage = PlaceholderPage;
 export const InspectionDetailsPage = PlaceholderPage;
 
-// Users - TODO: Migrate these pages
-export const UserProfilePage = PlaceholderPage;
-export const UsersListPage = PlaceholderPage;
+// Users
+export { default as UsersListPage } from './users/UsersListPage';
+export const UserProfilePage = PlaceholderPage; // TODO: Migrate this page
 
 // Finance - TODO: Migrate these pages
 export const FinanceOverviewPage = PlaceholderPage;

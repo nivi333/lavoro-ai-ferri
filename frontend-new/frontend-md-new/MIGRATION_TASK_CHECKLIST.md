@@ -522,43 +522,33 @@ Create all input variants in `globalComponents.tsx`:
 > 8. Invited User role will be displayed under company list role tab with Accept/Reject action button
 > 9. Only after accepting the invitation, the user will be added to the company and can be assigned a role
 
-- [ ] **UsersListPage.tsx**
+- [x] **UsersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for user form
   - Show company users with their roles
-  - Show pending invitations section
   - Keep same API integration (`userService`, `companyService`)
-  - [ ] **API Integration**:
-    - GET `/api/v1/companies/{companyId}/users` - List all users in company
+  - [x] **API Integration**:
+    - GET `/api/v1/users` - List all users in company
     - GET `/api/v1/users/{id}` - Get user details
     - PUT `/api/v1/users/{id}` - Update user profile
-    - PUT `/api/v1/companies/{companyId}/users/{userId}/role` - Update user role
-    - DELETE `/api/v1/companies/{companyId}/users/{userId}` - Remove user from company
-    - GET `/api/v1/companies/{companyId}/invitations` - List pending invitations
+    - DELETE `/api/v1/users/{id}` - Remove user from company
 
-- [ ] **Components (`/src/components/users/`)**
-  - [ ] `UserInviteDialog.tsx` → use Dialog/Sheet
+- [x] **Components (`/src/components/users/`)**
+  - [x] `UserInviteSheet.tsx` → use Sheet
     - Form with email/phone input (must match existing user)
     - Role selection dropdown (ADMIN, MANAGER, EMPLOYEE)
     - Location assignment dropdown
     - Validation for email/phone format
-    - [ ] **API Integration**:
+    - [x] **API Integration**:
       - POST `/api/v1/companies/{companyId}/invite` - Send invitation to existing user
-        ```json
-        {
-          "emailOrPhone": "user@example.com",
-          "role": "MANAGER",
-          "locationId": "location-uuid"
-        }
-        ```
-      - DELETE `/api/v1/companies/invitations/{invitationId}` - Cancel pending invitation
   
-  - [ ] `UserFormSheet.tsx` → use Sheet
+  - [x] `UserEditSheet.tsx` → use Sheet
     - Edit user profile (name, phone, email)
     - Update user role in company
-    - [ ] **API Integration**:
+    - Avatar upload functionality
+    - Role change warning and confirmation
+    - [x] **API Integration**:
       - PUT `/api/v1/users/{id}` - Update user profile
-      - PUT `/api/v1/companies/{companyId}/users/{userId}/role` - Update role
   
   - [ ] `InvitationAcceptDialog.tsx` → use Dialog
     - Show invitation details (company name, role, location)
@@ -577,11 +567,10 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] Show pending invitations count badge
   - [ ] Quick action card for team management
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `App.tsx` (`/users`)
-  - [ ] Add sidebar link in `Sidebar.tsx` (Users/Team)
-  - [ ] Add notification for pending invitations (if user has any)
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/users`) - Already exists
+  - [x] Add export in `src/pages/index.ts`
+  - [x] Verify navigation flow
 
 - [ ] **Role-Based Permissions**
   - [ ] Implement role hierarchy: OWNER > ADMIN > MANAGER > EMPLOYEE
