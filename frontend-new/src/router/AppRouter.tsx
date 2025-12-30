@@ -326,7 +326,9 @@ export default function AppRouter() {
               path='/users'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <UsersListPage />
+                  <MainLayout>
+                    <UsersListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

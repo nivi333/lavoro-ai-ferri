@@ -28,6 +28,7 @@ import { PrimaryButton } from '@/components/globalComponents';
 import { Card } from '@/components/ui/card';
 import { analyticsService, DashboardAnalytics } from '@/services/analyticsService';
 import { COMPANY_TEXT } from '@/constants/company';
+import UserInviteSheet from '@/components/users/UserInviteSheet';
 
 const DashboardPage = () => {
   const { currentCompany } = useAuth();
@@ -274,23 +275,15 @@ const DashboardPage = () => {
         </Card>
       </div>
 
-      {/* User Invite Modal - Placeholder */}
-      {inviteDrawerVisible && (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
-          <Card className='w-full max-w-md'>
-            <div className='p-6'>
-              <h3 className='text-lg font-semibold mb-4'>Invite Team Member</h3>
-              <p className='text-sm text-muted-foreground mb-4'>
-                User invite functionality will be available once the user management module is
-                migrated.
-              </p>
-              <div className='flex justify-end'>
-                <PrimaryButton onClick={() => setInviteDrawerVisible(false)}>Close</PrimaryButton>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
+      {/* User Invite Sheet */}
+      <UserInviteSheet
+        open={inviteDrawerVisible}
+        onOpenChange={setInviteDrawerVisible}
+        onSuccess={() => {
+          setInviteDrawerVisible(false);
+          toast.success('User invited successfully');
+        }}
+      />
     </div>
   );
 };

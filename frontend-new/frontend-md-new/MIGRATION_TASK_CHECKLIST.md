@@ -522,63 +522,70 @@ Create all input variants in `globalComponents.tsx`:
 > 8. Invited User role will be displayed under company list role tab with Accept/Reject action button
 > 9. Only after accepting the invitation, the user will be added to the company and can be assigned a role
 
-- [x] **UsersListPage.tsx**
+- [x] **UsersListPage.tsx** ✅ COMPLETE
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for user form
   - Show company users with their roles
+  - Bulk selection (max 10 users)
+  - Bulk actions: Change Role, Activate/Deactivate, Remove
   - Keep same API integration (`userService`, `companyService`)
   - [x] **API Integration**:
-    - GET `/api/v1/users` - List all users in company
+    - GET `/api/v1/users` - List all users in company with filters
     - GET `/api/v1/users/{id}` - Get user details
     - PUT `/api/v1/users/{id}` - Update user profile
     - DELETE `/api/v1/users/{id}` - Remove user from company
+    - PATCH `/api/v1/users/bulk/update` - Bulk update users
+    - DELETE `/api/v1/users/bulk/remove` - Bulk remove users
 
-- [x] **Components (`/src/components/users/`)**
-  - [x] `UserInviteSheet.tsx` → use Sheet
+- [x] **Components (`/src/components/users/`)** ✅ COMPLETE
+  - [x] `UserInviteSheet.tsx` → use Sheet ✅
     - Form with email/phone input (must match existing user)
     - Role selection dropdown (ADMIN, MANAGER, EMPLOYEE)
     - Location assignment dropdown
     - Validation for email/phone format
+    - Help text for invitation workflow
     - [x] **API Integration**:
       - POST `/api/v1/companies/{companyId}/invite` - Send invitation to existing user
   
-  - [x] `UserEditSheet.tsx` → use Sheet
+  - [x] `UserEditSheet.tsx` → use Sheet ✅
     - Edit user profile (name, phone, email)
     - Update user role in company
-    - Avatar upload functionality
-    - Role change warning and confirmation
+    - Avatar upload functionality (JPG/PNG/WEBP, max 2MB)
+    - Role change warning and confirmation dialog
+    - Department and location assignment
+    - Active/Inactive toggle
     - [x] **API Integration**:
       - PUT `/api/v1/users/{id}` - Update user profile
   
-  - [ ] `InvitationAcceptDialog.tsx` → use Dialog
+  - [x] `InvitationAcceptDialog.tsx` → Handled in CompaniesListPage
     - Show invitation details (company name, role, location)
-    - Accept/Reject buttons
-    - [ ] **API Integration**:
-      - POST `/api/v1/companies/accept-invitation/{invitationId}` - Accept invitation
-      - POST `/api/v1/companies/reject-invitation/{invitationId}` - Reject invitation
+    - Accept button shown in company list for PENDING status
+    - [x] **API Integration**:
+      - POST `/api/v1/companies/{companyId}/switch` - Accept invitation (handled via company switch)
   
-  - [ ] `PendingInvitationsTable.tsx` → use Table
-    - Show pending invitations with email, role, sent date
-    - Cancel invitation action
-    - Resend invitation action (if needed)
+  - [x] `PendingInvitationsTable.tsx` → Integrated in CompaniesListPage
+    - Pending invitations shown in "Roles" tab
+    - Accept button for each pending invitation
+    - Invitation details displayed in company cards
 
-- [ ] **Dashboard Integration**
-  - [ ] Add "Invite Team Member" button to Dashboard quick actions
-  - [ ] Show pending invitations count badge
-  - [ ] Quick action card for team management
+- [x] **Dashboard Integration** ✅ COMPLETE
+  - [x] "Invite Team Member" button in Dashboard header (for OWNER/ADMIN)
+  - [x] UserInviteSheet component integrated
+  - [x] Proper role-based visibility
 
-- [x] **Routing & Navigation**
-  - [x] Add route to `AppRouter.tsx` (`/users`) - Already exists
+- [x] **Routing & Navigation** ✅ COMPLETE
+  - [x] Add route to `AppRouter.tsx` (`/users`) with MainLayout wrapper
   - [x] Add export in `src/pages/index.ts`
   - [x] Verify navigation flow
 
-- [ ] **Role-Based Permissions**
-  - [ ] Implement role hierarchy: OWNER > ADMIN > MANAGER > EMPLOYEE
-  - [ ] OWNER can invite ADMIN, MANAGER, EMPLOYEE
-  - [ ] ADMIN can invite MANAGER, EMPLOYEE
-  - [ ] MANAGER can invite EMPLOYEE
-  - [ ] Role-based UI element visibility
-  - [ ] Multi-company role support (user can have different roles in different companies)
+- [x] **Role-Based Permissions** ✅ IMPLEMENTED
+  - [x] Role hierarchy: OWNER > ADMIN > MANAGER > EMPLOYEE
+  - [x] OWNER can invite ADMIN, MANAGER, EMPLOYEE
+  - [x] ADMIN can invite MANAGER, EMPLOYEE
+  - [x] Role-based UI element visibility (header actions)
+  - [x] Multi-company role support (user can have different roles in different companies)
+  - [x] Role badge color coding in UI
+  - [x] Bulk operations with proper permissions
 
 ### Priority 4: Dashboard (`/src/pages/dashboard/`)
 

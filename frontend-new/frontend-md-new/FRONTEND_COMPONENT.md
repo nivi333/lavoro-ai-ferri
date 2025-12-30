@@ -182,6 +182,134 @@ const registrationData = {
 
 ---
 
+## User Management
+
+### UsersListPage (`/src/pages/users/UsersListPage.tsx`)
+
+**UI Elements**:
+- Page header with "Team Members" title
+- Header action: "Invite User" button (PrimaryButton)
+- Filters:
+  - Search input (name, email, or role)
+  - Role filter dropdown (All Roles, OWNER, ADMIN, MANAGER, EMPLOYEE)
+  - Status filter dropdown (All Status, Active, Inactive)
+- Bulk actions bar (when users selected):
+  - Change Role button
+  - Activate/Deactivate buttons
+  - Remove button (DangerButton)
+  - Clear Selection button
+- Data table with columns:
+  - Checkbox (for bulk selection, max 10)
+  - User (Avatar + Name + Email)
+  - Role (Badge with color coding)
+  - Status (Active/Inactive badge)
+  - Last Active (formatted time)
+  - Actions (Dropdown menu)
+- Empty state when no users
+
+**Role Badge Colors**:
+- OWNER: `info` variant (blue)
+- ADMIN: `default` variant (gray)
+- MANAGER: `success` variant (green)
+- EMPLOYEE: `warning` variant (orange)
+
+**Actions Dropdown**:
+- Edit User
+- Change Role
+- Activate/Deactivate
+- Remove (red text)
+
+**APIs**:
+- `GET /api/v1/users` - List company users with filters
+- `PUT /api/v1/users/{id}` - Update user
+- `DELETE /api/v1/users/{id}` - Remove user from company
+- `PATCH /api/v1/users/bulk/update` - Bulk update users
+- `DELETE /api/v1/users/bulk/remove` - Bulk remove users
+
+---
+
+### UserInviteSheet (`/src/components/users/UserInviteSheet.tsx`)
+
+**Component Type**: Sheet (Drawer replacement)
+
+**Fields**:
+| Field | Variable | Type | Mandatory | Validation |
+|-------|----------|------|-----------|------------|
+| Email or Phone | `emailOrPhone` | string | ✓ | Email regex OR Phone regex (same as login) |
+| Role | `role` | select | ✓ | Options: EMPLOYEE, MANAGER, ADMIN |
+| Location | `locationId` | select | ✓ | Dropdown of company locations |
+
+**Role Options**:
+- EMPLOYEE (default)
+- MANAGER
+- ADMIN
+- Note: OWNER role cannot be assigned via invitation
+
+**Help Text**:
+- "Only existing users can be invited to join your company"
+- "User will receive an invitation to accept or decline"
+- "Invalid or non-existent users will be reported"
+
+**Logic**:
+```typescript
+const inviteData = {
+  emailOrPhone: values.emailOrPhone.trim(),
+  role: values.role,
+  companyId: currentCompany.id,
+  locationId: values.locationId,
+};
+```
+
+**API**: `POST /api/v1/companies/{companyId}/invite`
+
+**On Success**: Close sheet, show success toast, refresh users list
+
+---
+
+### UserEditSheet (`/src/components/users/UserEditSheet.tsx`)
+
+**Component Type**: Sheet (Drawer replacement)
+
+**Sections**:
+
+#### 1. Personal Information
+| Field | Variable | Type | Mandatory | Validation |
+|-------|----------|------|-----------|------------|
+| Avatar | `avatarUrl` | file | ✗ | JPG/PNG/WEBP, Max 2MB |
+| First Name | `firstName` | string | ✓ | Min 1 char |
+| Last Name | `lastName` | string | ✓ | Min 1 char |
+
+#### 2. Contact Details
+| Field | Variable | Type | Mandatory | Validation |
+|-------|----------|------|-----------|------------|
+| Email | `email` | string | ✓ | Email format |
+| Phone | `phone` | string | ✗ | Phone format |
+
+#### 3. Role & Permissions
+| Field | Variable | Type | Mandatory | Options |
+|-------|----------|------|-----------|----------|
+| Role | `role` | select | ✓ | OWNER, ADMIN, MANAGER, EMPLOYEE |
+| Department | `department` | string | ✗ | Free text |
+| Location | `locationId` | select | ✗ | Company locations |
+| Active Status | `isActive` | switch | ✓ | Boolean toggle |
+
+**Role Change Warning**:
+- Alert shown when role is changed
+- Confirmation dialog before saving
+- Warning text: "Changing the user's role will immediately affect their access permissions."
+
+**Avatar Upload**:
+- Click to upload
+- Preview in circular avatar
+- File validation (type and size)
+- Base64 conversion for upload
+
+**API**: `PUT /api/v1/users/{id}`
+
+**On Success**: Close sheet, show success toast, refresh users list
+
+---
+
 ## Notes
 
 1. **Email or Phone**: Both login and register use a SINGLE `emailOrPhone` field, not separate fields
@@ -190,3 +318,6 @@ const registrationData = {
 4. **Logo Placement**: All auth pages have logo in AuthLayout (top-left), NOT inside card
 5. **Company Selection**: MUST call `switchCompany()` before navigating to dashboard
 6. **Role Colors**: Must match exact hex values for consistency
+7. **User Invitation**: Only existing registered users can be invited to companies
+8. **Bulk Operations**: Maximum 10 users can be selected at once for bulk actions
+9. **Role Hierarchy**: OWNER > ADMIN > MANAGER > EMPLOYEE
