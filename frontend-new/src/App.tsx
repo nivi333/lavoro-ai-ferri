@@ -14,6 +14,7 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import LocationListPage from './pages/company/LocationListPage';
 import ProductsListPage from './pages/products/ProductsListPage';
 import CustomerListPage from './pages/sales/CustomerListPage';
+import OrdersListPage from './pages/orders/OrdersListPage';
 import SupplierListPage from './pages/purchase/SupplierListPage';
 import PlaceholderPage from './components/PlaceholderPage';
 import { SidebarStylesInjector } from './styles/sidebar.styles';
@@ -150,11 +151,11 @@ function App() {
                 }
               />
               <Route
-                path='/sales/orders'
+                path='/orders'
                 element={
                   <ProtectedRoute requireCompany={true}>
                     <MainLayout>
-                      <PlaceholderPage />
+                      <OrdersListPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }

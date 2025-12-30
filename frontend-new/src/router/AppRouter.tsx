@@ -128,7 +128,7 @@ export default function AppRouter() {
             />
 
             <Route
-              path='/sales/orders'
+              path='/orders'
               element={
                 <ProtectedRoute requireCompany={true}>
                   <OrdersListPage />
@@ -137,7 +137,7 @@ export default function AppRouter() {
             />
 
             <Route
-              path='/sales/invoices' 
+              path='/sales/invoices'
               element={
                 <ProtectedRoute requireCompany={true}>
                   <InvoicesListPage />

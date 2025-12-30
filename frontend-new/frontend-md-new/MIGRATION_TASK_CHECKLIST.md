@@ -621,12 +621,6 @@ Create all input variants in `globalComponents.tsx`:
     - [x] **API Integration**: 
       - POST `/api/v1/inventory/reserve` - Reserve stock
       - DELETE `/api/v1/inventory/reserve/{id}` - Release reservation
-  - [ ] `StockAlertsList.tsx` → use shadcn/ui components
-    - [ ] **API Integration**: GET `/api/v1/inventory/alerts` - Get stock alerts
-  - [ ] `LocationInventoryCard.tsx` → use Card
-  - [ ] `InventoryFilters.tsx` → use Select, Input
-  - [ ] `StockLevelIndicator.tsx` → use Badge
-  - [ ] `InventoryChart.tsx` → use Recharts
 
 - [x] **Routing & Navigation**
   - [x] Add route to `AppRouter.tsx` (`/inventory`), `App.tsx`
@@ -637,29 +631,29 @@ Create all input variants in `globalComponents.tsx`:
 
 > [!NOTE]
 > **Why Priority 7**: Sales orders require products, customers, and inventory to exist. They drive the sales workflow.
-- [ ] **OrdersListPage.tsx**
+- [x] **OrdersListPage.tsx**
   - Replace Ant Design Table with shadcn/ui Table
   - Replace Drawer with Sheet for order form
   - Replace Tag with Badge for order status
   - Keep same data display
   - Keep same API integration (`orderService`)
-  - [ ] **API Integration**: 
+  - [x] **API Integration**: 
     - GET `/api/v1/orders` - List all orders
     - GET `/api/v1/orders/{id}` - Get order details
     - DELETE `/api/v1/orders/{id}` - Delete order
 
-- [ ] **Components (`/src/components/orders/`)**
-  - [ ] `OrderFormDrawer.tsx` → use Sheet
-    - [ ] **API Integration**: 
+- [x] **Components (`/src/components/orders/`)**
+  - [x] `OrderFormSheet.tsx` (replaced `OrderFormDrawer.tsx`)
+    - [x] **API Integration**: 
       - POST `/api/v1/orders` - Create new order
       - PUT `/api/v1/orders/{id}` - Update order
       - PATCH `/api/v1/orders/{id}/status` - Update order status
-  - [ ] `OrderTable.tsx` → use shadcn/ui Table
+  - [x] `OrderTable.tsx` → integrated into `OrdersListPage.tsx`
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/orders`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [x] **Routing & Navigation**
+  - [x] Add route to `AppRouter.tsx` (`/orders`), `App.tsx`
+  - [x] Add sidebar link in `Sidebar.tsx`
+  - [x] Verify navigation flow
 
 ### Priority 8: Purchase Orders (`/src/pages/purchase/`)
 
