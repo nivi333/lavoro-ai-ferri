@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { FolderOpen, Edit, Trash2, MoreVertical, UserCog, Ban, CheckCircle } from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
 import { useHeader } from '@/contexts/HeaderContext';
-import MainLayout from '@/components/layout/MainLayout';
 import { userService, User, UserFilters } from '@/services/userService';
 import UserInviteSheet from '@/components/users/UserInviteSheet';
 import UserEditSheet from '@/components/users/UserEditSheet';
@@ -51,7 +51,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { MoreVertical, Edit, UserCog, Ban, CheckCircle, Trash2, FolderOpen } from 'lucide-react';
 
 const UsersListPage = () => {
   const { currentCompany } = useAuth();
@@ -306,313 +305,304 @@ const UsersListPage = () => {
 
   if (!currentCompany) {
     return (
-      <MainLayout>
-        <PageContainer>
-          <EmptyState
-            icon={<FolderOpen className='h-12 w-12' />}
-            message='Please select a company to manage users.'
-          />
-        </PageContainer>
-      </MainLayout>
+      <PageContainer>
+        <EmptyState
+          icon={<FolderOpen className='h-12 w-12' />}
+          message='Please select a company to manage users.'
+        />
+      </PageContainer>
     );
   }
 
   return (
-    <MainLayout>
-      <PageContainer>
-        <PageHeader>
-          <PageTitle>Team Members</PageTitle>
-        </PageHeader>
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>Team Members</PageTitle>
+      </PageHeader>
 
-        <ActionBar>
-          <SearchInput
-            placeholder='Search by name, email, or role'
-            value={filters.search}
-            onChange={e => handleSearch(e.target.value)}
-            onClear={() => handleSearch('')}
-            className='w-[300px]'
-          />
-          <Select value={filters.role || ''} onValueChange={handleRoleFilter}>
-            <SelectTrigger className='w-[150px]'>
-              <SelectValue placeholder='Filter by role' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value=''>All Roles</SelectItem>
-              <SelectItem value='OWNER'>Owner</SelectItem>
-              <SelectItem value='ADMIN'>Admin</SelectItem>
-              <SelectItem value='MANAGER'>Manager</SelectItem>
-              <SelectItem value='EMPLOYEE'>Employee</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={filters.status || ''} onValueChange={handleStatusFilter}>
-            <SelectTrigger className='w-[150px]'>
-              <SelectValue placeholder='Filter by status' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value=''>All Status</SelectItem>
-              <SelectItem value='active'>Active</SelectItem>
-              <SelectItem value='inactive'>Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </ActionBar>
+      <ActionBar>
+        <SearchInput
+          placeholder='Search by name, email, or role'
+          value={filters.search}
+          onChange={e => handleSearch(e.target.value)}
+          onClear={() => handleSearch('')}
+          className='w-[300px]'
+        />
+        <Select value={filters.role || ''} onValueChange={handleRoleFilter}>
+          <SelectTrigger className='w-[150px]'>
+            <SelectValue placeholder='Filter by role' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value=''>All Roles</SelectItem>
+            <SelectItem value='OWNER'>Owner</SelectItem>
+            <SelectItem value='ADMIN'>Admin</SelectItem>
+            <SelectItem value='MANAGER'>Manager</SelectItem>
+            <SelectItem value='EMPLOYEE'>Employee</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filters.status || ''} onValueChange={handleStatusFilter}>
+          <SelectTrigger className='w-[150px]'>
+            <SelectValue placeholder='Filter by status' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value=''>All Status</SelectItem>
+            <SelectItem value='active'>Active</SelectItem>
+            <SelectItem value='inactive'>Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </ActionBar>
 
-        {selectedRowKeys.length > 0 && (
-          <div className='flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-base'>
-            <span className='text-sm font-medium'>{selectedRowKeys.length} users selected</span>
-            <OutlinedButton size='sm' onClick={handleBulkRoleChange}>
-              Change Role
-            </OutlinedButton>
-            <OutlinedButton size='sm' onClick={() => handleBulkStatusChange(true)}>
-              Activate
-            </OutlinedButton>
-            <OutlinedButton size='sm' onClick={() => handleBulkStatusChange(false)}>
-              Deactivate
-            </OutlinedButton>
-            <DangerButton size='sm' onClick={handleBulkDelete}>
-              Remove
-            </DangerButton>
-            <OutlinedButton size='sm' onClick={() => setSelectedRowKeys([])}>
-              Clear Selection
-            </OutlinedButton>
+      {selectedRowKeys.length > 0 && (
+        <div className='flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-base'>
+          <span className='text-sm font-medium'>{selectedRowKeys.length} users selected</span>
+          <OutlinedButton size='sm' onClick={handleBulkRoleChange}>
+            Change Role
+          </OutlinedButton>
+          <OutlinedButton size='sm' onClick={() => handleBulkStatusChange(true)}>
+            Activate
+          </OutlinedButton>
+          <OutlinedButton size='sm' onClick={() => handleBulkStatusChange(false)}>
+            Deactivate
+          </OutlinedButton>
+          <DangerButton size='sm' onClick={handleBulkDelete}>
+            Remove
+          </DangerButton>
+          <OutlinedButton size='sm' onClick={() => setSelectedRowKeys([])}>
+            Clear Selection
+          </OutlinedButton>
+        </div>
+      )}
+
+      <TableCard>
+        {tableLoading ? (
+          <div className='flex items-center justify-center py-12'>
+            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
           </div>
-        )}
-
-        <TableCard>
-          {tableLoading ? (
-            <div className='flex items-center justify-center py-12'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
-            </div>
-          ) : users.length === 0 ? (
-            <EmptyState
-              icon={<FolderOpen className='h-12 w-12' />}
-              message='No team members found'
-              action={
-                <PrimaryButton onClick={() => setInviteSheetOpen(true)} size='sm'>
-                  Invite Your First User
-                </PrimaryButton>
-              }
-            />
-          ) : (
-            <DataTable>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className='w-[50px]'>
+        ) : users.length === 0 ? (
+          <EmptyState
+            icon={<FolderOpen className='h-12 w-12' />}
+            message='No team members found'
+            action={
+              <PrimaryButton onClick={() => setInviteSheetOpen(true)} size='sm'>
+                Invite Your First User
+              </PrimaryButton>
+            }
+          />
+        ) : (
+          <DataTable>
+            <TableHeader>
+              <TableRow>
+                <TableHead className='w-[50px]'>
+                  <Checkbox
+                    checked={selectedRowKeys.length === users.length && users.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className='w-[280px]'>User</TableHead>
+                <TableHead className='w-[120px]'>Role</TableHead>
+                <TableHead className='w-[100px]'>Status</TableHead>
+                <TableHead className='w-[150px]'>Last Active</TableHead>
+                <TableHead className='w-[80px] text-center'>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell>
                     <Checkbox
-                      checked={selectedRowKeys.length === users.length && users.length > 0}
-                      onCheckedChange={toggleSelectAll}
+                      checked={selectedRowKeys.includes(user.id)}
+                      onCheckedChange={() => toggleRowSelection(user.id)}
                     />
-                  </TableHead>
-                  <TableHead className='w-[280px]'>User</TableHead>
-                  <TableHead className='w-[120px]'>Role</TableHead>
-                  <TableHead className='w-[100px]'>Status</TableHead>
-                  <TableHead className='w-[150px]'>Last Active</TableHead>
-                  <TableHead className='w-[80px] text-center'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map(user => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedRowKeys.includes(user.id)}
-                        onCheckedChange={() => toggleRowSelection(user.id)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className='flex items-center gap-3'>
-                        <Avatar className='h-10 w-10'>
-                          <AvatarImage src={user.avatarUrl} />
-                          <AvatarFallback className='bg-primary text-primary-foreground'>
-                            {getInitials(user.firstName, user.lastName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className='min-w-0 flex-1'>
-                          <div className='font-medium truncate'>
-                            {user.firstName} {user.lastName}
-                          </div>
-                          <div className='text-xs text-muted-foreground truncate'>{user.email}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-3'>
+                      <Avatar className='h-10 w-10'>
+                        <AvatarImage src={user.avatarUrl} />
+                        <AvatarFallback className='bg-primary text-primary-foreground'>
+                          {getInitials(user.firstName, user.lastName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className='min-w-0 flex-1'>
+                        <div className='font-medium truncate'>
+                          {user.firstName} {user.lastName}
                         </div>
+                        <div className='text-xs text-muted-foreground truncate'>{user.email}</div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge variant={getRoleBadgeVariant(user.role)}>
-                        {user.role}
-                      </StatusBadge>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge variant={user.isActive ? 'success' : 'error'}>
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </StatusBadge>
-                    </TableCell>
-                    <TableCell className='text-muted-foreground'>
-                      {formatLastActive(user.lastActive)}
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className='p-2 hover:bg-muted rounded'>
-                            <MoreVertical className='h-4 w-4' />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuItem onClick={() => handleEdit(user)}>
-                            <Edit className='mr-2 h-4 w-4' />
-                            Edit User
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleChangeRole(user)}>
-                            <UserCog className='mr-2 h-4 w-4' />
-                            Change Role
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleStatus(user)}>
-                            {user.isActive ? (
-                              <>
-                                <Ban className='mr-2 h-4 w-4' />
-                                Deactivate
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className='mr-2 h-4 w-4' />
-                                Activate
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleRemove(user)}
-                            className='text-error'
-                          >
-                            <Trash2 className='mr-2 h-4 w-4' />
-                            Remove
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </DataTable>
-          )}
-        </TableCard>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge variant={getRoleBadgeVariant(user.role)}>{user.role}</StatusBadge>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge variant={user.isActive ? 'success' : 'error'}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </StatusBadge>
+                  </TableCell>
+                  <TableCell className='text-muted-foreground'>
+                    {formatLastActive(user.lastActive)}
+                  </TableCell>
+                  <TableCell className='text-center'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className='p-2 hover:bg-muted rounded'>
+                          <MoreVertical className='h-4 w-4' />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem onClick={() => handleEdit(user)}>
+                          <Edit className='mr-2 h-4 w-4' />
+                          Edit User
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleChangeRole(user)}>
+                          <UserCog className='mr-2 h-4 w-4' />
+                          Change Role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleToggleStatus(user)}>
+                          {user.isActive ? (
+                            <>
+                              <Ban className='mr-2 h-4 w-4' />
+                              Deactivate
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className='mr-2 h-4 w-4' />
+                              Activate
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleRemove(user)} className='text-error'>
+                          <Trash2 className='mr-2 h-4 w-4' />
+                          Remove
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </DataTable>
+        )}
+      </TableCard>
 
-        <UserInviteSheet
-          open={inviteSheetOpen}
-          onOpenChange={setInviteSheetOpen}
-          onSuccess={() => {
-            setInviteSheetOpen(false);
-            fetchUsers();
-          }}
-        />
+      <UserInviteSheet
+        open={inviteSheetOpen}
+        onOpenChange={setInviteSheetOpen}
+        onSuccess={() => {
+          setInviteSheetOpen(false);
+          fetchUsers();
+        }}
+      />
 
-        <UserEditSheet
-          open={editSheetOpen}
-          onOpenChange={setEditSheetOpen}
-          user={selectedUser}
-          onSuccess={() => {
-            setEditSheetOpen(false);
-            setSelectedUser(null);
-            fetchUsers();
-          }}
-        />
+      <UserEditSheet
+        open={editSheetOpen}
+        onOpenChange={setEditSheetOpen}
+        user={selectedUser}
+        onSuccess={() => {
+          setEditSheetOpen(false);
+          setSelectedUser(null);
+          fetchUsers();
+        }}
+      />
 
-        {/* Delete User Dialog */}
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Remove User</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to remove {userToDelete?.firstName} {userToDelete?.lastName}{' '}
-                from this company?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmRemove} className='bg-error hover:bg-error-hover'>
-                Remove
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {/* Delete User Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {userToDelete?.firstName} {userToDelete?.lastName}{' '}
+              from this company?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className='bg-error hover:bg-error-hover'>
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        {/* Role Change Dialog */}
-        <AlertDialog open={roleChangeDialogOpen} onOpenChange={setRoleChangeDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Change User Role</AlertDialogTitle>
-              <AlertDialogDescription>
-                Change role for {userToChangeRole?.firstName} {userToChangeRole?.lastName}:
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className='py-4'>
-              <Select value={newRole} onValueChange={setNewRole}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select role' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='OWNER'>Owner</SelectItem>
-                  <SelectItem value='ADMIN'>Admin</SelectItem>
-                  <SelectItem value='MANAGER'>Manager</SelectItem>
-                  <SelectItem value='EMPLOYEE'>Employee</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmRoleChange}>Change Role</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {/* Role Change Dialog */}
+      <AlertDialog open={roleChangeDialogOpen} onOpenChange={setRoleChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change User Role</AlertDialogTitle>
+            <AlertDialogDescription>
+              Change role for {userToChangeRole?.firstName} {userToChangeRole?.lastName}:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className='py-4'>
+            <Select value={newRole} onValueChange={setNewRole}>
+              <SelectTrigger>
+                <SelectValue placeholder='Select role' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='OWNER'>Owner</SelectItem>
+                <SelectItem value='ADMIN'>Admin</SelectItem>
+                <SelectItem value='MANAGER'>Manager</SelectItem>
+                <SelectItem value='EMPLOYEE'>Employee</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRoleChange}>Change Role</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        {/* Bulk Role Change Dialog */}
-        <AlertDialog open={bulkRoleChangeDialogOpen} onOpenChange={setBulkRoleChangeDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Bulk Role Change</AlertDialogTitle>
-              <AlertDialogDescription>
-                Change role for {selectedRowKeys.length} selected users:
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className='py-4'>
-              <Select value={bulkNewRole} onValueChange={setBulkNewRole}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Select new role' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='ADMIN'>Admin</SelectItem>
-                  <SelectItem value='MANAGER'>Manager</SelectItem>
-                  <SelectItem value='EMPLOYEE'>Employee</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmBulkRoleChange}>Change Role</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+      {/* Bulk Role Change Dialog */}
+      <AlertDialog open={bulkRoleChangeDialogOpen} onOpenChange={setBulkRoleChangeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bulk Role Change</AlertDialogTitle>
+            <AlertDialogDescription>
+              Change role for {selectedRowKeys.length} selected users:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className='py-4'>
+            <Select value={bulkNewRole} onValueChange={setBulkNewRole}>
+              <SelectTrigger>
+                <SelectValue placeholder='Select new role' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='ADMIN'>Admin</SelectItem>
+                <SelectItem value='MANAGER'>Manager</SelectItem>
+                <SelectItem value='EMPLOYEE'>Employee</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBulkRoleChange}>Change Role</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-        {/* Bulk Delete Dialog */}
-        <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Remove Users</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to remove {selectedRowKeys.length} selected users from this
-                company?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={confirmBulkDelete}
-                className='bg-error hover:bg-error-hover'
-              >
-                Remove
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </PageContainer>
-    </MainLayout>
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Users</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {selectedRowKeys.length} selected users from this
+              company?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmBulkDelete}
+              className='bg-error hover:bg-error-hover'
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </PageContainer>
   );
 };
 
