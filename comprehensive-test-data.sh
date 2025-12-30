@@ -19,7 +19,8 @@
 # - Textile Operations data
 # =========================================
 
-set -e  # Exit on error
+# Removed set -e to see all errors - script will continue even on failures
+# set -e
 
 # Colors for output
 RED='\033[0;31m'
@@ -105,11 +106,27 @@ REGISTER_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/register" \
 OWNER_TOKEN=$(echo $REGISTER_RESPONSE | jq -r '.tokens.accessToken')
 OWNER_ID=$(echo $REGISTER_RESPONSE | jq -r '.user.id')
 
+# If registration failed (user exists), try login
+if [ "$OWNER_TOKEN" == "null" ] || [ -z "$OWNER_TOKEN" ]; then
+    print_info "User exists, attempting login..."
+    
+    LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
+      -H "$CONTENT_TYPE" \
+      -d "{
+        \"emailOrPhone\": \"$OWNER_EMAIL\",
+        \"password\": \"$OWNER_PASSWORD\"
+      }")
+    
+    OWNER_TOKEN=$(echo $LOGIN_RESPONSE | jq -r '.tokens.accessToken')
+    OWNER_ID=$(echo $LOGIN_RESPONSE | jq -r '.user.id')
+fi
+
 if [ "$OWNER_TOKEN" != "null" ] && [ -n "$OWNER_TOKEN" ]; then
-    print_status 0 "Owner user created: $OWNER_EMAIL"
+    print_status 0 "Owner user ready: $OWNER_EMAIL"
 else
-    print_status 1 "Failed to create owner user"
+    print_status 1 "Failed to create/login owner user"
     echo "Response: $REGISTER_RESPONSE"
+    echo "Login Response: $LOGIN_RESPONSE"
     exit 1
 fi
 
@@ -122,7 +139,7 @@ ROLES=("ADMIN" "ADMIN" "ADMIN" "MANAGER" "MANAGER" "MANAGER" "EMPLOYEE" "EMPLOYE
 
 for i in {1..9}; do
     ROLE=${ROLES[$i-1]}
-    EMAIL="${ROLE,,}${i}@lavoro.com"  # Convert to lowercase
+    EMAIL="$(echo $ROLE | tr '[:upper:]' '[:lower:]')${i}@lavoro.com"  # Convert to lowercase
     
     print_info "Creating employee user $i: $EMAIL..."
     
@@ -141,12 +158,24 @@ for i in {1..9}; do
     
     TOKEN=$(echo $REGISTER_RESPONSE | jq -r '.tokens.accessToken')
     
+    # If registration failed (user exists), try login
+    if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
+        LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
+          -H "$CONTENT_TYPE" \
+          -d "{
+            \"emailOrPhone\": \"$EMAIL\",
+            \"password\": \"$OWNER_PASSWORD\"
+          }")
+        
+        TOKEN=$(echo $LOGIN_RESPONSE | jq -r '.tokens.accessToken')
+    fi
+    
     if [ "$TOKEN" != "null" ] && [ -n "$TOKEN" ]; then
         EMPLOYEE_EMAILS[$i]=$EMAIL
         EMPLOYEE_TOKENS[$i]=$TOKEN
-        print_status 0 "Employee user $i created: $EMAIL (Role: $ROLE)"
+        print_status 0 "Employee user $i ready: $EMAIL (Role: $ROLE)"
     else
-        print_status 1 "Failed to create employee user $i"
+        print_status 1 "Failed to create/login employee user $i"
     fi
 done
 
