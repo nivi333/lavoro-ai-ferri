@@ -259,11 +259,10 @@ export function PurchaseOrderFormSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
             {/* Purchase Order Info */}
-            <div className='space-y-4'>
+            <div>
               <h3 className='text-sm font-medium'>Purchase Order Info</h3>
-
               <div className='grid grid-cols-2 gap-4'>
                 <div className='no-form-context-needed space-y-2'>
                   <label className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>

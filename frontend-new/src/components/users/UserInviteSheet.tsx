@@ -158,87 +158,89 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
           </SheetDescription>
         </SheetHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-6'>
-            <FormField
-              control={form.control}
-              name='emailOrPhone'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email or Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder='user@example.com or +1234567890' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='role'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className='flex-1 overflow-y-auto px-1'>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
+              <FormField
+                control={form.control}
+                name='emailOrPhone'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email or Phone</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select role for user' />
-                      </SelectTrigger>
+                      <Input placeholder='user@example.com or +1234567890' {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value='EMPLOYEE'>Employee</SelectItem>
-                      <SelectItem value='MANAGER'>Manager</SelectItem>
-                      <SelectItem value='ADMIN'>Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='locationId'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select location' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {locations.map(location => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name}
-                          {location.isDefault && ' (Default)'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='role'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select role for user' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='EMPLOYEE'>Employee</SelectItem>
+                        <SelectItem value='MANAGER'>Manager</SelectItem>
+                        <SelectItem value='ADMIN'>Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className='text-xs text-muted-foreground space-y-1 bg-muted/50 p-3 rounded-md'>
-              <p>• Only existing users can be invited to join your company</p>
-              <p>• User will receive an invitation to accept or decline</p>
-              <p>• Invalid or non-existent users will be reported</p>
-            </div>
+              <FormField
+                control={form.control}
+                name='locationId'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select location' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {locations.map(location => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name}
+                            {location.isDefault && ' (Default)'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <SheetFooter className='gap-2'>
-              <OutlinedButton type='button' onClick={handleClose} disabled={loading}>
-                Cancel
-              </OutlinedButton>
-              <PrimaryButton type='submit' loading={loading}>
-                Send Invitation
-              </PrimaryButton>
-            </SheetFooter>
-          </form>
-        </Form>
+              <div className='text-xs text-muted-foreground space-y-1 bg-muted/50 p-3 rounded-md'>
+                <p>• Only existing users can be invited to join your company</p>
+                <p>• User will receive an invitation to accept or decline</p>
+                <p>• Invalid or non-existent users will be reported</p>
+              </div>
+            </form>
+          </Form>
+        </div>
+
+        <SheetFooter className='gap-2'>
+          <OutlinedButton type='button' onClick={handleClose} disabled={loading}>
+            Cancel
+          </OutlinedButton>
+          <PrimaryButton type='submit' loading={loading} onClick={form.handleSubmit(onSubmit)}>
+            Send Invitation
+          </PrimaryButton>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

@@ -75,7 +75,7 @@ const navItems: NavItem[] = [
     children: [
       { label: 'Customers', icon: <UserCheck className='h-4 w-4' />, path: '/customers' },
       { label: 'Sales Orders', icon: <FilePlus className='h-4 w-4' />, path: '/orders' },
-      { label: 'Invoices', icon: <FileCheck className='h-4 w-4' />, path: '/invoices' },
+      { label: 'Invoices', icon: <FileCheck className='h-4 w-4' />, path: '/sales/invoices' },
     ],
   },
   {
@@ -89,7 +89,7 @@ const navItems: NavItem[] = [
         icon: <FilePlus className='h-4 w-4' />,
         path: '/purchase/orders',
       },
-      { label: 'Bills', icon: <FileCheck className='h-4 w-4' />, path: '/bills' },
+      { label: 'Bills', icon: <FileCheck className='h-4 w-4' />, path: '/purchase/bills' },
     ],
   },
   { label: 'Machines', icon: <Wrench className='h-5 w-5' />, path: '/machines' },

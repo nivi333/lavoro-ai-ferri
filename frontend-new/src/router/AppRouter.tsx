@@ -131,7 +131,9 @@ export default function AppRouter() {
               path='/orders'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <OrdersListPage />
+                  <MainLayout>
+                    <OrdersListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -140,7 +142,9 @@ export default function AppRouter() {
               path='/sales/invoices'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <InvoicesListPage />
+                  <MainLayout>
+                    <InvoicesListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -171,7 +175,9 @@ export default function AppRouter() {
               path='/purchase/orders'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <PurchaseOrdersListPage />
+                  <MainLayout>
+                    <PurchaseOrdersListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -180,7 +186,9 @@ export default function AppRouter() {
               path='/purchase/bills'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <BillsListPage />
+                  <MainLayout>
+                    <BillsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -201,7 +209,9 @@ export default function AppRouter() {
               path='/textile/fabrics'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <FabricProductionListPage />
+                  <MainLayout>
+                    <FabricProductionListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -210,7 +220,9 @@ export default function AppRouter() {
               path='/textile/yarns'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <YarnManufacturingListPage />
+                  <MainLayout>
+                    <YarnManufacturingListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -219,7 +231,9 @@ export default function AppRouter() {
               path='/textile/dyeing'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <DyeingFinishingListPage />
+                  <MainLayout>
+                    <DyeingFinishingListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -228,7 +242,9 @@ export default function AppRouter() {
               path='/textile/garments'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <GarmentManufacturingListPage />
+                  <MainLayout>
+                    <GarmentManufacturingListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -237,7 +253,9 @@ export default function AppRouter() {
               path='/textile/designs'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <DesignPatternsListPage />
+                  <MainLayout>
+                    <DesignPatternsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -246,7 +264,9 @@ export default function AppRouter() {
               path='/inventory'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <InventoryListPage />
+                  <MainLayout>
+                    <InventoryListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -255,7 +275,9 @@ export default function AppRouter() {
               path='/machines'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <MachineListPage />
+                  <MainLayout>
+                    <MachineListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -297,7 +319,9 @@ export default function AppRouter() {
               path='/inspections'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <InspectionsListPage />
+                  <MainLayout>
+                    <InspectionsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -306,7 +330,9 @@ export default function AppRouter() {
               path='/inspections/:id'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <InspectionDetailsPage />
+                  <MainLayout>
+                    <InspectionDetailsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -337,7 +363,9 @@ export default function AppRouter() {
               path='/users/:userId'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <UserProfilePage />
+                  <MainLayout>
+                    <UserProfilePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -346,7 +374,9 @@ export default function AppRouter() {
               path='/profile'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <UserProfilePage />
+                  <MainLayout>
+                    <UserProfilePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -355,7 +385,9 @@ export default function AppRouter() {
               path='/finance'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <FinanceOverviewPage />
+                  <MainLayout>
+                    <FinanceOverviewPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -364,7 +396,9 @@ export default function AppRouter() {
               path='/finance/accounts-receivable'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <AccountsReceivablePage />
+                  <MainLayout>
+                    <AccountsReceivablePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -373,7 +407,9 @@ export default function AppRouter() {
               path='/finance/accounts-payable'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <AccountsPayablePage />
+                  <MainLayout>
+                    <AccountsPayablePage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -382,7 +418,9 @@ export default function AppRouter() {
               path='/finance/expenses'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <ExpensesPage />
+                  <MainLayout>
+                    <ExpensesPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -391,7 +429,9 @@ export default function AppRouter() {
               path='/finance/petty-cash'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <PettyCashPage />
+                  <MainLayout>
+                    <PettyCashPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -401,7 +441,9 @@ export default function AppRouter() {
               path='/reports'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <ReportsListPage />
+                  <MainLayout>
+                    <ReportsListPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -410,7 +452,9 @@ export default function AppRouter() {
               path='/reports/financial'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <FinancialReportsPage />
+                  <MainLayout>
+                    <FinancialReportsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -419,7 +463,9 @@ export default function AppRouter() {
               path='/reports/inventory'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <InventoryReportsPage />
+                  <MainLayout>
+                    <InventoryReportsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -428,7 +474,9 @@ export default function AppRouter() {
               path='/reports/sales'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <SalesReportsPage />
+                  <MainLayout>
+                    <SalesReportsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -437,7 +485,9 @@ export default function AppRouter() {
               path='/reports/operational'
               element={
                 <ProtectedRoute requireCompany={true}>
-                  <OperationalReportsPage />
+                  <MainLayout>
+                    <OperationalReportsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -446,7 +496,9 @@ export default function AppRouter() {
               path='/subscription/plans'
               element={
                 <ProtectedRoute>
-                  <SubscriptionPlansPage />
+                  <MainLayout>
+                    <SubscriptionPlansPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

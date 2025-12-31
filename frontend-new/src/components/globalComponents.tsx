@@ -855,7 +855,7 @@ export const FormSheet = ({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className='w-full sm:max-w-[600px] overflow-y-auto'>
-        <ShadcnSheetHeader className='border-b pb-4 mb-4'>
+        <ShadcnSheetHeader className='border-b pb-1'>
           <SheetTitle>{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}
         </ShadcnSheetHeader>

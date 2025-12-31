@@ -250,7 +250,7 @@ export function CustomerFormSheet({
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 py-4'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             {/* Basic Information */}
             <div className='space-y-4'>
               <h3 className='text-sm font-medium text-muted-foreground'>Basic Information</h3>

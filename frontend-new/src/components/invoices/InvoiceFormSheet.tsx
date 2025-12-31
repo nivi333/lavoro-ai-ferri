@@ -382,9 +382,9 @@ export function InvoiceFormSheet({ open, onClose, initialData }: InvoiceFormShee
         </SheetHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-6'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3 mt-2'>
             {/* Invoice Info */}
-            <div className='space-y-4'>
+            <div>
               <h3 className='text-sm font-medium'>Invoice Info</h3>
 
               <div className='grid grid-cols-2 gap-4'>

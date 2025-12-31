@@ -705,7 +705,7 @@ Create all input variants in `globalComponents.tsx`:
       - DELETE `/api/v1/inventory/reserve/{id}` - Release reservation
 
 - [x] **Routing & Navigation**
-  - [x] Add route to `AppRouter.tsx` (`/inventory`), `App.tsx`
+  - [x] Add route to `AppRouter.tsx` (`/inventory`)
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
@@ -733,7 +733,7 @@ Create all input variants in `globalComponents.tsx`:
   - [x] `OrderTable.tsx` → integrated into `OrdersListPage.tsx`
 
 - [x] **Routing & Navigation**
-  - [x] Add route to `AppRouter.tsx` (`/orders`), `App.tsx`
+  - [x] Add route to `AppRouter.tsx` (`/orders`) 
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
@@ -760,7 +760,7 @@ Create all input variants in `globalComponents.tsx`:
   - [x] `PurchaseOrderTable.tsx` → integrated into `PurchaseOrdersListPage.tsx`
 
 - [x] **Routing & Navigation**
-  - [x] Add route to `AppRouter.tsx` (`/purchase/orders`), `App.tsx`
+  - [x] Add route to `AppRouter.tsx` (`/purchase/orders`) 
   - [x] Add sidebar link in `Sidebar.tsx`
   - [x] Verify navigation flow
 
@@ -801,7 +801,7 @@ Create all input variants in `globalComponents.tsx`:
   - [x] `/src/components/bills/BillTable.tsx` → use Table (Integrated in page)
 
 - [x] **Routing & Navigation**
-  - [x] Add route to `AppRouter.tsx` (`/invoices`, `/bills`), `App.tsx`
+  - [x] Add route to `AppRouter.tsx` (`/invoices`, `/bills`) 
   - [x] Add sidebar link in `Sidebar.tsx` (Already exists)
   - [x] Verify navigation flow
 
@@ -849,7 +849,7 @@ Create all input variants in `globalComponents.tsx`:
       - PUT `/api/v1/expenses/{id}` - Update expense
 
 - [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/finance`), `App.tsx`
+  - [ ] Add route to `AppRouter.tsx` (`/finance`) 
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 
@@ -921,7 +921,7 @@ Create all input variants in `globalComponents.tsx`:
   - [ ] `DefectChart.tsx` → use Recharts
 
 - [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/quality`), `App.tsx`
+  - [ ] Add route to `AppRouter.tsx` (`/quality`) 
   - [ ] Add sidebar link in `Sidebar.tsx`
   - [ ] Verify navigation flow
 

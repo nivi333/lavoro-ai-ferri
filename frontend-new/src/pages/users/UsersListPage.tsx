@@ -1,7 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FolderOpen, Edit, Trash2, MoreVertical, UserCog, Ban, CheckCircle } from 'lucide-react';
+import {
+  FolderOpen,
+  Edit,
+  Trash2,
+  MoreVertical,
+  UserCog,
+  Ban,
+  CheckCircle,
+  Filter,
+  Plus,
+} from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
-import { useHeader } from '@/contexts/HeaderContext';
 import { userService, User, UserFilters } from '@/services/userService';
 import UserInviteSheet from '@/components/users/UserInviteSheet';
 import UserEditSheet from '@/components/users/UserEditSheet';
@@ -15,7 +24,6 @@ import {
   OutlinedButton,
   EmptyState,
   StatusBadge,
-  TableCard,
   DataTable,
   TableHeader,
   TableBody,
@@ -54,7 +62,6 @@ import { toast } from 'sonner';
 
 const UsersListPage = () => {
   const { currentCompany } = useAuth();
-  const { setHeaderActions } = useHeader();
   const [users, setUsers] = useState<User[]>([]);
   const [tableLoading, setTableLoading] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -69,7 +76,7 @@ const UsersListPage = () => {
   const [newRole, setNewRole] = useState<string>('');
   const [bulkRoleChangeDialogOpen, setBulkRoleChangeDialogOpen] = useState(false);
   const [bulkNewRole, setBulkNewRole] = useState<string>('');
-  const [, setPagination] = useState({
+  const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 25,
     total: 0,
@@ -100,16 +107,6 @@ const UsersListPage = () => {
   }, [filters]);
 
   useEffect(() => {
-    setHeaderActions(
-      <PrimaryButton onClick={() => setInviteSheetOpen(true)} size='sm'>
-        Invite User
-      </PrimaryButton>
-    );
-
-    return () => setHeaderActions(null);
-  }, [setHeaderActions]);
-
-  useEffect(() => {
     if (currentCompany) {
       fetchUsers();
     }
@@ -120,11 +117,11 @@ const UsersListPage = () => {
   };
 
   const handleRoleFilter = (value: string) => {
-    setFilters({ ...filters, role: value || undefined, page: 1 });
+    setFilters({ ...filters, role: value === 'all' ? undefined : value, page: 1 });
   };
 
   const handleStatusFilter = (value: string) => {
-    setFilters({ ...filters, status: value || undefined, page: 1 });
+    setFilters({ ...filters, status: value === 'all' ? undefined : value, page: 1 });
   };
 
   const handleEdit = (user: User) => {
@@ -318,34 +315,42 @@ const UsersListPage = () => {
     <PageContainer>
       <PageHeader>
         <PageTitle>Team Members</PageTitle>
+        <PrimaryButton onClick={() => setInviteSheetOpen(true)}>
+          <Plus className='mr-2 h-4 w-4' /> Invite User
+        </PrimaryButton>
       </PageHeader>
 
       <ActionBar>
-        <SearchInput
-          placeholder='Search by name, email, or role'
-          value={filters.search}
-          onChange={e => handleSearch(e.target.value)}
-          onClear={() => handleSearch('')}
-          className='w-[300px]'
-        />
-        <Select value={filters.role || ''} onValueChange={handleRoleFilter}>
-          <SelectTrigger className='w-[150px]'>
-            <SelectValue placeholder='Filter by role' />
+        <div className='flex-1 max-w-md'>
+          <SearchInput
+            placeholder='Search by name, email, or role...'
+            value={filters.search}
+            onChange={e => handleSearch(e.target.value)}
+            onClear={() => handleSearch('')}
+          />
+        </div>
+        <Select value={filters.role || 'all'} onValueChange={handleRoleFilter}>
+          <SelectTrigger className='w-[180px]'>
+            <div className='flex items-center gap-2 text-muted-foreground'>
+              <Filter className='h-4 w-4' />
+              <SelectValue placeholder='Role' />
+            </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value=''>All Roles</SelectItem>
+            <SelectItem value='all'>All Roles</SelectItem>
             <SelectItem value='OWNER'>Owner</SelectItem>
             <SelectItem value='ADMIN'>Admin</SelectItem>
             <SelectItem value='MANAGER'>Manager</SelectItem>
             <SelectItem value='EMPLOYEE'>Employee</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={filters.status || ''} onValueChange={handleStatusFilter}>
+
+        <Select value={filters.status || 'all'} onValueChange={handleStatusFilter}>
           <SelectTrigger className='w-[150px]'>
-            <SelectValue placeholder='Filter by status' />
+            <SelectValue placeholder='Status' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value=''>All Status</SelectItem>
+            <SelectItem value='all'>All Status</SelectItem>
             <SelectItem value='active'>Active</SelectItem>
             <SelectItem value='inactive'>Inactive</SelectItem>
           </SelectContent>
@@ -373,7 +378,8 @@ const UsersListPage = () => {
         </div>
       )}
 
-      <TableCard>
+      {/* User Table */}
+      <div className='rounded-md border bg-card'>
         {tableLoading ? (
           <div className='flex items-center justify-center py-12'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
@@ -483,7 +489,32 @@ const UsersListPage = () => {
             </TableBody>
           </DataTable>
         )}
-      </TableCard>
+      </div>
+
+      {/* Pagination */}
+      {!tableLoading && users.length > 0 && (
+        <div className='flex items-center justify-end space-x-2 py-4'>
+          <div className='flex-1 text-sm text-muted-foreground'>
+            Page {pagination.current} of {Math.ceil(pagination.total / pagination.pageSize)}
+          </div>
+          <div className='space-x-2'>
+            <button
+              className='px-3 py-1 border rounded-md text-sm disabled:opacity-50 hover:bg-muted'
+              onClick={() => setPagination(prev => ({ ...prev, current: prev.current - 1 }))}
+              disabled={pagination.current <= 1}
+            >
+              Previous
+            </button>
+            <button
+              className='px-3 py-1 border rounded-md text-sm disabled:opacity-50 hover:bg-muted'
+              onClick={() => setPagination(prev => ({ ...prev, current: prev.current + 1 }))}
+              disabled={pagination.current >= Math.ceil(pagination.total / pagination.pageSize)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       <UserInviteSheet
         open={inviteSheetOpen}
@@ -539,10 +570,10 @@ const UsersListPage = () => {
                 <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='OWNER'>Owner</SelectItem>
                 <SelectItem value='ADMIN'>Admin</SelectItem>
                 <SelectItem value='MANAGER'>Manager</SelectItem>
                 <SelectItem value='EMPLOYEE'>Employee</SelectItem>
+                <SelectItem value='OWNER'>Owner</SelectItem>
               </SelectContent>
             </Select>
           </div>

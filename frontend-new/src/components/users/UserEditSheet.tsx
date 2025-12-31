@@ -211,7 +211,7 @@ const UserEditSheet = ({ open, onOpenChange, user, onSuccess }: UserEditSheetPro
           </SheetHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-6'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-2'>
               {/* Section 1: Personal Information */}
               <div className='space-y-4'>
                 <h3 className='text-sm font-semibold'>Personal Information</h3>
@@ -369,15 +369,14 @@ const UserEditSheet = ({ open, onOpenChange, user, onSuccess }: UserEditSheetPro
                   name='locationId'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <FormLabel>Location (Optional)</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select location' />
+                            <SelectValue placeholder='Select location (optional)' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value=''>No specific location</SelectItem>
                           {locations.map(location => (
                             <SelectItem key={location.id} value={location.id}>
                               {location.name}
