@@ -33,6 +33,7 @@ import {
   CreateCompanyRequest,
   UpdateCompanyRequest,
 } from '@/services/companyService';
+import { AuthStorage } from '@/utils/storage';
 import { toast } from 'sonner';
 
 const companySchema = z.object({
@@ -83,8 +84,11 @@ export function CompanyCreationSheet({
   const [uploading, setUploading] = useState(false);
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugUnique, setSlugUnique] = useState(true);
+  const [nameChecking, setNameChecking] = useState(false);
+  const [nameUnique, setNameUnique] = useState(true);
   const [loading, setLoading] = useState(false);
   const [originalSlug, setOriginalSlug] = useState<string>('');
+  const [originalName, setOriginalName] = useState<string>('');
 
   const isEditing = mode === 'edit' && !!editingCompanyId;
 
@@ -97,7 +101,10 @@ export function CompanyCreationSheet({
     setLogoFile(null);
     setSlugChecking(false);
     setSlugUnique(true);
+    setNameChecking(false);
+    setNameUnique(true);
     setOriginalSlug('');
+    setOriginalName('');
   }, [form]);
 
   // Load company data for editing
@@ -155,6 +162,7 @@ export function CompanyCreationSheet({
 
   // Auto-generate slug from name (only for create mode)
   const handleNameChange = (value: string) => {
+    checkNameUnique(value);
     if (!isEditing) {
       const slug = value
         .toLowerCase()
@@ -162,6 +170,50 @@ export function CompanyCreationSheet({
         .replace(/^-+|-+$/g, '');
       form.setValue('slug', slug);
       checkSlugUnique(slug);
+    }
+  };
+
+  // Company name uniqueness validation
+  const checkNameUnique = async (name: string) => {
+    if (!name || name.trim().length === 0) {
+      setNameUnique(true);
+      return;
+    }
+
+    // If editing and name hasn't changed, it's valid
+    if (isEditing && name.trim().toLowerCase() === originalName.toLowerCase()) {
+      setNameUnique(true);
+      return;
+    }
+
+    setNameChecking(true);
+    try {
+      // Use backend API to check name availability (similar to slug check)
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies/check-name?name=${encodeURIComponent(name.trim())}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${AuthStorage.getTokens()?.accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // If API fails, allow the name (backend will validate)
+        console.warn('Name check API failed, skipping client-side validation');
+        setNameUnique(true);
+        return;
+      }
+
+      const result = await response.json();
+      setNameUnique(result.available);
+    } catch (error) {
+      console.error('Error checking company name:', error);
+      setNameUnique(true); // Allow on error, backend will validate
+    } finally {
+      setNameChecking(false);
     }
   };
 
@@ -228,6 +280,10 @@ export function CompanyCreationSheet({
 
   // Form submission
   const onSubmit = async (values: CompanyFormValues) => {
+    if (!nameUnique) {
+      toast.error('Company name is already taken');
+      return;
+    }
     if (!slugUnique) {
       toast.error('Slug is already taken');
       return;

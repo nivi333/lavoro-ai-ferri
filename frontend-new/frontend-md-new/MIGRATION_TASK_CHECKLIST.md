@@ -952,6 +952,67 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Add sidebar link in `Sidebar.tsx` (Already exists)
   - [x] Verify navigation flow
 
+- [x] **Documentation**
+  - [x] Created comprehensive `docs/MACHINE_MANAGEMENT.md` (40+ sections)
+    - Architecture and component hierarchy
+    - Data models and interfaces
+    - API endpoints documentation
+    - State management patterns
+    - Validation rules
+    - User workflows
+    - Future enhancements roadmap
+
+### Data Validation & Uniqueness
+
+> [!IMPORTANT]
+> **Data Integrity**: Ensuring uniqueness of key identifiers across the application.
+
+- [x] **Company Name Uniqueness (Global)**
+  - [x] Implemented in `CompanyCreationSheet.tsx`
+  - [x] Backend API integration: `GET /api/v1/companies/check-name`
+  - [x] Real-time validation with loading states
+  - [x] Edit mode handling (allows keeping original name)
+
+- [ ] **Per-Company Uniqueness** (Implementation guide provided)
+  - [ ] Location Name - `LocationFormSheet.tsx`
+  - [ ] Customer Name - `CustomerFormSheet.tsx`
+  - [ ] Supplier Name - `SupplierFormSheet.tsx`
+  - [ ] Product Name - `ProductFormSheet.tsx`
+
+- [ ] **User Uniqueness (Global)** (Implementation guide provided)
+  - [ ] Email - `UserInviteSheet.tsx`
+  - [ ] Phone - `UserInviteSheet.tsx`
+
+- [x] **Documentation**
+  - [x] Created `UNIQUENESS_VALIDATION_GUIDE.md`
+    - Complete implementation patterns
+    - Code examples for each entity
+    - Testing checklist
+    - UI feedback guidelines
+
+### UI Consistency & Standardization
+
+> [!NOTE]
+> **Status**: Deferred due to large scope (5 pages, estimated 4-5 hours)
+> **Reference Design**: Products page table layout
+
+- [ ] **Quality Control Pages** (To be standardized)
+  - [ ] `InspectionsListPage.tsx` - Match Products page design
+  - [ ] `QualityCheckpointsListPage.tsx` - Match Products page design
+  - [ ] `QualityDefectsListPage.tsx` - Match Products page design
+  - [ ] `ComplianceReportsListPage.tsx` - Match Products page design
+  - [ ] `QualityReportsPage.tsx` - Match Products page design
+
+- [ ] **Required Changes Per Page**:
+  - Replace custom table with shadcn/ui `Table` components
+  - Use consistent `Badge` variants and colors
+  - Match column spacing and padding
+  - Use `PageContainer`, `PageHeader`, `PageTitle` structure
+  - Implement `SearchInput` and filter dropdowns
+  - Use `DropdownMenu` for actions (three-dot menu)
+  - Implement `EmptyState` component
+
+
 ### Priority 13: Reports Module (`/src/pages/reports/`)
 
 > [!NOTE]
