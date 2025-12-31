@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Building2, Globe, Mail, MapPin, Phone, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2, Globe, Mail, MapPin, Phone, Loader2, Edit } from 'lucide-react';
 import useAuth from '@/contexts/AuthContext';
-import { SecondaryButton } from '@/components/globalComponents';
+import { SecondaryButton, PrimaryButton } from '@/components/globalComponents';
 import { companyService } from '@/services/companyService';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { CompanyCreationSheet } from '@/components/company/CompanyCreationSheet';
 
 interface ExtendedCompany {
   id: string;
@@ -69,10 +70,11 @@ const getDisplayValue = (value?: ReactNode) => {
 
 export default function CompanyDetailPage() {
   const { tenantId } = useParams<{ tenantId: string }>();
-  const { currentCompany, companies } = useAuth();
+  const { currentCompany, companies, refreshCompanies } = useAuth();
   const navigate = useNavigate();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [loadingLogo, setLoadingLogo] = useState(false);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
 
   const effectiveTenantId = tenantId || currentCompany?.id;
 
@@ -232,10 +234,18 @@ export default function CompanyDetailPage() {
               An overview of your company information and registrations
             </p>
           </div>
-          <SecondaryButton onClick={handleBack}>
-            <ArrowLeft className='h-4 w-4 mr-2' />
-            Back to Dashboard
-          </SecondaryButton>
+          <div className='flex gap-2'>
+            {effectiveTenantId && (
+              <PrimaryButton size='sm' onClick={() => setEditSheetOpen(true)}>
+                <Edit className='h-4 w-4 mr-2' />
+                Edit Company
+              </PrimaryButton>
+            )}
+            <SecondaryButton onClick={handleBack}>
+              <ArrowLeft className='h-4 w-4 mr-2' />
+              Back to Dashboard
+            </SecondaryButton>
+          </div>
         </div>
 
         {/* Profile Card */}
@@ -328,6 +338,18 @@ export default function CompanyDetailPage() {
           </div>
         </Card>
       </div>
-  </div>
+
+      {/* Edit Company Sheet */}
+      <CompanyCreationSheet
+        open={editSheetOpen}
+        onClose={() => setEditSheetOpen(false)}
+        onCompanyCreated={() => {
+          refreshCompanies?.();
+          setEditSheetOpen(false);
+        }}
+        mode='edit'
+        editingCompanyId={effectiveTenantId}
+      />
+    </div>
   );
 }

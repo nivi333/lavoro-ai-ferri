@@ -602,6 +602,174 @@ for company_idx in {1..3}; do
 done
 
 # =========================================
+# STEP 13: CREATE FINANCE DATA (EXPENSES & PETTY CASH)
+# =========================================
+print_section "STEP 13: Creating Finance Data per Company"
+
+EXPENSE_CATEGORIES=("TRAVEL" "UTILITIES" "SUPPLIES" "MAINTENANCE" "OTHER")
+
+for company_idx in {1..3}; do
+    print_info "Creating 5 expenses for Company $company_idx..."
+    
+    for i in {1..5}; do
+        cat_idx=$((($i - 1) % 5))
+        CATEGORY=${EXPENSE_CATEGORIES[$cat_idx]}
+        
+        EXPENSE_RESPONSE=$(curl -s -X POST "$BASE_URL/expenses" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "{
+            \"category\": \"$CATEGORY\",
+            \"amount\": $((500 + $i * 100)),
+            \"expenseDate\": \"2024-12-0$i\",
+            \"description\": \"$CATEGORY expense $i for Company $company_idx\",
+            \"paymentMethod\": \"BANK_TRANSFER\",
+            \"status\": \"PENDING\"
+          }")
+        
+        EXPENSE_ID=$(echo $EXPENSE_RESPONSE | jq -r '.data.id')
+        if [ "$EXPENSE_ID" != "null" ] && [ -n "$EXPENSE_ID" ]; then
+            if [ $i -eq 1 ] || [ $i -eq 5 ]; then
+                print_status 0 "Expense $i created for Company $company_idx"
+            fi
+        fi
+    done
+    
+    print_info "Creating 3 petty cash accounts for Company $company_idx..."
+    
+    for i in {1..3}; do
+        PETTY_CASH_RESPONSE=$(curl -s -X POST "$BASE_URL/petty-cash/accounts" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "{
+            \"accountName\": \"Petty Cash Account $i\",
+            \"balance\": $((1000 + $i * 500)),
+            \"currency\": \"INR\",
+            \"isActive\": true
+          }")
+        
+        ACCOUNT_ID=$(echo $PETTY_CASH_RESPONSE | jq -r '.data.id')
+        if [ "$ACCOUNT_ID" != "null" ] && [ -n "$ACCOUNT_ID" ]; then
+            print_status 0 "Petty Cash Account $i created for Company $company_idx"
+        fi
+    done
+    
+    print_success "  ✓ Finance data created for Company $company_idx"
+done
+
+# =========================================
+# STEP 14: CREATE QUALITY CONTROL DATA
+# =========================================
+print_section "STEP 14: Creating Quality Control Data per Company"
+
+INSPECTION_TYPES=("INCOMING_MATERIAL" "IN_PROCESS" "FINAL_PRODUCT" "RANDOM_CHECK")
+CHECKPOINT_TYPES=("INCOMING" "IN_PROCESS" "FINAL" "RANDOM")
+DEFECT_CATEGORIES=("DIMENSIONAL" "VISUAL" "FUNCTIONAL" "MATERIAL")
+DEFECT_SEVERITIES=("CRITICAL" "MAJOR" "MINOR" "COSMETIC")
+
+for company_idx in {1..3}; do
+    print_info "Creating 5 quality inspections for Company $company_idx..."
+    
+    for i in {1..5}; do
+        type_idx=$((($i - 1) % 4))
+        INSPECTION_TYPE=${INSPECTION_TYPES[$type_idx]}
+        
+        INSPECTION_RESPONSE=$(curl -s -X POST "$BASE_URL/inspections/inspections" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "{
+            \"inspectionType\": \"$INSPECTION_TYPE\",
+            \"referenceType\": \"PRODUCT\",
+            \"referenceId\": \"PROD-00$i\",
+            \"inspectorName\": \"Inspector $i\",
+            \"scheduledDate\": \"2024-12-0$i\",
+            \"status\": \"PENDING\"
+          }")
+        
+        INSPECTION_ID=$(echo $INSPECTION_RESPONSE | jq -r '.data.id')
+        if [ "$INSPECTION_ID" != "null" ] && [ -n "$INSPECTION_ID" ]; then
+            if [ $i -eq 1 ] || [ $i -eq 5 ]; then
+                print_status 0 "Inspection $i created for Company $company_idx"
+            fi
+        fi
+    done
+    
+    print_info "Creating 5 quality checkpoints for Company $company_idx..."
+    
+    for i in {1..5}; do
+        type_idx=$((($i - 1) % 4))
+        CHECKPOINT_TYPE=${CHECKPOINT_TYPES[$type_idx]}
+        
+        CHECKPOINT_RESPONSE=$(curl -s -X POST "$BASE_URL/quality/checkpoints" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "{
+            \"checkpointType\": \"$CHECKPOINT_TYPE\",
+            \"checkpointName\": \"Checkpoint $i - Company $company_idx\",
+            \"inspectorName\": \"Inspector $i\",
+            \"inspectionDate\": \"2024-12-0$i\",
+            \"overallScore\": $((80 + $i * 2))
+          }")
+        
+        CHECKPOINT_ID=$(echo $CHECKPOINT_RESPONSE | jq -r '.data.id')
+        if [ "$CHECKPOINT_ID" != "null" ] && [ -n "$CHECKPOINT_ID" ]; then
+            if [ $i -eq 1 ] || [ $i -eq 5 ]; then
+                print_status 0 "Checkpoint $i created for Company $company_idx"
+            fi
+            
+            # Create defects for this checkpoint
+            if [ $i -le 3 ]; then
+                cat_idx=$((($i - 1) % 4))
+                sev_idx=$((($i - 1) % 4))
+                DEFECT_CATEGORY=${DEFECT_CATEGORIES[$cat_idx]}
+                DEFECT_SEVERITY=${DEFECT_SEVERITIES[$sev_idx]}
+                
+                DEFECT_RESPONSE=$(curl -s -X POST "$BASE_URL/quality/defects" \
+                  -H "$CONTENT_TYPE" \
+                  -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+                  -d "{
+                    \"checkpointId\": \"$CHECKPOINT_ID\",
+                    \"defectCategory\": \"$DEFECT_CATEGORY\",
+                    \"defectType\": \"Type $i\",
+                    \"severity\": \"$DEFECT_SEVERITY\",
+                    \"quantity\": $i,
+                    \"description\": \"Defect found in checkpoint $i\"
+                  }")
+                
+                DEFECT_ID=$(echo $DEFECT_RESPONSE | jq -r '.data.id')
+                if [ "$DEFECT_ID" != "null" ] && [ -n "$DEFECT_ID" ] && [ $i -eq 1 ]; then
+                    print_status 0 "Defect created for Checkpoint $i"
+                fi
+            fi
+        fi
+    done
+    
+    print_info "Creating 3 compliance reports for Company $company_idx..."
+    
+    for i in {1..3}; do
+        COMPLIANCE_RESPONSE=$(curl -s -X POST "$BASE_URL/quality/compliance" \
+          -H "$CONTENT_TYPE" \
+          -H "Authorization: Bearer ${COMPANY_TOKENS[$company_idx]}" \
+          -d "{
+            \"reportType\": \"ISO_9001\",
+            \"reportDate\": \"2024-12-0$i\",
+            \"auditorName\": \"Auditor $i\",
+            \"status\": \"SUBMITTED\",
+            \"findings\": \"Compliance findings for report $i\"
+          }")
+        
+        COMPLIANCE_ID=$(echo $COMPLIANCE_RESPONSE | jq -r '.data.id')
+        if [ "$COMPLIANCE_ID" != "null" ] && [ -n "$COMPLIANCE_ID" ]; then
+            if [ $i -eq 1 ] || [ $i -eq 3 ]; then
+                print_status 0 "Compliance Report $i created for Company $company_idx"
+            fi
+        fi
+    done
+    
+    print_success "  ✓ Quality Control data created for Company $company_idx"
+done
+
+# =========================================
 # FINAL SUMMARY
 # =========================================
 print_section "TEST DATA SEEDING COMPLETED"
@@ -641,6 +809,12 @@ echo "  - 5 Purchase Orders"
 echo "  - 5 Sales Orders"
 echo "  - 5 Invoices"
 echo "  - 5 Bills"
+echo "  - 5 Expenses"
+echo "  - 3 Petty Cash Accounts"
+echo "  - 5 Quality Inspections"
+echo "  - 5 Quality Checkpoints"
+echo "  - 3 Quality Defects"
+echo "  - 3 Compliance Reports"
 echo ""
 
 echo -e "${CYAN}=========================================${NC}"

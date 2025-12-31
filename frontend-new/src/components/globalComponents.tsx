@@ -391,7 +391,7 @@ export const PageTitle = forwardRef<HTMLHeadingElement, PageTitleProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <h2
-        className={cn('font-heading text-heading-2 font-semibold m-0', className)}
+        className={cn('font-heading text-heading-3 font-semibold m-0', className)}
         ref={ref}
         {...props}
       >

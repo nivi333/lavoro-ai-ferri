@@ -125,7 +125,7 @@ const DashboardPage = () => {
     <div>
       {/* Page Header */}
       <div className='mb-6'>
-        <h2 className='font-heading text-heading-2 font-semibold m-0'>Dashboard</h2>
+        <h2 className='font-heading text-heading-3 font-semibold m-0'>Dashboard</h2>
       </div>
 
       {/* Dashboard Content */}

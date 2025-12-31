@@ -122,7 +122,7 @@ export default function LocationListPage() {
       <div className='space-y-6'>
         {/* Header */}
         <div className='flex items-center justify-between'>
-          <h2 className='text-heading-2 font-heading font-semibold'>Company Locations</h2>
+          <h2 className='text-heading-3 font-heading font-semibold'>Company Locations</h2>
           <Button onClick={handleAddLocation} disabled={currentCompany?.role === 'EMPLOYEE'}>
             <Plus className='mr-2 h-4 w-4' />
             Add Location
