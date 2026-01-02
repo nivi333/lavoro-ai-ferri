@@ -5,7 +5,6 @@ import {
   PageContainer,
   PageHeader,
   PageTitle,
-  Card,
   StatusBadge,
   DataTable,
   TableHeader,
@@ -196,7 +195,6 @@ const QualityCheckpointsListPage = () => {
             </PrimaryButton>
           }
         />
-      ) : (
       ) : (
         <div className='rounded-base border bg-card'>
           <DataTable

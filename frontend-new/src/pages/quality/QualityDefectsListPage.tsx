@@ -5,7 +5,6 @@ import {
   PageContainer,
   PageHeader,
   PageTitle,
-  Card,
   StatusBadge,
   DataTable,
   TableHeader,
@@ -219,7 +218,6 @@ const QualityDefectsListPage = () => {
           }
         />
       ) : (
-      ) : (
         <div className='rounded-base border bg-card'>
           <DataTable
             sortColumn={sortColumn}
@@ -307,7 +305,7 @@ const QualityDefectsListPage = () => {
               ))}
             </TableBody>
           </DataTable>
-        </div>>
+        </div>
       )}
     </PageContainer>
   );

@@ -7,7 +7,6 @@ import {
   PageHeader,
   PageTitle,
   ActionBar,
-  Card,
   StatusBadge,
   DataTable,
   TableHeader,
@@ -217,7 +216,6 @@ const InspectionsListPage = () => {
           }
         />
       ) : (
-      ) : (
         <div className='rounded-base border bg-card'>
           <DataTable className='border-none'>
             <TableHeader>
@@ -318,7 +316,6 @@ const InspectionsListPage = () => {
             </TableBody>
           </DataTable>
         </div>
-      )}
       )}
     </PageContainer>
   );

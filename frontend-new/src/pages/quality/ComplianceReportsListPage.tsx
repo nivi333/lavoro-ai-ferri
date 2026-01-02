@@ -5,7 +5,6 @@ import {
   PageContainer,
   PageHeader,
   PageTitle,
-  Card,
   StatusBadge,
   DataTable,
   TableHeader,
@@ -203,7 +202,6 @@ const ComplianceReportsListPage = () => {
           }
         />
       ) : (
-      ) : (
         <div className='rounded-base border bg-card'>
           <DataTable
             sortColumn={sortColumn}
@@ -284,7 +282,7 @@ const ComplianceReportsListPage = () => {
               ))}
             </TableBody>
           </DataTable>
-        </div>>
+        </div>
       )}
     </PageContainer>
   );
