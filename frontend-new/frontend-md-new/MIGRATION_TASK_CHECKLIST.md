@@ -1014,73 +1014,65 @@ Create all input variants in `globalComponents.tsx`:
 
 
 ### Priority 13: Reports Module (`/src/pages/reports/`)
-
 > [!NOTE]
 > **Why Priority 13**: Reports provide analytics and insights after operational data exists.
-- [ ] **ReportsPage.tsx**
-  - Replace Ant Design Layout with custom layout
-  - Replace Tabs with shadcn/ui Tabs
 
-- [ ] **ReportsListPage.tsx**
-  - Replace Ant Design Card with shadcn/ui Card
-  - Replace Grid with Tailwind grid
+- [ ] **Shared Report Components** (`/src/components/reports/shared/`)
+  - [ ] Create `ReportFilters.tsx` using Shadcn/UI (Date Range Picker, Select, Input, Button)
+  - [ ] Create `ReportSummaryCards.tsx` using Shadcn/UI Cards for KPI display
+  - [ ] Create `ReportChart.tsx` wrapper for Recharts (Bar, Line, Pie)
 
-- [ ] **ReportCategoryPage.tsx**
-  - Replace Ant Design components with shadcn/ui
+- [ ] **Reports Landing Page**
+  - [ ] Implement `ReportsListPage.tsx` with Shadcn/UI Grid layout for category cards
+  - [ ] Define routes in `AppRouter.tsx` for all report categories
+  - [ ] Update `Sidebar.tsx` with Reports link
 
-- [ ] **FinancialReportsPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace DatePicker with shadcn/ui DatePicker
-  - Replace charts with Recharts
-  - Keep same report generation logic
-  - [ ] **API Integration**: 
-    - GET `/api/v1/reports/profit-loss` - Profit & Loss report
-    - GET `/api/v1/reports/balance-sheet` - Balance Sheet report
-    - GET `/api/v1/reports/cash-flow` - Cash Flow report
-    - GET `/api/v1/reports/trial-balance` - Trial Balance report
-    - GET `/api/v1/reports/gst` - GST report
-    - GET `/api/v1/reports/accounts-payable` - Accounts Payable report
-    - GET `/api/v1/reports/expense-summary` - Expense Summary report
+- [ ] **Financial Reports Page** (`/reports/financial`)
+  - [ ] Create `FinancialReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [ ] **Tabs & Components**:
+    - [ ] `ProfitLossReport` (API: `getProfitLossReport`)
+    - [ ] `BalanceSheetReport` (API: `getBalanceSheet`)
+    - [ ] `CashFlowReport` (API: `getCashFlowStatement`)
+    - [ ] `TrialBalanceReport` (API: `getTrialBalance`)
+    - [ ] `GSTReport` (API: `getGSTReport`)
+    - [ ] `AccountsReceivableReport` (API: `getARAgingReport`)
+    - [ ] `AccountsPayableReport` (API: `getAPAgingReport`)
+    - [ ] `ExpenseSummaryReport` (API: `getExpenseSummary`)
 
-- [ ] **InventoryReportsPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace charts with Recharts
-  - Keep same report generation logic
-  - [ ] **API Integration**: 
-    - GET `/api/v1/reports/stock-summary` - Stock Summary report
-    - GET `/api/v1/reports/stock-aging` - Stock Aging report
-    - GET `/api/v1/reports/inventory-valuation` - Inventory Valuation report
+- [ ] **Sales Reports Page** (`/reports/sales`)
+  - [ ] Create `SalesReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [ ] **Tabs & Components**:
+    - [ ] `SalesSummaryReport` (API: `getSalesSummary`)
+    - [ ] `SalesTrendReport` (API: `getSalesTrendsReport`)
+    - [ ] `TopSellingProductsReport` (API: `getTopSellingProductsReport`)
+    - [ ] `CustomerPurchaseHistoryReport` (API: `getCustomerPurchaseHistoryReport`)
+    - [ ] `SalesByRegionReport` (API: `getSalesByRegionReport`)
 
-- [ ] **OperationalReportsPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace charts with Recharts
-  - Keep same report generation logic
-  - [ ] **API Integration**: 
-    - GET `/api/v1/reports/production-efficiency` - Production Efficiency report
-    - GET `/api/v1/reports/machine-utilization` - Machine Utilization report
-    - GET `/api/v1/reports/quality-metrics` - Quality Metrics report
+- [ ] **Inventory Reports Page** (`/reports/inventory`)
+  - [ ] Create `InventoryReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [ ] **Tabs & Components**:
+    - [ ] `InventorySummaryReport` (API: `getInventorySummary`)
+    - [ ] `StockValuationReport` (API: `getStockValuationReport`)
+    - [ ] `LowStockReport` (API: `getLowStockReport`)
+    - [ ] `InventoryMovementReport` (API: `getInventoryMovementReport`)
+    - [ ] `StockAgingReport` (API: `getStockAgingReport`)
 
-- [ ] **SalesReportsPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
-  - Replace charts with Recharts
-  - Keep same report generation logic
-  - [ ] **API Integration**: 
-    - GET `/api/v1/reports/top-selling-products` - Top Selling Products report
-    - GET `/api/v1/reports/customer-purchase-history` - Customer Purchase History
-    - GET `/api/v1/reports/sales-by-region` - Sales by Region report
+- [ ] **Operational Reports Page** (`/reports/operational`)
+  - [ ] Create `OperationalReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [ ] **Tabs & Components**:
+    - [ ] `ProductionEfficiencyReport` (API: `getProductionEfficiencyReport`)
+    - [ ] `MachineUtilizationReport` (API: `getMachineUtilizationReport`)
+    - [ ] `QualityMetricsReport` (API: `getQualityMetricsReport`)
+    - [ ] `ProductionPlanningReport` (API: `getProductionPlanningReport`)
 
-- [ ] **Components (`/src/components/reports/`)**
-  - [ ] `ReportFilters.tsx` → use shadcn/ui components
-  - [ ] `ReportCard.tsx` → use Card
-  - [ ] All financial report components → use Table, Recharts
-  - [ ] All inventory report components → use Table, Recharts
-  - [ ] All operational report components → use Table, Recharts
-  - [ ] All sales report components → use Table, Recharts
+- [ ] **Analytics Reports Page** (`/reports/analytics`)
+  - [ ] Create `AnalyticsReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [ ] **Tabs & Components**:
+    - [ ] `BusinessPerformanceReport` (API: `getBusinessPerformanceReport`)
+    - [ ] `TextileAnalyticsReport` (API: `getTextileAnalyticsReport`)
 
-- [ ] **Routing & Navigation**
-  - [ ] Add route to `AppRouter.tsx` (`/reports`)
-  - [ ] Add sidebar link in `Sidebar.tsx`
-  - [ ] Verify navigation flow
+- [ ] **Custom Reports** (`/reports/custom`)
+  - [ ] Implement placeholder/coming soon page for Custom Reports
 
 ### Priority 14: Textile Operations (`/src/pages/textile/`)
 
