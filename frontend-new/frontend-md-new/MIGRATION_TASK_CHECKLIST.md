@@ -973,11 +973,11 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Real-time validation with loading states
   - [x] Edit mode handling (allows keeping original name)
 
-- [ ] **Per-Company Uniqueness** (Implementation guide provided)
-  - [ ] Location Name - `LocationFormSheet.tsx`
-  - [ ] Customer Name - `CustomerFormSheet.tsx`
-  - [ ] Supplier Name - `SupplierFormSheet.tsx`
-  - [ ] Product Name - `ProductFormSheet.tsx`
+- [x] **Per-Company Uniqueness** ✅ COMPLETE
+  - [x] Location Name - `LocationFormSheet.tsx`
+  - [x] Customer Name - `CustomerFormSheet.tsx`
+  - [x] Supplier Name - `SupplierFormSheet.tsx`
+  - [x] Product Name - `ProductFormSheet.tsx`
 
 - [ ] **User Uniqueness (Global)** (Implementation guide provided)
   - [ ] Email - `UserInviteSheet.tsx`
@@ -996,8 +996,8 @@ Create all input variants in `globalComponents.tsx`:
 > **Status**: Deferred due to large scope (5 pages, estimated 4-5 hours)
 > **Reference Design**: Products page table layout
 
-- [ ] **Quality Control Pages** (To be standardized)
-  - [ ] `InspectionsListPage.tsx` - Match Products page design
+- [x] **Quality Control Pages** (UI Standardization in Progress)
+  - [x] `InspectionsListPage.tsx` - Updated to use ActionBar component
   - [ ] `QualityCheckpointsListPage.tsx` - Match Products page design
   - [ ] `QualityDefectsListPage.tsx` - Match Products page design
   - [ ] `ComplianceReportsListPage.tsx` - Match Products page design

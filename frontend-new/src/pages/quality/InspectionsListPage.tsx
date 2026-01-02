@@ -6,6 +6,7 @@ import {
   PageContainer,
   PageHeader,
   PageTitle,
+  ActionBar,
   Card,
   StatusBadge,
   DataTable,
@@ -151,13 +152,15 @@ const InspectionsListPage = () => {
       </PageHeader>
 
       {/* Filters */}
-      <div className='flex flex-wrap gap-3 mb-6'>
-        <SearchInput
-          placeholder='Search by code or reference...'
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          className='w-[250px]'
-        />
+      <ActionBar>
+        <div className='flex-1 max-w-md'>
+          <SearchInput
+            placeholder='Search by code or reference...'
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            onClear={() => setSearchText('')}
+          />
+        </div>
 
         <Select value={selectedType} onValueChange={setSelectedType}>
           <SelectTrigger className='w-[180px]'>
@@ -197,7 +200,7 @@ const InspectionsListPage = () => {
             <SelectItem value='BATCH'>Batch</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </ActionBar>
 
       {/* Table */}
       {loading ? (
