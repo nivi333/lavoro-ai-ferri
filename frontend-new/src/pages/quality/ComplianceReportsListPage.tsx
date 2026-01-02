@@ -37,6 +37,8 @@ import { qualityService } from '@/services/qualityService';
 import useAuth from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 
+import { useSortableTable } from '@/hooks/useSortableTable';
+
 interface ComplianceReport {
   id: string;
   reportId: string;
@@ -60,6 +62,16 @@ const STATUS_COLORS: Record<string, 'default' | 'success' | 'warning' | 'error' 
 const ComplianceReportsListPage = () => {
   const { currentCompany } = useAuth();
   const [reports, setReports] = useState<ComplianceReport[]>([]);
+  const {
+    sortedData: sortedReports,
+    sortColumn,
+    sortDirection,
+    handleSort,
+  } = useSortableTable({
+    data: reports,
+    defaultSortColumn: 'reportDate',
+    defaultSortDirection: 'desc',
+  });
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [selectedType, setSelectedType] = useState<string>('');
@@ -192,21 +204,35 @@ const ComplianceReportsListPage = () => {
         />
       ) : (
         <Card>
-          <DataTable>
+          <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={handleSort}>
             <TableHeader>
               <TableRow>
-                <TableHead className='w-[120px]'>Report ID</TableHead>
-                <TableHead className='w-[150px]'>Report Type</TableHead>
-                <TableHead className='w-[150px]'>Auditor</TableHead>
-                <TableHead className='w-[140px]'>Report Date</TableHead>
-                <TableHead className='w-[150px]'>Certification</TableHead>
-                <TableHead className='w-[120px]'>Status</TableHead>
-                <TableHead>Findings</TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='reportId'>
+                  Report ID
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='reportType'>
+                  Report Type
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='auditorName'>
+                  Auditor
+                </TableHead>
+                <TableHead className='w-[140px]' sortable sortKey='reportDate'>
+                  Report Date
+                </TableHead>
+                <TableHead className='w-[150px]' sortable sortKey='certification'>
+                  Certification
+                </TableHead>
+                <TableHead className='w-[120px]' sortable sortKey='status'>
+                  Status
+                </TableHead>
+                <TableHead sortable sortKey='findings'>
+                  Findings
+                </TableHead>
                 <TableHead className='w-[100px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reports.map(report => (
+              {sortedReports.map(report => (
                 <TableRow key={report.id}>
                   <TableCell>
                     <span className='font-semibold'>{report.reportId}</span>

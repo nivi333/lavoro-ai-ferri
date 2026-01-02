@@ -993,15 +993,15 @@ Create all input variants in `globalComponents.tsx`:
 ### UI Consistency & Standardization
 
 > [!NOTE]
-> **Status**: Deferred due to large scope (5 pages, estimated 4-5 hours)
+> **Status**: Completed
 > **Reference Design**: Products page table layout
 
-- [x] **Quality Control Pages** (UI Standardization in Progress)
+- [x] **Quality Control Pages** (UI Standardization Completed)
   - [x] `InspectionsListPage.tsx` - Updated to use ActionBar component
-  - [ ] `QualityCheckpointsListPage.tsx` - Match Products page design
-  - [ ] `QualityDefectsListPage.tsx` - Match Products page design
-  - [ ] `ComplianceReportsListPage.tsx` - Match Products page design
-  - [ ] `QualityReportsPage.tsx` - Match Products page design
+  - [x] `QualityCheckpointsListPage.tsx` - Match Products page design
+  - [x] `QualityDefectsListPage.tsx` - Match Products page design
+  - [x] `ComplianceReportsListPage.tsx` - Match Products page design
+  - [x] `QualityReportsPage.tsx` - Match Products page design
 
 - [ ] **Required Changes Per Page**:
   - Replace custom table with shadcn/ui `Table` components
