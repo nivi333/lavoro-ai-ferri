@@ -28,6 +28,9 @@ interface ProductTableProps {
   onAdjustStock: (product: ProductSummary) => void;
   onDelete: (product: ProductSummary) => void;
   userRole?: string;
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc' | null;
+  onSort?: (column: string) => void;
 }
 
 export function ProductTable({
@@ -38,6 +41,9 @@ export function ProductTable({
   onAdjustStock,
   onDelete,
   userRole,
+  sortColumn,
+  sortDirection,
+  onSort,
 }: ProductTableProps) {
   const isEmployee = userRole === 'EMPLOYEE';
 
@@ -65,13 +71,51 @@ export function ProductTable({
     <DataTable>
       <TableHeader>
         <TableRow>
-          <TableHead>Product Code</TableHead>
-          <TableHead>Product Name</TableHead>
+          <TableHead
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'productCode' ? sortDirection : null}
+            onSort={() => onSort?.('productCode')}
+          >
+            Product Code
+          </TableHead>
+          <TableHead
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'name' ? sortDirection : null}
+            onSort={() => onSort?.('name')}
+          >
+            Product Name
+          </TableHead>
           <TableHead>Barcode</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead className='text-right'>Stock</TableHead>
-          <TableHead className='text-right'>Price</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'category' ? sortDirection : null}
+            onSort={() => onSort?.('category')}
+          >
+            Category
+          </TableHead>
+          <TableHead
+            className='text-right'
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'stockQuantity' ? sortDirection : null}
+            onSort={() => onSort?.('stockQuantity')}
+          >
+            Stock
+          </TableHead>
+          <TableHead
+            className='text-right'
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'sellingPrice' ? sortDirection : null}
+            onSort={() => onSort?.('sellingPrice')}
+          >
+            Price
+          </TableHead>
+          <TableHead
+            sortable={!!onSort}
+            sortDirection={sortColumn === 'isActive' ? sortDirection : null}
+            onSort={() => onSort?.('isActive')}
+          >
+            Status
+          </TableHead>
           <TableHead className='w-[80px]'></TableHead>
         </TableRow>
       </TableHeader>

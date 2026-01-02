@@ -719,10 +719,20 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
 );
 TableRow.displayName = 'TableRow';
 
-export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  sortable?: boolean;
+  sortDirection?: 'asc' | 'desc' | null;
+  onSort?: () => void;
+}
 
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, sortable = false, sortDirection = null, onSort, ...props }, ref) => {
+    const handleClick = () => {
+      if (sortable && onSort) {
+        onSort();
+      }
+    };
+
     return (
       <th
         ref={ref}
@@ -731,11 +741,31 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
           'font-medium text-muted-foreground',
           'whitespace-nowrap',
           '[&:has([role=checkbox])]:pr-0',
+          sortable && 'cursor-pointer select-none hover:bg-muted/80 transition-colors',
           className
         )}
+        onClick={handleClick}
         {...props}
       >
-        {children}
+        <div className='flex items-center gap-2'>
+          {children}
+          {sortable && (
+            <div className='flex flex-col'>
+              <ChevronUp
+                className={cn(
+                  'h-3 w-3 -mb-1',
+                  sortDirection === 'asc' ? 'text-primary' : 'text-muted-foreground/40'
+                )}
+              />
+              <ChevronDown
+                className={cn(
+                  'h-3 w-3',
+                  sortDirection === 'desc' ? 'text-primary' : 'text-muted-foreground/40'
+                )}
+              />
+            </div>
+          )}
+        </div>
       </th>
     );
   }

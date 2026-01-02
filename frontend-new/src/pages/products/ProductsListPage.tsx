@@ -59,6 +59,10 @@ export default function ProductsListPage() {
   );
   const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'ALL');
 
+  // Sorting State
+  const [sortColumn, setSortColumn] = useState<string>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
   // UI State
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
@@ -189,6 +193,17 @@ export default function ProductsListPage() {
     fetchProducts();
   };
 
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      // Toggle direction if same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New column, default to ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
   if (!currentCompany) {
     return (
       <PageContainer>
@@ -254,6 +269,9 @@ export default function ProductsListPage() {
           onAdjustStock={handleAdjustStock}
           onDelete={handleDeleteClick}
           userRole={currentCompany.role}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSort}
         />
       </div>
 
