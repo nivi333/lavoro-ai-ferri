@@ -979,7 +979,7 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Supplier Name - `SupplierFormSheet.tsx`
   - [x] Product Name - `ProductFormSheet.tsx`
 
-- [ ] **User Uniqueness (Global)** (Implementation guide provided)
+- [ ] **User Uniqueness (Global)** (Implementation guide provided for EmailOrPhone )
   - [ ] Email - `UserInviteSheet.tsx`
   - [ ] Phone - `UserInviteSheet.tsx`
 
@@ -1027,52 +1027,52 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Define routes in `AppRouter.tsx` for all report categories
   - [x] Update `Sidebar.tsx` with Reports link
 
-- [ ] **Financial Reports Page** (`/reports/financial`)
-  - [ ] Create `FinancialReportsPage.tsx` with Shadcn/UI Tabs structure
-  - [ ] **Tabs & Components**:
-    - [ ] `ProfitLossReport` (API: `getProfitLossReport`)
-    - [ ] `BalanceSheetReport` (API: `getBalanceSheet`)
-    - [ ] `CashFlowReport` (API: `getCashFlowStatement`)
-    - [ ] `TrialBalanceReport` (API: `getTrialBalance`)
-    - [ ] `GSTReport` (API: `getGSTReport`)
-    - [ ] `AccountsReceivableReport` (API: `getARAgingReport`)
-    - [ ] `AccountsPayableReport` (API: `getAPAgingReport`)
-    - [ ] `ExpenseSummaryReport` (API: `getExpenseSummary`)
+- [x] **Financial Reports Page** (`/reports/financial`)
+  - [x] Create `FinancialReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [x] **Tabs & Components**:
+    - [x] `ProfitLossReport` (API: `getProfitLossReport`)
+    - [x] `BalanceSheetReport` (API: `getBalanceSheet`)
+    - [x] `CashFlowReport` (API: `getCashFlowStatement`)
+    - [x] `TrialBalanceReport` (API: `getTrialBalance`)
+    - [x] `GSTReport` (API: `getGSTReport`)
+    - [x] `AccountsReceivableReport` (API: `getARAgingReport`)
+    - [x] `AccountsPayableReport` (API: `getAPAgingReport`)
+    - [x] `ExpenseSummaryReport` (API: `getExpenseSummary`)
 
-- [ ] **Sales Reports Page** (`/reports/sales`)
-  - [ ] Create `SalesReportsPage.tsx` with Shadcn/UI Tabs structure
-  - [ ] **Tabs & Components**:
-    - [ ] `SalesSummaryReport` (API: `getSalesSummary`)
-    - [ ] `SalesTrendReport` (API: `getSalesTrendsReport`)
-    - [ ] `TopSellingProductsReport` (API: `getTopSellingProductsReport`)
-    - [ ] `CustomerPurchaseHistoryReport` (API: `getCustomerPurchaseHistoryReport`)
-    - [ ] `SalesByRegionReport` (API: `getSalesByRegionReport`)
+- [x] **Sales Reports Page** (`/reports/sales`)
+  - [x] Create `SalesReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [x] **Tabs & Components**:
+    - [x] `SalesSummaryReport` (API: `getSalesSummary`)
+    - [x] `SalesTrendReport` (API: `getSalesTrendsReport`)
+    - [x] `TopSellingProductsReport` (API: `getTopSellingProductsReport`)
+    - [x] `CustomerPurchaseHistoryReport` (API: `getCustomerPurchaseHistoryReport`)
+    - [x] `SalesByRegionReport` (API: `getSalesByRegionReport`)
 
-- [ ] **Inventory Reports Page** (`/reports/inventory`)
-  - [ ] Create `InventoryReportsPage.tsx` with Shadcn/UI Tabs structure
-  - [ ] **Tabs & Components**:
-    - [ ] `InventorySummaryReport` (API: `getInventorySummary`)
-    - [ ] `StockValuationReport` (API: `getStockValuationReport`)
-    - [ ] `LowStockReport` (API: `getLowStockReport`)
-    - [ ] `InventoryMovementReport` (API: `getInventoryMovementReport`)
-    - [ ] `StockAgingReport` (API: `getStockAgingReport`)
+- [x] **Inventory Reports Page** (`/reports/inventory`)
+  - [x] Create `InventoryReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [x] **Tabs & Components**:
+    - [x] `InventorySummaryReport` (API: `getInventorySummary`)
+    - [x] `StockValuationReport` (API: `getStockValuationReport`)
+    - [x] `LowStockReport` (API: `getLowStockReport`)
+    - [x] `InventoryMovementReport` (API: `getInventoryMovementReport`)
+    - [x] `StockAgingReport` (API: `getStockAgingReport`)
 
-- [ ] **Operational Reports Page** (`/reports/operational`)
-  - [ ] Create `OperationalReportsPage.tsx` with Shadcn/UI Tabs structure
-  - [ ] **Tabs & Components**:
-    - [ ] `ProductionEfficiencyReport` (API: `getProductionEfficiencyReport`)
-    - [ ] `MachineUtilizationReport` (API: `getMachineUtilizationReport`)
-    - [ ] `QualityMetricsReport` (API: `getQualityMetricsReport`)
-    - [ ] `ProductionPlanningReport` (API: `getProductionPlanningReport`)
+- [x] **Operational Reports Page** (`/reports/operational`)
+  - [x] Create `OperationalReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [x] **Tabs & Components**:
+    - [x] `ProductionEfficiencyReport` (API: `getProductionEfficiencyReport`)
+    - [x] `MachineUtilizationReport` (API: `getMachineUtilizationReport`)
+    - [x] `QualityMetricsReport` (API: `getQualityMetricsReport`)
+    - [x] `ProductionPlanningReport` (API: `getProductionPlanningReport`)
 
-- [ ] **Analytics Reports Page** (`/reports/analytics`)
-  - [ ] Create `AnalyticsReportsPage.tsx` with Shadcn/UI Tabs structure
-  - [ ] **Tabs & Components**:
-    - [ ] `BusinessPerformanceReport` (API: `getBusinessPerformanceReport`)
-    - [ ] `TextileAnalyticsReport` (API: `getTextileAnalyticsReport`)
+- [x] **Analytics Reports Page** (`/reports/analytics`)
+  - [x] Create `AnalyticsReportsPage.tsx` with Shadcn/UI Tabs structure
+  - [x] **Tabs & Components**:
+    - [x] `BusinessPerformanceReport` (API: `getBusinessPerformanceReport`)
+    - [x] `TextileAnalyticsReport` (API: `getTextileAnalyticsReport`)
 
-- [ ] **Custom Reports** (`/reports/custom`)
-  - [ ] Implement placeholder/coming soon page for Custom Reports
+- [x] **Custom Reports** (`/reports/custom`)
+  - [x] Implement placeholder/coming soon page for Custom Reports
 
 ### Priority 14: Textile Operations (`/src/pages/textile/`)
 

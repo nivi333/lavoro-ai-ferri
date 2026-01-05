@@ -317,6 +317,52 @@ class UserService {
       throw error;
     }
   }
+
+  async checkEmailAvailability(email: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/users/check-email?email=${encodeURIComponent(email)}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        console.warn('Email check API failed, skipping client-side validation');
+        return true; // Fallback: allow and let backend validate on submit
+      }
+
+      const result = await response.json();
+      return result.available;
+    } catch (error) {
+      console.error('Error checking email availability:', error);
+      return true;
+    }
+  }
+
+  async checkPhoneAvailability(phone: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/users/check-phone?phone=${encodeURIComponent(phone)}`,
+        {
+          method: 'GET',
+          headers: this.getAuthHeaders(),
+        }
+      );
+
+      if (!response.ok) {
+        console.warn('Phone check API failed, skipping client-side validation');
+        return true; // Fallback: allow and let backend validate on submit
+      }
+
+      const result = await response.json();
+      return result.available;
+    } catch (error) {
+      console.error('Error checking phone availability:', error);
+      return true;
+    }
+  }
 }
 
 export const userService = new UserService();

@@ -59,11 +59,13 @@ export { default as AccountsPayablePage } from './finance/AccountsPayablePage';
 export { default as ExpensesPage } from './finance/ExpensesPage';
 export { default as PettyCashPage } from './finance/PettyCashPage';
 
-// Reports - TODO: Migrate these pages
-export const FinancialReportsPage = PlaceholderPage;
-export const InventoryReportsPage = PlaceholderPage;
-export const SalesReportsPage = PlaceholderPage;
-export const OperationalReportsPage = PlaceholderPage;
+// Reports
+export { default as FinancialReportsPage } from './reports/FinancialReportsPage';
+export { default as InventoryReportsPage } from './reports/InventoryReportsPage';
+export { default as SalesReportsPage } from './reports/SalesReportsPage';
+export { default as OperationalReportsPage } from './reports/OperationalReportsPage';
+export { default as AnalyticsReportsPage } from './reports/AnalyticsReportsPage';
+export { default as CustomReportsPage } from './reports/CustomReportsPage';
 
 // Subscription
 export const SubscriptionPlansPage = PlaceholderPage;

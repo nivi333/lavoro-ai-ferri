@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import useAuth from '@/contexts/AuthContext';
 import { companyService } from '@/services/companyService';
+import { userService } from '@/services/userService';
 import { locationService, Location } from '@/services/locationService';
 import {
   Sheet,
@@ -64,6 +65,8 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
   const { currentCompany } = useAuth();
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [isChecking, setIsChecking] = useState(false);
+  const [isUnique, setIsUnique] = useState(true);
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteSchema),
@@ -116,7 +119,42 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
     }
   };
 
+  const checkAvailability = async (value: string) => {
+    if (!value || value.trim().length === 0) {
+      setIsUnique(true);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
+
+    if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+      return; // Not a valid format yet, let zod handle format validation
+    }
+
+    setIsChecking(true);
+    try {
+      let available = true;
+      if (emailRegex.test(value)) {
+        available = await userService.checkEmailAvailability(value);
+      } else if (phoneRegex.test(value)) {
+        available = await userService.checkPhoneAvailability(value);
+      }
+      setIsUnique(available);
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      setIsUnique(true); // Fail open
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
   const onSubmit = async (values: InviteFormValues) => {
+    if (!isUnique) {
+      toast.error('User with this email or phone is already registered/invited');
+      return;
+    }
+
     if (!currentCompany) {
       toast.error('No company selected. Please select a company first.');
       return;
@@ -168,8 +206,21 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
                   <FormItem>
                     <FormLabel>Email or Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder='user@example.com or +1234567890' {...field} />
+                      <Input
+                        placeholder='user@example.com or +1234567890'
+                        {...field}
+                        onChange={e => {
+                          field.onChange(e);
+                          checkAvailability(e.target.value);
+                        }}
+                      />
                     </FormControl>
+                    {isChecking && (
+                      <p className='text-xs text-muted-foreground mt-1'>Checking availability...</p>
+                    )}
+                    {!isChecking && !isUnique && (
+                      <p className='text-xs text-destructive mt-1'>User already exists</p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
