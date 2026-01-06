@@ -979,9 +979,9 @@ Create all input variants in `globalComponents.tsx`:
   - [x] Supplier Name - `SupplierFormSheet.tsx`
   - [x] Product Name - `ProductFormSheet.tsx`
 
-- [ ] **User Uniqueness (Global)** (Implementation guide provided for EmailOrPhone )
-  - [ ] Email - `UserInviteSheet.tsx`
-  - [ ] Phone - `UserInviteSheet.tsx`
+- [x] **User Uniqueness (Global)** (Implementation guide provided for EmailOrPhone )
+  - [x] Email - `UserInviteSheet.tsx`
+  - [x] Phone - `UserInviteSheet.tsx`
 
 - [x] **Documentation**
   - [x] Created `UNIQUENESS_VALIDATION_GUIDE.md`
@@ -1003,14 +1003,14 @@ Create all input variants in `globalComponents.tsx`:
   - [x] `ComplianceReportsListPage.tsx` - Match Products page design
   - [x] `QualityReportsPage.tsx` - Match Products page design
 
-- [ ] **Required Changes Per Page**:
-  - Replace custom table with shadcn/ui `Table` components
-  - Use consistent `Badge` variants and colors
-  - Match column spacing and padding
-  - Use `PageContainer`, `PageHeader`, `PageTitle` structure
-  - Implement `SearchInput` and filter dropdowns
-  - Use `DropdownMenu` for actions (three-dot menu)
-  - Implement `EmptyState` component
+- [x] **Required Changes Per Page**:
+  - [x] Replace custom table with shadcn/ui `Table` components
+  - [x] Use consistent `Badge` variants and colors
+  - [x] Match column spacing and padding
+  - [x] Use `PageContainer`, `PageHeader`, `PageTitle` structure
+  - [x] Implement `SearchInput` and filter dropdowns
+  - [x] Use `DropdownMenu` for actions (three-dot menu)
+  - [x] Implement `EmptyState` component
 
 
 ### Priority 13: Reports Module (`/src/pages/reports/`)
@@ -1149,8 +1149,8 @@ Create all input variants in `globalComponents.tsx`:
 
 > [!NOTE]
 > **Why Priority 15**: User management is administrative and not required for core operations.
-- [ ] **UsersListPage.tsx**
-  - Replace Ant Design Table with shadcn/ui Table
+- [x] **UsersListPage.tsx**
+  - [x] Replace Ant Design Table with shadcn/ui Table
   - Keep same API integration (`userService`)
   - [ ] **API Integration**: 
     - GET `/api/v1/users` - List all users

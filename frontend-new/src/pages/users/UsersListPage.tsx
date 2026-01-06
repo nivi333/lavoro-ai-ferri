@@ -32,6 +32,7 @@ import {
   TableHead,
   TableCell,
   DangerButton,
+  IconButton,
 } from '@/components/globalComponents';
 import {
   Select,
@@ -262,9 +263,9 @@ const UsersListPage = () => {
       case 'ADMIN':
         return 'default';
       case 'MANAGER':
-        return 'success';
-      case 'EMPLOYEE':
         return 'warning';
+      case 'EMPLOYEE':
+        return 'default';
       default:
         return 'default';
     }
@@ -442,9 +443,9 @@ const UsersListPage = () => {
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-3'>
-                      <Avatar className='h-10 w-10'>
+                      <Avatar className='h-9 w-9 border'>
                         <AvatarImage src={user.avatarUrl} />
-                        <AvatarFallback className='bg-primary text-primary-foreground'>
+                        <AvatarFallback className='bg-primary/10 text-primary'>
                           {getInitials(user.firstName, user.lastName)}
                         </AvatarFallback>
                       </Avatar>
@@ -460,7 +461,7 @@ const UsersListPage = () => {
                     <StatusBadge variant={getRoleBadgeVariant(user.role)}>{user.role}</StatusBadge>
                   </TableCell>
                   <TableCell>
-                    <StatusBadge variant={user.isActive ? 'success' : 'error'}>
+                    <StatusBadge variant={user.isActive ? 'success' : 'default'}>
                       {user.isActive ? 'Active' : 'Inactive'}
                     </StatusBadge>
                   </TableCell>
@@ -470,9 +471,9 @@ const UsersListPage = () => {
                   <TableCell className='text-center'>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className='p-2 hover:bg-muted rounded'>
+                        <IconButton variant='ghost' className='h-8 w-8 p-0'>
                           <MoreVertical className='h-4 w-4' />
-                        </button>
+                        </IconButton>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end'>
                         <DropdownMenuItem onClick={() => handleEdit(user)}>

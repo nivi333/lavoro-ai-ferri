@@ -119,35 +119,46 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
     }
   };
 
-  const checkAvailability = async (value: string) => {
-    if (!value || value.trim().length === 0) {
-      setIsUnique(true);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
-
-    if (!emailRegex.test(value) && !phoneRegex.test(value)) {
-      return; // Not a valid format yet, let zod handle format validation
-    }
-
-    setIsChecking(true);
-    try {
-      let available = true;
-      if (emailRegex.test(value)) {
-        available = await userService.checkEmailAvailability(value);
-      } else if (phoneRegex.test(value)) {
-        available = await userService.checkPhoneAvailability(value);
+  // Debounce checkAvailability
+  useEffect(() => {
+    const checkAvailability = async () => {
+      const value = form.getValues('emailOrPhone');
+      if (!value || value.trim().length === 0) {
+        setIsUnique(true);
+        return;
       }
-      setIsUnique(available);
-    } catch (error) {
-      console.error('Error checking availability:', error);
-      setIsUnique(true); // Fail open
-    } finally {
-      setIsChecking(false);
-    }
-  };
+
+      // Basic regex for quick pre-validation before API call
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phoneRegex = /^[+]?[0-9\s\-()]{10,}$/;
+
+      if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+        return;
+      }
+
+      setIsChecking(true);
+      try {
+        let available = true;
+        if (emailRegex.test(value)) {
+          available = await userService.checkEmailAvailability(value);
+        } else if (phoneRegex.test(value)) {
+          available = await userService.checkPhoneAvailability(value);
+        }
+        setIsUnique(available);
+      } catch (error) {
+        console.error('Error checking availability:', error);
+        setIsUnique(true); // Fail open
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      checkAvailability();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [form.watch('emailOrPhone')]);
 
   const onSubmit = async (values: InviteFormValues) => {
     if (!isUnique) {
@@ -206,14 +217,7 @@ const UserInviteSheet = ({ open, onOpenChange, onSuccess }: UserInviteSheetProps
                   <FormItem>
                     <FormLabel>Email or Phone</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder='user@example.com or +1234567890'
-                        {...field}
-                        onChange={e => {
-                          field.onChange(e);
-                          checkAvailability(e.target.value);
-                        }}
-                      />
+                      <Input placeholder='user@example.com or +1234567890' {...field} />
                     </FormControl>
                     {isChecking && (
                       <p className='text-xs text-muted-foreground mt-1'>Checking availability...</p>
