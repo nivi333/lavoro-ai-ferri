@@ -4,14 +4,13 @@ import { reportService } from '@/services/reportService';
 import { TrialBalanceReport as TrialBalanceData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface TrialBalanceReportProps {
@@ -54,7 +53,8 @@ const TrialBalanceReport: React.FC<TrialBalanceReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -88,41 +88,44 @@ const TrialBalanceReport: React.FC<TrialBalanceReportProps> = ({
       <ReportSummaryCards cards={cards} loading={loading} />
 
       {data && (
-        <TableCard title='Account Balances'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Account Code</TableHead>
-                <TableHead>Account Name</TableHead>
-                <TableHead className='text-right'>Debit</TableHead>
-                <TableHead className='text-right'>Credit</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAccounts?.map((account, index) => (
-                <TableRow key={index}>
-                  <TableCell className='font-mono'>{account.accountCode}</TableCell>
-                  <TableCell>{account.accountName}</TableCell>
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold'>Account Balances</h3>
+          <div className='rounded-md border bg-card'>
+            <DataTable>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Account Code</TableHead>
+                  <TableHead>Account Name</TableHead>
+                  <TableHead className='text-right'>Debit</TableHead>
+                  <TableHead className='text-right'>Credit</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAccounts?.map((account, index) => (
+                  <TableRow key={index}>
+                    <TableCell className='font-mono'>{account.accountCode}</TableCell>
+                    <TableCell>{account.accountName}</TableCell>
+                    <TableCell className='text-right'>
+                      {account.debit > 0 ? formatCurrency(account.debit) : '-'}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      {account.credit > 0 ? formatCurrency(account.credit) : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <TableRow className='font-bold bg-muted/50'>
+                  <TableCell colSpan={2}>Total</TableCell>
                   <TableCell className='text-right'>
-                    {account.debit > 0 ? formatCurrency(account.debit) : '-'}
+                    {formatCurrency(data.summary.totalDebits)}
                   </TableCell>
                   <TableCell className='text-right'>
-                    {account.credit > 0 ? formatCurrency(account.credit) : '-'}
+                    {formatCurrency(data.summary.totalCredits)}
                   </TableCell>
                 </TableRow>
-              ))}
-              <TableRow className='font-bold bg-muted/50'>
-                <TableCell colSpan={2}>Total</TableCell>
-                <TableCell className='text-right'>
-                  {formatCurrency(data.summary.totalDebits)}
-                </TableCell>
-                <TableCell className='text-right'>
-                  {formatCurrency(data.summary.totalCredits)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableCard>
+              </TableBody>
+            </DataTable>
+          </div>
+        </div>
       )}
     </div>
   );

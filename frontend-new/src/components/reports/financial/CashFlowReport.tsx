@@ -5,14 +5,13 @@ import { reportService } from '@/services/reportService';
 import { CashFlowReport as CashFlowData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface CashFlowReportProps {
@@ -61,7 +60,8 @@ const CashFlowReport: React.FC<CashFlowReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -90,80 +90,89 @@ const CashFlowReport: React.FC<CashFlowReportProps> = ({
 
       {data && (
         <div className='space-y-6'>
-          <TableCard title='Operating Activities'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Activity</TableHead>
-                  <TableHead className='text-right'>Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.operatingActivities.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Operating Activities</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Activity</TableHead>
+                    <TableHead className='text-right'>Amount</TableHead>
                   </TableRow>
-                ))}
-                <TableRow className='font-bold bg-muted/50'>
-                  <TableCell>Net Cash from Operating Activities</TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(data.summary.operatingCashFlow)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.operatingActivities.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow className='font-bold bg-muted/50'>
+                    <TableCell>Net Cash from Operating Activities</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(data.summary.operatingCashFlow)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
 
-          <TableCard title='Investing Activities'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Activity</TableHead>
-                  <TableHead className='text-right'>Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.investingActivities.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Investing Activities</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Activity</TableHead>
+                    <TableHead className='text-right'>Amount</TableHead>
                   </TableRow>
-                ))}
-                <TableRow className='font-bold bg-muted/50'>
-                  <TableCell>Net Cash from Investing Activities</TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(data.summary.investingCashFlow)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.investingActivities.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow className='font-bold bg-muted/50'>
+                    <TableCell>Net Cash from Investing Activities</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(data.summary.investingCashFlow)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
 
-          <TableCard title='Financing Activities'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Activity</TableHead>
-                  <TableHead className='text-right'>Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.financingActivities.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Financing Activities</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Activity</TableHead>
+                    <TableHead className='text-right'>Amount</TableHead>
                   </TableRow>
-                ))}
-                <TableRow className='font-bold bg-muted/50'>
-                  <TableCell>Net Cash from Financing Activities</TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(data.summary.financingCashFlow)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.financingActivities.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell className='text-right'>{formatCurrency(item.amount)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow className='font-bold bg-muted/50'>
+                    <TableCell>Net Cash from Financing Activities</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(data.summary.financingCashFlow)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
         </div>
       )}
     </div>

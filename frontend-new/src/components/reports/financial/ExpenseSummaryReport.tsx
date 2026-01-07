@@ -5,14 +5,13 @@ import { reportService } from '@/services/reportService';
 import { ExpenseSummaryReport as ExpenseData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface ExpenseSummaryReportProps {
@@ -61,7 +60,8 @@ const ExpenseSummaryReport: React.FC<ExpenseSummaryReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -92,31 +92,34 @@ const ExpenseSummaryReport: React.FC<ExpenseSummaryReportProps> = ({
       <ReportSummaryCards cards={cards} loading={loading} />
 
       {data && (
-        <TableCard title='Expenses by Supplier'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Supplier</TableHead>
-                <TableHead className='text-right'>Bill Count</TableHead>
-                <TableHead className='text-right'>Total Expenses</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSuppliers?.map((supplier, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <div className='font-medium'>{supplier.supplierName}</div>
-                    <div className='text-xs text-muted-foreground'>{supplier.supplierCode}</div>
-                  </TableCell>
-                  <TableCell className='text-right'>{supplier.billCount}</TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(supplier.totalExpenses)}
-                  </TableCell>
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold'>Expenses by Supplier</h3>
+          <div className='rounded-md border bg-card'>
+            <DataTable>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Supplier</TableHead>
+                  <TableHead className='text-right'>Bill Count</TableHead>
+                  <TableHead className='text-right'>Total Expenses</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableCard>
+              </TableHeader>
+              <TableBody>
+                {filteredSuppliers?.map((supplier, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div className='font-medium'>{supplier.supplierName}</div>
+                      <div className='text-xs text-muted-foreground'>{supplier.supplierCode}</div>
+                    </TableCell>
+                    <TableCell className='text-right'>{supplier.billCount}</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(supplier.totalExpenses)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </DataTable>
+          </div>
+        </div>
       )}
     </div>
   );

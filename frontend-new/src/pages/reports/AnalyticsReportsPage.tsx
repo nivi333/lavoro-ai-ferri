@@ -52,7 +52,7 @@ const AnalyticsReportsPage = () => {
         onValueChange={setActiveTab}
         className='w-full'
       >
-        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-6 flex-wrap'>
+        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1 flex-wrap'>
           <TabsTrigger value='product-performance'>Product Performance</TabsTrigger>
           <TabsTrigger value='customer-insights'>Customer Insights</TabsTrigger>
           <TabsTrigger value='business-performance'>Business Performance</TabsTrigger>

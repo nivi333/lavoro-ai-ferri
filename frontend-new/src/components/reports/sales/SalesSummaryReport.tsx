@@ -3,19 +3,16 @@ import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
 import { SalesSummaryReport as SalesSummaryData } from '@/services/reportTypes';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
-import ReportChart from '@/components/reports/shared/ReportChart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface SalesSummaryReportProps {
   dateRange: DateRange | undefined;
@@ -31,7 +28,6 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<SalesSummaryData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -42,7 +38,6 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       return;
     }
 
-    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -54,7 +49,6 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       console.error('Error fetching Sales Summary:', error);
       toast.error('Failed to load Sales Summary report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -63,37 +57,10 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Total Revenue',
-          value: formatCurrency(data.summary.totalRevenue),
-          color: '#16a34a',
-        },
-        {
-          title: 'Paid Invoices',
-          value: data.summary.paidInvoices,
-          suffix: ` / ${data.summary.totalInvoices}`,
-        },
-        {
-          title: 'Total Paid',
-          value: formatCurrency(data.summary.totalPaid),
-        },
-        {
-          title: 'Average Invoice',
-          value: formatCurrency(data.summary.averageInvoiceValue),
-        },
-        {
-          title: 'Collection Rate',
-          value: `${data.summary.collectionRate}%`,
-          color: '#2563eb',
-        },
-      ]
-    : [];
 
   const filteredCustomers = data?.customerSales.filter(
     c =>
@@ -101,81 +68,70 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       (c.customerCode && c.customerCode.toLowerCase().includes(searchText.toLowerCase()))
   );
 
-  const chartData = data?.salesTrend.map(item => ({
-    name: item.month,
-    Revenue: item.revenue,
-    Invoices: item.invoiceCount,
-  }));
-
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <>
-          <ReportChart title='Sales Trend' loading={loading}>
-            <BarChart data={chartData || []}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='name' />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey='Revenue' fill='#16a34a' />
-            </BarChart>
-          </ReportChart>
-
-          <TableCard title='Sales by Customer'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className='text-right'>Invoices</TableHead>
-                  <TableHead className='text-right'>Total Sales</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCustomers?.map((customer, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{customer.customerName}</div>
-                      <div className='text-xs text-muted-foreground'>
-                        {customer.customerCode || 'N/A'}
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-right'>{customer.invoiceCount}</TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(customer.totalSales)}
-                    </TableCell>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Sales by Customer</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead className='text-right'>Invoices</TableHead>
+                    <TableHead className='text-right'>Total Sales</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {filteredCustomers?.map((customer, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{customer.customerName}</div>
+                        <div className='text-xs text-muted-foreground'>
+                          {customer.customerCode || 'N/A'}
+                        </div>
+                      </TableCell>
+                      <TableCell className='text-right'>{customer.invoiceCount}</TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(customer.totalSales)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
 
-          <TableCard title='Recent Product Sales'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead className='text-right'>Quantity</TableHead>
-                  <TableHead className='text-right'>Revenue</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.productSales.slice(0, 10).map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{product.productName}</div>
-                      <div className='text-xs text-muted-foreground'>{product.productCode}</div>
-                    </TableCell>
-                    <TableCell className='text-right'>{product.quantity}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(product.revenue)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Recent Product Sales</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead className='text-right'>Quantity</TableHead>
+                    <TableHead className='text-right'>Revenue</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
-        </>
+                </TableHeader>
+                <TableBody>
+                  {data.productSales.slice(0, 10).map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{product.productName}</div>
+                        <div className='text-xs text-muted-foreground'>{product.productCode}</div>
+                      </TableCell>
+                      <TableCell className='text-right'>{product.quantity}</TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(product.revenue)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

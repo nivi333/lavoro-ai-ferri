@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface StockValuationReportProps {
@@ -44,14 +43,12 @@ const StockValuationReport: React.FC<StockValuationReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<ValuationData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [triggerFetch]);
 
   const fetchData = async () => {
-    setLoading(true);
     onLoadingChange(true);
     try {
       const dateStr = asOfDate ? format(asOfDate, 'yyyy-MM-dd') : undefined;
@@ -61,7 +58,6 @@ const StockValuationReport: React.FC<StockValuationReportProps> = ({
       console.error('Error fetching Stock Valuation report:', error);
       toast.error('Failed to load Stock Valuation report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -70,27 +66,10 @@ const StockValuationReport: React.FC<StockValuationReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Total Inventory Value',
-          value: formatCurrency(data.summary.totalValue),
-          color: '#16a34a',
-        },
-        {
-          title: 'Total Items',
-          value: data.summary.totalItems,
-        },
-        // {
-        //   title: 'Avg Value / Item',
-        //   value: formatCurrency(data.summary.averageValuePerItem),
-        // },
-      ]
-    : [];
 
   const filteredItems = data?.items?.filter(
     item =>
@@ -100,11 +79,9 @@ const StockValuationReport: React.FC<StockValuationReportProps> = ({
 
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <TableCard title='Inventory Valuation'>
-          <Table>
+        <div className='rounded-md border bg-card'>
+          <DataTable>
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
@@ -130,8 +107,8 @@ const StockValuationReport: React.FC<StockValuationReportProps> = ({
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
-        </TableCard>
+          </DataTable>
+        </div>
       )}
     </div>
   );

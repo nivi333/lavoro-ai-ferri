@@ -3,19 +3,16 @@ import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
 import { SalesTrendsReport as SalesTrendData } from '@/services/reportTypes';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
-import { TableCard } from '@/components/globalComponents';
-import { toast } from 'sonner';
-import ReportChart from '@/components/reports/shared/ReportChart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/globalComponents';
+import { toast } from 'sonner';
 
 interface SalesTrendReportProps {
   dateRange: DateRange | undefined;
@@ -31,7 +28,6 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<SalesTrendData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -42,7 +38,6 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
       return;
     }
 
-    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -54,7 +49,6 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
       console.error('Error fetching Sales Trends report:', error);
       toast.error('Failed to load Sales Trends report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -63,59 +57,19 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
-  const cards = data
-    ? [
-        {
-          title: 'Total Revenue',
-          value: formatCurrency(data.summary.totalRevenue),
-          color: '#16a34a',
-        },
-        {
-          title: 'Total Orders',
-          value: data.summary.totalOrders,
-        },
-        {
-          title: 'Growth Rate',
-          value: `${data.summary.growthRate}%`,
-          color: data.summary.growthRate >= 0 ? '#16a34a' : '#dc2626',
-        },
-        {
-          title: 'Avg Order Value',
-          value: formatCurrency(data.summary.averageOrderValue),
-        },
-      ]
-    : [];
-
-  const chartData = data?.trendsByPeriod.map(item => ({
-    name: item.period, // Date or Month name
-    Revenue: item.revenue,
-    Orders: item.orders,
-  }));
-
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <>
-          <ReportChart title='Revenue Trend' loading={loading}>
-            <BarChart data={chartData || []}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='name' />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey='Revenue' fill='#2563eb' />
-            </BarChart>
-          </ReportChart>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <TableCard title='Periodic Performance'>
-              <Table>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Periodic Performance</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Period</TableHead>
@@ -139,11 +93,14 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-            </TableCard>
+              </DataTable>
+            </div>
+          </div>
 
-            <TableCard title='Category Performance'>
-              <Table>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Category Performance</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Category</TableHead>
@@ -160,10 +117,10 @@ const SalesTrendReport: React.FC<SalesTrendReportProps> = ({
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-            </TableCard>
+              </DataTable>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

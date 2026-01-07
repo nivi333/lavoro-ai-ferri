@@ -68,7 +68,7 @@ const FinancialReportsPage = () => {
         onValueChange={setActiveTab}
         className='w-full'
       >
-        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-6 flex-wrap'>
+        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1 flex-wrap'>
           <TabsTrigger value='profit-loss'>Profit & Loss</TabsTrigger>
           <TabsTrigger value='balance-sheet'>Balance Sheet</TabsTrigger>
           <TabsTrigger value='cash-flow'>Cash Flow</TabsTrigger>

@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface StockAgingReportProps {
@@ -44,14 +43,12 @@ const StockAgingReport: React.FC<StockAgingReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<StockAgingData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [triggerFetch]);
 
   const fetchData = async () => {
-    setLoading(true);
     onLoadingChange(true);
     try {
       const dateStr = asOfDate ? format(asOfDate, 'yyyy-MM-dd') : undefined;
@@ -61,7 +58,6 @@ const StockAgingReport: React.FC<StockAgingReportProps> = ({
       console.error('Error fetching Stock Aging report:', error);
       toast.error('Failed to load Stock Aging report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -70,23 +66,10 @@ const StockAgingReport: React.FC<StockAgingReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Total Stock Value',
-          value: formatCurrency(data.summary.totalValue),
-        },
-        {
-          title: 'Old Stock Value (>180 Days)',
-          value: formatCurrency(data.summary.oldStockValue),
-          color: '#dc2626',
-        },
-      ]
-    : [];
 
   const filteredItems = data?.items?.filter(
     item =>
@@ -96,11 +79,9 @@ const StockAgingReport: React.FC<StockAgingReportProps> = ({
 
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <TableCard title='Stock Aging Analysis'>
-          <Table>
+        <div className='rounded-md border bg-card'>
+          <DataTable>
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
@@ -136,8 +117,8 @@ const StockAgingReport: React.FC<StockAgingReportProps> = ({
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
-        </TableCard>
+          </DataTable>
+        </div>
       )}
     </div>
   );

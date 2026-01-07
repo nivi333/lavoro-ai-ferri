@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { reportService } from '@/services/reportService';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard, StatusBadge } from '@/components/globalComponents';
+  StatusBadge,
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface LowStockReportProps {
@@ -44,14 +44,12 @@ const LowStockReport: React.FC<LowStockReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<LowStockData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [triggerFetch]);
 
   const fetchData = async () => {
-    setLoading(true);
     onLoadingChange(true);
     try {
       const result = await reportService.getLowStockReport();
@@ -60,25 +58,9 @@ const LowStockReport: React.FC<LowStockReportProps> = ({
       console.error('Error fetching Low Stock report:', error);
       toast.error('Failed to load Low Stock report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Total Low Stock Items',
-          value: data.summary.totalLowStockItems,
-          color: '#eab308', // yellow
-        },
-        {
-          title: 'Critical Level Items',
-          value: data.summary.criticalItems,
-          color: '#dc2626', // red
-        },
-      ]
-    : [];
 
   const filteredItems = data?.items?.filter(
     item =>
@@ -88,11 +70,9 @@ const LowStockReport: React.FC<LowStockReportProps> = ({
 
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <TableCard title='Low Stock Items'>
-          <Table>
+        <div className='rounded-md border bg-card'>
+          <DataTable>
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
@@ -125,8 +105,8 @@ const LowStockReport: React.FC<LowStockReportProps> = ({
                 );
               })}
             </TableBody>
-          </Table>
-        </TableCard>
+          </DataTable>
+        </div>
       )}
     </div>
   );

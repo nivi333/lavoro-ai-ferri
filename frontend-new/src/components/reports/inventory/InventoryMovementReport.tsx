@@ -3,19 +3,15 @@ import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
 import { InventoryMovementReport as MovementData } from '@/services/reportTypes';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
-import ReportChart from '@/components/reports/shared/ReportChart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface InventoryMovementReportProps {
   dateRange: DateRange | undefined;
@@ -31,7 +27,6 @@ const InventoryMovementReport: React.FC<InventoryMovementReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<MovementData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -42,7 +37,6 @@ const InventoryMovementReport: React.FC<InventoryMovementReportProps> = ({
       return;
     }
 
-    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -54,86 +48,39 @@ const InventoryMovementReport: React.FC<InventoryMovementReportProps> = ({
       console.error('Error fetching Inventory Movement report:', error);
       toast.error('Failed to load Inventory Movement report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Total Movements',
-          value: data.summary.totalMovements,
-        },
-        {
-          title: 'Incoming',
-          value: data.summary.incoming,
-          color: '#16a34a', // green
-        },
-        {
-          title: 'Outgoing',
-          value: data.summary.outgoing,
-          color: '#dc2626', // red
-        },
-        {
-          title: 'Net Change',
-          value: data.summary.netChange,
-          color: data.summary.netChange >= 0 ? '#16a34a' : '#dc2626',
-        },
-      ]
-    : [];
 
   const filteredItems = data?.movementsByProduct.filter(item =>
     item.productName.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const chartData = data?.movementTrend.map(item => ({
-    name: item.date,
-    In: item.incoming,
-    Out: item.outgoing,
-  }));
-
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <>
-          <ReportChart title='Movement Trend' loading={loading}>
-            <BarChart data={chartData || []}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='name' />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey='In' fill='#16a34a' name='Incoming' />
-              <Bar dataKey='Out' fill='#dc2626' name='Outgoing' />
-            </BarChart>
-          </ReportChart>
-
-          <TableCard title='Product Movements'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead className='text-right'>Incoming</TableHead>
-                  <TableHead className='text-right'>Outgoing</TableHead>
-                  <TableHead className='text-right'>Net Change</TableHead>
+        <div className='rounded-md border bg-card'>
+          <DataTable>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead className='text-right'>Incoming</TableHead>
+                <TableHead className='text-right'>Outgoing</TableHead>
+                <TableHead className='text-right'>Net Change</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredItems?.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell className='font-medium'>{item.productName}</TableCell>
+                  <TableCell className='text-right text-green-600'>+{item.incoming}</TableCell>
+                  <TableCell className='text-right text-red-600'>-{item.outgoing}</TableCell>
+                  <TableCell className='text-right font-bold'>{item.netChange}</TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredItems?.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell className='font-medium'>{item.productName}</TableCell>
-                    <TableCell className='text-right text-green-600'>+{item.incoming}</TableCell>
-                    <TableCell className='text-right text-red-600'>-{item.outgoing}</TableCell>
-                    <TableCell className='text-right font-bold'>{item.netChange}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
-        </>
+              ))}
+            </TableBody>
+          </DataTable>
+        </div>
       )}
     </div>
   );

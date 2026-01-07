@@ -5,14 +5,13 @@ import { reportService } from '@/services/reportService';
 import { ProfitLossReport as ProfitLossData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface ProfitLossReportProps {
@@ -62,7 +61,8 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -104,9 +104,10 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
         <div className='space-y-6'>
           {/* Revenue and COGS Section */}
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <TableCard title='Income'>
-              <div className='rounded-md border'>
-                <Table>
+            <div className='space-y-4'>
+              <h3 className='text-lg font-semibold'>Income</h3>
+              <div className='rounded-md border bg-card'>
+                <DataTable>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Category</TableHead>
@@ -128,13 +129,14 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                       </TableCell>
                     </TableRow>
                   </TableBody>
-                </Table>
+                </DataTable>
               </div>
-            </TableCard>
+            </div>
 
-            <TableCard title='Cost of Goods Sold'>
-              <div className='rounded-md border'>
-                <Table>
+            <div className='space-y-4'>
+              <h3 className='text-lg font-semibold'>Cost of Goods Sold</h3>
+              <div className='rounded-md border bg-card'>
+                <DataTable>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Category</TableHead>
@@ -156,15 +158,16 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                       </TableCell>
                     </TableRow>
                   </TableBody>
-                </Table>
+                </DataTable>
               </div>
-            </TableCard>
+            </div>
           </div>
 
           {/* Expenses Section */}
-          <TableCard title='Operating Expenses'>
-            <div className='rounded-md border'>
-              <Table>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Operating Expenses</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Category</TableHead>
@@ -185,9 +188,9 @@ const ProfitLossReport: React.FC<ProfitLossReportProps> = ({
                     </TableCell>
                   </TableRow>
                 </TableBody>
-              </Table>
+              </DataTable>
             </div>
-          </TableCard>
+          </div>
         </div>
       )}
     </div>

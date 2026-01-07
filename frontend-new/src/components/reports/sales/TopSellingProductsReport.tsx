@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
+
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface TopSellingProductsReportProps {
@@ -50,7 +49,6 @@ const TopSellingProductsReport: React.FC<TopSellingProductsReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<TopSellingData | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -61,7 +59,6 @@ const TopSellingProductsReport: React.FC<TopSellingProductsReportProps> = ({
       return;
     }
 
-    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -73,7 +70,6 @@ const TopSellingProductsReport: React.FC<TopSellingProductsReportProps> = ({
       console.error('Error fetching Top Selling Products report:', error);
       toast.error('Failed to load Top Selling Products report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -82,23 +78,10 @@ const TopSellingProductsReport: React.FC<TopSellingProductsReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
-
-  const cards = data
-    ? [
-        {
-          title: 'Top Product',
-          value: data.summary.topPerformerName || 'N/A',
-          subValue: data.summary.topPerformerCategory,
-        },
-        {
-          title: 'Total Units Sold',
-          value: data.products?.reduce((acc, p) => acc + (p.quantitySold || 0), 0) || 0,
-        },
-      ]
-    : [];
 
   const filteredProducts = data?.products?.filter(
     p =>
@@ -108,40 +91,41 @@ const TopSellingProductsReport: React.FC<TopSellingProductsReportProps> = ({
 
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
-        <TableCard title='Top Selling Products'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rank</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className='text-right'>Units Sold</TableHead>
-                <TableHead className='text-right'>Revenue</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts?.map((product, index) => (
-                <TableRow key={index}>
-                  <TableCell className='w-12 text-center font-bold text-muted-foreground'>
-                    #{index + 1}
-                  </TableCell>
-                  <TableCell>
-                    <div className='font-medium'>{product.productName}</div>
-                    <div className='text-xs text-muted-foreground'>{product.productCode}</div>
-                  </TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell className='text-right font-medium'>{product.quantitySold}</TableCell>
-                  <TableCell className='text-right'>
-                    {formatCurrency(product.salesRevenue)}
-                  </TableCell>
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold'>Top Selling Products</h3>
+          <div className='rounded-md border bg-card'>
+            <DataTable>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Rank</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead className='text-right'>Units Sold</TableHead>
+                  <TableHead className='text-right'>Revenue</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableCard>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts?.map((product, index) => (
+                  <TableRow key={index}>
+                    <TableCell className='w-12 text-center font-bold text-muted-foreground'>
+                      #{index + 1}
+                    </TableCell>
+                    <TableCell>
+                      <div className='font-medium'>{product.productName}</div>
+                      <div className='text-xs text-muted-foreground'>{product.productCode}</div>
+                    </TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell className='text-right font-medium'>{product.quantitySold}</TableCell>
+                    <TableCell className='text-right'>
+                      {formatCurrency(product.salesRevenue)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </DataTable>
+          </div>
+        </div>
       )}
     </div>
   );

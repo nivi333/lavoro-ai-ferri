@@ -4,14 +4,13 @@ import { reportService } from '@/services/reportService';
 import { GSTReport as GSTData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface GSTReportProps {
@@ -62,7 +61,8 @@ const GSTReport: React.FC<GSTReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -90,61 +90,68 @@ const GSTReport: React.FC<GSTReportProps> = ({
 
       {data && (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <TableCard title='Output Tax (Sales Invoices)'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className='text-right'>Taxable</TableHead>
-                  <TableHead className='text-right'>Tax</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.outputTax.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{item.invoiceId}</div> // Ideally invoice number
-                      <div className='text-xs text-muted-foreground'>{item.customerName}</div>
-                    </TableCell>
-                    <TableCell>{new Date(item.invoiceDate).toLocaleDateString()}</TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(item.taxableAmount)}
-                    </TableCell>
-                    <TableCell className='text-right'>{formatCurrency(item.taxAmount)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Output Tax (Sales Invoices)</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className='text-right'>Taxable</TableHead>
+                    <TableHead className='text-right'>Tax</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.outputTax.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{item.invoiceId}</div> // Ideally invoice
+                        number
+                        <div className='text-xs text-muted-foreground'>{item.customerName}</div>
+                      </TableCell>
+                      <TableCell>{new Date(item.invoiceDate).toLocaleDateString()}</TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(item.taxableAmount)}
+                      </TableCell>
+                      <TableCell className='text-right'>{formatCurrency(item.taxAmount)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
 
-          <TableCard title='Input Tax (Purchase Bills)'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Bill</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className='text-right'>Taxable</TableHead>
-                  <TableHead className='text-right'>Tax</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.inputTax.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{item.billId}</div>
-                      <div className='text-xs text-muted-foreground'>{item.supplierName}</div>
-                    </TableCell>
-                    <TableCell>{new Date(item.billDate).toLocaleDateString()}</TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(item.taxableAmount)}
-                    </TableCell>
-                    <TableCell className='text-right'>{formatCurrency(item.taxAmount)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Input Tax (Purchase Bills)</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Bill</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className='text-right'>Taxable</TableHead>
+                    <TableHead className='text-right'>Tax</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.inputTax.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{item.billId}</div>
+                        <div className='text-xs text-muted-foreground'>{item.supplierName}</div>
+                      </TableCell>
+                      <TableCell>{new Date(item.billDate).toLocaleDateString()}</TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(item.taxableAmount)}
+                      </TableCell>
+                      <TableCell className='text-right'>{formatCurrency(item.taxAmount)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -4,17 +4,14 @@ import { format } from 'date-fns';
 import { reportService } from '@/services/reportService';
 
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
-import ReportChart from '@/components/reports/shared/ReportChart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface SalesByRegionReportProps {
   dateRange: DateRange | undefined;
@@ -37,7 +34,6 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<RegionData[] | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -48,7 +44,6 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
       return;
     }
 
-    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -60,7 +55,6 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
       console.error('Error fetching Sales by Region report:', error);
       toast.error('Failed to load Sales by Region report');
     } finally {
-      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -69,7 +63,8 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -77,32 +72,15 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
     r.region?.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const chartData = filteredData?.map(item => ({
-    name: item.region,
-    Revenue: item.revenue,
-  }));
-
   return (
     <div className='space-y-6'>
-      {loading && !data && <p>Loading...</p>}
-
       {/* Optional: Summary cards if we can aggregate from the region list locally or if API returns summary */}
 
       {filteredData && filteredData.length > 0 && (
-        <>
-          <ReportChart title='Revenue by Region' loading={loading}>
-            <BarChart data={chartData || []}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='name' />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey='Revenue' fill='#8884d8' />
-            </BarChart>
-          </ReportChart>
-
-          <TableCard title='Regional Performance'>
-            <Table>
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold'>Regional Performance</h3>
+          <div className='rounded-md border bg-card'>
+            <DataTable>
               <TableHeader>
                 <TableRow>
                   <TableHead>Region</TableHead>
@@ -121,9 +99,9 @@ const SalesByRegionReport: React.FC<SalesByRegionReportProps> = ({
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          </TableCard>
-        </>
+            </DataTable>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { reportService } from '@/services/reportService';
 import { InventorySummaryReport as InventorySummaryData } from '@/services/reportTypes';
-import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface InventorySummaryReportProps {
@@ -54,93 +52,74 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
     }).format(amount);
   };
 
-  const cards = data
-    ? [
-        {
-          title: 'Total Items',
-          value: data.summary.totalItems,
-        },
-        {
-          title: 'Total Quantity',
-          value: data.summary.totalQuantity,
-        },
-        {
-          title: 'Total Value',
-          value: formatCurrency(data.summary.totalValue),
-          color: '#16a34a',
-        },
-        {
-          title: 'Low Stock Items',
-          value: data.summary.lowStockCount,
-          color: data.summary.lowStockCount > 0 ? '#dc2626' : undefined,
-        },
-      ]
-    : [];
-
   const filteredLocations = data?.stockByLocation.filter(l =>
     l.locationName?.toLowerCase().includes(searchText.toLowerCase())
   );
 
   return (
     <div className='space-y-6'>
-      <ReportSummaryCards cards={cards} loading={loading} />
-
       {data && (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <TableCard title='Stock by Location'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Location</TableHead>
-                  <TableHead className='text-right'>Items</TableHead>
-                  <TableHead className='text-right'>Total Qty</TableHead>
-                  <TableHead className='text-right'>Value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLocations?.map((loc, index) => (
-                  <TableRow key={index}>
-                    <TableCell className='font-medium'>{loc.locationName}</TableCell>
-                    <TableCell className='text-right'>{loc.itemCount}</TableCell>
-                    <TableCell className='text-right'>{loc.totalQuantity}</TableCell>
-                    <TableCell className='text-right'>{formatCurrency(loc.totalValue)}</TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Stock by Location</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Location</TableHead>
+                    <TableHead className='text-right'>Items</TableHead>
+                    <TableHead className='text-right'>Total Qty</TableHead>
+                    <TableHead className='text-right'>Value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {filteredLocations?.map((loc, index) => (
+                    <TableRow key={index}>
+                      <TableCell className='font-medium'>{loc.locationName}</TableCell>
+                      <TableCell className='text-right'>{loc.itemCount}</TableCell>
+                      <TableCell className='text-right'>{loc.totalQuantity}</TableCell>
+                      <TableCell className='text-right'>{formatCurrency(loc.totalValue)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
 
-          <TableCard title='Top Products by Value'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead className='text-right'>Qty</TableHead>
-                  <TableHead className='text-right'>Unit Price</TableHead>
-                  <TableHead className='text-right'>Total Value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.topProductsByValue.map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{product.productName}</div>
-                      <div className='text-xs text-muted-foreground'>{product.productCode}</div>
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      {product.quantityOnHand} {product.unitOfMeasure}
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(product.unitPrice)}
-                    </TableCell>
-                    <TableCell className='text-right font-medium'>
-                      {formatCurrency(product.totalValue)}
-                    </TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Top Products by Value</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead className='text-right'>Qty</TableHead>
+                    <TableHead className='text-right'>Unit Price</TableHead>
+                    <TableHead className='text-right'>Total Value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {data.topProductsByValue.map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{product.productName}</div>
+                        <div className='text-xs text-muted-foreground'>{product.productCode}</div>
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {product.quantityOnHand} {product.unitOfMeasure}
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(product.unitPrice)}
+                      </TableCell>
+                      <TableCell className='text-right font-medium'>
+                        {formatCurrency(product.totalValue)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -4,14 +4,13 @@ import { reportService } from '@/services/reportService';
 import { APAgingReport as APAgingData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
 import {
-  Table,
+  DataTable,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { TableCard } from '@/components/globalComponents';
+} from '@/components/globalComponents';
 import { toast } from 'sonner';
 
 interface AccountsPayableReportProps {
@@ -54,7 +53,8 @@ const AccountsPayableReport: React.FC<AccountsPayableReportProps> = ({
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -117,41 +117,48 @@ const AccountsPayableReport: React.FC<AccountsPayableReportProps> = ({
             </div>
           </div>
 
-          <TableCard title='Supplier Aging'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead className='text-right'>Current</TableHead>
-                  <TableHead className='text-right'>31-60 Days</TableHead>
-                  <TableHead className='text-right'>61-90 Days</TableHead>
-                  <TableHead className='text-right'>&gt;90 Days</TableHead>
-                  <TableHead className='text-right'>Total Due</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSuppliers?.map((supplier, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className='font-medium'>{supplier.supplierName}</div>
-                      <div className='text-xs text-muted-foreground'>{supplier.email}</div>
-                    </TableCell>
-                    <TableCell className='text-right'>{formatCurrency(supplier.current)}</TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(supplier.days31to60)}
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      {formatCurrency(supplier.days61to90)}
-                    </TableCell>
-                    <TableCell className='text-right'>{formatCurrency(supplier.over90)}</TableCell>
-                    <TableCell className='text-right font-bold'>
-                      {formatCurrency(supplier.totalOutstanding)}
-                    </TableCell>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Supplier Aging</h3>
+            <div className='rounded-md border bg-card'>
+              <DataTable>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead className='text-right'>Current</TableHead>
+                    <TableHead className='text-right'>31-60 Days</TableHead>
+                    <TableHead className='text-right'>61-90 Days</TableHead>
+                    <TableHead className='text-right'>&gt;90 Days</TableHead>
+                    <TableHead className='text-right'>Total Due</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableCard>
+                </TableHeader>
+                <TableBody>
+                  {filteredSuppliers?.map((supplier, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='font-medium'>{supplier.supplierName}</div>
+                        <div className='text-xs text-muted-foreground'>{supplier.email}</div>
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(supplier.current)}
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(supplier.days31to60)}
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(supplier.days61to90)}
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {formatCurrency(supplier.over90)}
+                      </TableCell>
+                      <TableCell className='text-right font-bold'>
+                        {formatCurrency(supplier.totalOutstanding)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTable>
+            </div>
+          </div>
         </>
       )}
     </div>

@@ -52,7 +52,7 @@ const OperationalReportsPage = () => {
         onValueChange={setActiveTab}
         className='w-full'
       >
-        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-6 flex-wrap'>
+        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1 flex-wrap'>
           <TabsTrigger value='efficiency'>Production Efficiency</TabsTrigger>
           <TabsTrigger value='machine'>Machine Utilization</TabsTrigger>
           <TabsTrigger value='quality'>Quality Metrics</TabsTrigger>
