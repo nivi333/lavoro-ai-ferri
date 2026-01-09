@@ -21,7 +21,7 @@ import {
 // ============================================================================
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-base text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-base text-sm font-medium transition-all focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -207,7 +207,7 @@ export const TextInput = forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         className={cn(
-          'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50',
           error && 'border-error focus-visible:ring-error',
           className
         )}
@@ -228,7 +228,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
         <input
           type={showPassword ? 'text' : 'password'}
           className={cn(
-            'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10',
+            'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 pr-10',
             error && 'border-error focus-visible:ring-error',
             className
           )}
@@ -260,7 +260,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <input
           type='text'
           className={cn(
-            'flex h-10 w-full rounded-base border border-input bg-background pl-10 pr-10 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+            'flex h-10 w-full rounded-base border border-input bg-background pl-10 pr-10 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50',
             error && 'border-error focus-visible:ring-error',
             className
           )}
@@ -292,7 +292,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     return (
       <textarea
         className={cn(
-          'flex min-h-[80px] w-full rounded-base border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y',
+          'flex min-h-[80px] w-full rounded-base border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 resize-y',
           error && 'border-error focus-visible:ring-error',
           className
         )}
@@ -316,7 +316,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         <input
           type='number'
           className={cn(
-            'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-8',
+            'flex h-10 w-full rounded-base border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 pr-8',
             error && 'border-error focus-visible:ring-error',
             className
           )}
