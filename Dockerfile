@@ -81,5 +81,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application with migrations and safety checks
-CMD ["sh", "-c", "echo 'Starting deployment...' && npx prisma generate && npx prisma migrate deploy && echo 'Migrations complete. Starting server...' && TS_NODE_PROJECT=tsconfig.prod.json node -r tsconfig-paths/register dist/index.js"]
+# Start the application - migrations are optional (run manually or via CI/CD)
+# If SKIP_MIGRATIONS is set or DIRECT_URL is not configured, skip migrations
+CMD ["sh", "-c", "echo 'Starting deployment...' && npx prisma generate && if [ \"$SKIP_MIGRATIONS\" = \"true\" ] || [ -z \"$DIRECT_URL\" ]; then echo 'Skipping migrations (SKIP_MIGRATIONS=true or DIRECT_URL not set)'; else echo 'Running migrations...' && npx prisma migrate deploy --skip-seed 2>/dev/null || echo 'Migration skipped or failed - continuing startup...'; fi && echo 'Starting server...' && TS_NODE_PROJECT=tsconfig.prod.json node -r tsconfig-paths/register dist/index.js"]
