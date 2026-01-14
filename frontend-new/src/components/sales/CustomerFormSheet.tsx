@@ -519,9 +519,7 @@ export function CustomerFormSheet({
                   name='billingCity'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        City <span className='text-destructive'>*</span>
-                      </FormLabel>
+                      <FormLabel>City</FormLabel>
                       <FormControl>
                         <Input placeholder='City' {...field} />
                       </FormControl>
@@ -549,9 +547,7 @@ export function CustomerFormSheet({
                   name='billingCountry'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        Country <span className='text-destructive'>*</span>
-                      </FormLabel>
+                      <FormLabel>Country</FormLabel>
                       <FormControl>
                         <Input placeholder='Country' {...field} />
                       </FormControl>
