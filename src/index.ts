@@ -16,6 +16,7 @@ import {
   timeoutMiddleware,
   maintenanceModeMiddleware,
 } from './middleware/requestMiddleware';
+import { performanceMonitor } from './middleware/performanceMonitor';
 import {
   enhancedErrorHandler,
   notFoundHandler,
@@ -38,6 +39,7 @@ const app = express();
 // Core middleware stack
 app.use(maintenanceModeMiddleware);
 app.use(requestIdMiddleware);
+app.use(performanceMonitor); // Track slow requests
 app.use(responseTimeMiddleware);
 app.use(requestLoggingMiddleware);
 app.use(apiVersionMiddleware);

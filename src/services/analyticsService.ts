@@ -1,6 +1,11 @@
 import { PrismaClient as GlobalPrismaClient } from '@prisma/client';
+import { redisClient } from '../utils/redis';
+import { logger } from '../utils/logger';
 
 const globalPrisma = new GlobalPrismaClient();
+
+// Cache TTL: 5 minutes
+const CACHE_TTL = 300;
 
 interface DashboardAnalytics {
   // Core Stats
@@ -70,6 +75,16 @@ class AnalyticsService {
    */
   async getDashboardAnalytics(companyId: string): Promise<DashboardAnalytics> {
     try {
+      // Check cache first
+      const cacheKey = `analytics:dashboard:${companyId}`;
+      const cached = await redisClient.get(cacheKey).catch(() => null);
+      
+      if (cached) {
+        logger.info(`Cache hit for dashboard analytics: ${companyId}`);
+        return JSON.parse(cached);
+      }
+      
+      logger.info(`Cache miss for dashboard analytics: ${companyId}`);
       // Run all queries in parallel for better performance
       const [
         productsCount,
@@ -271,7 +286,7 @@ class AnalyticsService {
         {} as Record<string, number>
       );
 
-      return {
+      const result = {
         // Core Stats
         totalProducts: productsCount,
         activeOrders: ordersCount,
@@ -314,6 +329,13 @@ class AnalyticsService {
         dyeingFinishing: textileData[2],
         garmentManufacturing: textileData[3],
       };
+
+      // Cache the result for 5 minutes
+      await redisClient.setex(cacheKey, CACHE_TTL, JSON.stringify(result)).catch(err => {
+        logger.error('Failed to cache dashboard analytics:', err);
+      });
+
+      return result;
     } catch (error: any) {
       console.error('Error fetching dashboard analytics:', error);
       throw new Error(`Failed to fetch dashboard analytics: ${error.message}`);

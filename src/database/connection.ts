@@ -13,6 +13,12 @@ export const globalPrisma = new PrismaClient({
   log: config.env === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
 });
 
+// Enable connection pooling
+globalPrisma.$connect().catch(err => {
+  logger.error('Failed to connect to database:', err);
+  process.exit(1);
+});
+
 // Connection pool manager for tenant-specific databases
 class DatabaseManager {
   private tenantPools = new Map<string, Pool>();

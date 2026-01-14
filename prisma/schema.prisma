@@ -270,6 +270,10 @@ model orders {
   @@unique([company_id, order_id])
   @@index([company_id])
   @@index([customer_id])
+  @@index([status])
+  @@index([company_id, status])
+  @@index([order_date])
+  @@index([is_active])
 }
 
 model order_items {
@@ -519,6 +523,94 @@ model product_categories {
   @@unique([company_id, category_id])
   @@index([company_id])
   @@index([parent_id])
+}
+
+model invoices {
+  id                 String    @id
+  invoice_id         String    @unique
+  company_id         String
+  location_id        String?
+  order_id           String?
+  customer_id        String?
+  invoice_date       DateTime
+  due_date           DateTime?
+  status             String    @default("DRAFT")
+  subtotal_amount    Decimal   @db.Decimal(12, 2)
+  tax_amount         Decimal   @db.Decimal(12, 2)
+  total_amount       Decimal   @db.Decimal(12, 2)
+  balance_due        Decimal   @default(0) @db.Decimal(12, 2)
+  notes              String?
+  is_active          Boolean   @default(true)
+  created_at         DateTime  @default(now())
+  updated_at         DateTime
+
+  company  companies          @relation("CompanyInvoices", fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation("LocationInvoices", fields: [location_id], references: [id])
+  order    orders?            @relation("OrderInvoices", fields: [order_id], references: [id])
+  customer customers?         @relation(fields: [customer_id], references: [id])
+
+  @@index([company_id])
+  @@index([customer_id])
+  @@index([status])
+  @@index([company_id, status])
+  @@index([invoice_date])
+  @@index([due_date])
+}
+
+model bills {
+  id              String             @id
+  bill_id         String             @unique
+  company_id      String
+  location_id     String?
+  supplier_id     String?
+  bill_date       DateTime
+  due_date        DateTime?
+  status          String             @default("DRAFT")
+  subtotal_amount Decimal            @db.Decimal(12, 2)
+  tax_amount      Decimal            @db.Decimal(12, 2)
+  total_amount    Decimal            @db.Decimal(12, 2)
+  balance_due     Decimal            @default(0) @db.Decimal(12, 2)
+  notes           String?
+  is_active       Boolean            @default(true)
+  created_at      DateTime           @default(now())
+  updated_at      DateTime
+
+  company  companies          @relation("CompanyBills", fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation("LocationBills", fields: [location_id], references: [id])
+  supplier suppliers?         @relation(fields: [supplier_id], references: [id])
+
+  @@index([company_id])
+  @@index([supplier_id])
+  @@index([status])
+  @@index([company_id, status])
+  @@index([bill_date])
+}
+
+model purchase_orders {
+  id              String             @id
+  po_id           String             @unique
+  company_id      String
+  location_id     String?
+  supplier_id     String?
+  order_date      DateTime
+  expected_date   DateTime?
+  status          String             @default("DRAFT")
+  subtotal_amount Decimal            @db.Decimal(12, 2)
+  tax_amount      Decimal            @db.Decimal(12, 2)
+  total_amount    Decimal            @db.Decimal(12, 2)
+  notes           String?
+  is_active       Boolean            @default(true)
+  created_at      DateTime           @default(now())
+  updated_at      DateTime
+
+  company  companies          @relation("CompanyPurchaseOrders", fields: [company_id], references: [id], onDelete: Cascade)
+  location company_locations? @relation("LocationPurchaseOrders", fields: [location_id], references: [id])
+  supplier suppliers?         @relation(fields: [supplier_id], references: [id])
+
+  @@index([company_id])
+  @@index([supplier_id])
+  @@index([status])
+  @@index([company_id, status])
 }
 
 model products {
