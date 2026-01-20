@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import Joi from 'joi';
 import { CreateLocationData, UpdateLocationData } from '../types';
 
-const globalPrisma = new PrismaClient();
+// Use shared global Prisma client
 
 // Generate unique location ID (L001, L002, etc.)
 export async function generateLocationId(companyId: string): Promise<string> {

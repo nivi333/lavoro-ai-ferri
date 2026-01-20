@@ -1,7 +1,7 @@
 import { PrismaClient, FabricType, QualityGrade, YarnType, YarnProcess, DyeingProcess, GarmentType, ProductionStage, DesignCategory, DesignStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
-const globalPrisma = new PrismaClient();
+import { globalPrisma } from '../database/connection';
 
 // ============================================
 // FABRIC PRODUCTION INTERFACES

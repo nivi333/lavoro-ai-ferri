@@ -1,7 +1,8 @@
 import { PrismaClient, MachineStatus, MaintenanceType, BreakdownSeverity, BreakdownStatus, BreakdownPriority } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { logger } from '../utils/logger';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export interface CreateMachineRequest {
   name: string;

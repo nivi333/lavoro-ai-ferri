@@ -1,4 +1,5 @@
 import { PrismaClient, DocumentType } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import {
   CreateBillData,
@@ -7,7 +8,7 @@ import {
   ListFinancialDocumentFilters,
 } from '../types';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export class FinancialDocumentService {
   private prisma: PrismaClient;

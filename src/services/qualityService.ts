@@ -1,7 +1,8 @@
 import { PrismaClient, CheckpointType, QCStatus, DefectCategory, DefectSeverity, ResolutionStatus, ComplianceType, ComplianceStatus, InspectionType, InspectionStatus, DefectStatus, EvaluationType } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 
-const globalPrisma = new PrismaClient();
+// Use shared global Prisma client
 
 interface CreateCheckpointData {
   checkpointType: CheckpointType;

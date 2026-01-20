@@ -1,7 +1,7 @@
 import { PrismaClient, InspectionType, InspectionStatus, EvaluationType } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 
-const globalPrisma = new PrismaClient();
 
 // Interfaces for Inspection System
 export interface CreateInspectionData {

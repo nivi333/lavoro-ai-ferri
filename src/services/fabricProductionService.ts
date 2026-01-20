@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 // Interfaces
 export interface CreateFabricProductionData {

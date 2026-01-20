@@ -1,8 +1,9 @@
 import { PrismaClient, POStatus, OrderPriority } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import { CreatePurchaseOrderData, ListPurchaseOrderFilters } from '../types';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export class PurchaseOrderService {
   private prisma: PrismaClient;

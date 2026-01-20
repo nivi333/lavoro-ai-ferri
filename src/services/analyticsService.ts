@@ -1,8 +1,6 @@
-import { PrismaClient as GlobalPrismaClient } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { redisClient } from '../utils/redis';
 import { logger } from '../utils/logger';
-
-const globalPrisma = new GlobalPrismaClient();
 
 // Cache TTL: 5 minutes
 const CACHE_TTL = 300;

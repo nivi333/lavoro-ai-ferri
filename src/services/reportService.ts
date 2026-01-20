@@ -1,9 +1,10 @@
 import { PrismaClient, InvoiceStatus, BillStatus } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { logger } from '../utils/logger';
 import { format } from 'date-fns';
 import { analyticsReportService } from './analyticsReportService';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export class ReportService {
   private prisma: PrismaClient;

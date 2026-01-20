@@ -1,7 +1,8 @@
 import { PrismaClient, ExpenseStatus, ExpenseCategory, PaymentMethod } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export interface CreateExpenseData {
   title: string;

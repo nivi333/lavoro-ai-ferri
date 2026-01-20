@@ -31,15 +31,6 @@ services:
       - key: DIRECT_URL
         sync: false
         # Direct URL without pgbouncer for migrations
-      - key: DB_MAX_CONNECTIONS
-        value: 5
-        # Reduced for Supabase free tier (max 15 connections in transaction mode)
-      - key: DB_IDLE_TIMEOUT
-        value: 10000
-        # Faster idle timeout to release connections quickly
-      - key: DB_CONNECTION_TIMEOUT
-        value: 5000
-        # Connection timeout in milliseconds
       - key: REDIS_URL
         fromService:
           name: lavoro-redis

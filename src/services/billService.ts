@@ -1,4 +1,5 @@
 import { PrismaClient, BillStatus, PaymentTerms, Prisma } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import {
   CreateBillData,
@@ -8,7 +9,7 @@ import {
   BillStatusType,
 } from '../types';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 /**
  * Bill Service

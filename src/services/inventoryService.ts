@@ -6,9 +6,10 @@ import {
   AlertType,
   AlertStatus,
 } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 // ============================================
 // INTERFACES

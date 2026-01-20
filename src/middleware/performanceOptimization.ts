@@ -24,9 +24,6 @@ export const performanceOptimization = (req: Request, res: Response, next: NextF
         tenantId: (req as any).tenantId,
       });
     }
-
-    // Add performance header
-    res.setHeader('X-Response-Time', `${duration}ms`);
   });
 
   // Set cache headers for GET requests

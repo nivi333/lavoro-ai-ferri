@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { logger } from '../utils/logger';
 
 /**
@@ -9,7 +10,7 @@ class AnalyticsReportService {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = globalPrisma;
   }
 
   /**

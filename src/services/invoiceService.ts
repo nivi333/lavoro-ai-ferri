@@ -1,8 +1,9 @@
 import { PrismaClient, InvoiceStatus, PaymentMethod, PaymentTerms } from '@prisma/client';
+import { globalPrisma } from '../database/connection';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateInvoiceData, UpdateInvoiceData, ListInvoiceFilters, InvoiceItemInput } from '../types';
 
-const prisma = new PrismaClient();
+const prisma = globalPrisma;
 
 export class InvoiceService {
   private prisma: PrismaClient;
