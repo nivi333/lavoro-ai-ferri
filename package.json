@@ -30,6 +30,7 @@
     "db:migrate:test": "DATABASE_URL=$DATABASE_URL prisma migrate deploy",
     "db:validate": "prisma validate",
     "db:seed": "ts-node prisma/seed.ts",
+    "seed:live": "node scripts/seed-live-simple.js",
     "docker:build": "docker build -t lavoro-ai-ferri/backend .",
     "docker:run": "docker run -p 3000:3000 lavoro-ai-ferri/backend",
     "docker:compose:up": "docker-compose up -d",
