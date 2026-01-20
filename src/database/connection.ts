@@ -3,21 +3,38 @@ import { Pool } from 'pg';
 import { config } from '../config/config';
 import { logger } from '../utils/logger';
 
-// Global Prisma client for shared tables (users, tenants, sessions)
-export const globalPrisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: config.database.url,
-    },
-  },
-  log: config.env === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-});
+// Singleton pattern for global Prisma client to prevent connection leaks
+let globalPrismaInstance: PrismaClient | null = null;
 
-// Enable connection pooling
-globalPrisma.$connect().catch(err => {
-  logger.error('Failed to connect to database:', err);
-  process.exit(1);
-});
+function getGlobalPrisma(): PrismaClient {
+  if (!globalPrismaInstance) {
+    // Add connection_limit to DATABASE_URL for Prisma connection pooling
+    const dbUrl = config.database.url.includes('?') 
+      ? `${config.database.url}&connection_limit=3&pool_timeout=10`
+      : `${config.database.url}?connection_limit=3&pool_timeout=10`;
+
+    globalPrismaInstance = new PrismaClient({
+      datasources: {
+        db: {
+          url: dbUrl,
+        },
+      },
+      log: config.env === 'development' ? ['error', 'warn'] : ['error'],
+    });
+
+    // Connect once on initialization
+    globalPrismaInstance.$connect().catch(err => {
+      logger.error('Failed to connect to database:', err);
+      globalPrismaInstance = null;
+      process.exit(1);
+    });
+
+    logger.info('Global Prisma client initialized with optimized connection pooling');
+  }
+  return globalPrismaInstance;
+}
+
+export const globalPrisma = getGlobalPrisma();
 
 // Connection pool manager for tenant-specific databases
 class DatabaseManager {
@@ -33,41 +50,54 @@ class DatabaseManager {
   }
 
   /**
-   * Get or create a connection pool for a specific tenant
+   * Get or create a connection pool for a specific tenant with optimized settings
    */
   getTenantPool(tenantId: string): Pool {
     if (!this.tenantPools.has(tenantId)) {
       const schemaName = this.getSchemaName(tenantId);
       const pool = new Pool({
         connectionString: config.database.url,
-        max: config.database.maxConnections,
-        idleTimeoutMillis: config.database.idleTimeout,
+        max: 2, // Reduced from config.database.maxConnections for Supabase free tier
+        min: 0, // Allow pool to scale down to 0 when idle
+        idleTimeoutMillis: 10000, // Close idle connections faster (10s)
         connectionTimeoutMillis: config.database.connectionTimeout,
+        allowExitOnIdle: true, // Allow process to exit when connections are idle
         options: `-c search_path=${schemaName},public`,
       });
 
       pool.on('error', (err) => logger.error(`Pool error for tenant ${tenantId}:`, err));
+      pool.on('connect', () => logger.debug(`New connection for tenant ${tenantId}`));
+      pool.on('remove', () => logger.debug(`Connection removed for tenant ${tenantId}`));
+      
       this.tenantPools.set(tenantId, pool);
-      logger.info(`Created pool for tenant: ${tenantId}`);
+      logger.info(`Created optimized pool for tenant: ${tenantId}`);
     }
 
     return this.tenantPools.get(tenantId)!;
   }
 
   /**
-   * Get or create a Prisma client for a specific tenant
+   * Get or create a Prisma client for a specific tenant with optimized pooling
    */
   getTenantPrisma(tenantId: string): PrismaClient {
     if (!this.tenantPrismaClients.has(tenantId)) {
       const schemaName = this.getSchemaName(tenantId);
-      // Create a connection URL that includes the schema search_path
-      const tenantUrl = `${config.database.url}?options=-c%20search_path%3D${schemaName}%2Cpublic`;
+      // Create a connection URL with schema search_path and connection pooling
+      const baseUrl = config.database.url;
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      const tenantUrl = `${baseUrl}${separator}options=-c%20search_path%3D${schemaName}%2Cpublic&connection_limit=2&pool_timeout=10`;
 
       const prismaClient = new PrismaClient({
         datasources: {
           db: { url: tenantUrl },
         },
-        log: config.env === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+        log: config.env === 'development' ? ['error', 'warn'] : ['error'],
+      });
+
+      // Connect immediately to avoid cold start delays
+      prismaClient.$connect().catch(err => {
+        logger.error(`Failed to connect tenant Prisma for ${tenantId}:`, err);
+        this.tenantPrismaClients.delete(tenantId);
       });
 
       this.tenantPrismaClients.set(tenantId, prismaClient);
