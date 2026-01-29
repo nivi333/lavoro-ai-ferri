@@ -1,6 +1,4 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { http, HttpResponse } from 'msw';
-import { server } from '../../__tests__/mocks/server';
 
 const productService = {
   async getProducts(filters?: any) {
