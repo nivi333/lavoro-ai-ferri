@@ -63,73 +63,77 @@ describe('Database Integration Tests', () => {
       // Create test user
       const user = await prisma.users.create({
         data: {
-          user_id: `user-seed-${Date.now()}`,
+          id: `user-seed-${Date.now()}`,
           email: `seed${Date.now()}@example.com`,
           phone: '+1234567890',
-          password_hash: 'hashed-password',
+          password: 'hashed-password',
           first_name: 'Seed',
           last_name: 'User',
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
-      expect(user).toHaveProperty('user_id');
+      expect(user).toHaveProperty('id');
       expect(user.email).toContain('seed');
 
       // Cleanup
-      await prisma.users.delete({ where: { user_id: user.user_id } });
+      await prisma.users.delete({ where: { id: user.id } });
     });
 
     test('should handle seed data relationships', async () => {
       // Create user
       const user = await prisma.users.create({
         data: {
-          user_id: `user-rel-${Date.now()}`,
+          id: `user-rel-${Date.now()}`,
           email: `rel${Date.now()}@example.com`,
           phone: '+1234567890',
-          password_hash: 'hashed-password',
+          password: 'hashed-password',
           first_name: 'Relation',
           last_name: 'Test',
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Create company
       const company = await prisma.companies.create({
         data: {
-          tenant_id: `tenant-${Date.now()}`,
+          id: `company-${Date.now()}`,
+          company_id: `COMP${Date.now()}`,
           name: 'Test Company',
           slug: `test-company-${Date.now()}`,
-          industry: 'textile',
-          country: 'India',
-          established_date: new Date(),
-          business_type: 'MANUFACTURING',
+          industry: 'TEXTILE_MANUFACTURING',
+          is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Create user-company relationship
       const userCompany = await prisma.user_companies.create({
         data: {
-          user_id: user.user_id,
-          tenant_id: company.tenant_id,
+          id: `uc-${Date.now()}`,
+          user_id: user.id,
+          company_id: company.id,
           role: 'OWNER',
+          updated_at: new Date(),
         },
       });
 
-      expect(userCompany).toHaveProperty('user_id', user.user_id);
-      expect(userCompany).toHaveProperty('tenant_id', company.tenant_id);
+      expect(userCompany).toHaveProperty('user_id', user.id);
+      expect(userCompany).toHaveProperty('company_id', company.id);
 
       // Cleanup
       await prisma.user_companies.delete({
         where: {
-          user_id_tenant_id: {
-            user_id: user.user_id,
-            tenant_id: company.tenant_id,
+          user_id_company_id: {
+            user_id: user.id,
+            company_id: company.id,
           },
         },
       });
-      await prisma.companies.delete({ where: { tenant_id: company.tenant_id } });
-      await prisma.users.delete({ where: { user_id: user.user_id } });
+      await prisma.companies.delete({ where: { id: company.id } });
+      await prisma.users.delete({ where: { id: user.id } });
     });
   });
 
@@ -141,36 +145,36 @@ describe('Database Integration Tests', () => {
       // Create two test tenants
       const company1 = await prisma.companies.create({
         data: {
-          tenant_id: `tenant1-${Date.now()}`,
+          id: `company1-${Date.now()}`,
+          company_id: `COMP1-${Date.now()}`,
           name: 'Company 1',
           slug: `company1-${Date.now()}`,
-          industry: 'textile',
-          country: 'India',
-          established_date: new Date(),
-          business_type: 'MANUFACTURING',
+          industry: 'TEXTILE_MANUFACTURING',
+          is_active: true,
+          updated_at: new Date(),
         },
       });
 
       const company2 = await prisma.companies.create({
         data: {
-          tenant_id: `tenant2-${Date.now()}`,
+          id: `company2-${Date.now()}`,
+          company_id: `COMP2-${Date.now()}`,
           name: 'Company 2',
           slug: `company2-${Date.now()}`,
-          industry: 'textile',
-          country: 'India',
-          established_date: new Date(),
-          business_type: 'MANUFACTURING',
+          industry: 'TEXTILE_MANUFACTURING',
+          is_active: true,
+          updated_at: new Date(),
         },
       });
 
-      tenant1 = company1.tenant_id;
-      tenant2 = company2.tenant_id;
+      tenant1 = company1.id;
+      tenant2 = company2.id;
     });
 
     afterAll(async () => {
       // Cleanup
       await prisma.companies.deleteMany({
-        where: { tenant_id: { in: [tenant1, tenant2] } },
+        where: { id: { in: [tenant1, tenant2] } },
       });
     });
 
@@ -178,52 +182,58 @@ describe('Database Integration Tests', () => {
       // Create product for tenant1
       const product1 = await prisma.products.create({
         data: {
-          product_id: `prod1-${Date.now()}`,
-          tenant_id: tenant1,
+          id: `prod1-${Date.now()}`,
+          product_id: `PROD1-${Date.now()}`,
+          product_code: `PC1-${Date.now()}`,
+          company_id: tenant1,
           name: 'Product 1',
           sku: `SKU1-${Date.now()}`,
           cost_price: 100,
           selling_price: 150,
-          stock_quantity: 100,
+          stock_quantity: 10,
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Create product for tenant2
       const product2 = await prisma.products.create({
         data: {
-          product_id: `prod2-${Date.now()}`,
-          tenant_id: tenant2,
+          id: `prod2-${Date.now()}`,
+          product_id: `PROD2-${Date.now()}`,
+          product_code: `PC2-${Date.now()}`,
+          company_id: tenant2,
           name: 'Product 2',
           sku: `SKU2-${Date.now()}`,
           cost_price: 200,
           selling_price: 250,
-          stock_quantity: 200,
+          stock_quantity: 20,
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Query products for tenant1
       const tenant1Products = await prisma.products.findMany({
-        where: { tenant_id: tenant1 },
+        where: { company_id: tenant1 },
       });
 
       // Should only return tenant1's products
       expect(tenant1Products.length).toBeGreaterThan(0);
-      expect(tenant1Products.every(p => p.tenant_id === tenant1)).toBe(true);
+      expect(tenant1Products.every(p => p.company_id === tenant1)).toBe(true);
 
       // Query products for tenant2
       const tenant2Products = await prisma.products.findMany({
-        where: { tenant_id: tenant2 },
+        where: { company_id: tenant2 },
       });
 
       // Should only return tenant2's products
       expect(tenant2Products.length).toBeGreaterThan(0);
-      expect(tenant2Products.every(p => p.tenant_id === tenant2)).toBe(true);
+      expect(tenant2Products.every(p => p.company_id === tenant2)).toBe(true);
 
       // Cleanup
       await prisma.products.deleteMany({
-        where: { product_id: { in: [product1.product_id, product2.product_id] } },
+        where: { id: { in: [product1.id, product2.id] } },
       });
     });
 
@@ -231,14 +241,17 @@ describe('Database Integration Tests', () => {
       // Create product for tenant1
       const product = await prisma.products.create({
         data: {
-          product_id: `prod-cross-${Date.now()}`,
-          tenant_id: tenant1,
+          id: `prod-cross-${Date.now()}`,
+          product_id: `PROD-CROSS-${Date.now()}`,
+          product_code: `PC-CROSS-${Date.now()}`,
+          company_id: tenant1,
           name: 'Cross Tenant Test',
           sku: `SKU-CROSS-${Date.now()}`,
           cost_price: 100,
           selling_price: 150,
-          stock_quantity: 100,
+          stock_quantity: 10,
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
@@ -246,7 +259,7 @@ describe('Database Integration Tests', () => {
       const result = await prisma.products.findFirst({
         where: {
           product_id: product.product_id,
-          tenant_id: tenant2,
+          company_id: tenant2,
         },
       });
 
@@ -254,7 +267,7 @@ describe('Database Integration Tests', () => {
       expect(result).toBeNull();
 
       // Cleanup
-      await prisma.products.delete({ where: { product_id: product.product_id } });
+      await prisma.products.delete({ where: { id: product.id } });
     });
   });
 
@@ -278,26 +291,27 @@ describe('Database Integration Tests', () => {
       // Create test data
       const user = await prisma.users.create({
         data: {
-          user_id: `user-integrity-${Date.now()}`,
+          id: `user-integrity-${Date.now()}`,
           email: `integrity${Date.now()}@example.com`,
           phone: '+1234567890',
-          password_hash: 'hashed-password',
+          password: 'hashed-password',
           first_name: 'Integrity',
           last_name: 'Test',
           is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Verify data was created
       const retrieved = await prisma.users.findUnique({
-        where: { user_id: user.user_id },
+        where: { id: user.id },
       });
 
       expect(retrieved).not.toBeNull();
       expect(retrieved?.email).toBe(user.email);
 
       // Cleanup
-      await prisma.users.delete({ where: { user_id: user.user_id } });
+      await prisma.users.delete({ where: { id: user.id } });
     });
 
     test('should handle transaction rollback', async () => {
@@ -308,13 +322,14 @@ describe('Database Integration Tests', () => {
           // Create user
           await tx.users.create({
             data: {
-              user_id: userId,
+              id: userId,
               email: `rollback${Date.now()}@example.com`,
               phone: '+1234567890',
-              password_hash: 'hashed-password',
+              password: 'hashed-password',
               first_name: 'Rollback',
               last_name: 'Test',
               is_active: true,
+              updated_at: new Date(),
             },
           });
 
@@ -327,7 +342,7 @@ describe('Database Integration Tests', () => {
 
       // Verify user was not created
       const user = await prisma.users.findUnique({
-        where: { user_id: userId },
+        where: { id: userId },
       });
 
       expect(user).toBeNull();
@@ -342,26 +357,30 @@ describe('Database Integration Tests', () => {
       // Create company first
       await prisma.companies.create({
         data: {
-          tenant_id: tenantId,
+          id: tenantId,
+          company_id: `BULK-${Date.now()}`,
           name: 'Bulk Test Company',
           slug: `bulk-test-${Date.now()}`,
-          industry: 'textile',
-          country: 'India',
-          established_date: new Date(),
-          business_type: 'MANUFACTURING',
+          industry: 'TEXTILE_MANUFACTURING',
+          is_active: true,
+          updated_at: new Date(),
         },
       });
 
       // Create 100 products
+      const timestamp = Date.now();
       const products = Array(100).fill(null).map((_, i) => ({
-        product_id: `bulk-prod-${Date.now()}-${i}`,
-        tenant_id: tenantId,
+        id: `bulk-prod-${timestamp}-${i}`,
+        product_id: `BULK-PROD-${timestamp}-${i}`,
+        product_code: `BULK-PC-${timestamp}-${i}`,
+        company_id: tenantId,
         name: `Bulk Product ${i}`,
-        sku: `BULK-SKU-${Date.now()}-${i}`,
+        sku: `BULK-SKU-${timestamp}-${i}`,
         cost_price: 100,
         selling_price: 150,
-        stock_quantity: 100,
+        stock_quantity: 10,
         is_active: true,
+        updated_at: new Date(),
       }));
 
       await prisma.products.createMany({ data: products });
@@ -373,16 +392,16 @@ describe('Database Integration Tests', () => {
       expect(duration).toBeLessThan(5000);
 
       // Cleanup
-      await prisma.products.deleteMany({ where: { tenant_id: tenantId } });
-      await prisma.companies.delete({ where: { tenant_id: tenantId } });
+      await prisma.products.deleteMany({ where: { company_id: tenantId } });
+      await prisma.companies.delete({ where: { id: tenantId } });
     });
 
     test('should use indexes for queries', async () => {
-      // Query with indexed field (tenant_id)
+      // Query with indexed field (company_id)
       const startTime = Date.now();
 
       await prisma.products.findMany({
-        where: { tenant_id: 'test-tenant' },
+        where: { company_id: 'test-tenant' },
         take: 100,
       });
 

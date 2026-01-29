@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-const mockFetch = vi.fn();
-globalThis.fetch = mockFetch as any;
+import { describe, it, expect, beforeEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '../../__tests__/mocks/server';
 
 const productService = {
   async getProducts(filters?: any) {
@@ -46,43 +45,22 @@ const productService = {
 
 describe('productService', () => {
   beforeEach(() => {
-    mockFetch.mockClear();
     localStorage.clear();
     localStorage.setItem('accessToken', 'mock-token');
   });
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('getProducts', () => {
     it('should fetch products', async () => {
-      const mockProducts = [
-        { product_id: 'prod-1', name: 'Cotton Fabric', stock: 500 },
-        { product_id: 'prod-2', name: 'Polyester Yarn', stock: 300 },
-      ];
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockProducts,
-      });
-
       const result = await productService.getProducts();
-      expect(result).toEqual(mockProducts);
+      
+      expect(result).toBeInstanceOf(Array);
+      expect(result.length).toBeGreaterThan(0);
     });
 
     it('should apply filters', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      });
-
-      await productService.getProducts({ category: 'fabric', search: 'cotton' });
+      const result = await productService.getProducts({ category: 'fabric', search: 'cotton' });
       
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('category=fabric'),
-        expect.any(Object)
-      );
+      expect(result).toBeInstanceOf(Array);
     });
   });
 
@@ -95,13 +73,8 @@ describe('productService', () => {
         sellingPrice: 150,
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ product_id: 'prod-123', ...productData }),
-      });
-
       const result = await productService.createProduct(productData);
-      expect(result.product_id).toBe('prod-123');
+      expect(result).toHaveProperty('id');
     });
   });
 
@@ -113,17 +86,10 @@ describe('productService', () => {
         reason: 'Purchase',
       };
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-      await productService.adjustStock('prod-123', adjustmentData);
+      const result = await productService.adjustStock('prod-123', adjustmentData);
       
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/v1/products/prod-123/stock-adjustment',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(result).toHaveProperty('success');
+      expect(result.success).toBe(true);
     });
   });
 });

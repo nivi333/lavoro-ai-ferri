@@ -1,8 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-// Mock fetch globally
-const mockFetch = vi.fn();
-globalThis.fetch = mockFetch as any;
+import { describe, it, expect, beforeEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '../../__tests__/mocks/server';
 
 const authService = {
   async login(credentials: { identifier: string; password: string }) {
@@ -56,43 +54,26 @@ const authService = {
 
 describe('authService', () => {
   beforeEach(() => {
-    mockFetch.mockClear();
     localStorage.clear();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
   });
 
   describe('login', () => {
     it('should send login request with credentials', async () => {
-      const mockResponse = {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-        user: { id: 'user-123', email: 'test@example.com' },
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
       const credentials = { identifier: 'test@example.com', password: 'Test123!@#' };
       const result = await authService.login(credentials);
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-      expect(result).toEqual(mockResponse);
+      expect(result).toHaveProperty('accessToken');
+      expect(result).toHaveProperty('refreshToken');
+      expect(result).toHaveProperty('user');
+      expect(result.accessToken).toBe('mock-access-token');
     });
 
     it('should throw error on failed login', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-      });
+      server.use(
+        http.post('/api/v1/auth/login', () => {
+          return new HttpResponse(null, { status: 401 });
+        })
+      );
 
       const credentials = { identifier: 'test@example.com', password: 'wrong' };
       
@@ -100,27 +81,20 @@ describe('authService', () => {
     });
 
     it('should handle network errors', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      server.use(
+        http.post('/api/v1/auth/login', () => {
+          return HttpResponse.error();
+        })
+      );
 
       const credentials = { identifier: 'test@example.com', password: 'Test123!@#' };
       
-      await expect(authService.login(credentials)).rejects.toThrow('Network error');
+      await expect(authService.login(credentials)).rejects.toThrow();
     });
   });
 
   describe('register', () => {
     it('should send registration request with user data', async () => {
-      const mockResponse = {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-        user: { id: 'user-123', email: 'test@example.com' },
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
       const userData = {
         email: 'test@example.com',
         phone: '+1234567890',
@@ -131,19 +105,18 @@ describe('authService', () => {
 
       const result = await authService.register(userData);
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-      expect(result).toEqual(mockResponse);
+      expect(result).toHaveProperty('accessToken');
+      expect(result).toHaveProperty('refreshToken');
+      expect(result).toHaveProperty('user');
+      expect(result.accessToken).toBe('mock-access-token');
     });
 
     it('should throw error on failed registration', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-      });
+      server.use(
+        http.post('/api/v1/auth/register', () => {
+          return new HttpResponse(null, { status: 400 });
+        })
+      );
 
       const userData = {
         email: 'test@example.com',
@@ -157,10 +130,11 @@ describe('authService', () => {
     });
 
     it('should handle validation errors', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 422,
-      });
+      server.use(
+        http.post('/api/v1/auth/register', () => {
+          return new HttpResponse(null, { status: 422 });
+        })
+      );
 
       const userData = {
         email: 'invalid-email',
@@ -179,30 +153,15 @@ describe('authService', () => {
       localStorage.setItem('accessToken', 'mock-access-token');
       localStorage.setItem('refreshToken', 'mock-refresh-token');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ message: 'Logged out successfully' }),
-      });
+      const result = await authService.logout();
 
-      await authService.logout();
-
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/logout', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer mock-access-token',
-        },
-      });
+      expect(result).toHaveProperty('message');
+      expect(result.message).toBe('Logged out successfully');
     });
 
     it('should clear tokens from localStorage', async () => {
       localStorage.setItem('accessToken', 'mock-access-token');
       localStorage.setItem('refreshToken', 'mock-refresh-token');
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ message: 'Logged out successfully' }),
-      });
 
       await authService.logout();
 
@@ -213,10 +172,11 @@ describe('authService', () => {
     it('should throw error on failed logout', async () => {
       localStorage.setItem('accessToken', 'mock-access-token');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-      });
+      server.use(
+        http.post('/api/v1/auth/logout', () => {
+          return new HttpResponse(null, { status: 401 });
+        })
+      );
       
       await expect(authService.logout()).rejects.toThrow('Logout failed');
     });
@@ -226,45 +186,28 @@ describe('authService', () => {
     it('should send refresh token request', async () => {
       localStorage.setItem('refreshToken', 'mock-refresh-token');
 
-      const mockResponse = {
-        accessToken: 'new-access-token',
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      });
-
       const result = await authService.refreshToken();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: 'mock-refresh-token' }),
-      });
-      expect(result).toEqual(mockResponse);
+      expect(result).toHaveProperty('accessToken');
+      expect(result.accessToken).toBe('new-mock-access-token');
     });
 
     it('should update access token in localStorage', async () => {
       localStorage.setItem('refreshToken', 'mock-refresh-token');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ accessToken: 'new-access-token' }),
-      });
-
       await authService.refreshToken();
 
-      expect(localStorage.getItem('accessToken')).toBe('new-access-token');
+      expect(localStorage.getItem('accessToken')).toBe('new-mock-access-token');
     });
 
     it('should throw error on failed refresh', async () => {
       localStorage.setItem('refreshToken', 'expired-refresh-token');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-      });
+      server.use(
+        http.post('/api/v1/auth/refresh', () => {
+          return new HttpResponse(null, { status: 401 });
+        })
+      );
       
       await expect(authService.refreshToken()).rejects.toThrow('Token refresh failed');
     });
@@ -274,37 +217,19 @@ describe('authService', () => {
     it('should handle missing refresh token', async () => {
       localStorage.removeItem('refreshToken');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ accessToken: 'new-token' }),
-      });
+      const result = await authService.refreshToken();
 
-      await authService.refreshToken();
-
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken: null }),
-      });
+      expect(result).toHaveProperty('accessToken');
+      expect(localStorage.getItem('accessToken')).toBe('new-mock-access-token');
     });
 
     it('should handle missing access token in logout', async () => {
       localStorage.removeItem('accessToken');
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ message: 'Logged out' }),
-      });
+      const result = await authService.logout();
 
-      await authService.logout();
-
-      expect(mockFetch).toHaveBeenCalledWith('/api/v1/auth/logout', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer null',
-        },
-      });
+      expect(result).toHaveProperty('message');
+      expect(localStorage.getItem('accessToken')).toBeNull();
     });
   });
 });

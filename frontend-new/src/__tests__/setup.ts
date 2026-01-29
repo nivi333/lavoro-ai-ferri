@@ -1,10 +1,24 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterEach, beforeAll, afterAll } from 'vitest';
+import { server } from './mocks/server';
 
-// Cleanup after each test
+// Start MSW server before all tests - it will bypass requests that have mocked fetch
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'bypass' });
+});
+
+// Reset handlers after each test
 afterEach(() => {
+  server.resetHandlers();
   cleanup();
+  localStorage.clear();
+  sessionStorage.clear();
+});
+
+// Stop MSW server after all tests
+afterAll(() => {
+  server.close();
 });
 
 // Mock window.matchMedia

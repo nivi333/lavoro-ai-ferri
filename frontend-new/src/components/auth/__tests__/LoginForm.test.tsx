@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 /**
  * LoginForm Component Tests
@@ -9,23 +10,19 @@ import userEvent from '@testing-library/user-event';
 
 // Mock LoginForm component for testing
 const MockLoginForm = ({ onSubmit }: { onSubmit: (data: any) => void | Promise<void> }) => {
+  const [formData, setFormData] = React.useState({ identifier: '', password: '' });
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      identifier: formData.get('identifier') as string,
-      password: formData.get('password') as string,
-    };
     
-    // Basic validation
-    if (!data.identifier) {
-      throw new Error('Email or phone is required');
-    }
-    if (!data.password) {
-      throw new Error('Password is required');
+    // Basic validation - prevent submission if fields are empty
+    if (!formData.identifier || !formData.password) {
+      return; // Don't call onSubmit if validation fails
     }
     
-    onSubmit(data);
+    onSubmit(formData);
+    // Reset form after successful submission
+    setFormData({ identifier: '', password: '' });
   };
 
   return (
@@ -38,6 +35,8 @@ const MockLoginForm = ({ onSubmit }: { onSubmit: (data: any) => void | Promise<v
           type="text"
           placeholder="Enter email or phone"
           data-testid="identifier-input"
+          value={formData.identifier}
+          onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
         />
       </div>
       <div>
@@ -48,6 +47,8 @@ const MockLoginForm = ({ onSubmit }: { onSubmit: (data: any) => void | Promise<v
           type="password"
           placeholder="Enter password"
           data-testid="password-input"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
       </div>
       <button type="submit" data-testid="submit-button">
@@ -187,17 +188,17 @@ describe('LoginForm Component', () => {
 
   it('should clear form after submission', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(<MockLoginForm onSubmit={mockOnSubmit} />);
+    render(<MockLoginForm onSubmit={mockOnSubmit} />);
     
     await user.type(screen.getByTestId('identifier-input'), 'test@example.com');
     await user.type(screen.getByTestId('password-input'), 'password123');
     await user.click(screen.getByTestId('submit-button'));
     
-    // Simulate form reset after successful submission
-    rerender(<MockLoginForm onSubmit={mockOnSubmit} />);
-    
-    expect(screen.getByTestId('identifier-input')).toHaveValue('');
-    expect(screen.getByTestId('password-input')).toHaveValue('');
+    // Form should auto-clear after successful submission
+    await waitFor(() => {
+      expect(screen.getByTestId('identifier-input')).toHaveValue('');
+      expect(screen.getByTestId('password-input')).toHaveValue('');
+    });
   });
 });
 

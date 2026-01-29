@@ -129,13 +129,13 @@ describe('MachineFormDrawer Component', () => {
   describe('Drawer Modes', () => {
     it('should render in create mode', () => {
       render(<MockMachineFormDrawer open={true} mode="create" onClose={mockOnClose} onSuccess={mockOnSuccess} />);
-      expect(screen.getByText('Add Machine')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Add Machine' })).toBeInTheDocument();
       expect(screen.getByTestId('submit-button')).toHaveTextContent('Add Machine');
     });
 
     it('should render in edit mode', () => {
       render(<MockMachineFormDrawer open={true} mode="edit" onClose={mockOnClose} onSuccess={mockOnSuccess} />);
-      expect(screen.getByText('Edit Machine')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Edit Machine' })).toBeInTheDocument();
       expect(screen.getByTestId('submit-button')).toHaveTextContent('Update Machine');
     });
 

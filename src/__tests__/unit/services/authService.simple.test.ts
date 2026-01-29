@@ -3,55 +3,101 @@
  * Tests password hashing, token generation, and authentication logic
  */
 
+import { AuthService } from '../../../services/authService';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { createMockUser, createMockRegisterData, createMockLoginCredentials } from '../../factories/userFactory';
+import { globalPrisma } from '../../../database/connection';
+import { redisClient } from '../../../utils/redis';
+import gdprService from '../../../services/gdprService';
+
+// Mock external dependencies
+jest.mock('../../../database/connection', () => ({
+  globalPrisma: {
+    users: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    sessions: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+  },
+}));
+
+jest.mock('../../../utils/redis', () => ({
+  redisClient: {
+    set: jest.fn().mockResolvedValue('OK'),
+    setex: jest.fn().mockResolvedValue('OK'),
+    get: jest.fn(),
+    del: jest.fn(),
+  },
+}));
+
+jest.mock('../../../services/gdprService', () => ({
+  default: {
+    recordConsent: jest.fn(),
+  },
+}));
+
+jest.mock('../../../utils/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}));
 
 describe('AuthService - Password Hashing', () => {
   describe('hashPassword', () => {
-    it('should hash password with bcrypt', () => {
+    it('should hash password with bcrypt', async () => {
       const password = 'Test123!@#';
-      const hashedPassword = '$2a$10$hashedpassword123';
+      const hashedPassword = await AuthService.hashPassword(password);
       
-      // Mock bcrypt.hash to return hashed password
-      // In actual implementation, bcrypt.hash would be mocked
       expect(hashedPassword).toBeDefined();
       expect(hashedPassword).not.toBe(password);
       expect(hashedPassword.length).toBeGreaterThan(20);
+      expect(hashedPassword).toMatch(/^\$2[aby]\$/);
     });
 
-    it('should use bcrypt rounds from config', () => {
-      const bcryptRounds = 10;
-      expect(bcryptRounds).toBe(10);
-    });
-
-    it('should handle hashing errors gracefully', () => {
-      // Test error handling when bcrypt fails
-      expect(true).toBe(true);
+    it('should generate different hashes for same password', async () => {
+      const password = 'Test123!@#';
+      const hash1 = await AuthService.hashPassword(password);
+      const hash2 = await AuthService.hashPassword(password);
+      
+      expect(hash1).not.toBe(hash2);
     });
   });
 
-  describe('comparePassword', () => {
-    it('should return true for matching passwords', () => {
+  describe('verifyPassword', () => {
+    it('should return true for matching passwords', async () => {
       const plainPassword = 'Test123!@#';
-      const hashedPassword = '$2a$10$hashedpassword123';
+      const hashedPassword = await AuthService.hashPassword(plainPassword);
       
-      // Mock bcrypt.compare to return true
-      const isMatch = true;
+      const isMatch = await AuthService.verifyPassword(plainPassword, hashedPassword);
       expect(isMatch).toBe(true);
     });
 
-    it('should return false for non-matching passwords', () => {
-      const plainPassword = 'WrongPassword';
-      const hashedPassword = '$2a$10$hashedpassword123';
+    it('should return false for non-matching passwords', async () => {
+      const plainPassword = 'Test123!@#';
+      const wrongPassword = 'WrongPassword';
+      const hashedPassword = await AuthService.hashPassword(plainPassword);
       
-      // Mock bcrypt.compare to return false
-      const isMatch = false;
+      const isMatch = await AuthService.verifyPassword(wrongPassword, hashedPassword);
       expect(isMatch).toBe(false);
     });
   });
 });
 
 describe('AuthService - User Registration', () => {
-  it('should register new user successfully', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should register new user successfully', async () => {
     const registerData = createMockRegisterData();
     const mockUser = createMockUser({
       email: registerData.email,
@@ -59,127 +105,137 @@ describe('AuthService - User Registration', () => {
       last_name: registerData.lastName,
     });
 
-    // Mock Prisma user.create
-    expect(mockUser.email).toBe(registerData.email);
-    expect(mockUser.first_name).toBe(registerData.firstName);
-    expect(mockUser.last_name).toBe(registerData.lastName);
-    expect(mockUser.is_active).toBe(true);
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(null);
+    (globalPrisma.users.create as jest.Mock).mockResolvedValue(mockUser);
+    (globalPrisma.sessions.create as jest.Mock).mockResolvedValue({ id: 'session-123' });
+    (redisClient.set as jest.Mock).mockResolvedValue('OK');
+    (gdprService.recordConsent as jest.Mock).mockResolvedValue(undefined);
+
+    const result = await AuthService.register(registerData);
+    
+    expect(result.user.email).toBe(registerData.email);
+    expect(result.user.first_name).toBe(registerData.firstName);
+    expect(result.user.last_name).toBe(registerData.lastName);
+    expect(result.tokens).toBeDefined();
+    expect(result.tokens.accessToken).toBeDefined();
+    expect(result.tokens.refreshToken).toBeDefined();
   });
 
-  it('should require email or phone', () => {
+  it('should require email or phone', async () => {
     const invalidData: any = {
       firstName: 'John',
       lastName: 'Doe',
       password: 'Test123!@#',
     };
 
-    // Should throw error: "Email or phone is required"
-    expect(() => {
-      if (!invalidData.email && !invalidData.phone) {
-        throw new Error('Email or phone is required');
-      }
-    }).toThrow('Email or phone is required');
+    await expect(AuthService.register(invalidData)).rejects.toThrow('Email or phone is required');
   });
 
-  it('should reject duplicate email', () => {
+  it('should reject duplicate email', async () => {
     const registerData = createMockRegisterData();
     const existingUser = createMockUser({ email: registerData.email });
 
-    // Mock Prisma user.findFirst to return existing user
-    expect(existingUser).toBeDefined();
-    expect(existingUser.email).toBe(registerData.email);
-    
-    // Should throw error: "Email already exists"
-    const error = new Error('Email already exists');
-    expect(error.message).toBe('Email already exists');
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(existingUser);
+
+    await expect(AuthService.register(registerData)).rejects.toThrow('Email already exists');
   });
 
-  it('should hash password before saving', () => {
+  it('should hash password before saving', async () => {
     const registerData = createMockRegisterData();
-    const hashedPassword = '$2a$10$hashedpassword123';
+    const mockUser = createMockUser();
 
-    expect(hashedPassword).not.toBe(registerData.password);
-    expect(hashedPassword).toContain('$2a$10$');
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(null);
+    (globalPrisma.users.create as jest.Mock).mockImplementation(async (data: any) => {
+      expect(data.data.password).not.toBe(registerData.password);
+      expect(data.data.password).toMatch(/^\$2[aby]\$/);
+      return mockUser;
+    });
+    (globalPrisma.sessions.create as jest.Mock).mockResolvedValue({ id: 'session-123' });
+    (redisClient.set as jest.Mock).mockResolvedValue('OK');
+
+    await AuthService.register(registerData);
+    
+    expect(globalPrisma.users.create).toHaveBeenCalled();
   });
 
-  it('should validate password strength', () => {
-    const weakPassword = '123';
-    const strongPassword = 'Test123!@#';
-
-    expect(weakPassword.length).toBeLessThan(8);
-    expect(strongPassword.length).toBeGreaterThanOrEqual(8);
-  });
-
-  it('should create GDPR consent records', () => {
+  it('should create GDPR consent records', async () => {
     const registerData = createMockRegisterData({
       hasConsentedToTerms: true,
       hasConsentedToPrivacy: true,
       hasConsentedToCookies: true,
     });
+    const mockUser = createMockUser();
 
-    expect(registerData.hasConsentedToTerms).toBe(true);
-    expect(registerData.hasConsentedToPrivacy).toBe(true);
-    expect(registerData.hasConsentedToCookies).toBe(true);
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(null);
+    (globalPrisma.users.create as jest.Mock).mockResolvedValue(mockUser);
+    (globalPrisma.sessions.create as jest.Mock).mockResolvedValue({ id: 'session-123' });
+    (redisClient.set as jest.Mock).mockResolvedValue('OK');
+    (gdprService.recordConsent as jest.Mock).mockResolvedValue(undefined);
+
+    await AuthService.register(registerData);
+    
+    expect(gdprService.recordConsent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: mockUser.user_id,
+        hasConsentedToTerms: true,
+        hasConsentedToPrivacy: true,
+        hasConsentedToCookies: true,
+      })
+    );
   });
 });
 
 describe('AuthService - User Login', () => {
-  it('should login with valid credentials', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should login with valid credentials', async () => {
     const credentials = createMockLoginCredentials();
-    const mockUser = createMockUser({ email: credentials.emailOrPhone });
+    const hashedPassword = await AuthService.hashPassword(credentials.password);
+    const mockUser = createMockUser({ 
+      email: credentials.emailOrPhone,
+      password: hashedPassword,
+    });
 
-    // Mock successful login
-    expect(mockUser.email).toBe(credentials.emailOrPhone);
-    expect(mockUser.is_active).toBe(true);
-  });
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+    (globalPrisma.sessions.create as jest.Mock).mockResolvedValue({ id: 'session-123' });
+    (redisClient.set as jest.Mock).mockResolvedValue('OK');
 
-  it('should reject invalid password', () => {
-    const credentials = createMockLoginCredentials({ password: 'WrongPassword' });
-    const mockUser = createMockUser();
-
-    // Mock bcrypt.compare returns false
-    const isPasswordValid = false;
-    expect(isPasswordValid).toBe(false);
+    const result = await AuthService.login(credentials);
     
-    const error = new Error('Invalid credentials');
-    expect(error.message).toBe('Invalid credentials');
+    expect(result.user.email).toBe(credentials.emailOrPhone);
+    expect(result.tokens).toBeDefined();
+    expect(result.tokens.accessToken).toBeDefined();
+    expect(result.tokens.refreshToken).toBeDefined();
   });
 
-  it('should reject non-existent user', () => {
+  it('should reject invalid password', async () => {
+    const credentials = createMockLoginCredentials({ password: 'WrongPassword' });
+    const hashedPassword = await AuthService.hashPassword('CorrectPassword');
+    const mockUser = createMockUser({ password: hashedPassword });
+
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+
+    await expect(AuthService.login(credentials)).rejects.toThrow('Invalid credentials');
+  });
+
+  it('should reject non-existent user', async () => {
     const credentials = createMockLoginCredentials({ emailOrPhone: 'nonexistent@example.com' });
 
-    // Mock Prisma user.findFirst returns null
-    const user = null;
-    expect(user).toBeNull();
-    
-    const error = new Error('User not found');
-    expect(error.message).toBe('User not found');
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(null);
+
+    await expect(AuthService.login(credentials)).rejects.toThrow('User not found');
   });
 
-  it('should reject inactive user', () => {
+  it('should reject inactive user', async () => {
     const credentials = createMockLoginCredentials();
-    const mockUser = createMockUser({ is_active: false });
+    const hashedPassword = await AuthService.hashPassword(credentials.password);
+    const mockUser = createMockUser({ is_active: false, password: hashedPassword });
 
-    expect(mockUser.is_active).toBe(false);
-    
-    const error = new Error('Account is inactive');
-    expect(error.message).toBe('Account is inactive');
-  });
+    (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
 
-  it('should accept email or phone as identifier', () => {
-    const emailCredentials = createMockLoginCredentials({ emailOrPhone: 'test@example.com' });
-    const phoneCredentials = createMockLoginCredentials({ emailOrPhone: '+91-1234567890' });
-
-    expect(emailCredentials.emailOrPhone).toContain('@');
-    expect(phoneCredentials.emailOrPhone).toContain('+');
-  });
-
-  it('should record login timestamp', () => {
-    const mockUser = createMockUser();
-    const loginTime = new Date();
-
-    expect(loginTime).toBeInstanceOf(Date);
-    expect(loginTime.getTime()).toBeLessThanOrEqual(Date.now());
+    await expect(AuthService.login(credentials)).rejects.toThrow('Account is inactive');
   });
 });
 
@@ -188,15 +244,13 @@ describe('AuthService - Token Management', () => {
     const userId = 'user-123';
     const sessionId = 'session-456';
     
-    const tokens = {
-      accessToken: 'mock_access_token',
-      refreshToken: 'mock_refresh_token',
-      expiresIn: 86400,
-    };
+    const accessToken = AuthService.generateAccessToken({ userId, sessionId });
+    const refreshToken = AuthService.generateRefreshToken({ userId, sessionId });
 
-    expect(tokens.accessToken).toBeDefined();
-    expect(tokens.refreshToken).toBeDefined();
-    expect(tokens.expiresIn).toBe(86400);
+    expect(accessToken).toBeDefined();
+    expect(refreshToken).toBeDefined();
+    expect(typeof accessToken).toBe('string');
+    expect(typeof refreshToken).toBe('string');
   });
 
   it('should include user info in JWT payload', () => {
@@ -204,48 +258,43 @@ describe('AuthService - Token Management', () => {
       userId: 'user-123',
       tenantId: 'tenant-456',
       role: 'OWNER',
-      type: 'access',
       sessionId: 'session-789',
     };
 
-    expect(payload.userId).toBe('user-123');
-    expect(payload.tenantId).toBe('tenant-456');
-    expect(payload.role).toBe('OWNER');
-    expect(payload.type).toBe('access');
-  });
+    const accessToken = AuthService.generateAccessToken(payload);
+    const decoded = AuthService.verifyToken(accessToken, 'access');
 
-  it('should set correct expiration times', () => {
-    const accessTokenExpiry = 86400; // 24 hours
-    const refreshTokenExpiry = 604800; // 7 days
-
-    expect(accessTokenExpiry).toBe(24 * 60 * 60);
-    expect(refreshTokenExpiry).toBe(7 * 24 * 60 * 60);
+    expect(decoded.userId).toBe('user-123');
+    expect(decoded.tenantId).toBe('tenant-456');
+    expect(decoded.role).toBe('OWNER');
+    expect(decoded.type).toBe('access');
   });
 
   it('should verify valid tokens', () => {
-    const token = 'valid_token';
     const payload = {
       userId: 'user-123',
       sessionId: 'session-456',
-      type: 'access',
     };
 
-    // Mock jwt.verify returns payload
-    expect(payload.userId).toBe('user-123');
-    expect(payload.type).toBe('access');
+    const token = AuthService.generateAccessToken(payload);
+    const decoded = AuthService.verifyToken(token, 'access');
+
+    expect(decoded.userId).toBe('user-123');
+    expect(decoded.sessionId).toBe('session-456');
+    expect(decoded.type).toBe('access');
   });
 
-  it('should reject expired tokens', () => {
-    const expiredToken = 'expired_token';
-    const error = new Error('Token expired');
-    
-    expect(error.message).toBe('Token expired');
-  });
+  it('should verify refresh tokens separately', () => {
+    const payload = {
+      userId: 'user-123',
+      sessionId: 'session-456',
+    };
 
-  it('should reject invalid tokens', () => {
-    const invalidToken = 'invalid_token';
-    const error = new Error('Invalid token');
-    
-    expect(error.message).toBe('Invalid token');
+    const refreshToken = AuthService.generateRefreshToken(payload);
+    const decoded = AuthService.verifyToken(refreshToken, 'refresh');
+
+    expect(decoded.userId).toBe('user-123');
+    expect(decoded.sessionId).toBe('session-456');
+    expect(decoded.type).toBe('refresh');
   });
 });
