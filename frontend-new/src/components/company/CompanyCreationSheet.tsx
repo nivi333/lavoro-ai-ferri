@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Building2, Trash2, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import {
   Form,
@@ -185,7 +186,7 @@ export function CompanyCreationSheet({
     try {
       // Use backend API to check name availability (similar to slug check)
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies/check-name?name=${encodeURIComponent(name.trim())}`,
+        `${API_BASE_URL}/companies/check-name?name=${encodeURIComponent(name.trim())}`,
         {
           method: 'GET',
           headers: {

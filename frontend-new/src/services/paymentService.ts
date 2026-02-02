@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+import { API_BASE_URL } from '../config/api';
 
 export type PaymentType = 'INVOICE_PAYMENT' | 'BILL_PAYMENT' | 'EXPENSE_PAYMENT' | 'REFUND' | 'ADVANCE' | 'OTHER';
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED';

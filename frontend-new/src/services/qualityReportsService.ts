@@ -1,6 +1,6 @@
+import { API_BASE_URL } from '../config/api';
 import { AuthStorage } from '../utils/storage';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export interface QualityMetrics {
   totalInspections: number;

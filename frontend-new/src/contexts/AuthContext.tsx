@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { AuthState, User, Company, AuthTokens, LoginCredentials } from '../types/auth';
 import { AuthStorage } from '../utils/storage';
+import { API_BASE_URL } from '../config/api';
 
 // Auth Actions
 type AuthAction =
@@ -137,7 +138,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -157,14 +158,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { user, tokens } = data;
 
       // Fetch companies after login (separate endpoint)
-      const companiesRes = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        }
-      );
+      const companiesRes = await fetch(`${API_BASE_URL}/companies`, {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      });
       if (!companiesRes.ok) {
         throw new Error('Failed to fetch companies');
       }
@@ -195,16 +193,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/register`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userData),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -228,16 +223,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/auth/forgot-password`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -270,15 +262,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       // Call switch company API to get new tokens with tenantId
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies/${company.id}/switch`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/companies/${company.id}/switch`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -325,7 +314,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error('No access token available');
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/companies`, {
+      const response = await fetch(`${API_BASE_URL}/companies`, {
         headers: {
           Authorization: `Bearer ${tokens.accessToken}`,
         },
@@ -359,14 +348,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/users/${currentUser.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/users/${currentUser.id}`, {
+        headers: {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch user details');

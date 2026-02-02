@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../config/api';
 import {
   ProfitLossReport,
   BalanceSheetReport,
@@ -21,7 +22,6 @@ import {
   TextileAnalyticsReport,
 } from './reportTypes';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
 class ReportService {
   private getAuthHeaders(): HeadersInit {
