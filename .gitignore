@@ -58,11 +58,11 @@ jspm_packages/
 .yarn-integrity
 
 # Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# .env - Contains safe defaults, CAN be committed to Git
+.env.local              # Never commit - contains sensitive local credentials
+.env.development.local  # Never commit - local overrides
+.env.test.local         # Never commit - test environment secrets
+.env.production.local   # Never commit - production overrides
 
 # parcel-bundler cache
 .cache
@@ -138,7 +138,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# .env is now tracked - only .env.local is ignored
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
