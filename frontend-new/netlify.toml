@@ -35,5 +35,5 @@
 
 # Production environment variables (set in Netlify UI)
 # VITE_API_BASE_URL = https://ayphentextilebackend-7ic9arjz.b4a.run/api/v1
-# VITE_APP_NAME = Lavoro AI Ferri - Textile Manufacturing ERP
+# VITE_APP_NAME = Ayphen Textile
 # VITE_APP_VERSION = 1.0.0
