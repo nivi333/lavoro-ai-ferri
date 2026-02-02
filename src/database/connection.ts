@@ -9,7 +9,7 @@ let globalPrismaInstance: PrismaClient | null = null;
 function getGlobalPrisma(): PrismaClient {
   if (!globalPrismaInstance) {
     // Add connection_limit to DATABASE_URL for Prisma connection pooling
-    const dbUrl = config.database.url.includes('?') 
+    const dbUrl = config.database.url.includes('?')
       ? `${config.database.url}&connection_limit=5&pool_timeout=20&connect_timeout=10`
       : `${config.database.url}?connection_limit=5&pool_timeout=20&connect_timeout=10`;
 
@@ -54,6 +54,18 @@ function getGlobalPrisma(): PrismaClient {
 
 export const globalPrisma = getGlobalPrisma();
 
+// Export a function to ensure connection is ready (call at startup for warmup)
+export async function ensureDatabaseConnection(): Promise<boolean> {
+  try {
+    await globalPrisma.$queryRaw`SELECT 1`;
+    logger.info('Database connection verified and warmed up');
+    return true;
+  } catch (error) {
+    logger.error('Database connection verification failed:', error);
+    return false;
+  }
+}
+
 // Connection pool manager for tenant-specific databases
 class DatabaseManager {
   private tenantPools = new Map<string, Pool>();
@@ -83,10 +95,10 @@ class DatabaseManager {
         options: `-c search_path=${schemaName},public`,
       });
 
-      pool.on('error', (err) => logger.error(`Pool error for tenant ${tenantId}:`, err));
+      pool.on('error', err => logger.error(`Pool error for tenant ${tenantId}:`, err));
       pool.on('connect', () => logger.debug(`New connection for tenant ${tenantId}`));
       pool.on('remove', () => logger.debug(`Connection removed for tenant ${tenantId}`));
-      
+
       this.tenantPools.set(tenantId, pool);
       logger.info(`Created optimized pool for tenant: ${tenantId}`);
     }
@@ -486,7 +498,7 @@ class DatabaseManager {
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_customers_tenant ON ${schemaName}.customers(tenant_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_invoices_tenant_location ON ${schemaName}.invoices(tenant_id, location_id)`,
       `CREATE INDEX IF NOT EXISTS idx_${schemaName}_purchase_orders_tenant_location ON ${schemaName}.purchase_orders(tenant_id, location_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_bills_tenant_location ON ${schemaName}.bills(tenant_id, location_id)`
+      `CREATE INDEX IF NOT EXISTS idx_${schemaName}_bills_tenant_location ON ${schemaName}.bills(tenant_id, location_id)`,
     ];
 
     for (const indexQuery of indexes) {

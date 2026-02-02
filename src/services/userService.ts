@@ -1,6 +1,7 @@
 import { PrismaClient as GlobalPrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
+import { config } from '@/config/config';
 
 const globalPrisma = new GlobalPrismaClient();
 
@@ -52,15 +53,7 @@ class UserService {
   // Get all users for a company with filters
   async getCompanyUsers(companyId: string, filters: UserFilters = {}) {
     try {
-      const {
-        search,
-        role,
-        status,
-        department,
-        locationId,
-        page = 1,
-        limit = 25,
-      } = filters;
+      const { search, role, status, department, locationId, page = 1, limit = 25 } = filters;
 
       // Build where clause
       const where: any = {
@@ -111,7 +104,7 @@ class UserService {
       const total = await globalPrisma.user_companies.count({ where });
 
       // Transform data to camelCase
-      const users = userCompanies.map((uc) => ({
+      const users = userCompanies.map(uc => ({
         id: uc.users.id,
         firstName: uc.users.first_name,
         lastName: uc.users.last_name,
@@ -133,7 +126,7 @@ class UserService {
       if (search) {
         const searchLower = search.toLowerCase();
         filteredUsers = users.filter(
-          (user) =>
+          user =>
             user.firstName.toLowerCase().includes(searchLower) ||
             user.lastName.toLowerCase().includes(searchLower) ||
             user.email.toLowerCase().includes(searchLower) ||
@@ -206,7 +199,7 @@ class UserService {
         isActive: userCompany.is_active,
         createdAt: userCompany.created_at,
         updatedAt: userCompany.updated_at,
-        sessions: userCompany.users.sessions.map((s) => ({
+        sessions: userCompany.users.sessions.map(s => ({
           id: s.id,
           lastActive: s.updated_at,
           createdAt: s.created_at,
@@ -245,7 +238,7 @@ class UserService {
           OR: [
             userData.email ? { email: userData.email } : {},
             userData.phone ? { phone: userData.phone } : {},
-          ].filter((obj) => Object.keys(obj).length > 0),
+          ].filter(obj => Object.keys(obj).length > 0),
         },
       });
 
@@ -288,9 +281,9 @@ class UserService {
       }
 
       // Create new user
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const hashedPassword = await bcrypt.hash(userData.password, config.security.bcryptRounds);
 
-      const newUser = await globalPrisma.$transaction(async (tx) => {
+      const newUser = await globalPrisma.$transaction(async tx => {
         const createdUser = await tx.users.create({
           data: {
             id: uuidv4(),
@@ -338,11 +331,7 @@ class UserService {
   }
 
   // Bulk invite users
-  async bulkInviteUsers(
-    companyId: string,
-    inviterUserId: string,
-    usersData: BulkInviteData[]
-  ) {
+  async bulkInviteUsers(companyId: string, inviterUserId: string, usersData: BulkInviteData[]) {
     try {
       // Validate inviter has permission
       const inviter = await globalPrisma.user_companies.findFirst({
@@ -390,7 +379,12 @@ class UserService {
   }
 
   // Update user
-  async updateUser(userId: string, companyId: string, updaterUserId: string, updateData: UpdateUserData) {
+  async updateUser(
+    userId: string,
+    companyId: string,
+    updaterUserId: string,
+    updateData: UpdateUserData
+  ) {
     try {
       // Validate updater has permission
       const updater = await globalPrisma.user_companies.findFirst({
@@ -418,9 +412,15 @@ class UserService {
       }
 
       // Update user data
-      const updatedUser = await globalPrisma.$transaction(async (tx) => {
+      const updatedUser = await globalPrisma.$transaction(async tx => {
         // Update user table
-        if (updateData.firstName || updateData.lastName || updateData.email || updateData.phone || updateData.avatarUrl !== undefined) {
+        if (
+          updateData.firstName ||
+          updateData.lastName ||
+          updateData.email ||
+          updateData.phone ||
+          updateData.avatarUrl !== undefined
+        ) {
           await tx.users.update({
             where: { id: userId },
             data: {
@@ -635,7 +635,7 @@ class UserService {
         take: 50,
       });
 
-      return sessions.map((session) => ({
+      return sessions.map(session => ({
         id: session.id,
         type: session.is_active ? 'login' : 'logout',
         timestamp: session.updated_at,

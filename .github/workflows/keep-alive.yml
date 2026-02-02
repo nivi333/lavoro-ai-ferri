@@ -1,0 +1,32 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Run every 10 minutes to prevent Render free tier cold starts
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Endpoint
+        run: |
+          echo "Pinging backend to prevent cold start..."
+          response=$(curl -s -w "\n%{http_code}" https://ayphen-textile-backend.onrender.com/api/v1/health)
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Backend is healthy"
+          elif [ "$http_code" -eq 503 ]; then
+            echo "⚠️ Backend starting up (503), will retry..."
+            sleep 30
+            curl -s https://ayphen-textile-backend.onrender.com/api/v1/health || true
+          else
+            echo "❌ Backend responded with HTTP $http_code"
+            exit 1
+          fi
