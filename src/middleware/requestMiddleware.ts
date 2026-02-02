@@ -15,16 +15,23 @@ export const corsMiddleware = cors({
 
     // Parse allowed origins - support comma-separated list
     const configOrigin = config.cors.origin;
-    const allowedOrigins = typeof configOrigin === 'string' 
-      ? configOrigin.split(',').map(o => o.trim())
-      : Array.isArray(configOrigin) ? configOrigin : [configOrigin];
+    const allowedOrigins =
+      typeof configOrigin === 'string'
+        ? configOrigin.split(',').map(o => o.trim())
+        : Array.isArray(configOrigin)
+          ? configOrigin
+          : [configOrigin];
 
-    // Add common Netlify patterns
+    // Add common Netlify and Vercel patterns
     const netlifyPatterns = [
       'https://ayphentextile.netlify.app',
       'https://ayphen-textile.netlify.app',
       /https:\/\/.*\.netlify\.app$/,
     ];
+
+    const vercelPatterns = ['https://ayphen-textile.vercel.app', /https:\/\/.*\.vercel\.app$/];
+
+    const allPatterns = [...netlifyPatterns, ...vercelPatterns];
 
     // Allow all origins in development
     if (config.env === 'development') {
@@ -36,8 +43,8 @@ export const corsMiddleware = cors({
       return callback(null, true);
     }
 
-    // Check Netlify patterns
-    for (const pattern of netlifyPatterns) {
+    // Check deployment platform patterns (Netlify and Vercel)
+    for (const pattern of allPatterns) {
       if (typeof pattern === 'string' && pattern === origin) {
         return callback(null, true);
       }
@@ -81,7 +88,7 @@ export const securityMiddleware = helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
       connectSrc: ["'self'"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
@@ -123,12 +130,13 @@ export const compressionMiddleware = compression({
  * Request ID middleware for tracing
  */
 export const requestIdMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const requestId = req.headers['x-request-id'] as string || 
-                   `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+  const requestId =
+    (req.headers['x-request-id'] as string) ||
+    `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   req.requestId = requestId;
   res.setHeader('X-Request-ID', requestId);
-  
+
   next();
 };
 
@@ -137,7 +145,7 @@ export const requestIdMiddleware = (req: Request, res: Response, next: NextFunct
  */
 export const requestLoggingMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const start = Date.now();
-  
+
   logger.info('Incoming request', {
     requestId: req.requestId,
     method: req.method,
@@ -160,7 +168,11 @@ export const requestLoggingMiddleware = (req: Request, res: Response, next: Next
 /**
  * Content type validation middleware
  */
-export const contentTypeMiddleware = (req: Request, res: Response, next: NextFunction): Response | void => {
+export const contentTypeMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response | void => {
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
     // Only require Content-Type for requests that actually have a body
     const contentLength = parseInt(req.headers['content-length'] || '0');
@@ -192,7 +204,7 @@ export const timeoutMiddleware = (timeout: number = 30000) => {
         res.status(408).json({ success: false, message: 'Request timeout' });
       }
     }, timeout);
-    
+
     res.on('finish', () => clearTimeout(timer));
     next();
   };
@@ -201,7 +213,11 @@ export const timeoutMiddleware = (timeout: number = 30000) => {
 /**
  * Maintenance mode middleware
  */
-export const maintenanceModeMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const maintenanceModeMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   if (process.env['MAINTENANCE_MODE'] === 'true') {
     res.status(503).json({
       error: 'Service Under Maintenance',
@@ -277,12 +293,12 @@ function parseSize(size: string): number {
     mb: 1024 * 1024,
     gb: 1024 * 1024 * 1024,
   };
-  
+
   const match = size.toLowerCase().match(/^(\d+)(b|kb|mb|gb)$/);
   if (!match) {
     throw new Error('Invalid size format');
   }
-  
+
   const [, value, unit] = match;
   return parseInt(value) * units[unit];
 }
