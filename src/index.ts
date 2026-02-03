@@ -27,9 +27,13 @@ import {
 
 import { setupSwagger } from './docs/swagger';
 import v1Routes from './routes/v1';
+import { HeartbeatService } from './services/heartbeatService';
 
 // Load environment variables
 dotenv.config();
+
+// Start background services
+HeartbeatService.start();
 
 // Setup error handlers
 setupUnhandledRejectionHandler();

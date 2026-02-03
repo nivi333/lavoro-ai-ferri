@@ -105,48 +105,62 @@ export const requireRole = (allowedRoles: string[]) => {
 
 /**
  * Validate that user has access to the specified tenant
+ * Optimized with Redis caching to avoid redundant DB hits
  */
 async function validateTenantAccess(userId: string, tenantId: string): Promise<boolean> {
+  const cacheKey = `auth:access:${userId}:${tenantId}`;
+
   try {
+    // 1. Check Redis cache first
+    const { redisClient } = await import('../utils/redis');
+    if (redisClient.isReady()) {
+      const cachedAccess = await redisClient.get(cacheKey);
+      if (cachedAccess === 'true') return true;
+      if (cachedAccess === 'false') return false;
+    }
+
     logger.debug(`Validating tenant access: user ${userId} -> tenant ${tenantId}`);
 
-    const access = await globalPrisma.user_companies.findFirst({
+    // 2. Fallback to DB
+    const access = await globalPrisma.user_companies.findUnique({
       where: {
-        user_id: userId,
-        company_id: tenantId,
-        is_active: true,
+        user_id_company_id: {
+          user_id: userId,
+          company_id: tenantId,
+        },
       },
-      include: {
+      select: {
+        is_active: true,
+        role: true,
         companies: {
           select: {
-            id: true,
-            name: true,
             is_active: true,
+            name: true,
           },
         },
       },
     });
 
-    if (!access) {
-      logger.warn(
-        `Access denied: No user_companies record found for user ${userId} and tenant ${tenantId}`
-      );
-      return false;
-    }
-
-    if (!access.companies) {
-      logger.warn(`Access denied: Company ${tenantId} not found`);
-      return false;
-    }
-
-    if (!access.companies.is_active) {
-      logger.warn(`Access denied: Company ${tenantId} is inactive`);
-      return false;
-    }
-
-    logger.debug(
-      `Access granted: user ${userId} has ${access.role} role in company ${access.companies.name}`
+    const isAuthorized = !!(
+      access &&
+      access.is_active &&
+      access.companies &&
+      access.companies.is_active
     );
+
+    // 3. Update Redis cache (expire in 5 minutes)
+    if (redisClient.isReady()) {
+      await redisClient.setex(cacheKey, 300, isAuthorized.toString()).catch(err => {
+        logger.error('Failed to cache tenant access:', err);
+      });
+    }
+
+    if (!isAuthorized) {
+      logger.warn(`Access denied for user ${userId} to tenant ${tenantId}`);
+      return false;
+    }
+
+    logger.debug(`Access granted: user ${userId} to company ${access.companies.name}`);
     return true;
   } catch (error) {
     logger.error('Error validating tenant access:', error);

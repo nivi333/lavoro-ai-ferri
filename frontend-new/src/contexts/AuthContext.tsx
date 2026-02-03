@@ -133,6 +133,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
+  // Keep-alive ping to prevent backend from sleeping on Render Free Tier
+  useEffect(() => {
+    const pingBackend = async () => {
+      try {
+        await fetch(`${API_BASE_URL}/health/ping`);
+      } catch (error) {
+        // Silent error, ping failed but it's okay
+        console.warn('Keep-alive ping failed');
+      }
+    };
+
+    // Ping every 5 minutes (300,000 ms)
+    const interval = setInterval(pingBackend, 300000);
+
+    // Initial ping
+    pingBackend();
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Login function (must call backend API)
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {

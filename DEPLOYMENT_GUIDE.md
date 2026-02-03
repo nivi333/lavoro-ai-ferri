@@ -5,7 +5,7 @@
 This guide will walk you through deploying the Ayphen Textile ERP application with:
 - **Backend**: Render (Free tier)
 - **Frontend**: Netlify (Free tier)
-- **Database**: Supabase PostgreSQL
+- **Database**: Render PostgreSQL
 - **Cache**: Render Redis (Starter tier)
 
 ---
@@ -15,7 +15,7 @@ This guide will walk you through deploying the Ayphen Textile ERP application wi
 1. **GitHub Account** - Your code repository
 2. **Render Account** - Sign up at https://render.com
 3. **Netlify Account** - Sign up at https://netlify.com
-4. **Supabase Account** - Already set up with database
+4. **Render Account** - Sign up at https://render.com
 
 ---
 
@@ -62,54 +62,9 @@ This guide will walk you through deploying the Ayphen Textile ERP application wi
 
 In the Render service settings, add these environment variables:
 
-#### Required Variables (Set Manually):
+#### Required Variables:
 
-```bash
-# Database Configuration (Supabase)
-DATABASE_URL=postgresql://postgres.aqltcwzryeximjeuohpa:ayphenTextile@aws-1-ap-south-1.pooler.supabase.com:5432/postgres
-
-DIRECT_URL=postgresql://postgres.aqltcwzryeximjeuohpa:ayphenTextile@aws-1-ap-south-1.pooler.supabase.com:5432/postgres
-
-# CORS Configuration
-CORS_ORIGIN=https://ayphentextile.netlify.app
-
-# JWT Secrets (Generate secure random strings)
-JWT_SECRET=<GENERATE_SECURE_RANDOM_STRING_32_CHARS>
-JWT_REFRESH_SECRET=<GENERATE_SECURE_RANDOM_STRING_32_CHARS>
-SESSION_SECRET=<GENERATE_SECURE_RANDOM_STRING_32_CHARS>
-```
-
-**To generate secure secrets, run in terminal:**
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-#### Auto-Generated Variables (Render will set these):
-
-```bash
-NODE_ENV=production
-PORT=10000
-HOST=0.0.0.0
-API_VERSION=v1
-API_PREFIX=/api
-BCRYPT_ROUNDS=10
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_EXPIRES_IN=7d
-DB_MAX_CONNECTIONS=10
-DB_IDLE_TIMEOUT=30000
-DB_CONNECTION_TIMEOUT=10000
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-```
-
-#### Redis URL (Link from Redis service):
-
-1. Go to your Redis instance
-2. Copy the **Internal Connection String**
-3. Add as environment variable:
-   ```bash
-   REDIS_URL=<YOUR_REDIS_INTERNAL_URL>
-   ```
+Render will automatically provide the `DATABASE_URL` if you link a Render PostgreSQL service to this Web Service.
 
 ### Step 4: Deploy Backend
 

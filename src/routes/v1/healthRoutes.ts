@@ -7,6 +7,11 @@ import { config } from '../../config/config';
 
 const router = Router();
 
+// Minimal ping endpoint for keep-alive (no DB/Redis check)
+router.get('/ping', (_req, res) => {
+  res.status(200).send('OK');
+});
+
 // Basic health check
 router.get('/', async (req, res) => {
   try {
@@ -177,7 +182,7 @@ router.get('/database', async (req, res) => {
 router.get('/redis', async (req, res) => {
   try {
     const start = Date.now();
-    
+
     if (!redisClient.isReady()) {
       throw new Error('Redis client not ready');
     }

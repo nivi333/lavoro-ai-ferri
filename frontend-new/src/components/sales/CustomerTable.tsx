@@ -50,6 +50,9 @@ export function CustomerTable({
     <DataTable sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort}>
       <TableHeader>
         <TableRow>
+          <TableHead sortable sortKey='code'>
+            Code
+          </TableHead>
           <TableHead sortable sortKey='name'>
             Name
           </TableHead>
@@ -74,6 +77,7 @@ export function CustomerTable({
       <TableBody>
         {customers.map(customer => (
           <TableRow key={customer.id}>
+            <TableCell className='font-medium'>{customer.code}</TableCell>
             <TableCell className='font-medium'>{customer.name}</TableCell>
             <TableCell>{customer.phone || '—'}</TableCell>
             <TableCell>{customer.email || '—'}</TableCell>
@@ -118,7 +122,7 @@ export function CustomerTable({
         ))}
         {!loading && customers.length === 0 && (
           <TableRow>
-            <TableCell colSpan={7} className='h-24 text-center'>
+            <TableCell colSpan={8} className='h-24 text-center'>
               No customers found.
             </TableCell>
           </TableRow>
