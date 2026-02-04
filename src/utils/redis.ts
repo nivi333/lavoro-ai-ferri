@@ -62,15 +62,25 @@ class RedisManager {
   }
 
   async connect(): Promise<void> {
-    try {
-      if (!this.isConnected) {
+    const maxRetries = 3;
+    let retryCount = 0;
+
+    while (retryCount < maxRetries && !this.isConnected) {
+      try {
+        logger.info(`Attempting Redis connection (Attempt ${retryCount + 1}/${maxRetries})...`);
         await this.client.connect();
-        logger.info('Redis connection established');
+        logger.info('Redis connection established successfully');
+        return;
+      } catch (error: any) {
+        retryCount++;
+        this.lastError = `Attempt ${retryCount}: ${error.message}`;
+        logger.warn(`Redis connection failed (Attempt ${retryCount}/${maxRetries}):`, error);
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
       }
-    } catch (error) {
-      logger.warn('Redis connection failed - continuing without Redis:', error);
-      // Don't throw error, just continue without Redis
     }
+    logger.error('Failed to establish Redis connection after multiple attempts.');
   }
 
   async disconnect(): Promise<void> {
