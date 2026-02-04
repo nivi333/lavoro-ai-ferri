@@ -5,6 +5,7 @@ import { logger } from './logger';
 class RedisManager {
   private client: RedisClientType;
   private isConnected: boolean = false;
+  private lastError: string | null = null;
 
   constructor() {
     let clientConfig: any;
@@ -39,8 +40,9 @@ class RedisManager {
       this.isConnected = true;
     });
 
-    this.client.on('error', (error) => {
+    this.client.on('error', error => {
       logger.error('Redis client error:', error);
+      this.lastError = error.message || String(error);
       this.isConnected = false;
     });
 
@@ -84,6 +86,10 @@ class RedisManager {
 
   isReady(): boolean {
     return this.isConnected;
+  }
+
+  getLastError(): string | null {
+    return this.lastError;
   }
 
   // Convenience methods for common operations
@@ -214,32 +220,39 @@ class RedisManager {
       if (!this.isConnected) return 0;
       return await this.client.hDel(key, fields);
     } catch (error) {
-      logger.warn(`Redis HDEL error for key ${key}, fields ${fields.join(', ')} - Redis not available:`, error);
+      logger.warn(
+        `Redis HDEL error for key ${key}, fields ${fields.join(', ')} - Redis not available:`,
+        error
+      );
       return 0;
     }
   }
 
   // Rate limiting helper
-  async rateLimit(key: string, limit: number, windowSeconds: number): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  async rateLimit(
+    key: string,
+    limit: number,
+    windowSeconds: number
+  ): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
     try {
       if (!this.isConnected) {
         // Allow all requests if Redis is not available
         return {
           allowed: true,
           remaining: limit - 1,
-          resetTime: Date.now() + (windowSeconds * 1000),
+          resetTime: Date.now() + windowSeconds * 1000,
         };
       }
-      
+
       const current = await this.incr(key);
-      
+
       if (current === 1) {
         await this.expire(key, windowSeconds);
       }
-      
+
       const ttl = await this.ttl(key);
-      const resetTime = Date.now() + (ttl * 1000);
-      
+      const resetTime = Date.now() + ttl * 1000;
+
       return {
         allowed: current <= limit,
         remaining: Math.max(0, limit - current),
@@ -251,7 +264,7 @@ class RedisManager {
       return {
         allowed: true,
         remaining: limit - 1,
-        resetTime: Date.now() + (windowSeconds * 1000),
+        resetTime: Date.now() + windowSeconds * 1000,
       };
     }
   }
@@ -332,7 +345,7 @@ const redisManager = new RedisManager();
 export const redisClient = redisManager;
 
 // Auto-connect on import
-redisManager.connect().catch((error) => {
+redisManager.connect().catch(error => {
   logger.error('Failed to auto-connect to Redis:', error);
 });
 

@@ -128,7 +128,7 @@ router.get('/detailed', async (req, res) => {
         detailedHealth.services.redis = {
           status: 'unhealthy',
           responseTime: Date.now() - redisStart,
-          error: 'Redis client not ready (isConnected is false)',
+          error: redisClient.getLastError() || 'Redis client not ready (isConnected is false)',
         } as any;
         detailedHealth.status = 'DEGRADED';
       }
