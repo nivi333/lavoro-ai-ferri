@@ -27,6 +27,7 @@ router.get('/', async (req, res) => {
         redis: 'checking...',
         redisConfig: redisClient.getConfigSummary(),
         redisEnvKeys: Object.keys(process.env).filter(key => key.startsWith('REDIS_')),
+        dummyVar: process.env.DUMMY_VAR,
       },
     };
 

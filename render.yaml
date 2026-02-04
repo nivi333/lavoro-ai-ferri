@@ -61,6 +61,8 @@ services:
         value: /api
       - key: BCRYPT_ROUNDS
         value: 8
+      - key: DUMMY_VAR
+        value: 'true'
       - key: RATE_LIMIT_WINDOW_MS
         value: 900000
       - key: RATE_LIMIT_MAX_REQUESTS
