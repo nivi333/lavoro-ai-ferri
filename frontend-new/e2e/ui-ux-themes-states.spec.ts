@@ -4,9 +4,9 @@ test.describe('Theme Switching and UI States Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Login and navigate to dashboard
     await page.goto('/login');
-    await page.fill('input[name="identifier"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'Test123!@#');
-    await page.click('button[type="submit"]');
+    await page.fill('#emailOrPhone', 'nivi2@gm.com');
+    await page.fill('#password', 'Test@123');
+    await page.click('button:has-text("Sign In")');
     await page.waitForURL('**/companies');
     await page.click('[data-testid="company-row"]:first-child');
     await page.waitForURL('**/dashboard');
@@ -127,10 +127,10 @@ test.describe('Theme Switching and UI States Tests', () => {
       await page.fill('input[name="sku"]', 'TEST-001');
       
       // Submit
-      await page.click('button[type="submit"]');
+      await page.click('button:has-text("Sign In")');
       
       // Loading state on button
-      const submitButton = page.locator('button[type="submit"]');
+      const submitButton = page.locator('button:has-text("Sign In")');
       const isDisabled = await submitButton.isDisabled();
       expect(isDisabled).toBeTruthy();
     });
@@ -173,7 +173,7 @@ test.describe('Theme Switching and UI States Tests', () => {
       await page.click('button:has-text("Add Product")');
       
       // Try to submit without filling required fields
-      await page.click('button[type="submit"]');
+      await page.click('button:has-text("Sign In")');
       
       // Error messages should be clear and visible
       const errorMessages = await page.locator('[data-testid="error-message"]').all();
@@ -196,7 +196,7 @@ test.describe('Theme Switching and UI States Tests', () => {
       await page.click('button:has-text("Add Product")');
       await page.fill('input[name="name"]', 'Test Product');
       await page.fill('input[name="sku"]', 'TEST-001');
-      await page.click('button[type="submit"]');
+      await page.click('button:has-text("Sign In")');
       
       // Error toast should appear
       await expect(page.locator('[data-testid="error-toast"]')).toBeVisible({ timeout: 3000 });
@@ -214,8 +214,8 @@ test.describe('Theme Switching and UI States Tests', () => {
       await expect(page.locator('text=Please enter a valid email address')).toBeVisible();
       
       // Enter weak password
-      await page.fill('input[name="password"]', '123');
-      await page.locator('input[name="password"]').blur();
+      await page.fill('#password', '123');
+      await page.locator('#password').blur();
       
       // Should show password requirements
       await expect(page.locator('text=Password must be at least 8 characters')).toBeVisible();
@@ -234,7 +234,7 @@ test.describe('Theme Switching and UI States Tests', () => {
       const ariaInvalid = await emailInput.getAttribute('aria-invalid');
       
       // Complete valid email
-      await page.fill('input[name="email"]', 'test@example.com');
+      await page.fill('input[name="email"]', 'nivi2@gm.com');
       await page.locator('input[name="email"]').blur();
       
       // Should show valid state
@@ -246,7 +246,7 @@ test.describe('Theme Switching and UI States Tests', () => {
       await page.waitForURL('**/products');
       
       await page.click('button:has-text("Add Product")');
-      await page.click('button[type="submit"]');
+      await page.click('button:has-text("Sign In")');
       
       // Invalid fields should have error styling
       const nameInput = page.locator('input[name="name"]');
@@ -267,7 +267,7 @@ test.describe('Theme Switching and UI States Tests', () => {
       await expect(page.locator('text=Please enter a valid email')).toBeVisible();
       
       // Correct the error
-      await page.fill('input[name="email"]', 'test@example.com');
+      await page.fill('input[name="email"]', 'nivi2@gm.com');
       await page.locator('input[name="email"]').blur();
       
       // Error should disappear

@@ -4,9 +4,9 @@ test.describe('Machine Maintenance and Breakdown Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Login and select company
     await page.goto('/login');
-    await page.fill('input[name="identifier"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'Test123!@#');
-    await page.click('button[type="submit"]');
+    await page.fill('#emailOrPhone', 'nivi2@gm.com');
+    await page.fill('#password', 'Test@123');
+    await page.click('button:has-text("Sign In")');
     await page.waitForURL('**/companies');
     await page.click('[data-testid="company-row"]:first-child');
     await page.waitForURL('**/dashboard');

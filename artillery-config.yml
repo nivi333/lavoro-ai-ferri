@@ -2,216 +2,216 @@
 # Tests the performance and scalability of the Lavoro AI Ferri API under load
 
 config:
-  target: "http://localhost:3000"
+  target: 'http://localhost:3000'
   phases:
     # Warm-up phase: Gradually increase load
     - duration: 60
       arrivalRate: 5
-      name: "Warm-up phase"
+      name: 'Warm-up phase'
     # Ramp-up phase: Increase to moderate load
     - duration: 120
       arrivalRate: 10
       rampTo: 50
-      name: "Ramp-up to moderate load"
+      name: 'Ramp-up to moderate load'
     # Sustained load phase: Maintain high load
     - duration: 180
       arrivalRate: 50
-      name: "Sustained high load"
+      name: 'Sustained high load'
     # Spike test: Sudden traffic spike
     - duration: 60
       arrivalRate: 100
-      name: "Traffic spike"
+      name: 'Traffic spike'
     # Cool-down phase: Gradual decrease
     - duration: 60
       arrivalRate: 50
       rampTo: 5
-      name: "Cool-down phase"
-  
+      name: 'Cool-down phase'
+
   # Performance thresholds
   ensure:
-    maxErrorRate: 1  # Max 1% error rate
-    p95: 500         # 95th percentile response time < 500ms
-    p99: 1000        # 99th percentile response time < 1000ms
-  
+    maxErrorRate: 1 # Max 1% error rate
+    p95: 500 # 95th percentile response time < 500ms
+    p99: 1000 # 99th percentile response time < 1000ms
+
   # HTTP defaults
   http:
     timeout: 10
-  
+
   # Plugins
   plugins:
     expect: {}
     metrics-by-endpoint: {}
-  
+
   # Variables for test data
   variables:
-    testEmail: "loadtest@example.com"
-    testPassword: "LoadTest123!"
+    testEmail: 'nivi2@gm.com'
+    testPassword: 'Test@123'
 
 # Test scenarios
 scenarios:
   # 1. Health Check Endpoint
-  - name: "Health Check"
+  - name: 'Health Check'
     weight: 10
     flow:
       - get:
-          url: "/health"
+          url: '/health'
           expect:
             - statusCode: 200
             - contentType: json
             - hasProperty: status
 
   # 2. Authentication Flow
-  - name: "User Authentication"
+  - name: 'User Authentication'
     weight: 20
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
           expect:
-            - statusCode: [200, 401]  # Accept both success and auth failure
+            - statusCode: [200, 401] # Accept both success and auth failure
             - contentType: json
 
   # 3. Company List Retrieval
-  - name: "Get Companies"
+  - name: 'Get Companies'
     weight: 15
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/companies"
+          url: '/api/v1/companies'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 4. Product Listing
-  - name: "Get Products"
+  - name: 'Get Products'
     weight: 15
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/products"
+          url: '/api/v1/products'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 5. Inventory Retrieval
-  - name: "Get Inventory"
+  - name: 'Get Inventory'
     weight: 10
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/inventory"
+          url: '/api/v1/inventory'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 6. Order Listing
-  - name: "Get Orders"
+  - name: 'Get Orders'
     weight: 10
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/orders"
+          url: '/api/v1/orders'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 7. Machine Listing
-  - name: "Get Machines"
+  - name: 'Get Machines'
     weight: 10
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/machines"
+          url: '/api/v1/machines'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 8. Analytics Dashboard
-  - name: "Get Analytics"
+  - name: 'Get Analytics'
     weight: 5
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/analytics/dashboard"
+          url: '/api/v1/analytics/dashboard'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
 
   # 9. Quality Checkpoints
-  - name: "Get Quality Checkpoints"
+  - name: 'Get Quality Checkpoints'
     weight: 5
     flow:
       - post:
-          url: "/api/v1/auth/login"
+          url: '/api/v1/auth/login'
           json:
-            emailOrPhone: "{{ testEmail }}"
-            password: "{{ testPassword }}"
+            emailOrPhone: '{{ testEmail }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.tokens.accessToken"
-              as: "accessToken"
+            - json: '$.tokens.accessToken'
+              as: 'accessToken'
       - get:
-          url: "/api/v1/quality/checkpoints"
+          url: '/api/v1/quality/checkpoints'
           headers:
-            Authorization: "Bearer {{ accessToken }}"
+            Authorization: 'Bearer {{ accessToken }}'
           expect:
             - statusCode: [200, 401]
             - contentType: json
