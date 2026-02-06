@@ -24,7 +24,6 @@ const FinancialReportsPage = () => {
   const [triggerFetch, setTriggerFetch] = useState(0);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profit-loss');
-  const user = AuthStorage.getUser();
   // Get currency from active company or default to INR
   const company = AuthStorage.getCurrentCompany();
   // We assume company object has currency field now (added to type)
