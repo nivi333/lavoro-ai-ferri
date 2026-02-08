@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
 import { QualityMetricsReport as QualityData } from '@/services/reportTypes';
 
@@ -63,9 +64,9 @@ const QualityMetricsReport: React.FC<QualityMetricsReportProps> = ({
   return (
     <div className='space-y-6'>
       {loading && (
-        <div className='text-center py-12'>
-          <div className='inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]' />
-          <p className='mt-4 text-muted-foreground'>Loading quality metrics...</p>
+        <div className='flex items-center justify-center py-16'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+          <span className='ml-2 text-muted-foreground'>Loading report data...</span>
         </div>
       )}
 

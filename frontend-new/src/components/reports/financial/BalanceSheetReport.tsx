@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
 import { BalanceSheetReport as BalanceSheetData } from '@/services/reportTypes';
 import ReportSummaryCards from '@/components/reports/shared/ReportSummaryCards';
@@ -78,6 +79,15 @@ const BalanceSheetReport: React.FC<BalanceSheetReportProps> = ({
         },
       ]
     : [];
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center py-16'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        <span className='ml-2 text-muted-foreground'>Loading report data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

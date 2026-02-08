@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
 import { MachineUtilizationReport as UtilizationData } from '@/services/reportTypes';
 
@@ -28,6 +29,7 @@ const MachineUtilizationReport: React.FC<MachineUtilizationReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<UtilizationData | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -38,6 +40,7 @@ const MachineUtilizationReport: React.FC<MachineUtilizationReportProps> = ({
       return;
     }
 
+    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -49,6 +52,7 @@ const MachineUtilizationReport: React.FC<MachineUtilizationReportProps> = ({
       console.error('Error fetching Machine Utilization report:', error);
       toast.error('Failed to load Machine Utilization report');
     } finally {
+      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -56,6 +60,15 @@ const MachineUtilizationReport: React.FC<MachineUtilizationReportProps> = ({
   const filteredMachines = data?.utilizationByMachine.filter(m =>
     m.machineName.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center py-16'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        <span className='ml-2 text-muted-foreground'>Loading report data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

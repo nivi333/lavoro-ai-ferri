@@ -101,5 +101,28 @@ router.get(
   reportController.getProductPerformanceReport
 );
 
+// Machine Utilization Report (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required), locationId (optional)
+router.get(
+  '/machine-utilization',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getMachineUtilizationReport
+);
+
+// Production Efficiency Report (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required), locationId (optional)
+router.get(
+  '/production-efficiency',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getProductionEfficiencyReport
+);
+
+// Quality Metrics Report (OWNER, ADMIN, MANAGER can view)
+// Query params: startDate, endDate (required), locationId (optional)
+router.get(
+  '/quality-metrics',
+  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
+  reportController.getQualityMetricsReport
+);
 
 export default router;
