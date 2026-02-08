@@ -180,12 +180,10 @@ export function DyeingFinishingSheet({
               />
 
               {isEditing && process?.code && (
-                <FormItem>
-                  <FormLabel>Code</FormLabel>
-                  <FormControl>
-                    <Input value={process.code} disabled className='bg-muted' />
-                  </FormControl>
-                </FormItem>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Code</label>
+                  <Input value={process.code} disabled className='bg-muted' />
+                </div>
               )}
 
               <div className='grid grid-cols-2 gap-4'>

@@ -106,8 +106,8 @@ export function InventoryTable({
 
             return (
               <TableRow key={record.id}>
-                <TableCell className='font-mono text-xs'>
-                  {record.product.productCode || '-'}
+                <TableCell className='font-mono text-xs bg-muted/50 px-2 py-1 rounded'>
+                  {record.inventoryCode || record.product.productCode || '-'}
                 </TableCell>
                 <TableCell>
                   <div className='flex items-center gap-3'>

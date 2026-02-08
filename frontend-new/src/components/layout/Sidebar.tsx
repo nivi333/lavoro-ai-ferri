@@ -137,7 +137,6 @@ const navItems: NavItem[] = [
       },
     ],
   },
-  { label: 'Finance', icon: <DollarSign className='h-5 w-5' />, path: '/finance' },
   {
     label: 'Reports',
     icon: <FileText className='h-5 w-5' />,

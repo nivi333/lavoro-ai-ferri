@@ -91,6 +91,7 @@ export function MachineFormSheet({
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<{ url: string; name: string } | null>(null);
+  const [machineCode, setMachineCode] = useState<string>('');
 
   const isEditing = mode === 'edit' && !!editingMachineId;
 
@@ -130,6 +131,9 @@ export function MachineFormSheet({
 
             if (machine.imageUrl) {
               setImageFile({ url: machine.imageUrl, name: 'Machine Image' });
+            }
+            if (machine.machineCode) {
+              setMachineCode(machine.machineCode);
             }
           }
         })
@@ -307,6 +311,13 @@ export function MachineFormSheet({
                     Drag & drop or click to upload
                   </p>
                 </div>
+
+                {isEditing && machineCode && (
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Machine Code</label>
+                    <Input value={machineCode} disabled className='bg-muted' />
+                  </div>
+                )}
 
                 <FormField
                   control={form.control}

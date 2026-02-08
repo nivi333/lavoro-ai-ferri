@@ -226,6 +226,7 @@ export class TextileService {
 
   async createFabric(companyId: string, data: CreateFabricData) {
     const fabricId = await this.generateFabricId(companyId);
+    const code = await this.generateFabricCode(companyId);
 
     const fabric = await this.prisma.fabric_production.create({
       data: {
@@ -247,7 +248,7 @@ export class TextileService {
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         notes: data.notes,
-        code: data.code,
+        code: code,
         is_active: data.isActive,
         updated_at: new Date(),
       },
@@ -394,6 +395,7 @@ export class TextileService {
 
   async createYarn(companyId: string, data: CreateYarnData) {
     const yarnId = await this.generateYarnId(companyId);
+    const code = await this.generateYarnCode(companyId);
 
     const yarn = await this.prisma.yarn_manufacturing.create({
       data: {
@@ -414,7 +416,7 @@ export class TextileService {
         quality_grade: data.qualityGrade,
         image_url: data.imageUrl,
         notes: data.notes,
-        code: data.code,
+        code: code,
         is_active: data.isActive,
         yarn_name: data.yarnName,
         fiber_content: data.fiberContent,
@@ -563,6 +565,7 @@ export class TextileService {
 
   async createDyeing(companyId: string, data: CreateDyeingData) {
     const processId = await this.generateProcessId(companyId);
+    const code = await this.generateDyeingCode(companyId);
 
     const dyeing = await this.prisma.dyeing_finishing.create({
       data: {
@@ -587,7 +590,7 @@ export class TextileService {
         shrinkage_percent: data.shrinkagePercent,
         image_url: data.imageUrl,
         notes: data.notes,
-        code: data.code,
+        code: code,
         is_active: data.isActive,
         updated_at: new Date(),
       },
@@ -736,6 +739,7 @@ export class TextileService {
 
   async createGarment(companyId: string, data: CreateGarmentData) {
     const garmentId = await this.generateGarmentId(companyId);
+    const code = await this.generateGarmentCode(companyId);
 
     const garment = await this.prisma.garment_manufacturing.create({
       data: {
@@ -761,7 +765,7 @@ export class TextileService {
         defect_count: data.defectCount ?? 0,
         image_url: data.imageUrl,
         notes: data.notes,
-        code: data.code,
+        code: code,
         is_active: data.isActive,
         updated_at: new Date(),
       },
@@ -921,6 +925,7 @@ export class TextileService {
 
   async createDesign(companyId: string, data: CreateDesignData) {
     const designId = await this.generateDesignId(companyId);
+    const code = await this.generateDesignCode(companyId);
 
     const design = await this.prisma.design_patterns.create({
       data: {
@@ -937,7 +942,7 @@ export class TextileService {
         sample_image_url: data.sampleImageUrl,
         status: data.status,
         notes: data.notes,
-        code: data.code,
+        code: code,
         is_active: data.isActive,
         updated_at: new Date(),
       },
