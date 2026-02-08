@@ -50,7 +50,6 @@ const ReportsListPage = lazy(() => import('../pages/reports/ReportsListPage'));
 const FinancialReportsPage = lazy(() => import('../pages/reports/FinancialReportsPage'));
 const InventoryReportsPage = lazy(() => import('../pages/reports/InventoryReportsPage'));
 const SalesReportsPage = lazy(() => import('../pages/reports/SalesReportsPage'));
-const OperationalReportsPage = lazy(() => import('../pages/reports/OperationalReportsPage'));
 const SubscriptionPlansPage = lazy(() =>
   import('@/components/PlaceholderPage').then(module => ({ default: module.default }))
 );
@@ -491,16 +490,6 @@ export default function AppRouter() {
                 }
               />
 
-              <Route
-                path='/reports/operational'
-                element={
-                  <ProtectedRoute requireCompany={true}>
-                    <MainLayout>
-                      <OperationalReportsPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
 
               <Route
                 path='/subscription/plans'

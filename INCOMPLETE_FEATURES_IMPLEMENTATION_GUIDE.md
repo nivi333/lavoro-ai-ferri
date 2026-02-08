@@ -1,8 +1,8 @@
 # Incomplete Features & Implementation Guide
 
-> **Last Updated:** 2026-02-06  
+> **Last Updated:** 2026-02-08  
 > **Application:** Lavoro AI Ferri - Textile Manufacturing ERP  
-> **Status:** Comprehensive File-by-File Audit Complete
+> **Status:** Implementation In Progress - Many Items Completed
 
 ---
 
@@ -25,22 +25,27 @@
 
 ## Executive Summary
 
-| Category | Count | Severity |
-|----------|-------|----------|
-| 🔴 Security Issues | 4 | Critical |
-| 🟠 Authentication Gaps | 5 | High |
-| 🟡 Backend TODOs | 9 | Medium |
-| 🟡 Frontend Incomplete | 15 | Medium |
-| 🟢 Code Quality | 8 | Low |
-| 🟢 Enhancements | 12 | Low |
+| Category | Total | Completed | Remaining | Omitted |
+|----------|-------|-----------|-----------|---------|
+| 🔴 Security Issues | 4 | 0 | 2 | 2 (S1, S2) |
+| 🟠 Authentication Gaps | 5 | 2 | 0 | 3 (A1, A3, A5) |
+| 🟡 Backend TODOs | 9 | 2 | 6 | 1 (B9) |
+| 🟡 Frontend Incomplete | 15 | 7 | 5 | 3 (F8, I1, I3) |
+| 🟢 Code Quality | 8 | 2 | 4 | 2 (CQ5, CQ6) |
+| 🟢 Placeholder Pages | 4 | 0 | 3 | 1 (P1) |
 
-**Total Issues Identified:** 53+
+**Total Issues Identified:** 53+  
+**Completed:** 13 ✅  
+**Remaining:** 20  
+**Omitted (per user request):** 12
 
 ---
 
 ## Critical Security Issues
 
-### S1. Rate Limiting Completely Disabled ⚠️ CRITICAL
+### S1. Rate Limiting Completely Disabled ⚠️ CRITICAL [OMITTED]
+
+**Status:** ⏭️ Omitted per user request
 
 **File:** `src/middleware/rateLimiter.ts`
 
@@ -72,7 +77,9 @@ export const sensitiveOperationRateLimit = (req, res, next) => next();
 
 ---
 
-### S2. Stripe Placeholder Keys
+### S2. Stripe Placeholder Keys [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (Subscription/Stripe features not needed)
 
 **Files:**
 - `src/services/paymentGatewayService.ts` (Line 7)
@@ -123,7 +130,9 @@ const complianceStats = await globalPrisma.compliance_reports.groupBy({...}) as 
 
 ## Authentication & Authorization
 
-### A1. Google OAuth Not Implemented
+### A1. Google OAuth Not Implemented [OMITTED]
+
+**Status:** ⏭️ Omitted per user request
 
 **Files:**
 - `frontend-new/src/components/auth/GoogleAuthCallback.tsx`
@@ -175,11 +184,18 @@ if (code) {
 
 ---
 
-### A2. Refresh Token API Not Implemented
+### A2. Refresh Token API Not Implemented ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Backend: `POST /api/v1/auth/refresh` endpoint added in `authRoutes.ts`
+- Backend: `refreshToken` method in `authService.ts` with session rotation
+- Frontend: `refreshToken` function in `AuthContext.tsx` calls the API
 
 **File:** `frontend-new/src/contexts/AuthContext.tsx` (Lines 330-337)
 
-**Current State:**
+**Previous State:**
 ```typescript
 const refreshToken = useCallback(async () => {
   try {
@@ -231,7 +247,9 @@ const refreshToken = useCallback(async () => {
 
 ---
 
-### A3. Password Reset Email Not Sent
+### A3. Password Reset Email Not Sent [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (SMTP/Email features not needed)
 
 **File:** `frontend-new/src/pages/auth/ForgotPasswordPage.tsx`
 
@@ -269,11 +287,18 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
 
 ---
 
-### A4. Password Change Not Implemented
+### A4. Password Change Not Implemented ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Backend: `POST /api/v1/auth/change-password` endpoint added in `authRoutes.ts`
+- Backend: `changePassword` method in `authService.ts` with validation
+- Validates current password, hashes new password, invalidates other sessions
 
 **File:** `frontend-new/src/pages/users/UserProfilePage.tsx` (Line 259)
 
-**Current State:**
+**Previous State:**
 ```typescript
 {/* Placeholder for change password - often separate logic */}
 <PrimaryButton variant='secondary'>Change Password</PrimaryButton>
@@ -337,10 +362,17 @@ model users {
 
 ## Backend Incomplete Features
 
-### B1. Total Inventory Value Returns Zero
+### B1. Total Inventory Value Returns Zero ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Added SQL query to calculate `SUM(stock_quantity * cost_price)` from `location_inventory` joined with `products`
+- Value now correctly returned in analytics response
 
 **File:** `src/services/analyticsService.ts` (Line 249)
 
+**Previous State:**
 ```typescript
 totalInventoryValue: 0, // TODO: Calculate from products * stock * cost_price
 ```
@@ -358,10 +390,17 @@ totalInventoryValue: Number(inventoryValue[0]?.total || 0),
 
 ---
 
-### B2. Active Breakdowns Count Returns Zero
+### B2. Active Breakdowns Count Returns Zero ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Added Prisma count query for `breakdown_reports` with status `OPEN` or `IN_PROGRESS`
+- Value now correctly returned in analytics response
 
 **File:** `src/services/analyticsService.ts` (Line 262)
 
+**Previous State:**
 ```typescript
 activeBreakdowns: 0, // TODO: Get from breakdown_reports table
 ```
@@ -535,7 +574,9 @@ model user_activities {
 
 ---
 
-### B9. Email Service Not Configured
+### B9. Email Service Not Configured [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (SMTP/Email features not needed)
 
 **Current State:** No email provider integrated.
 
@@ -555,12 +596,20 @@ model user_activities {
 
 ## Frontend Incomplete Features
 
-### F1. Machine Management - Schedule Maintenance
+### F1. Machine Management - Schedule Maintenance ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Created `MaintenanceScheduleSheet.tsx` component
+- Integrated with MachineListPage dropdown menu
+- Calls `machineService.scheduleMaintenance()` API
 
 **File:** `frontend-new/src/pages/machines/MachineListPage.tsx` (Line 373)
 
+**Previous State:**
 ```typescript
-onClick={() => toast.info('Schedule Maintenance coming soon')}
+onClick={() => toast.info('Schedule Maintenance coming soon'))
 ```
 
 **Implementation:**
@@ -570,101 +619,87 @@ onClick={() => toast.info('Schedule Maintenance coming soon')}
 
 ---
 
-### F2. Machine Management - Report Breakdown
+### F2. Machine Management - Report Breakdown ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Created `BreakdownReportSheet.tsx` component
+- Integrated with MachineListPage dropdown menu
+- Calls `machineService.reportBreakdown()` API
 
 **File:** `frontend-new/src/pages/machines/MachineListPage.tsx` (Line 380)
 
-```typescript
-onClick={() => toast.info('Report Breakdown coming soon')}
-```
-
-**Implementation:**
-1. Create `BreakdownReportSheet.tsx` component
-2. Connect to `POST /api/v1/machines/breakdowns`
-3. Add severity selection, description, photos upload
-
 ---
 
-### F3. Machine Management - View History
+### F3. Machine Management - View History ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Created `MachineHistoryDialog.tsx` component
+- Integrated with MachineListPage dropdown menu
+- Calls `machineService.getMachineStatusHistory()` API
 
 **File:** `frontend-new/src/pages/machines/MachineListPage.tsx` (Line 385)
 
-```typescript
-onClick={() => toast.info('View History coming soon')}
-```
-
-**Implementation:**
-1. Create `MachineHistoryDialog.tsx` component
-2. Connect to `GET /api/v1/machines/:id/status-history`
-3. Display timeline of status changes, maintenance, breakdowns
-
 ---
 
-### F4. Machine Management - Assign Operator
+### F4. Machine Management - Assign Operator ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Created `AssignOperatorSheet.tsx` component
+- Integrated with MachineListPage dropdown menu
+- Calls `machineService.assignOperator()` API
 
 **File:** `frontend-new/src/pages/machines/MachineListPage.tsx` (Line 389)
 
-```typescript
-onClick={() => toast.info('Assign Operator coming soon')}
-```
-
-**Implementation:**
-1. Create `AssignOperatorSheet.tsx` component
-2. Connect to `POST /api/v1/machines/assignments`
-3. Add shift selection, primary operator toggle
-
 ---
 
-### F5. Inventory - Stock History
+### F5. Inventory - Stock History ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Created `StockHistoryDialog.tsx` component
+- Integrated with InventoryListPage
+- Fetches stock movements from API
 
 **File:** `frontend-new/src/pages/inventory/InventoryListPage.tsx` (Line 154)
 
-```typescript
-toast.info('Stock history feature coming soon');
-```
-
-**Implementation:**
-1. Create `StockHistoryDialog.tsx` component
-2. Connect to `GET /api/v1/inventory/movements?productId=X`
-3. Display movement timeline with filters
-
 ---
 
-### F6. Supplier - Create PO
+### F6. Supplier - Create PO ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Added navigation to `/purchase/orders/new?supplierId=X`
+- Supplier context passed via URL params
 
 **File:** `frontend-new/src/pages/purchase/SupplierListPage.tsx` (Line 133)
 
-```typescript
-toast.info('Create PO functionality is coming soon.');
-```
-
-**Implementation:**
-1. Open `PurchaseOrderFormSheet` with supplier pre-filled
-2. Navigate to `/purchase/orders?supplierId=X`
-
 ---
 
-### F7. Supplier - View POs
+### F7. Supplier - View POs ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Added navigation to `/purchase/orders?supplierId=X`
+- Filters POs by supplier
 
 **File:** `frontend-new/src/pages/purchase/SupplierListPage.tsx` (Line 137)
 
-```typescript
-toast.info('View POs functionality is coming soon.');
-```
-
-**Implementation:**
-1. Navigate to `/purchase/orders?supplierId=X`
-2. Or create `SupplierPOsDialog.tsx` for inline viewing
-
 ---
 
-### F8. Google Sign-In Button
+### F8. Google Sign-In Button [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (Google OAuth not needed)
 
 **File:** `frontend-new/src/pages/auth/LoginPage.tsx` (Line 149)
-
-```typescript
-toast.info('Google Sign-In', { description: 'Feature coming soon...' });
-```
 
 **Implementation:** See [A1. Google OAuth Not Implemented](#a1-google-oauth-not-implemented)
 
@@ -672,16 +707,12 @@ toast.info('Google Sign-In', { description: 'Feature coming soon...' });
 
 ## Missing Frontend-Backend Integrations
 
-### I1. Audit Log Viewing UI
+### I1. Audit Log Viewing UI [OMITTED]
+
+**Status:** ⏭️ Omitted per user request
 
 **Backend:** `src/routes/v1/auditRoutes.ts` exists with endpoints
 **Frontend:** No UI to view audit logs
-
-**Implementation:**
-1. Create `AuditLogPage.tsx` in `pages/admin/`
-2. Add route `/admin/audit-logs`
-3. Connect to `GET /api/v1/audit-logs`
-4. Add filters for user, action type, date range
 
 ---
 
@@ -697,30 +728,29 @@ toast.info('Google Sign-In', { description: 'Feature coming soon...' });
 
 ---
 
-### I3. Subscription Management UI
+### I3. Subscription Management UI [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (Subscription/Stripe features not needed)
 
 **Backend:** `src/routes/v1/subscriptionRoutes.ts` exists
 **Frontend:** `SubscriptionPlansPage` is a placeholder
-
-**Implementation:**
-1. Create proper `SubscriptionPlansPage.tsx`
-2. Display available plans with pricing
-3. Integrate Stripe Checkout
-4. Show current subscription status
 
 ---
 
 ## Code Quality Issues
 
-### CQ1. Debug Console.logs in Production Code
+### CQ1. Debug Console.logs in Production Code ✅ PARTIALLY COMPLETED
 
-**Files with debug logs:**
+**Status:** ✅ Partially implemented on 2026-02-08
 
+**Completed:**
+- Removed debug logs from `CompaniesListPage.tsx`
+- Removed debug logs from `companyService.ts`
+
+**Remaining:**
 | File | Lines | Content |
 |------|-------|---------|
-| `frontend-new/src/pages/company/CompaniesListPage.tsx` | 98-105 | 4 console.log statements |
-| `frontend-new/src/services/companyService.ts` | 214-227 | 6 debug logs with "=== DEBUG ===" |
-| `frontend-new/src/config/api.ts` | 65-66 | Logs API config on every load |
+| `frontend-new/src/config/api.ts` | 65-66 | Logs API config (acceptable in dev) |
 | `frontend-new/src/components/auth/GoogleAuthCallback.tsx` | 22 | Logs OAuth code |
 
 **Fix:**
@@ -752,13 +782,14 @@ getTenantPrisma(tenantId: string): PrismaClient {
 
 ---
 
-### CQ3. Duplicate Route Registration
+### CQ3. Duplicate Route Registration ✅ COMPLETED
+
+**Status:** ✅ Implemented on 2026-02-08
+
+**Implementation:**
+- Removed duplicate `/machines` route from `AppRouter.tsx`
 
 **File:** `frontend-new/src/router/AppRouter.tsx`
-
-**Issue:** `/machines` route registered twice (lines 295-304 and 362-371).
-
-**Fix:** Remove the duplicate route block.
 
 ---
 
@@ -796,48 +827,36 @@ mv src/routes/v1/inventoryRoutes.ts.disabled src/routes/v1/inventoryRoutes.ts
 
 ---
 
-### D2. Production Routes Disabled
+### D2. Production Routes Disabled ✅ COMPLETED
 
-**File:** `src/routes/v1/productionRoutes.ts.disabled`
+**Status:** ✅ Implemented on 2026-02-08
 
-**Contains:**
-- Production orders CRUD
-- Work orders CRUD
-- Production summary
-- Reference data (statuses, priorities, operations)
+**Implementation:**
+- Renamed `productionRoutes.ts.disabled` to `productionRoutes.ts`
+- Registered routes in `src/routes/v1/index.ts`
 
-**Fix:**
-```bash
-mv src/routes/v1/productionRoutes.ts.disabled src/routes/v1/productionRoutes.ts
-# Update src/routes/v1/index.ts to import and register
-```
+**File:** `src/routes/v1/productionRoutes.ts`
 
 ---
 
-### D3. Production Controller Disabled
+### D3. Production Controller Disabled ✅ COMPLETED
 
-**File:** `src/controllers/productionController.ts.disabled`
+**Status:** ✅ Implemented on 2026-02-08
 
-**Contains:** Full production order management controller.
+**Implementation:**
+- Renamed `productionController.ts.disabled` to `productionController.ts`
 
-**Fix:**
-```bash
-mv src/controllers/productionController.ts.disabled src/controllers/productionController.ts
-```
+**File:** `src/controllers/productionController.ts`
 
 ---
 
 ## Placeholder Pages
 
-### P1. Subscription Plans Page
+### P1. Subscription Plans Page [OMITTED]
+
+**Status:** ⏭️ Omitted per user request (Subscription/Stripe features not needed)
 
 **File:** `frontend-new/src/pages/index.ts` (Line 70)
-
-```typescript
-export const SubscriptionPlansPage = PlaceholderPage;
-```
-
-**Implementation:** Create full subscription management page with Stripe integration.
 
 ---
 

@@ -62,9 +62,7 @@ export { default as PettyCashPage } from './finance/PettyCashPage';
 export { default as FinancialReportsPage } from './reports/FinancialReportsPage';
 export { default as InventoryReportsPage } from './reports/InventoryReportsPage';
 export { default as SalesReportsPage } from './reports/SalesReportsPage';
-export { default as OperationalReportsPage } from './reports/OperationalReportsPage';
 export { default as AnalyticsReportsPage } from './reports/AnalyticsReportsPage';
-export { default as CustomReportsPage } from './reports/CustomReportsPage';
 
 // Subscription
 export const SubscriptionPlansPage = PlaceholderPage;

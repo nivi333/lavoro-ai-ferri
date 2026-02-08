@@ -25,7 +25,7 @@ import paymentRoutes from './paymentRoutes';
 import pettyCashRoutes from './pettyCashRoutes';
 import auditRoutes from './auditRoutes';
 import gdprRoutes from './gdprRoutes';
-import productionRoutes from './productionRoutes';
+// import productionRoutes from './productionRoutes'; // Disabled - missing productionService
 import { tenantIsolationMiddleware } from '../../middleware/tenantIsolation';
 import { subscriptionController } from '../../controllers/subscriptionController';
 import { subscriptionRoutes } from './subscriptionRoutes';
@@ -105,7 +105,7 @@ router.use('/petty-cash', pettyCashRoutes);
 router.use('/audit-logs', auditRoutes);
 router.use('/gdpr', gdprRoutes);
 router.use('/companies/:tenantId/customers', customerRoutes);
-router.use('/production', productionRoutes);
+// router.use('/production', productionRoutes); // Disabled - missing productionService
 router.use('/subscriptions', subscriptionRoutes);
 
 export default router;

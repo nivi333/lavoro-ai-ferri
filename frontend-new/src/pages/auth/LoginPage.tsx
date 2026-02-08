@@ -136,23 +136,39 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+      
       // Check if Google Client ID is configured
-      if (!import.meta.env.VITE_GOOGLE_CLIENT_ID) {
+      if (!clientId || clientId === 'your_google_client_id_here') {
         toast.error('Google Sign-In not configured', {
-          description: 'Please contact administrator.',
+          description: 'Please set VITE_GOOGLE_CLIENT_ID in your .env file.',
         });
         return;
       }
 
-      // TODO: Implement Google Sign-In with PKCE
-      toast.info('Google Sign-In', {
-        description: 'Feature coming soon...',
-      });
+      // Generate state for CSRF protection
+      const state = crypto.randomUUID();
+      sessionStorage.setItem('google_oauth_state', state);
+
+      // Build Google OAuth URL
+      const redirectUri = `${window.location.origin}/auth/google/callback`;
+      const scope = 'openid email profile';
+      
+      const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      googleAuthUrl.searchParams.set('client_id', clientId);
+      googleAuthUrl.searchParams.set('redirect_uri', redirectUri);
+      googleAuthUrl.searchParams.set('response_type', 'code');
+      googleAuthUrl.searchParams.set('scope', scope);
+      googleAuthUrl.searchParams.set('state', state);
+      googleAuthUrl.searchParams.set('access_type', 'offline');
+      googleAuthUrl.searchParams.set('prompt', 'consent');
+
+      // Redirect to Google OAuth
+      window.location.href = googleAuthUrl.toString();
     } catch (error: any) {
       toast.error('Google Sign-In failed', {
         description: getErrorMessage(error),
       });
-    } finally {
       setGoogleLoading(false);
     }
   };

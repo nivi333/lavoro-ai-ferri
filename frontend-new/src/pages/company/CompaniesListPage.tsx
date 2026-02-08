@@ -99,6 +99,8 @@ export default function CompaniesListPage() {
     try {
       await switchCompany(company);
       toast.success('Company switched successfully');
+      // Navigate to dashboard after successful company switch
+      navigate('/dashboard');
     } catch (error: unknown) {
       toast.error(getErrorMessage(error));
     } finally {

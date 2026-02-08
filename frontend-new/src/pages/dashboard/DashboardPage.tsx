@@ -118,8 +118,8 @@ const DashboardPage = () => {
   );
 
   const totalRevenue = analytics?.monthlyRevenue || 0;
-  const netProfit = totalRevenue * 0.15; // Placeholder 15% margin
-  const growthRate = 15.8;
+  const totalInventoryValue = analytics?.totalInventoryValue || 0;
+  const pendingPayments = analytics?.pendingPayments || 0;
 
   return (
     <div>
@@ -157,21 +157,23 @@ const DashboardPage = () => {
             </div>
           </Card>
 
-          {/* Net Profit Card */}
+          {/* Inventory Value Card */}
           <Card className='hover:shadow-lg hover:-translate-y-0.5 transition-all'>
             <div className='p-6'>
               <div className='flex items-start justify-between mb-2'>
                 <div className='flex-1'>
-                  <p className='text-sm text-muted-foreground font-medium mb-1'>Net Profit</p>
+                  <p className='text-sm text-muted-foreground font-medium mb-1'>Inventory Value</p>
                   <div className='flex items-center gap-2'>
                     <IndianRupee className='h-5 w-5 text-success' />
                     <p className='text-2xl font-semibold text-success'>
-                      {netProfit.toLocaleString()}
+                      {totalInventoryValue.toLocaleString()}
                     </p>
                   </div>
                 </div>
               </div>
-              <p className='text-xs text-muted-foreground font-medium'>Margin: 15%</p>
+              <p className='text-xs text-muted-foreground font-medium'>
+                Low Stock: {analytics?.lowStockProducts || 0}
+              </p>
             </div>
           </Card>
 
@@ -195,19 +197,23 @@ const DashboardPage = () => {
             </div>
           </Card>
 
-          {/* Growth Rate Card */}
+          {/* Pending Payments Card */}
           <Card className='hover:shadow-lg hover:-translate-y-0.5 transition-all'>
             <div className='p-6'>
               <div className='flex items-start justify-between mb-2'>
                 <div className='flex-1'>
-                  <p className='text-sm text-muted-foreground font-medium mb-1'>Growth Rate</p>
+                  <p className='text-sm text-muted-foreground font-medium mb-1'>Pending Payments</p>
                   <div className='flex items-center gap-2'>
-                    <BarChart3 className='h-5 w-5 text-warning' />
-                    <p className='text-2xl font-semibold text-warning'>{growthRate}%</p>
+                    <IndianRupee className='h-5 w-5 text-warning' />
+                    <p className='text-2xl font-semibold text-warning'>
+                      {pendingPayments.toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </div>
-              <p className='text-xs text-success font-medium'>Year over year</p>
+              <p className='text-xs text-muted-foreground'>
+                Overdue: {analytics?.overdueInvoices || 0}
+              </p>
             </div>
           </Card>
         </div>

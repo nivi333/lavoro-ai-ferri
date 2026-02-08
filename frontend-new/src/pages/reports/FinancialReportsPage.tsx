@@ -7,11 +7,6 @@ import ReportFilters from '@/components/reports/shared/ReportFilters';
 import ProfitLossReport from '@/components/reports/financial/ProfitLossReport';
 import BalanceSheetReport from '@/components/reports/financial/BalanceSheetReport';
 import CashFlowReport from '@/components/reports/financial/CashFlowReport';
-import TrialBalanceReport from '@/components/reports/financial/TrialBalanceReport';
-import GSTReport from '@/components/reports/financial/GSTReport';
-import AccountsReceivableReport from '@/components/reports/financial/AccountsReceivableReport';
-import AccountsPayableReport from '@/components/reports/financial/AccountsPayableReport';
-import ExpenseSummaryReport from '@/components/reports/financial/ExpenseSummaryReport';
 import { AuthStorage } from '@/utils/storage';
 
 const FinancialReportsPage = () => {
@@ -34,13 +29,7 @@ const FinancialReportsPage = () => {
     setTriggerFetch(prev => prev + 1);
   };
 
-  const isSingleDateTab = [
-    'balance-sheet',
-    'trial-balance',
-    'ar-aging',
-    'ap-aging',
-    'stock-aging',
-  ].includes(activeTab);
+  const isSingleDateTab = ['balance-sheet'].includes(activeTab);
 
   return (
     <PageContainer>
@@ -48,7 +37,7 @@ const FinancialReportsPage = () => {
         <div className='flex flex-col gap-1'>
           <h2 className='text-2xl font-bold tracking-tight'>Financial Reports</h2>
           <p className='text-muted-foreground'>
-            Generate and view financial statements, tax reports, and aging summaries.
+            Generate and view core financial statements.
           </p>
         </div>
       </PageHeader>
@@ -74,15 +63,10 @@ const FinancialReportsPage = () => {
         onValueChange={setActiveTab}
         className='w-full'
       >
-        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1 flex-wrap'>
+        <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1'>
           <TabsTrigger value='profit-loss'>Profit & Loss</TabsTrigger>
           <TabsTrigger value='balance-sheet'>Balance Sheet</TabsTrigger>
           <TabsTrigger value='cash-flow'>Cash Flow</TabsTrigger>
-          <TabsTrigger value='trial-balance'>Trial Balance</TabsTrigger>
-          <TabsTrigger value='gst'>GST Report</TabsTrigger>
-          <TabsTrigger value='ar-aging'>AR Aging</TabsTrigger>
-          <TabsTrigger value='ap-aging'>AP Aging</TabsTrigger>
-          <TabsTrigger value='expenses'>Expense Summary</TabsTrigger>
         </TabsList>
 
         <div className='mt-4'>
@@ -106,51 +90,6 @@ const FinancialReportsPage = () => {
           </TabsContent>
           <TabsContent value='cash-flow'>
             <CashFlowReport
-              dateRange={dateRange}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-              currency={currency}
-            />
-          </TabsContent>
-          <TabsContent value='trial-balance'>
-            <TrialBalanceReport
-              asOfDate={singleDate}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-              currency={currency}
-            />
-          </TabsContent>
-          <TabsContent value='gst'>
-            <GSTReport
-              dateRange={dateRange}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-              currency={currency}
-            />
-          </TabsContent>
-          <TabsContent value='ar-aging'>
-            <AccountsReceivableReport
-              asOfDate={singleDate}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-              currency={currency}
-            />
-          </TabsContent>
-          <TabsContent value='ap-aging'>
-            <AccountsPayableReport
-              asOfDate={singleDate}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-              currency={currency}
-            />
-          </TabsContent>
-          <TabsContent value='expenses'>
-            <ExpenseSummaryReport
               dateRange={dateRange}
               searchText={searchText}
               triggerFetch={triggerFetch}

@@ -99,29 +99,6 @@ router.get(
   reportController.getStockValuationReport
 );
 
-// Production Efficiency Report (OWNER, ADMIN, MANAGER can view)
-// Query params: startDate, endDate (required)
-router.get(
-  '/production-efficiency',
-  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-  reportController.getProductionEfficiencyReport
-);
-
-// Machine Utilization Report (OWNER, ADMIN, MANAGER can view)
-// Query params: startDate, endDate (required), locationId (optional)
-router.get(
-  '/machine-utilization',
-  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-  reportController.getMachineUtilizationReport
-);
-
-// Quality Metrics Report (OWNER, ADMIN, MANAGER can view)
-// Query params: startDate, endDate (required)
-router.get(
-  '/quality-metrics',
-  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-  reportController.getQualityMetricsReport
-);
 
 // Inventory Movement Report (OWNER, ADMIN, MANAGER can view)
 // Query params: startDate, endDate (required), locationId (optional)
@@ -131,13 +108,6 @@ router.get(
   reportController.getInventoryMovementReport
 );
 
-// Production Planning Report (OWNER, ADMIN, MANAGER can view)
-// Query params: startDate, endDate (required)
-router.get(
-  '/production-planning',
-  requireRole(['OWNER', 'ADMIN', 'MANAGER']),
-  reportController.getProductionPlanningReport
-);
 
 // Sales Trends Report (OWNER, ADMIN, MANAGER can view)
 // Query params: startDate, endDate (required), groupBy (optional, default: month)
