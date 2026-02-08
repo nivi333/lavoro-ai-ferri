@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { InventoryTable } from '@/components/inventory/InventoryTable';
 import { InventoryFormSheet } from '@/components/inventory/InventoryFormSheet';
 import { StockMovementDialog } from '@/components/inventory/StockMovementDialog';
+import { StockHistoryDialog } from '@/components/inventory/StockHistoryDialog';
 // import { StockReservationDialog } from '@/components/inventory/StockReservationDialog';
 
 import { inventoryService, LocationInventory, InventoryFilters } from '@/services/inventoryService';
@@ -40,7 +41,7 @@ export default function InventoryListPage() {
   // Sheet/Dialog states
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMovementOpen, setIsMovementOpen] = useState(false);
-  // const [isReservationOpen, setIsReservationOpen] = useState(false); // Unused for now, maybe for future
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<LocationInventory | null>(null);
 
   const { currentCompany } = useAuth();
@@ -150,8 +151,9 @@ export default function InventoryListPage() {
     setIsMovementOpen(true);
   };
 
-  const handleViewHistory = (_record: LocationInventory) => {
-    toast.info('Stock history feature coming soon');
+  const handleViewHistory = (record: LocationInventory) => {
+    setSelectedRecord(record);
+    setIsHistoryOpen(true);
   };
 
   const clearFilters = () => {
@@ -266,8 +268,17 @@ export default function InventoryListPage() {
         initialLocationId={selectedRecord?.locationId}
       />
 
-      {/* Reservation Dialog - Not integrated in list/actions yet, but available */}
-      {/* <StockReservationDialog ... /> */}
+      {/* Stock History Dialog */}
+      <StockHistoryDialog
+        productId={selectedRecord?.productId || null}
+        productName={selectedRecord?.product?.name}
+        locationId={selectedRecord?.locationId}
+        open={isHistoryOpen}
+        onOpenChange={(open) => {
+          setIsHistoryOpen(open);
+          if (!open) setSelectedRecord(null);
+        }}
+      />
     </div>
   );
 }

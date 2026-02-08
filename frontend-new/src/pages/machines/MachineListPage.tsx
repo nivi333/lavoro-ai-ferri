@@ -64,6 +64,10 @@ import {
 } from '@/services/machineService';
 import { locationService, Location } from '@/services/locationService';
 import { MachineFormSheet } from '@/components/machines/MachineFormSheet';
+import { MachineHistoryDialog } from '@/components/machines/MachineHistoryDialog';
+import { BreakdownReportSheet } from '@/components/machines/BreakdownReportSheet';
+import { MaintenanceScheduleSheet } from '@/components/machines/MaintenanceScheduleSheet';
+import { AssignOperatorSheet } from '@/components/machines/AssignOperatorSheet';
 
 export default function MachineListPage() {
   const { currentCompany } = useAuth();
@@ -77,6 +81,13 @@ export default function MachineListPage() {
   const [machineToDelete, setMachineToDelete] = useState<Machine | null>(null);
   const [searchText, setSearchText] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string | undefined>(undefined);
+
+  // New feature dialogs/sheets
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [breakdownSheetOpen, setBreakdownSheetOpen] = useState(false);
+  const [maintenanceSheetOpen, setMaintenanceSheetOpen] = useState(false);
+  const [assignOperatorSheetOpen, setAssignOperatorSheetOpen] = useState(false);
+  const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const fetchInProgressRef = useRef(false);
 
@@ -370,23 +381,39 @@ export default function MachineListPage() {
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => toast.info('Schedule Maintenance coming soon')}
+                          onClick={() => {
+                            setSelectedMachine(machine);
+                            setMaintenanceSheetOpen(true);
+                          }}
                           disabled={isEmployee}
                         >
                           <Calendar className='mr-2 h-4 w-4' />
                           Schedule Maintenance
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => toast.info('Report Breakdown coming soon')}
+                          onClick={() => {
+                            setSelectedMachine(machine);
+                            setBreakdownSheetOpen(true);
+                          }}
                         >
                           <AlertTriangle className='mr-2 h-4 w-4' />
                           Report Breakdown
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info('View History coming soon')}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedMachine(machine);
+                            setHistoryDialogOpen(true);
+                          }}
+                        >
                           <History className='mr-2 h-4 w-4' />
                           View History
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info('Assign Operator coming soon')}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedMachine(machine);
+                            setAssignOperatorSheetOpen(true);
+                          }}
+                        >
                           <UserPlus className='mr-2 h-4 w-4' />
                           Assign Operator
                         </DropdownMenuItem>
@@ -443,6 +470,34 @@ export default function MachineListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Machine Feature Dialogs/Sheets */}
+      <MachineHistoryDialog
+        machine={selectedMachine}
+        open={historyDialogOpen}
+        onOpenChange={setHistoryDialogOpen}
+      />
+
+      <BreakdownReportSheet
+        machine={selectedMachine}
+        open={breakdownSheetOpen}
+        onOpenChange={setBreakdownSheetOpen}
+        onSuccess={refreshMachines}
+      />
+
+      <MaintenanceScheduleSheet
+        machine={selectedMachine}
+        open={maintenanceSheetOpen}
+        onOpenChange={setMaintenanceSheetOpen}
+        onSuccess={refreshMachines}
+      />
+
+      <AssignOperatorSheet
+        machine={selectedMachine}
+        open={assignOperatorSheetOpen}
+        onOpenChange={setAssignOperatorSheetOpen}
+        onSuccess={refreshMachines}
+      />
     </PageContainer>
   );
 }

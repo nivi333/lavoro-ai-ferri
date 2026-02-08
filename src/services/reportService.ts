@@ -22,6 +22,10 @@ export class ReportService {
       throw new Error('Missing required field: companyId');
     }
 
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Get all invoices in date range
     const invoices = await this.prisma.invoices.findMany({
       where: {
@@ -29,7 +33,7 @@ export class ReportService {
         is_active: true,
         invoice_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       select: {
@@ -796,6 +800,10 @@ export class ReportService {
       throw new Error('Missing required field: companyId');
     }
 
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Get all invoices in date range for revenue
     const invoices = await this.prisma.invoices.findMany({
       where: {
@@ -803,7 +811,7 @@ export class ReportService {
         is_active: true,
         invoice_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       include: {
@@ -818,7 +826,7 @@ export class ReportService {
         is_active: true,
         bill_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       include: {
@@ -837,7 +845,7 @@ export class ReportService {
         status: 'APPROVED',
         expense_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
     });
@@ -902,15 +910,6 @@ export class ReportService {
       },
       {} as Record<string, any>
     );
-
-    // Add Bills sum to expense breakdown as "Material Purchases"
-    if (totalBills > 0) {
-      expenseBreakdown['Material Purchases (Bills)'] = {
-        category: 'Material Purchases',
-        amount: totalBills,
-        percentage: 0,
-      };
-    }
 
     // Calculate percentages for expense breakdown
     const totalExpenses = costOfGoodsSold + operatingExpenses;
@@ -1146,6 +1145,10 @@ export class ReportService {
       throw new Error('Missing required field: companyId');
     }
 
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Get all invoices paid in period (cash inflow)
     const paidInvoices = await this.prisma.invoices.findMany({
       where: {
@@ -1154,7 +1157,7 @@ export class ReportService {
         status: 'PAID',
         payment_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
     });
@@ -1167,7 +1170,7 @@ export class ReportService {
         status: 'PAID',
         payment_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
     });
@@ -1319,6 +1322,10 @@ export class ReportService {
     // Determine date range based on period
     const { startDate, endDate } = this.getPeriodDates(period);
 
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Get all invoices in period (output tax)
     const invoices = await this.prisma.invoices.findMany({
       where: {
@@ -1326,7 +1333,7 @@ export class ReportService {
         is_active: true,
         invoice_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       include: {
@@ -1345,7 +1352,7 @@ export class ReportService {
         is_active: true,
         bill_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       include: {
@@ -1477,6 +1484,10 @@ export class ReportService {
       throw new Error('Missing required field: companyId');
     }
 
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Get all bills in date range (bills represent expenses)
     const bills = await this.prisma.bills.findMany({
       where: {
@@ -1484,7 +1495,7 @@ export class ReportService {
         is_active: true,
         bill_date: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       include: {
@@ -1594,13 +1605,17 @@ export class ReportService {
    * @returns Production Efficiency Report
    */
   async generateProductionEfficiencyReport(companyId: string, startDate: Date, endDate: Date) {
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
     // Fetch fabric production data to get production dates
     const fabricProduction = await this.prisma.fabric_production.findMany({
       where: {
         company_id: companyId,
         created_at: {
           gte: startDate,
-          lte: endDate,
+          lte: normalizedEndDate,
         },
       },
       select: {
@@ -1696,6 +1711,9 @@ export class ReportService {
     endDate: Date,
     locationId?: string
   ) {
+    // Normalize endDate to end of day
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
     // Fetch machines with their status history
     const machines = await this.prisma.machines.findMany({
       where: {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import {
   PageContainer,
@@ -25,6 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function SupplierListPage() {
+  const navigate = useNavigate();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,12 +131,12 @@ export default function SupplierListPage() {
     }
   };
 
-  const handleCreatePO = (_supplier: Supplier) => {
-    toast.info('Create PO functionality is coming soon.');
+  const handleCreatePO = (supplier: Supplier) => {
+    navigate(`/purchase/orders?action=create&supplierId=${supplier.id}&supplierName=${encodeURIComponent(supplier.name)}`);
   };
 
-  const handleViewPOs = (_supplier: Supplier) => {
-    toast.info('View POs functionality is coming soon.');
+  const handleViewPOs = (supplier: Supplier) => {
+    navigate(`/purchase/orders?supplierId=${supplier.id}&supplierName=${encodeURIComponent(supplier.name)}`);
   };
 
   return (

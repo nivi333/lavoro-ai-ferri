@@ -329,8 +329,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshToken = useCallback(async () => {
     try {
-      // TODO: Implement real refresh token API call here
-      throw new Error('refreshToken API not implemented');
+      const tokens = AuthStorage.getTokens();
+      if (!tokens?.refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: tokens.refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Token refresh failed');
+      }
+
+      const data = await response.json();
+      const newTokens: AuthTokens = {
+        accessToken: data.tokens.accessToken,
+        refreshToken: data.tokens.refreshToken,
+        expiresAt: Date.now() + (data.tokens.expiresIn * 1000),
+      };
+
+      AuthStorage.setTokens(newTokens);
+      dispatch({ type: 'REFRESH_TOKEN_SUCCESS', payload: newTokens });
     } catch {
       logout();
     }

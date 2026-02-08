@@ -133,15 +133,87 @@ export class AuthController {
    */
   static async refreshToken(req: Request, res: Response): Promise<void> {
     try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        res.status(400).json({
+          success: false,
+          message: 'Refresh token is required',
+        });
+        return;
+      }
+
+      const tokens = await AuthService.refreshAccessToken(refreshToken);
+      
       res.status(200).json({
         success: true,
         message: 'Token refreshed successfully',
+        tokens,
       });
     } catch (error: any) {
       logger.error('Token refresh error:', error);
-      res.status(500).json({
+      const status = error.message?.includes('Invalid') || error.message?.includes('expired')
+        ? 401
+        : error.message?.includes('User not found')
+          ? 404
+          : 500;
+      res.status(status).json({
         success: false,
         message: error.message || 'Token refresh failed',
+      });
+    }
+  }
+
+  /**
+   * Change password
+   */
+  static async changePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = (req as any).userId;
+
+      if (!currentPassword || !newPassword) {
+        res.status(400).json({
+          success: false,
+          message: 'Current password and new password are required',
+        });
+        return;
+      }
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Authentication required',
+        });
+        return;
+      }
+
+      // Validate new password strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        res.status(400).json({
+          success: false,
+          message: 'New password must be at least 8 characters with uppercase, lowercase, number, and special character',
+        });
+        return;
+      }
+
+      await AuthService.changePassword(userId, currentPassword, newPassword);
+
+      res.status(200).json({
+        success: true,
+        message: 'Password changed successfully',
+      });
+    } catch (error: any) {
+      logger.error('Change password error:', error);
+      const status = error.message?.includes('Current password')
+        ? 400
+        : error.message?.includes('User not found')
+          ? 404
+          : 500;
+      res.status(status).json({
+        success: false,
+        message: error.message || 'Password change failed',
       });
     }
   }

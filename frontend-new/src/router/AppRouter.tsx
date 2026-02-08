@@ -358,18 +358,6 @@ export default function AppRouter() {
                 }
               />
 
-              {/* Machine Management Routes */}
-              <Route
-                path='/machines'
-                element={
-                  <ProtectedRoute requireCompany={true}>
-                    <MainLayout>
-                      <MachineListPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                }
-              />
-
               <Route
                 path='/users'
                 element={

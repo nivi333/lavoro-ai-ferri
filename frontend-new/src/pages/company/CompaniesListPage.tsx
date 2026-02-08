@@ -95,16 +95,11 @@ export default function CompaniesListPage() {
   }
 
   const handleCompanySelect = async (company: Company) => {
-    console.log('[CompaniesListPage] handleCompanySelect called with:', company.name);
     setLoading(true);
     try {
-      console.log('[CompaniesListPage] Calling switchCompany...');
       await switchCompany(company);
-      console.log('[CompaniesListPage] switchCompany completed successfully');
       toast.success('Company switched successfully');
-      console.log('[CompaniesListPage] navigate() called');
     } catch (error: unknown) {
-      console.error('[CompaniesListPage] Error in handleCompanySelect:', error);
       toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);

@@ -381,4 +381,134 @@ export class AuthService {
         throw new Error('Invalid time unit');
     }
   }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  static async refreshAccessToken(refreshToken: string): Promise<AuthTokens> {
+    try {
+      // Verify the refresh token
+      const decoded = this.verifyToken(refreshToken, 'refresh');
+      
+      // Check if session exists in database
+      const session = await globalPrisma.sessions.findFirst({
+        where: {
+          id: decoded.sessionId,
+          user_id: decoded.userId,
+          token: refreshToken,
+          expires_at: { gt: new Date() },
+        },
+      });
+
+      if (!session) {
+        throw new Error('Invalid or expired refresh token');
+      }
+
+      // Check if user still exists and is active
+      const user = await globalPrisma.users.findFirst({
+        where: {
+          id: decoded.userId,
+          is_active: true,
+        },
+      });
+
+      if (!user) {
+        throw new Error('User not found or inactive');
+      }
+
+      // Generate new tokens
+      const newSessionId = uuidv4();
+      const tokenPayload = {
+        userId: decoded.userId,
+        sessionId: newSessionId,
+        tenantId: decoded.tenantId,
+        role: decoded.role,
+      };
+
+      const newAccessToken = this.generateAccessToken(tokenPayload);
+      const newRefreshToken = this.generateRefreshToken(tokenPayload);
+
+      // Update session with new token
+      const refreshExpMs = this.parseExpirationTime(config.jwt.refreshExpiresIn);
+      const expiresAt = new Date(Date.now() + refreshExpMs);
+
+      await globalPrisma.sessions.update({
+        where: { id: session.id },
+        data: {
+          id: newSessionId,
+          token: newRefreshToken,
+          expires_at: expiresAt,
+          updated_at: new Date(),
+        },
+      });
+
+      // Update Redis cache
+      const refreshExpSec = Math.floor(refreshExpMs / 1000);
+      await redisClient.del(`refresh_token:${decoded.sessionId}`).catch(() => {});
+      redisClient.setex(`refresh_token:${newSessionId}`, refreshExpSec, newRefreshToken).catch(err => {
+        logger.error('Failed to cache new refresh token in Redis:', err);
+      });
+
+      logger.info(`Token refreshed for user: ${decoded.userId}`);
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        expiresIn: this.parseExpirationTime(config.jwt.expiresIn) / 1000,
+      };
+    } catch (error: any) {
+      logger.error('Token refresh error:', error);
+      if (error.message.includes('Invalid') || error.message.includes('expired') || error.message.includes('User not found')) {
+        throw error;
+      }
+      throw new Error('Token refresh failed');
+    }
+  }
+
+  /**
+   * Change user password
+   */
+  static async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      const user = await globalPrisma.users.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const isValid = await this.verifyPassword(currentPassword, user.password);
+      if (!isValid) {
+        throw new Error('Current password is incorrect');
+      }
+
+      const hashedPassword = await this.hashPassword(newPassword);
+      await globalPrisma.users.update({
+        where: { id: userId },
+        data: {
+          password: hashedPassword,
+          updated_at: new Date(),
+        },
+      });
+
+      // Invalidate all existing sessions except current
+      await globalPrisma.sessions.deleteMany({
+        where: {
+          user_id: userId,
+        },
+      });
+
+      logger.info(`Password changed for user: ${userId}`);
+    } catch (error: any) {
+      logger.error('Password change error:', error);
+      if (error.message.includes('User not found') || error.message.includes('Current password')) {
+        throw error;
+      }
+      throw new Error('Password change failed');
+    }
+  }
 }

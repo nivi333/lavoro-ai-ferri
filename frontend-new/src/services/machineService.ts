@@ -536,6 +536,72 @@ class MachineService {
 
     return response.json();
   }
+
+  // Get machine status history
+  async getMachineStatusHistory(machineId: string): Promise<any[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/machines/${machineId}/status-history`, {
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        return [];
+      }
+
+      const result = await response.json();
+      return result.data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Report breakdown
+  async reportBreakdown(data: {
+    machineId: string;
+    severity: BreakdownSeverity;
+    priority: BreakdownPriority;
+    title: string;
+    description: string;
+    breakdownTime?: string;
+  }): Promise<ApiResponse<BreakdownReport>> {
+    const response = await fetch(`${API_BASE_URL}/machines/breakdowns`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return response.json();
+  }
+
+  // Schedule maintenance
+  async scheduleMaintenance(data: {
+    machineId: string;
+    maintenanceType: string;
+    scheduledDate: string;
+    description?: string;
+    assignedTechnicianId?: string;
+    estimatedDuration?: number;
+    priority?: string;
+  }): Promise<ApiResponse<MaintenanceSchedule>> {
+    const response = await fetch(`${API_BASE_URL}/machines/maintenance/schedules`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return response.json();
+  }
+
+  // Assign operator to machine
+  async assignOperator(machineId: string, operatorId: string, shiftType?: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_BASE_URL}/machines/assignments`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ machineId, operatorId, shiftType }),
+    });
+
+    return response.json();
+  }
 }
 
 export const machineService = new MachineService();

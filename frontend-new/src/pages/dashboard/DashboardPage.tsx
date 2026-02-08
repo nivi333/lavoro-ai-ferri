@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   ShoppingCart,
   BarChart3,
@@ -70,7 +70,7 @@ const DashboardPage = () => {
       const chartData = revenueTrendData.map((item: any) => ({
         month: item.month,
         Revenue: item.revenue,
-        Profit: item.revenue * 0.32, // 32% margin
+        Profit: item.revenue * 0.15, // Using a more conservative 15% estimate for now
       }));
       setRevenueTrends(chartData);
     } catch (error) {
@@ -117,8 +117,8 @@ const DashboardPage = () => {
     action => !action.requiresRole || (userRole && action.requiresRole.includes(userRole))
   );
 
-  const totalRevenue = analytics?.monthlyRevenue ? analytics.monthlyRevenue * 6 : 0;
-  const netProfit = totalRevenue * 0.32;
+  const totalRevenue = analytics?.monthlyRevenue || 0;
+  const netProfit = totalRevenue * 0.15; // Placeholder 15% margin
   const growthRate = 15.8;
 
   return (
@@ -145,9 +145,9 @@ const DashboardPage = () => {
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground font-medium mb-1'>Total Revenue</p>
                   <div className='flex items-center gap-2'>
-                    <DollarSign className='h-5 w-5 text-primary' />
+                    <IndianRupee className='h-5 w-5 text-primary' />
                     <p className='text-2xl font-semibold text-primary'>
-                      ${totalRevenue.toLocaleString()}
+                      {totalRevenue.toLocaleString()}
                     </p>
                     <TrendingUp className='h-4 w-4 text-success' />
                   </div>
@@ -164,14 +164,14 @@ const DashboardPage = () => {
                 <div className='flex-1'>
                   <p className='text-sm text-muted-foreground font-medium mb-1'>Net Profit</p>
                   <div className='flex items-center gap-2'>
-                    <DollarSign className='h-5 w-5 text-success' />
+                    <IndianRupee className='h-5 w-5 text-success' />
                     <p className='text-2xl font-semibold text-success'>
-                      ${netProfit.toLocaleString()}
+                      {netProfit.toLocaleString()}
                     </p>
                   </div>
                 </div>
               </div>
-              <p className='text-xs text-muted-foreground font-medium'>Margin: 32%</p>
+              <p className='text-xs text-muted-foreground font-medium'>Margin: 15%</p>
             </div>
           </Card>
 
@@ -221,8 +221,8 @@ const DashboardPage = () => {
                 <LineChart data={revenueTrends}>
                   <CartesianGrid strokeDasharray='3 3' />
                   <XAxis dataKey='month' />
-                  <YAxis tickFormatter={value => `$${(value / 1000).toFixed(0)}K`} />
-                  <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
+                  <YAxis tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`} />
+                  <Tooltip formatter={(value: number) => `₹${value.toLocaleString()}`} />
                   <Legend />
                   <Line
                     type='monotone'

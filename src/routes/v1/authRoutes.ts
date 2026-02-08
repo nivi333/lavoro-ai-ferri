@@ -83,4 +83,63 @@ router.post('/register', AuthController.register);
  */
 router.post('/login', AuthController.login);
 
+/**
+ * @swagger
+ * /api/v1/auth/refresh:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Refresh access token
+ *     description: Get new access token using refresh token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *       401:
+ *         description: Invalid or expired refresh token
+ */
+router.post('/refresh', AuthController.refreshToken);
+
+/**
+ * @swagger
+ * /api/v1/auth/change-password:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Change user password
+ *     description: Change password for authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid current password or weak new password
+ *       401:
+ *         description: Authentication required
+ */
+router.post('/change-password', AuthController.changePassword);
+
 export default router;

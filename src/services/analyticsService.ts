@@ -210,6 +210,23 @@ class AnalyticsService {
       const outOfStockCount = counts.out_of_stock_count;
       const activeDefectsCount = counts.active_defects_count;
 
+      // Calculate total inventory value
+      const inventoryValueResult = await globalPrisma.$queryRaw<[{ total: string | null }]>`
+        SELECT COALESCE(SUM(li.stock_quantity * COALESCE(p.cost_price, p.selling_price, 0)), 0)::text as total
+        FROM location_inventory li
+        JOIN products p ON li.product_id = p.id
+        WHERE li.company_id = ${companyId}
+      `;
+      const totalInventoryValue = Number(inventoryValueResult[0]?.total || 0);
+
+      // Get active breakdowns count
+      const activeBreakdownsCount = await globalPrisma.breakdown_reports.count({
+        where: {
+          company_id: companyId,
+          status: { in: ['OPEN', 'IN_PROGRESS'] },
+        },
+      });
+
       // Process inspections data
       const inspectionsMap = inspectionsData.reduce(
         (acc, item) => {
@@ -246,7 +263,7 @@ class AnalyticsService {
         // Inventory Stats
         lowStockProducts: lowStockCount,
         outOfStockProducts: outOfStockCount,
-        totalInventoryValue: 0, // TODO: Calculate from products * stock * cost_price
+        totalInventoryValue,
 
         // Quality Stats
         totalInspections:
@@ -259,7 +276,7 @@ class AnalyticsService {
         totalMachines: Object.values(machinesMap).reduce((sum, count) => sum + count, 0),
         activeMachines: machinesMap['IN_USE'] || 0,
         underMaintenance: machinesMap['UNDER_MAINTENANCE'] || 0,
-        activeBreakdowns: 0, // TODO: Get from breakdown_reports table
+        activeBreakdowns: activeBreakdownsCount,
 
         // Customer & Supplier Stats
         totalCustomers: customersCount,
