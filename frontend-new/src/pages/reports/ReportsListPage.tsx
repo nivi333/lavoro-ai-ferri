@@ -39,18 +39,18 @@ const ReportsListPage: React.FC = () => {
     {
       id: 'sales',
       name: 'Sales Reports',
-      description: 'Revenue analysis, customer insights, and sales trends',
+      description: 'Sales summary and top selling products',
       icon: <ShoppingCart className='h-8 w-8 text-[#722ed1]' />,
       path: '/reports/sales',
-      reportCount: 3,
+      reportCount: 2,
     },
     {
       id: 'inventory',
       name: 'Inventory Reports',
-      description: 'Stock levels, valuation, and movement analysis',
+      description: 'Stock summary and valuation',
       icon: <ShoppingBag className='h-8 w-8 text-[#1890ff]' />,
       path: '/reports/inventory',
-      reportCount: 3,
+      reportCount: 2,
     },
     {
       id: 'analytics',

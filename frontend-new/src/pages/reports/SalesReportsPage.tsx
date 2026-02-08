@@ -5,9 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageContainer, PageHeader } from '@/components/globalComponents';
 import ReportFilters from '@/components/reports/shared/ReportFilters';
 import SalesSummaryReport from '@/components/reports/sales/SalesSummaryReport';
-import SalesTrendReport from '@/components/reports/sales/SalesTrendReport';
 import TopSellingProductsReport from '@/components/reports/sales/TopSellingProductsReport';
-import CustomerPurchaseHistoryReport from '@/components/reports/sales/CustomerPurchaseHistoryReport';
 
 const SalesReportsPage = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -15,7 +13,6 @@ const SalesReportsPage = () => {
     to: new Date(),
   });
   const [searchText, setSearchText] = useState('');
-  const [period, setPeriod] = useState('month');
   const [triggerFetch, setTriggerFetch] = useState(0);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
@@ -24,15 +21,13 @@ const SalesReportsPage = () => {
     setTriggerFetch(prev => prev + 1);
   };
 
-  const showPeriodSelect = activeTab === 'trends';
-
   return (
     <PageContainer>
       <PageHeader>
         <div className='flex flex-col gap-1'>
           <h2 className='text-2xl font-bold tracking-tight'>Sales Reports</h2>
           <p className='text-muted-foreground'>
-            Analyze sales performance, trends, top products, and customer history.
+            Analyze sales performance and top products.
           </p>
         </div>
       </PageHeader>
@@ -46,9 +41,6 @@ const SalesReportsPage = () => {
           onGenerate={handleGenerate}
           loading={loading}
           searchPlaceholder='Search...'
-          showPeriodSelect={showPeriodSelect}
-          period={period}
-          setPeriod={setPeriod}
         />
       </div>
 
@@ -60,9 +52,7 @@ const SalesReportsPage = () => {
       >
         <TabsList className='w-full justify-start overflow-x-auto h-auto p-1 mb-1 flex-wrap'>
           <TabsTrigger value='summary'>Sales Summary</TabsTrigger>
-          <TabsTrigger value='trends'>Sales Trends</TabsTrigger>
           <TabsTrigger value='top-selling'>Top Selling Products</TabsTrigger>
-          <TabsTrigger value='customer-history'>Customer Purchase History</TabsTrigger>
         </TabsList>
 
         <div className='mt-4'>
@@ -74,24 +64,8 @@ const SalesReportsPage = () => {
               onLoadingChange={setLoading}
             />
           </TabsContent>
-          <TabsContent value='trends'>
-            <SalesTrendReport
-              dateRange={dateRange}
-              period={period}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-            />
-          </TabsContent>
           <TabsContent value='top-selling'>
             <TopSellingProductsReport
-              dateRange={dateRange}
-              searchText={searchText}
-              triggerFetch={triggerFetch}
-              onLoadingChange={setLoading}
-            />
-          </TabsContent>
-          <TabsContent value='customer-history'>
-            <CustomerPurchaseHistoryReport
               dateRange={dateRange}
               searchText={searchText}
               triggerFetch={triggerFetch}

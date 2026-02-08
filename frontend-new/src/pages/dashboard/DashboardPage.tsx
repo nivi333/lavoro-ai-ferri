@@ -10,13 +10,12 @@ import {
   Loader2,
 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import { toast } from 'sonner';
@@ -66,11 +65,11 @@ const DashboardPage = () => {
 
       setAnalytics(dashboardAnalytics);
 
-      // Transform revenue trends for Recharts
+      // Transform revenue trends for Recharts - using actual data only
       const chartData = revenueTrendData.map((item: any) => ({
         month: item.month,
         Revenue: item.revenue,
-        Profit: item.revenue * 0.15, // Using a more conservative 15% estimate for now
+        Orders: item.orders || 0,
       }));
       setRevenueTrends(chartData);
     } catch (error) {
@@ -153,7 +152,7 @@ const DashboardPage = () => {
                   </div>
                 </div>
               </div>
-              <p className='text-xs text-success font-medium'>+12.5% from last month</p>
+              <p className='text-xs text-muted-foreground font-medium'>This month</p>
             </div>
           </Card>
 
@@ -218,33 +217,75 @@ const DashboardPage = () => {
           </Card>
         </div>
 
-        {/* Revenue & Profit Trend Chart */}
+        {/* Revenue Trend Chart - Modern Area Chart */}
         {revenueTrends.length > 0 && (
-          <Card className='mb-6'>
+          <Card className='mb-6 overflow-hidden'>
             <div className='p-6'>
-              <h3 className='text-lg font-semibold mb-4'>Revenue & Profit Trend</h3>
-              <ResponsiveContainer width='100%' height={300}>
-                <LineChart data={revenueTrends}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='month' />
-                  <YAxis tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`} />
-                  <Tooltip formatter={(value: number) => `₹${value.toLocaleString()}`} />
-                  <Legend />
-                  <Line
+              <div className='flex items-center justify-between mb-6'>
+                <div>
+                  <h3 className='text-lg font-semibold'>Revenue Overview</h3>
+                  <p className='text-sm text-muted-foreground'>Monthly revenue and order trends</p>
+                </div>
+                <div className='flex items-center gap-4 text-sm'>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-3 h-3 rounded-full bg-primary' />
+                    <span className='text-muted-foreground'>Revenue</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-3 h-3 rounded-full bg-emerald-500' />
+                    <span className='text-muted-foreground'>Orders</span>
+                  </div>
+                </div>
+              </div>
+              <ResponsiveContainer width='100%' height={280}>
+                <AreaChart data={revenueTrends}>
+                  <defs>
+                    <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
+                      <stop offset='5%' stopColor='#7b5fc9' stopOpacity={0.3} />
+                      <stop offset='95%' stopColor='#7b5fc9' stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id='profitGradient' x1='0' y1='0' x2='0' y2='1'>
+                      <stop offset='5%' stopColor='#10b981' stopOpacity={0.3} />
+                      <stop offset='95%' stopColor='#10b981' stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' vertical={false} />
+                  <XAxis 
+                    dataKey='month' 
+                    axisLine={false} 
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <YAxis 
+                    tickFormatter={value => `₹${(value / 1000).toFixed(0)}K`}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    }}
+                  />
+                  <Area
                     type='monotone'
                     dataKey='Revenue'
-                    stroke='#df005c'
+                    stroke='#7b5fc9'
                     strokeWidth={2}
-                    dot={{ fill: '#df005c' }}
+                    fill='url(#revenueGradient)'
                   />
-                  <Line
+                  <Area
                     type='monotone'
-                    dataKey='Profit'
-                    stroke='#52c41a'
+                    dataKey='Orders'
+                    stroke='#10b981'
                     strokeWidth={2}
-                    dot={{ fill: '#52c41a' }}
+                    fill='url(#profitGradient)'
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </Card>
