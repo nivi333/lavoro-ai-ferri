@@ -1,5 +1,5 @@
 {
-  "name": "lavoro-ai-ferri-backend",
+  "name": "ayphen-textile-backend",
   "description": "Multi-tenant textile manufacturing ERP system backend",
   "image": "heroku/nodejs",
   "stack": "heroku-22",

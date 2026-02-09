@@ -20,7 +20,7 @@ const consoleFormat = winston.format.combine(
 export const logger = winston.createLogger({
   level: config.logging.level,
   format: logFormat,
-  defaultMeta: { service: 'lavoro-ai-ferri' },
+  defaultMeta: { service: 'ayphen-textile' },
   transports: [
     new winston.transports.File({
       filename: 'logs/error.log',

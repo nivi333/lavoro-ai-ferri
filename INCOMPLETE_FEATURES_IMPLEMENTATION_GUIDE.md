@@ -1,7 +1,7 @@
 # Incomplete Features & Implementation Guide
 
 > **Last Updated:** 2026-02-08  
-> **Application:** Lavoro AI Ferri - Textile Manufacturing ERP  
+> **Application:** Ayphen Textile - Textile Manufacturing ERP  
 > **Status:** Implementation In Progress - Many Items Completed
 
 ---
@@ -272,7 +272,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
   await sgMail.send({
     to: email,
-    from: 'noreply@lavoro-ai-ferri.com',
+    from: 'noreply@ayphen-textile.com',
     subject: 'Password Reset Request',
     html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`,
   });
@@ -933,7 +933,7 @@ interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<void> {
   await sgMail.send({
     to: options.to,
-    from: options.from || 'noreply@lavoro-ai-ferri.com',
+    from: options.from || 'noreply@ayphen-textile.com',
     subject: options.subject,
     html: options.html,
   });
@@ -943,7 +943,7 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
   await sendEmail({
     to: email,
-    subject: 'Password Reset Request - Lavoro AI Ferri',
+    subject: 'Password Reset Request - Ayphen Textile',
     html: `
       <h1>Password Reset</h1>
       <p>Click the link below to reset your password:</p>
@@ -960,7 +960,7 @@ export async function sendInvitationEmail(email: string, companyName: string, in
     subject: `You've been invited to join ${companyName}`,
     html: `
       <h1>Company Invitation</h1>
-      <p>${inviterName} has invited you to join ${companyName} on Lavoro AI Ferri.</p>
+      <p>${inviterName} has invited you to join ${companyName} on Ayphen Textile.</p>
       <a href="${acceptUrl}">Accept Invitation</a>
     `,
   });

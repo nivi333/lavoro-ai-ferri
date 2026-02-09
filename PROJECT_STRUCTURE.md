@@ -4,7 +4,7 @@
 
 ### **Backend (Root Directory)**
 ```
-/Users/nivetharamdev/Projects/lavoro-ai-ferri/
+/Users/nivetharamdev/Projects/ayphen-textile/
 ```
 
 **Core Backend Files:**
@@ -17,7 +17,7 @@
 
 ### **Frontend**
 ```
-/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/
+/Users/nivetharamdev/Projects/ayphen-textile/frontend-new/
 ```
 
 **Frontend Framework:** Vite + React + TypeScript + Ant Design
@@ -131,14 +131,14 @@ frontend-new/
 
 ### **Backend (Development)**
 ```bash
-cd /Users/nivetharamdev/Projects/lavoro-ai-ferri
+cd /Users/nivetharamdev/Projects/ayphen-textile
 npm install
 npm run dev
 ```
 
 ### **Frontend (Development)**
 ```bash
-cd /Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new
+cd /Users/nivetharamdev/Projects/ayphen-textile/frontend-new
 npm install
 npm run dev
 ```
@@ -184,8 +184,8 @@ npm run start:prod
 
 ## 📝 Important Notes
 
-1. **Backend root** = `/Users/nivetharamdev/Projects/lavoro-ai-ferri/`
-2. **Frontend** = `/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/`
+1. **Backend root** = `/Users/nivetharamdev/Projects/ayphen-textile/`
+2. **Frontend** = `/Users/nivetharamdev/Projects/ayphen-textile/frontend-new/`
 3. **Main backend code** = `src/` folder
 4. **Database schema** = `prisma/schema.prisma`
 5. **Deployment config** = `render.yaml` (Render.com free tier)

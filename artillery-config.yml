@@ -1,5 +1,5 @@
 # Artillery Load Testing Configuration
-# Tests the performance and scalability of the Lavoro AI Ferri API under load
+# Tests the performance and scalability of the Ayphen Textile API under load
 
 config:
   target: 'http://localhost:3000'

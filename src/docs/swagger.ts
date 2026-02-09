@@ -35,7 +35,7 @@ const swaggerDefinition = {
     `,
     contact: {
       name: 'API Support',
-      email: 'support@lavoro-ai-ferri.com',
+      email: 'support@ayphen-textile.com',
     },
     license: {
       name: 'MIT',
@@ -48,7 +48,7 @@ const swaggerDefinition = {
       description: 'Development server',
     },
     {
-      url: 'https://api.lavoro-ai-ferri.com/api/v1',
+      url: 'https://api.ayphen-textile.com/api/v1',
       description: 'Production server',
     },
   ],

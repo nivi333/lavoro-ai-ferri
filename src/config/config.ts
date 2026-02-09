@@ -149,7 +149,7 @@ export const config: Config = {
     port: parseInt(process.env.EMAIL_PORT || '587', 10),
     user: process.env.EMAIL_USER || '',
     password: process.env.EMAIL_PASSWORD || '',
-    from: process.env.EMAIL_FROM || 'noreply@lavoro-ai-ferri.com',
+    from: process.env.EMAIL_FROM || 'noreply@ayphen-textile.com',
   },
   upload: {
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10),

@@ -125,7 +125,7 @@ git push origin main
 1. Log in to Netlify Dashboard
 2. Click **"Add new site"** → **"Import an existing project"**
 3. Choose **"GitHub"** and authorize Netlify
-4. Select your repository: `lavoro-ai-ferri`
+4. Select your repository: `ayphen-textile`
 5. Configure build settings:
    - **Base directory**: `frontend-new`
    - **Build command**: `npm ci && npm run build`
