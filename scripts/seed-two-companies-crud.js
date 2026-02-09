@@ -263,7 +263,7 @@ async function run() {
   const userPayload = {
     firstName: 'Seed',
     lastName: 'Tester',
-    email: `seed-test-${timestamp}@lavoro.com`,
+    email: `seed-test-${timestamp}@ayphen.com`,
     password: 'SeedTest@123',
   };
 

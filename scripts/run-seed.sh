@@ -3,7 +3,7 @@
 echo "🚀 Running seed script for live deployment..."
 echo ""
 echo "⚠️  This will create test data in your database:"
-echo "   - 1 test user (testuser@lavoro.com / Test@123)"
+echo "   - 1 test user (testuser@ayphen.com / Test@123)"
 echo "   - 2 companies with full data"
 echo ""
 read -p "Continue? (y/n) " -n 1 -r

@@ -45,7 +45,7 @@ async function run() {
   const userPayload = {
     firstName: 'Multi',
     lastName: 'Test',
-    email: 'multi-test@lavoro.com',
+    email: 'multi-test@ayphen.com',
     password: 'TestPassword@123',
   };
 
@@ -219,7 +219,7 @@ async function run() {
   console.log('\n' + '='.repeat(40));
   console.log('🎉 POPULATION COMPLETE');
   console.log('='.repeat(40));
-  console.log('Email: multi-test@lavoro.com');
+  console.log('Email: multi-test@ayphen.com');
   console.log('Pass : TestPassword@123');
   console.log('='.repeat(40));
 }

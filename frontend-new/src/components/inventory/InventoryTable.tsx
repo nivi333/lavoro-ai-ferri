@@ -192,9 +192,6 @@ export function InventoryTable({
                         maximumFractionDigits: 2,
                       })}
                     </span>
-                    <span className='text-[10px] text-muted-foreground'>
-                      @ ₹{record.product.costPrice}
-                    </span>
                   </div>
                 </TableCell>
                 <TableCell>

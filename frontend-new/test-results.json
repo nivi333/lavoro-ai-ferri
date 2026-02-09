@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/playwright.config.ts",
-    "rootDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+    "configFile": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/playwright.config.ts",
+    "rootDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -26,7 +26,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/test-results",
+        "outputDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -34,7 +34,7 @@
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+        "testDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -42,7 +42,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/test-results",
+        "outputDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -50,7 +50,7 @@
         },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+        "testDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -58,7 +58,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/test-results",
+        "outputDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -66,7 +66,7 @@
         },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+        "testDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -74,7 +74,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/test-results",
+        "outputDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -82,7 +82,7 @@
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+        "testDir": "/Users/nivetharamdev/Projects/ayphen-textile/frontend-new/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -90,7 +90,7 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/test-results",
+        "outputDir": "/Users/nivetharamdev/Projects/ayphen-textile/frontend-new/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -98,7 +98,7 @@
         },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
-        "testDir": "/Users/nivetharamdev/Projects/lavoro-ai-ferri/frontend-new/e2e",
+        "testDir": "/Users/nivetharamdev/Projects/ayphen-textiles/frontend-new/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"

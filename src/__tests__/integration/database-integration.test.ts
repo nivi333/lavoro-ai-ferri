@@ -18,7 +18,7 @@ describe('Database Integration Tests', () => {
       try {
         // Run migrations
         execSync('npx prisma migrate deploy', {
-          env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
+          env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
           stdio: 'pipe',
         });
 
@@ -65,7 +65,7 @@ describe('Database Integration Tests', () => {
         data: {
           id: `user-seed-${Date.now()}`,
           email: `seed${Date.now()}@example.com`,
-          phone: '+1234567890',
+          phone: `+1${Date.now().toString().slice(-10)}`,
           password: 'hashed-password',
           first_name: 'Seed',
           last_name: 'User',
@@ -87,7 +87,7 @@ describe('Database Integration Tests', () => {
         data: {
           id: `user-rel-${Date.now()}`,
           email: `rel${Date.now()}@example.com`,
-          phone: '+1234567890',
+          phone: `+2${Date.now().toString().slice(-10)}`,
           password: 'hashed-password',
           first_name: 'Relation',
           last_name: 'Test',
@@ -276,7 +276,7 @@ describe('Database Integration Tests', () => {
       try {
         // Simulate backup by exporting schema
         execSync('npx prisma db pull', {
-          env: { ...process.env, DATABASE_URL: process.env.TEST_DATABASE_URL },
+          env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
           stdio: 'pipe',
         });
 
@@ -293,7 +293,7 @@ describe('Database Integration Tests', () => {
         data: {
           id: `user-integrity-${Date.now()}`,
           email: `integrity${Date.now()}@example.com`,
-          phone: '+1234567890',
+          phone: `+3${Date.now().toString().slice(-10)}`,
           password: 'hashed-password',
           first_name: 'Integrity',
           last_name: 'Test',
@@ -318,13 +318,13 @@ describe('Database Integration Tests', () => {
       const userId = `user-rollback-${Date.now()}`;
 
       try {
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async tx => {
           // Create user
           await tx.users.create({
             data: {
               id: userId,
               email: `rollback${Date.now()}@example.com`,
-              phone: '+1234567890',
+              phone: `+4${Date.now().toString().slice(-10)}`,
               password: 'hashed-password',
               first_name: 'Rollback',
               last_name: 'Test',
@@ -369,19 +369,21 @@ describe('Database Integration Tests', () => {
 
       // Create 100 products
       const timestamp = Date.now();
-      const products = Array(100).fill(null).map((_, i) => ({
-        id: `bulk-prod-${timestamp}-${i}`,
-        product_id: `BULK-PROD-${timestamp}-${i}`,
-        product_code: `BULK-PC-${timestamp}-${i}`,
-        company_id: tenantId,
-        name: `Bulk Product ${i}`,
-        sku: `BULK-SKU-${timestamp}-${i}`,
-        cost_price: 100,
-        selling_price: 150,
-        stock_quantity: 10,
-        is_active: true,
-        updated_at: new Date(),
-      }));
+      const products = Array(100)
+        .fill(null)
+        .map((_, i) => ({
+          id: `bulk-prod-${timestamp}-${i}`,
+          product_id: `BULK-PROD-${timestamp}-${i}`,
+          product_code: `BULK-PC-${timestamp}-${i}`,
+          company_id: tenantId,
+          name: `Bulk Product ${i}`,
+          sku: `BULK-SKU-${timestamp}-${i}`,
+          cost_price: 100,
+          selling_price: 150,
+          stock_quantity: 10,
+          is_active: true,
+          updated_at: new Date(),
+        }));
 
       await prisma.products.createMany({ data: products });
 
@@ -415,9 +417,9 @@ describe('Database Integration Tests', () => {
 
   describe('Connection Pooling', () => {
     test('should handle multiple concurrent connections', async () => {
-      const queries = Array(10).fill(null).map(() =>
-        prisma.users.findMany({ take: 1 })
-      );
+      const queries = Array(10)
+        .fill(null)
+        .map(() => prisma.users.findMany({ take: 1 }));
 
       const results = await Promise.all(queries);
 

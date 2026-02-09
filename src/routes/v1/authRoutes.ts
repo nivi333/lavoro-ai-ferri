@@ -141,5 +141,6 @@ router.post('/refresh', AuthController.refreshToken);
  *         description: Authentication required
  */
 router.post('/change-password', AuthController.changePassword);
+router.post('/logout', AuthController.logout);
 
 export default router;

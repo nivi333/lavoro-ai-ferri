@@ -4,7 +4,7 @@
 
 services:
   - type: redis
-    name: lavoro-redis
+    name: ayphen-redis
     plan: starter
     maxmemoryPolicy: allkeys-lru
     ipAllowList: []
@@ -30,7 +30,7 @@ services:
         sync: false
       - key: REDIS_URL
         fromService:
-          name: lavoro-redis
+          name: ayphen-redis
           type: redis
           property: internalConnectionString
       - key: JWT_SECRET

@@ -4,16 +4,13 @@
  */
 
 export const createMockUser = (overrides = {}) => ({
-  user_id: 'user-123',
+  id: 'user-123',
   email: 'test@example.com',
   phone: null,
   first_name: 'John',
   last_name: 'Doe',
   password: '$2a$10$hashedpassword123',
   is_active: true,
-  is_email_verified: false,
-  is_phone_verified: false,
-  last_login: null,
   created_at: new Date('2024-01-01'),
   updated_at: new Date('2024-01-01'),
   ...overrides,

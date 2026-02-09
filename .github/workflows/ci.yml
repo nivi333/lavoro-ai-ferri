@@ -2,9 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 env:
   NODE_VERSION: '20.x'
@@ -16,26 +16,26 @@ jobs:
   lint:
     name: Lint & Code Quality
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run ESLint
         run: npm run lint
-        
+
       - name: Run Prettier check
         run: npm run format:check
-        
+
       - name: TypeScript type check
         run: npm run type-check
 
@@ -43,14 +43,14 @@ jobs:
   test:
     name: Unit & Integration Tests
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: lavoro_test
+          POSTGRES_DB: ayphen_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -58,7 +58,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-          
+
       redis:
         image: redis:7
         options: >-
@@ -72,44 +72,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Generate Prisma client
         run: npm run db:generate
-        
+
       - name: Run database migrations
         run: npm run db:migrate:test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_test
-          
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_test
+
       - name: Run unit tests
         run: npm run test:unit
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           JWT_SECRET: test-jwt-secret-key-for-ci
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-for-ci
-          
+
       - name: Run integration tests
         run: npm run test:integration
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           JWT_SECRET: test-jwt-secret-key-for-ci
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-for-ci
-          
+
       - name: Upload test coverage
         uses: codecov/codecov-action@v3
         with:
@@ -121,23 +121,23 @@ jobs:
   security:
     name: Security Audit
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run npm audit
         run: npm audit --audit-level=high
-        
+
       - name: Run Snyk security scan
         uses: snyk/actions/node@master
         env:
@@ -150,44 +150,44 @@ jobs:
     name: Build & Docker Image
     runs-on: ubuntu-latest
     needs: [lint, test]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build application
         run: npm run build
-        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: lavoro-ai-ferri/backend
+          images: ayphen-textile/backend
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
-            
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -198,14 +198,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: lavoro-ai-ferri/backend:latest
+          image-ref: ayphen-textile/backend:latest
           format: 'sarif'
           output: 'trivy-results.sarif'
-          
+
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v2
         if: always()
@@ -216,14 +216,14 @@ jobs:
   migration-check:
     name: Database Migration Check
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: lavoro_migration_test
+          POSTGRES_DB: ayphen_migration_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -235,52 +235,52 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Generate Prisma client
         run: npm run db:generate
-        
+
       - name: Check migration status
         run: npm run db:migrate:status
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_migration_test
-          
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_migration_test
+
       - name: Run migrations
         run: npm run db:migrate:deploy
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_migration_test
-          
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_migration_test
+
       - name: Validate schema
         run: npm run db:validate
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_migration_test
-          
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_migration_test
+
       - name: Run seed data
         run: npm run db:seed
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_migration_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_migration_test
 
   # Performance Tests
   performance:
     name: Performance Tests
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     services:
       postgres:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: lavoro_perf_test
+          POSTGRES_DB: ayphen_perf_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -288,7 +288,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-          
+
       redis:
         image: redis:7
         options: >-
@@ -302,37 +302,37 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build application
         run: npm run build
-        
+
       - name: Setup database
         run: |
           npm run db:generate
           npm run db:migrate:deploy
           npm run db:seed
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_perf_test
-          
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_perf_test
+
       - name: Run performance tests
         run: npm run test:performance
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lavoro_perf_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayphen_perf_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           JWT_SECRET: test-jwt-secret-key-for-ci
           JWT_REFRESH_SECRET: test-jwt-refresh-secret-key-for-ci
-          
+
       - name: Upload performance results
         uses: actions/upload-artifact@v3
         with:

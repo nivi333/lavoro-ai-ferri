@@ -6,26 +6,39 @@
 import { AuthService } from '../../../services/authService';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { createMockUser, createMockRegisterData, createMockLoginCredentials } from '../../factories/userFactory';
+import {
+  createMockUser,
+  createMockRegisterData,
+  createMockLoginCredentials,
+} from '../../factories/userFactory';
 import { globalPrisma } from '../../../database/connection';
 import { redisClient } from '../../../utils/redis';
 import gdprService from '../../../services/gdprService';
 
 // Mock external dependencies
-jest.mock('../../../database/connection', () => ({
-  globalPrisma: {
-    users: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
+jest.mock('../../../database/connection', () => {
+  const actual = jest.requireActual('../../../database/connection');
+  return {
+    ...actual,
+    globalPrisma: {
+      ...actual.globalPrisma,
+      users: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      sessions: {
+        create: jest.fn(),
+        findFirst: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
     },
-    sessions: {
-      create: jest.fn(),
-      findFirst: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-  },
+  };
+});
+
+jest.mock('../../../services/gdprService', () => ({
+  recordConsent: jest.fn(),
 }));
 
 jest.mock('../../../utils/redis', () => ({
@@ -38,9 +51,7 @@ jest.mock('../../../utils/redis', () => ({
 }));
 
 jest.mock('../../../services/gdprService', () => ({
-  default: {
-    recordConsent: jest.fn(),
-  },
+  recordConsent: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('../../../utils/logger', () => ({
@@ -56,7 +67,7 @@ describe('AuthService - Password Hashing', () => {
     it('should hash password with bcrypt', async () => {
       const password = 'Test123!@#';
       const hashedPassword = await AuthService.hashPassword(password);
-      
+
       expect(hashedPassword).toBeDefined();
       expect(hashedPassword).not.toBe(password);
       expect(hashedPassword.length).toBeGreaterThan(20);
@@ -67,7 +78,7 @@ describe('AuthService - Password Hashing', () => {
       const password = 'Test123!@#';
       const hash1 = await AuthService.hashPassword(password);
       const hash2 = await AuthService.hashPassword(password);
-      
+
       expect(hash1).not.toBe(hash2);
     });
   });
@@ -76,7 +87,7 @@ describe('AuthService - Password Hashing', () => {
     it('should return true for matching passwords', async () => {
       const plainPassword = 'Test123!@#';
       const hashedPassword = await AuthService.hashPassword(plainPassword);
-      
+
       const isMatch = await AuthService.verifyPassword(plainPassword, hashedPassword);
       expect(isMatch).toBe(true);
     });
@@ -85,7 +96,7 @@ describe('AuthService - Password Hashing', () => {
       const plainPassword = 'Test123!@#';
       const wrongPassword = 'WrongPassword';
       const hashedPassword = await AuthService.hashPassword(plainPassword);
-      
+
       const isMatch = await AuthService.verifyPassword(wrongPassword, hashedPassword);
       expect(isMatch).toBe(false);
     });
@@ -112,7 +123,7 @@ describe('AuthService - User Registration', () => {
     (gdprService.recordConsent as jest.Mock).mockResolvedValue(undefined);
 
     const result = await AuthService.register(registerData);
-    
+
     expect(result.user.email).toBe(registerData.email);
     expect(result.user.first_name).toBe(registerData.firstName);
     expect(result.user.last_name).toBe(registerData.lastName);
@@ -128,7 +139,9 @@ describe('AuthService - User Registration', () => {
       password: 'Test123!@#',
     };
 
-    await expect(AuthService.register(invalidData)).rejects.toThrow('Email or phone is required');
+    await expect(AuthService.register(invalidData)).rejects.toThrow(
+      'Email or phone number is required'
+    );
   });
 
   it('should reject duplicate email', async () => {
@@ -137,7 +150,9 @@ describe('AuthService - User Registration', () => {
 
     (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(existingUser);
 
-    await expect(AuthService.register(registerData)).rejects.toThrow('Email already exists');
+    await expect(AuthService.register(registerData)).rejects.toThrow(
+      'User already exists with this email or phone'
+    );
   });
 
   it('should hash password before saving', async () => {
@@ -154,7 +169,7 @@ describe('AuthService - User Registration', () => {
     (redisClient.set as jest.Mock).mockResolvedValue('OK');
 
     await AuthService.register(registerData);
-    
+
     expect(globalPrisma.users.create).toHaveBeenCalled();
   });
 
@@ -173,13 +188,12 @@ describe('AuthService - User Registration', () => {
     (gdprService.recordConsent as jest.Mock).mockResolvedValue(undefined);
 
     await AuthService.register(registerData);
-    
+
     expect(gdprService.recordConsent).toHaveBeenCalledWith(
       expect.objectContaining({
-        userId: mockUser.user_id,
-        hasConsentedToTerms: true,
-        hasConsentedToPrivacy: true,
-        hasConsentedToCookies: true,
+        userId: mockUser.id,
+        consentType: 'TERMS_AND_CONDITIONS',
+        hasConsented: true,
       })
     );
   });
@@ -193,7 +207,7 @@ describe('AuthService - User Login', () => {
   it('should login with valid credentials', async () => {
     const credentials = createMockLoginCredentials();
     const hashedPassword = await AuthService.hashPassword(credentials.password);
-    const mockUser = createMockUser({ 
+    const mockUser = createMockUser({
       email: credentials.emailOrPhone,
       password: hashedPassword,
     });
@@ -203,7 +217,7 @@ describe('AuthService - User Login', () => {
     (redisClient.set as jest.Mock).mockResolvedValue('OK');
 
     const result = await AuthService.login(credentials);
-    
+
     expect(result.user.email).toBe(credentials.emailOrPhone);
     expect(result.tokens).toBeDefined();
     expect(result.tokens.accessToken).toBeDefined();
@@ -235,7 +249,7 @@ describe('AuthService - User Login', () => {
 
     (globalPrisma.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
 
-    await expect(AuthService.login(credentials)).rejects.toThrow('Account is inactive');
+    await expect(AuthService.login(credentials)).rejects.toThrow('Invalid credentials');
   });
 });
 
@@ -243,7 +257,7 @@ describe('AuthService - Token Management', () => {
   it('should generate access and refresh tokens', () => {
     const userId = 'user-123';
     const sessionId = 'session-456';
-    
+
     const accessToken = AuthService.generateAccessToken({ userId, sessionId });
     const refreshToken = AuthService.generateRefreshToken({ userId, sessionId });
 

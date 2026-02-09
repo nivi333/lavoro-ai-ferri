@@ -96,25 +96,29 @@ app.get('/', (req, res) => {
 app.use(notFoundHandler);
 app.use(enhancedErrorHandler);
 
-const server = app.listen(config.port, config.host, () => {
-  logger.info(`🚀 Server running on ${config.host}:${config.port} in ${config.env} mode`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
+// Only start the server if we're not running in a test environment
+let server: any;
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(config.port, config.host, () => {
+    logger.info(`🚀 Server running on ${config.host}:${config.port} in ${config.env} mode`);
   });
-});
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      logger.info('Process terminated');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', () => {
+    logger.info('SIGINT received, shutting down gracefully');
+    server.close(() => {
+      logger.info('Process terminated');
+      process.exit(0);
+    });
+  });
+}
 
 export default app;

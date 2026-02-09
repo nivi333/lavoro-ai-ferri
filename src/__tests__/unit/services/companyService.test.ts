@@ -3,7 +3,12 @@
  * Tests company creation, multi-tenant operations, and user-company relationships
  */
 
-import { createMockCompany, createMockCompanyData, createMockUserCompany, createMockLocation } from '../../factories/companyFactory';
+import {
+  createMockCompany,
+  createMockCompanyData,
+  createMockUserCompany,
+  createMockLocation,
+} from '../../factories/companyFactory';
 import { createMockUser } from '../../factories/userFactory';
 
 describe('CompanyService - Company Creation', () => {
@@ -19,7 +24,7 @@ describe('CompanyService - Company Creation', () => {
     // Verify company created
     expect(mockCompany.name).toBe(companyData.name);
     expect(mockCompany.tenant_id).toBeDefined();
-    
+
     // Verify default location created
     expect(mockLocation.tenant_id).toBe(mockCompany.tenant_id);
     expect(mockLocation.is_headquarters).toBe(true);
@@ -30,12 +35,12 @@ describe('CompanyService - Company Creation', () => {
     const mockUser = createMockUser();
     const mockCompany = createMockCompany();
     const mockUserCompany = createMockUserCompany({
-      user_id: mockUser.user_id,
+      user_id: mockUser.id,
       tenant_id: mockCompany.tenant_id,
       role: 'OWNER',
     });
 
-    expect(mockUserCompany.user_id).toBe(mockUser.user_id);
+    expect(mockUserCompany.user_id).toBe(mockUser.id);
     expect(mockUserCompany.tenant_id).toBe(mockCompany.tenant_id);
     expect(mockUserCompany.role).toBe('OWNER');
     expect(mockUserCompany.is_active).toBe(true);
@@ -49,7 +54,7 @@ describe('CompanyService - Company Creation', () => {
     expect(company1.company_id).toBe('COM001');
     expect(company2.company_id).toBe('COM002');
     expect(company3.company_id).toBe('COM003');
-    
+
     // Verify uniqueness
     const ids = [company1.company_id, company2.company_id, company3.company_id];
     const uniqueIds = new Set(ids);
@@ -59,7 +64,13 @@ describe('CompanyService - Company Creation', () => {
   it('should validate required fields', () => {
     const validData = createMockCompanyData();
     const requiredFields: (keyof ReturnType<typeof createMockCompanyData>)[] = [
-      'name', 'industry', 'country', 'addressLine1', 'city', 'state', 'contactInfo'
+      'name',
+      'industry',
+      'country',
+      'addressLine1',
+      'city',
+      'state',
+      'contactInfo',
     ];
 
     requiredFields.forEach(field => {
@@ -69,7 +80,7 @@ describe('CompanyService - Company Creation', () => {
     // Test missing required field
     const invalidData: any = { ...validData };
     delete invalidData.name;
-    
+
     expect(() => {
       if (!invalidData.name) {
         throw new Error('Company name is required');

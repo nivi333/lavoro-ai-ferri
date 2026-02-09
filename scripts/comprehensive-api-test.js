@@ -49,7 +49,7 @@ async function runTests() {
   const loginResult = await request(
     'POST',
     '/auth/login',
-    { emailOrPhone: 'testuser@lavoro.com', password: 'Test@123' },
+    { emailOrPhone: 'testuser@ayphen.com', password: 'Test@123' },
     'Login'
   );
   if (!loginResult.success) {

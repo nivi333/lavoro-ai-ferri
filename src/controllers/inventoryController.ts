@@ -102,7 +102,7 @@ export class InventoryController {
       }
 
       // Validate movement type
-      if (!Object.values(StockMovementType).includes(data.movementType)) {
+      if (!Object.values(StockMovementType || {}).includes(data.movementType)) {
         return res.status(400).json({
           success: false,
           error: 'Invalid movement type',
@@ -151,7 +151,7 @@ export class InventoryController {
       }
 
       // Validate reservation type
-      if (!Object.values(ReservationType).includes(data.reservationType)) {
+      if (!Object.values(ReservationType || {}).includes(data.reservationType)) {
         return res.status(400).json({
           success: false,
           error: 'Invalid reservation type',
@@ -247,7 +247,7 @@ export class InventoryController {
   // Get stock movement types enum
   async getStockMovementTypes(req: Request, res: Response) {
     try {
-      const movementTypes = Object.values(StockMovementType).map(type => ({
+      const movementTypes = Object.values(StockMovementType || {}).map(type => ({
         value: type,
         label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       }));
@@ -268,7 +268,7 @@ export class InventoryController {
   // Get reservation types enum
   async getReservationTypes(req: Request, res: Response) {
     try {
-      const reservationTypes = Object.values(ReservationType).map(type => ({
+      const reservationTypes = Object.values(ReservationType || {}).map(type => ({
         value: type,
         label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
       }));

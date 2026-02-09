@@ -12,7 +12,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const THEME_STORAGE_KEY = 'lavoro-theme';
+const THEME_STORAGE_KEY = 'ayphen-theme';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<AppTheme>(() => {
@@ -25,7 +25,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
-    
+
     // Apply dark class for Tailwind dark mode
     if (theme === 'dark') {
       root.classList.add('dark');
@@ -42,7 +42,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
     // Show loader during theme transition
     setIsThemeSwitching(true);
-    
+
     // Use requestAnimationFrame for smooth transition
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {

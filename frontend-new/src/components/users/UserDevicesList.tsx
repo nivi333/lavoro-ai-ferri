@@ -63,7 +63,7 @@ export default function UserDevicesList({ userId }: UserDevicesListProps) {
         <DataTable>
           <Table>
             <TableHead>
-              <TableRow>
+              <TableRow className='flex'>
                 <GlobalTableHeader>Device</GlobalTableHeader>
                 <GlobalTableHeader>Last Active</GlobalTableHeader>
                 <GlobalTableHeader>Started At</GlobalTableHeader>

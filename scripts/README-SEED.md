@@ -7,7 +7,7 @@ This guide explains how to populate your live deployment with comprehensive test
 The seed script creates realistic test data for **2 companies** with the following:
 
 ### User Account
-- **Email**: `testuser@lavoro.com`
+- **Email**: `testuser@ayphen.com`
 - **Password**: `Test@123`
 - **Role**: OWNER for both companies
 
@@ -95,7 +95,7 @@ chmod +x scripts/run-seed.sh
 
 ```bash
 # .env file
-DATABASE_URL="postgresql://user:password@localhost:5432/lavoro_ai_ferri"
+DATABASE_URL="postgresql://user:password@localhost:5432/ayphen_textile"
 ```
 
 ### For Live Deployment (Render/Supabase)
@@ -110,7 +110,7 @@ DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres?pgbounce
 After running the seed script:
 
 1. **Login to the application**
-   - Email: `testuser@lavoro.com`
+   - Email: `testuser@ayphen.com`
    - Password: `Test@123`
 
 2. **Select a company**
@@ -147,7 +147,7 @@ npm run seed:live
 # Option 2: Manually delete test data via SQL
 # Connect to your database and delete records for test companies
 DELETE FROM companies WHERE name IN ('Ayphen Textiles Ltd', 'Global Fabrics Inc');
-DELETE FROM users WHERE email = 'testuser@lavoro.com';
+DELETE FROM users WHERE email = 'testuser@ayphen.com';
 ```
 
 ## 🎯 Use Cases

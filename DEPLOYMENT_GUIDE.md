@@ -26,7 +26,7 @@ This guide will walk you through deploying the Ayphen Textile ERP application wi
 1. Log in to Render Dashboard
 2. Click **"New +"** → **"Redis"**
 3. Configure:
-   - **Name**: `lavoro-redis`
+   - **Name**: `ayphen-redis`
    - **Plan**: Starter ($7/month) or Free (if available)
    - **Max Memory Policy**: `allkeys-lru`
 4. Click **"Create Redis"**

@@ -10,13 +10,13 @@ async function main() {
   // 1. Create User
   console.log('🔐 Creating test user...');
   const hashedPassword = await bcrypt.hash('Test@123', 10);
-  
+
   const user = await prisma.users.upsert({
-    where: { email: 'testuser@lavoro.com' },
+    where: { email: 'testuser@ayphen.com' },
     update: {},
     create: {
       id: uuidv4(),
-      email: 'testuser@lavoro.com',
+      email: 'testuser@ayphen.com',
       password: hashedPassword,
       first_name: 'Test',
       last_name: 'User',
@@ -31,12 +31,12 @@ async function main() {
   // 2. Create Companies
   console.log('\n🏢 Creating companies...');
   const companies = [];
-  
+
   for (let i = 1; i <= 2; i++) {
     const companyId = uuidv4();
     const companyName = i === 1 ? 'Ayphen Textiles Ltd' : 'Global Fabrics Inc';
     const companySlug = i === 1 ? 'ayphen-textiles-ltd' : 'global-fabrics-inc';
-    
+
     const company = await prisma.companies.create({
       data: {
         id: companyId,
@@ -70,7 +70,14 @@ async function main() {
       },
     });
 
-    companies.push({ id: companyId, name: company.name, locations: [], products: [], customers: [], suppliers: [] });
+    companies.push({
+      id: companyId,
+      name: company.name,
+      locations: [],
+      products: [],
+      customers: [],
+      suppliers: [],
+    });
     console.log(`✅ Company: ${company.name}`);
   }
 
@@ -109,7 +116,7 @@ async function main() {
   console.log('\n👥 Creating customers and suppliers...');
   let customerCounter = 1;
   let supplierCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 5; i++) {
       const customerId = uuidv4();
@@ -166,14 +173,14 @@ async function main() {
   // 5. Create Products
   console.log('\n📦 Creating products...');
   let productCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 5; i++) {
       const productId = uuidv4();
       const productCode = `PROD${String(productCounter).padStart(3, '0')}`;
       const costPrice = 30 + i * 5;
       const sellingPrice = 50 + i * 10;
-      
+
       await prisma.products.create({
         data: {
           id: productId,
@@ -200,7 +207,7 @@ async function main() {
   // 6. Create Inventory
   console.log('\n📊 Creating inventory...');
   let inventoryCounter = 1;
-  
+
   for (const company of companies) {
     for (const productId of company.products) {
       for (let i = 0; i < 3; i++) {
@@ -208,7 +215,7 @@ async function main() {
         const stockQty = Math.floor(Math.random() * 1000) + 100;
         const reservedQty = Math.floor(Math.random() * 50);
         const availableQty = stockQty - reservedQty;
-        
+
         await prisma.location_inventory.create({
           data: {
             id: uuidv4(),
@@ -233,14 +240,19 @@ async function main() {
   // 7. Create Stock Adjustments
   console.log('\n📝 Creating stock adjustments...');
   let adjustmentCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 10; i++) {
       const adjustmentQty = Math.floor(Math.random() * 100) + 10;
       const previousStock = Math.floor(Math.random() * 500) + 100;
       const adjustmentType = ['ADD', 'REMOVE', 'SET'][i % 3];
-      const newStock = adjustmentType === 'REMOVE' ? previousStock - adjustmentQty : adjustmentType === 'ADD' ? previousStock + adjustmentQty : adjustmentQty;
-      
+      const newStock =
+        adjustmentType === 'REMOVE'
+          ? previousStock - adjustmentQty
+          : adjustmentType === 'ADD'
+            ? previousStock + adjustmentQty
+            : adjustmentQty;
+
       await prisma.stock_adjustments.create({
         data: {
           id: uuidv4(),
@@ -263,7 +275,7 @@ async function main() {
   // 8. Create Sales Orders
   console.log('\n🛒 Creating sales orders...');
   let orderCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 8; i++) {
       const orderId = uuidv4();
@@ -312,7 +324,7 @@ async function main() {
   // 9. Create Purchase Orders
   console.log('\n🛍️ Creating purchase orders...');
   let poCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 6; i++) {
       const poId = uuidv4();
@@ -361,14 +373,14 @@ async function main() {
   // 10. Create Invoices
   console.log('\n💰 Creating invoices...');
   let invoiceCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 10; i++) {
       const invoiceId = uuidv4();
       const totalAmount = 1200 + i * 100;
       const status = ['DRAFT', 'SENT', 'PAID', 'OVERDUE'][i % 4];
       const balanceDue = status === 'PAID' ? 0 : totalAmount;
-      
+
       await prisma.invoices.create({
         data: {
           id: invoiceId,
@@ -415,14 +427,14 @@ async function main() {
   // 11. Create Bills
   console.log('\n📄 Creating bills...');
   let billCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 8; i++) {
       const billId = uuidv4();
       const totalAmount = 900 + i * 100;
       const status = ['DRAFT', 'RECEIVED', 'PAID', 'OVERDUE'][i % 4];
       const balanceDue = status === 'PAID' ? 0 : totalAmount;
-      
+
       await prisma.bills.create({
         data: {
           id: billId,
@@ -499,7 +511,7 @@ async function main() {
   let defectCounter = 1;
   let inspectionCounter = 1;
   let complianceCounter = 1;
-  
+
   for (const company of companies) {
     for (let i = 1; i <= 5; i++) {
       const checkpointUuid = uuidv4();
@@ -509,7 +521,9 @@ async function main() {
           company_id: company.id,
           checkpoint_id: `QC${String(checkpointCounter).padStart(3, '0')}`,
           checkpoint_name: `Quality Check ${i}`,
-          checkpoint_type: ['INCOMING_MATERIAL', 'IN_PROCESS', 'FINAL_INSPECTION', 'PACKAGING'][i % 4],
+          checkpoint_type: ['INCOMING_MATERIAL', 'IN_PROCESS', 'FINAL_INSPECTION', 'PACKAGING'][
+            i % 4
+          ],
           product_id: company.products[i % company.products.length],
           location_id: company.locations[0],
           batch_number: `BATCH-${i}`,
@@ -706,7 +720,7 @@ async function main() {
 
   console.log('\n✨ Seeding completed successfully!');
   console.log('\n📊 Summary:');
-  console.log('  - 1 User: testuser@lavoro.com (Password: Test@123)');
+  console.log('  - 1 User: testuser@ayphen.com (Password: Test@123)');
   console.log('  - 2 Companies: Ayphen Textiles Ltd, Global Fabrics Inc');
   console.log('  - 5 Locations per company');
   console.log('  - 5 Customers & 5 Suppliers per company');
@@ -720,11 +734,11 @@ async function main() {
   console.log('  - 6 Machines per company');
   console.log('  - Quality control: checkpoints, defects, inspections, compliance');
   console.log('  - Textile operations: fabric, yarn, dyeing, garments, designs');
-  console.log('\n🎯 Login with testuser@lavoro.com / Test@123 to explore!');
+  console.log('\n🎯 Login with testuser@ayphen.com / Test@123 to explore!');
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('❌ Error:', e);
     process.exit(1);
   })

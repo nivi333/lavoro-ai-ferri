@@ -2,9 +2,22 @@ import { QualityService } from '../../../services/qualityService';
 import { PrismaClient } from '@prisma/client';
 
 // Define enum types as string literals to avoid mocking issues
-type CheckpointType = 'INCOMING_MATERIAL' | 'IN_PROCESS' | 'FINAL_INSPECTION' | 'PACKAGING' | 'RANDOM_SAMPLING' | 'BATCH_TEST';
+type CheckpointType =
+  | 'INCOMING_MATERIAL'
+  | 'IN_PROCESS'
+  | 'FINAL_INSPECTION'
+  | 'PACKAGING'
+  | 'RANDOM_SAMPLING'
+  | 'BATCH_TEST';
 type QCStatus = 'PENDING' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'REWORK_REQUIRED';
-type DefectCategory = 'FABRIC' | 'STITCHING' | 'COLOR' | 'MEASUREMENT' | 'PACKAGING' | 'FINISHING' | 'LABELING';
+type DefectCategory =
+  | 'FABRIC'
+  | 'STITCHING'
+  | 'COLOR'
+  | 'MEASUREMENT'
+  | 'PACKAGING'
+  | 'FINISHING'
+  | 'LABELING';
 type DefectSeverity = 'CRITICAL' | 'MAJOR' | 'MINOR' | 'COSMETIC';
 type ResolutionStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 type ComplianceType = 'ISO_9001' | 'OEKO_TEX' | 'GOTS' | 'WRAP' | 'SA8000' | 'BSCI' | 'SEDEX';
@@ -14,31 +27,40 @@ type ComplianceStatus = 'COMPLIANT' | 'NON_COMPLIANT' | 'PENDING_REVIEW' | 'EXPI
 jest.mock('../../../database/connection', () => ({
   globalPrisma: {
     quality_checkpoints: {
-      findFirst: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue({ id: '550e8400-e29b-41d4-a716-446655440000' }),
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
       delete: jest.fn(),
     },
     quality_defects: {
-      findFirst: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue(null),
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
       delete: jest.fn(),
     },
     quality_metrics: {
-      findFirst: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue(null),
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       delete: jest.fn(),
     },
     compliance_reports: {
-      findFirst: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue(null),
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
       delete: jest.fn(),
+    },
+    companies: {
+      findUnique: jest.fn(),
+    },
+    products: {
+      findUnique: jest.fn(),
+    },
+    users: {
+      findUnique: jest.fn(),
     },
   },
 }));
@@ -46,29 +68,29 @@ jest.mock('../../../database/connection', () => ({
 // Mock Prisma Client
 const mockPrisma = {
   quality_checkpoints: {
-    findFirst: jest.fn(),
+    findFirst: jest.fn().mockResolvedValue(null),
     create: jest.fn(),
-    findMany: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
     update: jest.fn(),
     delete: jest.fn(),
   },
   quality_defects: {
-    findFirst: jest.fn(),
+    findFirst: jest.fn().mockResolvedValue(null),
     create: jest.fn(),
-    findMany: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
     update: jest.fn(),
     delete: jest.fn(),
   },
   quality_metrics: {
-    findFirst: jest.fn(),
+    findFirst: jest.fn().mockResolvedValue(null),
     create: jest.fn(),
-    findMany: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
     delete: jest.fn(),
   },
   compliance_reports: {
-    findFirst: jest.fn(),
+    findFirst: jest.fn().mockResolvedValue(null),
     create: jest.fn(),
-    findMany: jest.fn(),
+    findMany: jest.fn().mockResolvedValue([]),
     update: jest.fn(),
     delete: jest.fn(),
   },
@@ -77,7 +99,7 @@ const mockPrisma = {
 describe('QualityService', () => {
   let qualityService: QualityService;
   const testCompanyId = 'test-company-123';
-  const testCheckpointId = 'checkpoint-uuid-123';
+  const testCheckpointId = '550e8400-e29b-41d4-a716-446655440000';
   const testDefectId = 'defect-uuid-123';
   const testMetricId = 'metric-uuid-123';
   const testReportId = 'report-uuid-123';
@@ -129,7 +151,9 @@ describe('QualityService', () => {
         };
 
         (mockPrisma.quality_checkpoints.findFirst as jest.Mock).mockResolvedValue(null);
-        (mockPrisma.quality_checkpoints.create as jest.Mock).mockResolvedValue(mockCreatedCheckpoint);
+        (mockPrisma.quality_checkpoints.create as jest.Mock).mockResolvedValue(
+          mockCreatedCheckpoint
+        );
 
         const result = await qualityService.createCheckpoint(testCompanyId, mockCheckpointData);
 
@@ -154,7 +178,9 @@ describe('QualityService', () => {
           checkpoint_id: 'QC005',
         };
 
-        (mockPrisma.quality_checkpoints.findFirst as jest.Mock).mockResolvedValue(mockLastCheckpoint);
+        (mockPrisma.quality_checkpoints.findFirst as jest.Mock).mockResolvedValue(
+          mockLastCheckpoint
+        );
         (mockPrisma.quality_checkpoints.create as jest.Mock).mockResolvedValue({
           id: testCheckpointId,
           checkpoint_id: 'QC006',
@@ -380,7 +406,9 @@ describe('QualityService', () => {
           updated_at: new Date(),
         };
 
-        (mockPrisma.quality_checkpoints.update as jest.Mock).mockResolvedValue(mockUpdatedCheckpoint);
+        (mockPrisma.quality_checkpoints.update as jest.Mock).mockResolvedValue(
+          mockUpdatedCheckpoint
+        );
 
         const result = await qualityService.updateCheckpoint(testCompanyId, testCheckpointId, {
           status: 'PASSED' as QCStatus,
@@ -478,7 +506,7 @@ describe('QualityService', () => {
         (mockPrisma.quality_defects.findFirst as jest.Mock).mockResolvedValue(null);
         (mockPrisma.quality_defects.create as jest.Mock).mockResolvedValue(mockCreatedDefect);
 
-        const result = await qualityService.createDefect(testCompanyId, mockDefectData);
+        const result = await qualityService.createDefect(testCompanyId, mockDefectData as any);
 
         expect(result.defectId).toBe('DEF001');
         expect(result.defectCategory).toBe('FABRIC' as DefectCategory);
@@ -508,7 +536,7 @@ describe('QualityService', () => {
           checkpointId: testCheckpointId,
           defectCategory: 'MEASUREMENT' as DefectCategory,
           defectType: 'Size Issue',
-          severity: 'MINOR' as DefectSeverity,
+          severity: 'MINOR' as any,
           quantity: 1,
         });
 

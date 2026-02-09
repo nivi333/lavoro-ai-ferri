@@ -2,12 +2,22 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import { qualityService } from '../services/qualityService';
 import { logger } from '../utils/logger';
-import { CheckpointType, QCStatus, DefectCategory, DefectSeverity, ResolutionStatus, ComplianceType, ComplianceStatus } from '@prisma/client';
+import {
+  CheckpointType,
+  QCStatus,
+  DefectCategory,
+  DefectSeverity,
+  ResolutionStatus,
+  ComplianceType,
+  ComplianceStatus,
+} from '@prisma/client';
 
 // Validation Schemas
 
 const createCheckpointSchema = Joi.object({
-  checkpointType: Joi.string().valid(...Object.values(CheckpointType)).required(),
+  checkpointType: Joi.string()
+    .valid(...Object.values(CheckpointType || {}))
+    .required(),
   checkpointName: Joi.string().min(1).max(255).required(),
   inspectorName: Joi.string().min(1).max(255).required(),
   inspectionDate: Joi.date().required(),
@@ -25,7 +35,9 @@ const createCheckpointSchema = Joi.object({
 });
 
 const updateCheckpointSchema = Joi.object({
-  checkpointType: Joi.string().valid(...Object.values(CheckpointType)).optional(),
+  checkpointType: Joi.string()
+    .valid(...Object.values(CheckpointType || {}))
+    .optional(),
   checkpointName: Joi.string().min(1).max(255).optional(),
   inspectorName: Joi.string().min(1).max(255).optional().allow('', null),
   inspectionDate: Joi.date().optional().allow(null),
@@ -37,7 +49,10 @@ const updateCheckpointSchema = Joi.object({
   lotNumber: Joi.string().optional().allow('', null),
   sampleSize: Joi.number().integer().min(1).optional().allow(null),
   testedQuantity: Joi.number().integer().min(1).optional().allow(null),
-  status: Joi.string().valid(...Object.values(QCStatus)).optional().allow(null),
+  status: Joi.string()
+    .valid(...Object.values(QCStatus || {}))
+    .optional()
+    .allow(null),
   overallScore: Joi.number().min(0).max(100).optional().allow(null),
   notes: Joi.string().max(1000).optional().allow('', null),
   isActive: Joi.boolean().optional(),
@@ -46,9 +61,13 @@ const updateCheckpointSchema = Joi.object({
 const createDefectSchema = Joi.object({
   checkpointId: Joi.string().required(),
   productId: Joi.string().optional().allow('', null),
-  defectCategory: Joi.string().valid(...Object.values(DefectCategory)).required(),
+  defectCategory: Joi.string()
+    .valid(...Object.values(DefectCategory || {}))
+    .required(),
   defectType: Joi.string().min(1).max(255).required(),
-  severity: Joi.string().valid(...Object.values(DefectSeverity)).required(),
+  severity: Joi.string()
+    .valid(...Object.values(DefectSeverity || {}))
+    .required(),
   quantity: Joi.number().integer().min(1).required(),
   affectedItems: Joi.number().integer().min(1).optional().allow(null),
   batchNumber: Joi.string().optional().allow('', null),
@@ -61,16 +80,22 @@ const createDefectSchema = Joi.object({
 const updateDefectSchema = Joi.object({
   checkpointId: Joi.string().optional(),
   productId: Joi.string().optional().allow('', null),
-  defectCategory: Joi.string().valid(...Object.values(DefectCategory)).optional(),
+  defectCategory: Joi.string()
+    .valid(...Object.values(DefectCategory || {}))
+    .optional(),
   defectType: Joi.string().min(1).max(255).optional(),
-  severity: Joi.string().valid(...Object.values(DefectSeverity)).optional(),
+  severity: Joi.string()
+    .valid(...Object.values(DefectSeverity || {}))
+    .optional(),
   quantity: Joi.number().integer().min(1).optional(),
   affectedItems: Joi.number().integer().min(1).optional().allow(null),
   batchNumber: Joi.string().optional().allow('', null),
   lotNumber: Joi.string().optional().allow('', null),
   description: Joi.string().max(1000).optional().allow('', null),
   imageUrl: Joi.string().uri().optional().allow('', null),
-  resolutionStatus: Joi.string().valid(...Object.values(ResolutionStatus)).optional(),
+  resolutionStatus: Joi.string()
+    .valid(...Object.values(ResolutionStatus || {}))
+    .optional(),
   resolvedBy: Joi.string().min(1).max(255).optional().allow('', null),
   resolutionNotes: Joi.string().max(1000).optional().allow('', null),
   isActive: Joi.boolean().optional(),
@@ -92,12 +117,16 @@ const createMetricSchema = Joi.object({
 });
 
 const createComplianceReportSchema = Joi.object({
-  reportType: Joi.string().valid(...Object.values(ComplianceType)).required(),
+  reportType: Joi.string()
+    .valid(...Object.values(ComplianceType || {}))
+    .required(),
   reportDate: Joi.date().required(),
   auditorName: Joi.string().min(1).max(255).required(),
   certification: Joi.string().max(255).optional().allow('', null),
   validityPeriod: Joi.string().max(100).optional().allow('', null),
-  status: Joi.string().valid(...Object.values(ComplianceStatus)).required(),
+  status: Joi.string()
+    .valid(...Object.values(ComplianceStatus || {}))
+    .required(),
   findings: Joi.string().max(2000).optional().allow('', null),
   recommendations: Joi.string().max(2000).optional().allow('', null),
   documentUrl: Joi.string().uri().optional().allow('', null),
@@ -105,12 +134,18 @@ const createComplianceReportSchema = Joi.object({
 });
 
 const updateComplianceReportSchema = Joi.object({
-  reportType: Joi.string().valid(...Object.values(ComplianceType)).optional().allow(null),
+  reportType: Joi.string()
+    .valid(...Object.values(ComplianceType || {}))
+    .optional()
+    .allow(null),
   reportDate: Joi.date().optional().allow(null),
   auditorName: Joi.string().min(1).max(255).optional().allow('', null),
   certification: Joi.string().max(255).optional().allow('', null),
   validityPeriod: Joi.string().max(100).optional().allow('', null),
-  status: Joi.string().valid(...Object.values(ComplianceStatus)).optional().allow(null),
+  status: Joi.string()
+    .valid(...Object.values(ComplianceStatus || {}))
+    .optional()
+    .allow(null),
   findings: Joi.string().max(2000).optional().allow('', null),
   recommendations: Joi.string().max(2000).optional().allow('', null),
   documentUrl: Joi.string().uri().optional().allow('', null),

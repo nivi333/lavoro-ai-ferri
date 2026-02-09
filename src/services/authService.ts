@@ -261,6 +261,11 @@ export class AuthService {
         throw new Error('User not found');
       }
 
+      // Verify user is active
+      if (!user.is_active) {
+        throw new Error('Invalid credentials');
+      }
+
       // Verify password with error handling
       let passwordValid = false;
       try {

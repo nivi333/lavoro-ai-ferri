@@ -467,7 +467,7 @@ export function CompanyCreationSheet({
                         <FormControl>
                           <div className='flex'>
                             <span className='inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md'>
-                              lavoro.ai/
+                              ayphen.ai/
                             </span>
                             <Input
                               {...field}

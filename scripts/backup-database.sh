@@ -20,7 +20,7 @@ fi
 # Database configuration
 DB_HOST=${DB_HOST:-localhost}
 DB_PORT=${DB_PORT:-5432}
-DB_NAME=${DB_NAME:-lavoro_prod}
+DB_NAME=${DB_NAME:-ayphen_prod}
 DB_USER=${DB_USER:-postgres}
 DB_PASSWORD=${DB_PASSWORD}
 
