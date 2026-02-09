@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
 import { SalesSummaryReport as SalesSummaryData } from '@/services/reportTypes';
 
@@ -28,9 +29,15 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<SalesSummaryData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const lastTriggerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchData();
+    if (lastTriggerRef.current !== triggerFetch) {
+      lastTriggerRef.current = triggerFetch;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFetch]);
 
   const fetchData = async () => {
@@ -38,6 +45,9 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       return;
     }
 
+    if (loading) return;
+
+    setLoading(true);
     onLoadingChange(true);
     try {
       const startDate = format(dateRange.from, 'yyyy-MM-dd');
@@ -49,6 +59,7 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       console.error('Error fetching Sales Summary:', error);
       toast.error('Failed to load Sales Summary report');
     } finally {
+      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -67,6 +78,15 @@ const SalesSummaryReport: React.FC<SalesSummaryReportProps> = ({
       c.customerName.toLowerCase().includes(searchText.toLowerCase()) ||
       (c.customerCode && c.customerCode.toLowerCase().includes(searchText.toLowerCase()))
   );
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center py-16'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        <span className='ml-2 text-muted-foreground'>Loading report data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

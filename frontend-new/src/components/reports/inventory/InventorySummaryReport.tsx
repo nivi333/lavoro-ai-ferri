@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Loader2 } from 'lucide-react';
 import { reportService } from '@/services/reportService';
 import { InventorySummaryReport as InventorySummaryData } from '@/services/reportTypes';
 import {
@@ -23,12 +24,21 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
   onLoadingChange,
 }) => {
   const [data, setData] = useState<InventorySummaryData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const lastTriggerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchData();
+    if (lastTriggerRef.current !== triggerFetch) {
+      lastTriggerRef.current = triggerFetch;
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerFetch]);
 
   const fetchData = async () => {
+    if (loading) return;
+
+    setLoading(true);
     onLoadingChange(true);
     try {
       const result = await reportService.getInventorySummary();
@@ -37,6 +47,7 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
       console.error('Error fetching Inventory Summary:', error);
       toast.error('Failed to load Inventory Summary report');
     } finally {
+      setLoading(false);
       onLoadingChange(false);
     }
   };
@@ -52,6 +63,15 @@ const InventorySummaryReport: React.FC<InventorySummaryReportProps> = ({
   const filteredLocations = data?.stockByLocation.filter(l =>
     l.locationName?.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center py-16'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        <span className='ml-2 text-muted-foreground'>Loading report data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

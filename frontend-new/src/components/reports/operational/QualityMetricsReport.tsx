@@ -30,11 +30,11 @@ const QualityMetricsReport: React.FC<QualityMetricsReportProps> = ({
 }) => {
   const [data, setData] = useState<QualityData | null>(null);
   const [loading, setLoading] = useState(false);
-  const lastTriggerRef = useRef<number>(-1);
+  const lastTriggerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Only fetch if triggerFetch has actually changed (user clicked Generate)
-    if (triggerFetch > 0 && triggerFetch !== lastTriggerRef.current) {
+    // Fetch on initial load or when triggerFetch changes (user clicked Generate)
+    if (lastTriggerRef.current !== triggerFetch) {
       lastTriggerRef.current = triggerFetch;
       fetchData();
     }

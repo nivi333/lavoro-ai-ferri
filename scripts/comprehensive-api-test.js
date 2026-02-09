@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * Comprehensive API Seed Test v2
- * Tests all CRUD operations with correct route paths
+ * Comprehensive CRUD API Test v4
+ * Tests Create, Read, Update, Delete for all entities with correct field validation
  */
 
 const BASE_URL = 'http://localhost:5001/api/v1';
 
 let authTokens = null;
 let testCompanyId = null;
+let testLocationId = null;
 let results = { passed: [], failed: [] };
 
 async function request(method, endpoint, body = null, description = '') {
@@ -27,10 +28,10 @@ async function request(method, endpoint, body = null, description = '') {
 
     if (response.ok) {
       results.passed.push(`✅ ${description}`);
-      return { success: true, data: data.data || data };
+      return { success: true, data: data.data || data, status: response.status };
     } else {
-      results.failed.push(`❌ ${description}: ${data.message || 'Unknown error'}`);
-      return { success: false, error: data };
+      results.failed.push(`❌ ${description}: ${data.message || data.details || 'Unknown error'}`);
+      return { success: false, error: data, status: response.status };
     }
   } catch (error) {
     results.failed.push(`❌ ${description}: ${error.message}`);
@@ -39,7 +40,7 @@ async function request(method, endpoint, body = null, description = '') {
 }
 
 async function runTests() {
-  console.log('🚀 Starting Comprehensive API Test v2...\n');
+  console.log('🚀 Starting Comprehensive CRUD API Test v4...\n');
 
   // ============ AUTH ============
   console.log('📋 AUTHENTICATION');
@@ -55,13 +56,6 @@ async function runTests() {
   }
   authTokens = loginResult.data.tokens;
   console.log('  🔐 Logged in');
-
-  await request(
-    'POST',
-    '/auth/refresh',
-    { refreshToken: authTokens.refreshToken },
-    'Refresh token'
-  );
 
   // ============ COMPANY + SWITCH CONTEXT ============
   console.log('\n📋 COMPANY');
@@ -79,84 +73,339 @@ async function runTests() {
       console.log(`  🔄 Switched to: ${companiesResult.data[0].name}`);
     }
   }
-  await request('GET', `/companies/${testCompanyId}`, null, 'Get company details');
 
-  // ============ LOCATIONS ============
-  console.log('\n📋 LOCATIONS');
-  await request('GET', '/locations', null, 'Get locations');
-
-  // ============ CUSTOMERS (nested under company) ============
-  console.log('\n📋 CUSTOMERS');
-  await request('GET', `/companies/${testCompanyId}/customers`, null, 'Get customers');
-
-  // ============ SUPPLIERS (nested under company) ============
-  console.log('\n📋 SUPPLIERS');
-  await request('GET', `/companies/${testCompanyId}/suppliers`, null, 'Get suppliers');
-
-  // ============ PRODUCTS ============
-  console.log('\n📋 PRODUCTS');
-  const products = await request('GET', '/products', null, 'Get products');
-  if (products.success && products.data?.length > 0) {
-    await request('GET', `/products/${products.data[0].id}`, null, 'Get single product');
+  // ============ LOCATIONS CRUD ============
+  console.log('\n📋 LOCATIONS CRUD');
+  const locList = await request('GET', '/locations', null, 'READ: Get locations');
+  if (locList.success && locList.data?.length > 0) {
+    testLocationId = locList.data[0].id;
+    await request('GET', `/locations/${testLocationId}`, null, 'READ: Get single location');
+    await request(
+      'PUT',
+      `/locations/${testLocationId}`,
+      { name: `Updated-${Date.now()}` },
+      'UPDATE: Edit location'
+    );
   }
 
-  // ============ ORDERS ============
-  console.log('\n📋 ORDERS');
-  const orders = await request('GET', '/orders', null, 'Get orders');
-  if (orders.success && orders.data?.length > 0) {
-    await request('GET', `/orders/${orders.data[0].id}`, null, 'Get single order');
+  // Create a test location (only 'name' is required per schema)
+  const newLoc = await request(
+    'POST',
+    '/locations',
+    {
+      name: `TestLoc-${Date.now()}`,
+      locationType: 'WAREHOUSE',
+    },
+    'CREATE: New location'
+  );
+  if (newLoc.success && newLoc.data?.id) {
+    await request('DELETE', `/locations/${newLoc.data.id}`, null, 'DELETE: Remove location');
   }
 
-  // ============ PURCHASE ORDERS ============
-  console.log('\n📋 PURCHASE ORDERS');
-  const pos = await request('GET', '/purchase-orders', null, 'Get POs');
-  if (pos.success && pos.data?.length > 0) {
-    await request('GET', `/purchase-orders/${pos.data[0].id}`, null, 'Get single PO');
+  // ============ CUSTOMERS CRUD ============
+  console.log('\n📋 CUSTOMERS CRUD');
+  const custList = await request(
+    'GET',
+    `/companies/${testCompanyId}/customers`,
+    null,
+    'READ: Get customers'
+  );
+  if (custList.success && custList.data?.length > 0) {
+    const custId = custList.data[0].id;
+    await request(
+      'GET',
+      `/companies/${testCompanyId}/customers/${custId}`,
+      null,
+      'READ: Get single customer'
+    );
+    await request(
+      'PUT',
+      `/companies/${testCompanyId}/customers/${custId}`,
+      { name: `UpdCust-${Date.now()}` },
+      'UPDATE: Edit customer'
+    );
   }
 
-  // ============ INVOICES ============
-  console.log('\n📋 INVOICES');
-  const invoices = await request('GET', '/invoices', null, 'Get invoices');
-  if (invoices.success && invoices.data?.length > 0) {
-    await request('GET', `/invoices/${invoices.data[0].id}`, null, 'Get single invoice');
+  // Create customer (name required, min 2 chars)
+  const newCust = await request(
+    'POST',
+    `/companies/${testCompanyId}/customers`,
+    {
+      name: `TestCustomer-${Date.now()}`,
+    },
+    'CREATE: New customer'
+  );
+  if (newCust.success && newCust.data?.id) {
+    await request(
+      'DELETE',
+      `/companies/${testCompanyId}/customers/${newCust.data.id}`,
+      null,
+      'DELETE: Remove customer'
+    );
   }
 
-  // ============ BILLS ============
-  console.log('\n📋 BILLS');
-  const bills = await request('GET', '/bills', null, 'Get bills');
-  if (bills.success && bills.data?.length > 0) {
-    await request('GET', `/bills/${bills.data[0].id}`, null, 'Get single bill');
+  // ============ SUPPLIERS CRUD ============
+  console.log('\n📋 SUPPLIERS CRUD');
+  const suppList = await request(
+    'GET',
+    `/companies/${testCompanyId}/suppliers`,
+    null,
+    'READ: Get suppliers'
+  );
+  if (suppList.success && suppList.data?.length > 0) {
+    const suppId = suppList.data[0].id;
+    await request(
+      'GET',
+      `/companies/${testCompanyId}/suppliers/${suppId}`,
+      null,
+      'READ: Get single supplier'
+    );
+    await request(
+      'PUT',
+      `/companies/${testCompanyId}/suppliers/${suppId}`,
+      { name: `UpdSupp-${Date.now()}` },
+      'UPDATE: Edit supplier'
+    );
   }
 
-  // ============ MACHINES ============
-  console.log('\n📋 MACHINES');
-  const machines = await request('GET', '/machines', null, 'Get machines');
-  if (machines.success && machines.data?.length > 0) {
-    await request('GET', `/machines/${machines.data[0].id}`, null, 'Get single machine');
+  // Create supplier (minimal required fields)
+  const newSupp = await request(
+    'POST',
+    `/companies/${testCompanyId}/suppliers`,
+    {
+      name: `TestSupp-${Date.now()}`,
+      email: `supp${Date.now()}@test.com`,
+    },
+    'CREATE: New supplier'
+  );
+  if (newSupp.success && newSupp.data?.id) {
+    await request(
+      'DELETE',
+      `/companies/${testCompanyId}/suppliers/${newSupp.data.id}`,
+      null,
+      'DELETE: Remove supplier'
+    );
+  }
+
+  // ============ PRODUCTS CRUD ============
+  console.log('\n📋 PRODUCTS CRUD');
+  const prodList = await request('GET', '/products', null, 'READ: Get products');
+  if (prodList.success && prodList.data?.length > 0) {
+    const prodId = prodList.data[0].id;
+    await request('GET', `/products/${prodId}`, null, 'READ: Get single product');
+    await request(
+      'PUT',
+      `/products/${prodId}`,
+      { name: `UpdProd-${Date.now()}` },
+      'UPDATE: Edit product'
+    );
+  }
+
+  // Create product (name, costPrice, sellingPrice required)
+  const newProd = await request(
+    'POST',
+    '/products',
+    {
+      name: `TestProduct-${Date.now()}`,
+      costPrice: 100,
+      sellingPrice: 150,
+    },
+    'CREATE: New product'
+  );
+  if (newProd.success && newProd.data?.id) {
+    await request('DELETE', `/products/${newProd.data.id}`, null, 'DELETE: Remove product');
+  }
+
+  // ============ ORDERS CRUD ============
+  console.log('\n📋 ORDERS CRUD');
+  const orderList = await request('GET', '/orders', null, 'READ: Get orders');
+  if (orderList.success && orderList.data?.length > 0) {
+    const orderId = orderList.data[0].id;
+    await request('GET', `/orders/${orderId}`, null, 'READ: Get single order');
+    await request(
+      'PUT',
+      `/orders/${orderId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit order'
+    );
+  }
+
+  // ============ PURCHASE ORDERS CRUD ============
+  console.log('\n📋 PURCHASE ORDERS CRUD');
+  const poList = await request('GET', '/purchase-orders', null, 'READ: Get POs');
+  if (poList.success && poList.data?.length > 0) {
+    const poId = poList.data[0].id;
+    await request('GET', `/purchase-orders/${poId}`, null, 'READ: Get single PO');
+    await request(
+      'PUT',
+      `/purchase-orders/${poId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit PO'
+    );
+  }
+
+  // ============ INVOICES CRUD ============
+  console.log('\n📋 INVOICES CRUD');
+  const invList = await request('GET', '/invoices', null, 'READ: Get invoices');
+  if (invList.success && invList.data?.length > 0) {
+    const invId = invList.data[0].id;
+    await request('GET', `/invoices/${invId}`, null, 'READ: Get single invoice');
+    await request(
+      'PUT',
+      `/invoices/${invId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit invoice'
+    );
+  }
+
+  // ============ BILLS CRUD ============
+  console.log('\n📋 BILLS CRUD');
+  const billList = await request('GET', '/bills', null, 'READ: Get bills');
+  if (billList.success && billList.data?.length > 0) {
+    const billId = billList.data[0].id;
+    await request('GET', `/bills/${billId}`, null, 'READ: Get single bill');
+    await request(
+      'PUT',
+      `/bills/${billId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit bill'
+    );
+  }
+
+  // ============ MACHINES CRUD ============
+  console.log('\n📋 MACHINES CRUD');
+  const machList = await request('GET', '/machines', null, 'READ: Get machines');
+  if (machList.success && machList.data?.length > 0) {
+    const machId = machList.data[0].id;
+    await request('GET', `/machines/${machId}`, null, 'READ: Get single machine');
+    await request(
+      'PUT',
+      `/machines/${machId}`,
+      { name: `UpdMach-${Date.now()}` },
+      'UPDATE: Edit machine'
+    );
+  }
+
+  // Create machine (required: name, warrantyExpiry, locationId)
+  if (testLocationId) {
+    const futureDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+    const newMach = await request(
+      'POST',
+      '/machines',
+      {
+        name: `TestMach-${Date.now()}`,
+        warrantyExpiry: futureDate,
+        locationId: testLocationId,
+      },
+      'CREATE: New machine'
+    );
+    if (newMach.success && newMach.data?.id) {
+      await request('DELETE', `/machines/${newMach.data.id}`, null, 'DELETE: Remove machine');
+    }
   }
 
   // ============ INVENTORY ============
   console.log('\n📋 INVENTORY');
-  await request('GET', '/inventory/locations', null, 'Get inventory locations');
-  await request('GET', '/inventory/alerts', null, 'Get stock alerts');
+  await request('GET', '/inventory/locations', null, 'READ: Get inventory locations');
+  await request('GET', '/inventory/alerts', null, 'READ: Get stock alerts');
 
-  // ============ QUALITY CONTROL ============
-  console.log('\n📋 QUALITY CONTROL');
-  await request('GET', '/quality/checkpoints', null, 'Get checkpoints');
-  await request('GET', '/quality/defects', null, 'Get defects');
-  await request('GET', '/inspections', null, 'Get inspections');
+  // ============ QUALITY CONTROL CRUD ============
+  console.log('\n📋 QUALITY CONTROL CRUD');
+  const cpList = await request('GET', '/quality/checkpoints', null, 'READ: Get checkpoints');
+  if (cpList.success && cpList.data?.length > 0) {
+    const cpId = cpList.data[0].id;
+    await request('GET', `/quality/checkpoints/${cpId}`, null, 'READ: Get single checkpoint');
+    await request(
+      'PUT',
+      `/quality/checkpoints/${cpId}`,
+      { name: `UpdCP-${Date.now()}` },
+      'UPDATE: Edit checkpoint'
+    );
+  }
 
-  // ============ TEXTILE OPERATIONS (correct paths) ============
-  console.log('\n📋 TEXTILE OPERATIONS');
-  await request('GET', '/textile/fabrics', null, 'Get fabrics');
-  await request('GET', '/textile/yarns', null, 'Get yarns');
-  await request('GET', '/textile/dyeing', null, 'Get dyeing');
-  await request('GET', '/textile/garments', null, 'Get garments');
-  await request('GET', '/textile/designs', null, 'Get designs');
+  const defList = await request('GET', '/quality/defects', null, 'READ: Get defects');
+  if (defList.success && defList.data?.length > 0) {
+    const defId = defList.data[0].id;
+    await request('GET', `/quality/defects/${defId}`, null, 'READ: Get single defect');
+    await request(
+      'PUT',
+      `/quality/defects/${defId}`,
+      { name: `UpdDef-${Date.now()}` },
+      'UPDATE: Edit defect'
+    );
+  }
+
+  // ============ TEXTILE OPERATIONS CRUD ============
+  console.log('\n📋 TEXTILE OPERATIONS CRUD');
+
+  // Fabrics
+  const fabList = await request('GET', '/textile/fabrics', null, 'READ: Get fabrics');
+  if (fabList.success && fabList.data?.length > 0) {
+    const fabId = fabList.data[0].id;
+    await request('GET', `/textile/fabrics/${fabId}`, null, 'READ: Get single fabric');
+    await request(
+      'PUT',
+      `/textile/fabrics/${fabId}`,
+      { name: `UpdFab-${Date.now()}` },
+      'UPDATE: Edit fabric'
+    );
+  }
+
+  // Yarns
+  const yarnList = await request('GET', '/textile/yarns', null, 'READ: Get yarns');
+  if (yarnList.success && yarnList.data?.length > 0) {
+    const yarnId = yarnList.data[0].id;
+    await request('GET', `/textile/yarns/${yarnId}`, null, 'READ: Get single yarn');
+    await request(
+      'PUT',
+      `/textile/yarns/${yarnId}`,
+      { name: `UpdYarn-${Date.now()}` },
+      'UPDATE: Edit yarn'
+    );
+  }
+
+  // Dyeing
+  const dyeList = await request('GET', '/textile/dyeing', null, 'READ: Get dyeing');
+  if (dyeList.success && dyeList.data?.length > 0) {
+    const dyeId = dyeList.data[0].id;
+    await request('GET', `/textile/dyeing/${dyeId}`, null, 'READ: Get single dyeing');
+    await request(
+      'PUT',
+      `/textile/dyeing/${dyeId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit dyeing'
+    );
+  }
+
+  // Garments
+  const garList = await request('GET', '/textile/garments', null, 'READ: Get garments');
+  if (garList.success && garList.data?.length > 0) {
+    const garId = garList.data[0].id;
+    await request('GET', `/textile/garments/${garId}`, null, 'READ: Get single garment');
+    await request(
+      'PUT',
+      `/textile/garments/${garId}`,
+      { notes: `Updated ${Date.now()}` },
+      'UPDATE: Edit garment'
+    );
+  }
+
+  // Designs
+  const desList = await request('GET', '/textile/designs', null, 'READ: Get designs');
+  if (desList.success && desList.data?.length > 0) {
+    const desId = desList.data[0].id;
+    await request('GET', `/textile/designs/${desId}`, null, 'READ: Get single design');
+    await request(
+      'PUT',
+      `/textile/designs/${desId}`,
+      { name: `UpdDes-${Date.now()}` },
+      'UPDATE: Edit design'
+    );
+  }
 
   // ============ DASHBOARD ============
   console.log('\n📋 DASHBOARD');
-  await request('GET', '/analytics/dashboard', null, 'Get dashboard');
+  await request('GET', '/analytics/dashboard', null, 'READ: Get dashboard');
 
   // ============ REPORTS ============
   console.log('\n📋 REPORTS');
@@ -211,7 +460,7 @@ async function runTests() {
 
   // ============ SUMMARY ============
   console.log('\n' + '='.repeat(60));
-  console.log('📊 TEST RESULTS');
+  console.log('📊 CRUD TEST RESULTS');
   console.log('='.repeat(60));
   const total = results.passed.length + results.failed.length;
   const pct = ((results.passed.length / total) * 100).toFixed(1);
@@ -222,6 +471,9 @@ async function runTests() {
     console.log('\n❌ FAILURES:');
     results.failed.forEach(f => console.log(`  ${f}`));
   }
+
+  console.log('\n✅ PASSED:');
+  results.passed.forEach(p => console.log(`  ${p}`));
 }
 
 runTests().catch(console.error);

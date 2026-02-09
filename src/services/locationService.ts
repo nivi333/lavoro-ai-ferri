@@ -116,7 +116,7 @@ export class LocationService {
           name: data.name,
           email: data.email,
           phone: data.phone,
-          address_line_1: data.addressLine1,
+          address_line_1: data.addressLine1 || '',
           address_line_2: data.addressLine2,
           city: data.city,
           state: data.state,
