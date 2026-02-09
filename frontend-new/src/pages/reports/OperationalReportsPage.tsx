@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
-import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageContainer, PageHeader } from '@/components/globalComponents';
 import ReportFilters from '@/components/reports/shared/ReportFilters';
@@ -18,7 +17,6 @@ const OperationalReportsPage = () => {
   const [triggerFetch, setTriggerFetch] = useState(0);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('machine-utilization');
-
 
   const handleGenerate = () => {
     setTriggerFetch(prev => prev + 1);
@@ -61,41 +59,30 @@ const OperationalReportsPage = () => {
         </TabsList>
 
         <div className='mt-4'>
-          {loading && (
-            <div className='flex items-center justify-center py-12'>
-              <Loader2 className='h-8 w-8 animate-spin text-primary' />
-              <span className='ml-2 text-muted-foreground'>Loading report data...</span>
-            </div>
-          )}
-          
-          {!loading && (
-            <>
-              <TabsContent value='machine-utilization'>
-                <MachineUtilizationReport
-                  dateRange={dateRange}
-                  searchText={searchText}
-                  triggerFetch={triggerFetch}
-                  onLoadingChange={setLoading}
-                />
-              </TabsContent>
-              <TabsContent value='production-efficiency'>
-                <ProductionEfficiencyReport
-                  dateRange={dateRange}
-                  searchText={searchText}
-                  triggerFetch={triggerFetch}
-                  onLoadingChange={setLoading}
-                />
-              </TabsContent>
-              <TabsContent value='quality-metrics'>
-                <QualityMetricsReport
-                  dateRange={dateRange}
-                  searchText={searchText}
-                  triggerFetch={triggerFetch}
-                  onLoadingChange={setLoading}
-                />
-              </TabsContent>
-            </>
-          )}
+          <TabsContent value='machine-utilization'>
+            <MachineUtilizationReport
+              dateRange={dateRange}
+              searchText={searchText}
+              triggerFetch={triggerFetch}
+              onLoadingChange={setLoading}
+            />
+          </TabsContent>
+          <TabsContent value='production-efficiency'>
+            <ProductionEfficiencyReport
+              dateRange={dateRange}
+              searchText={searchText}
+              triggerFetch={triggerFetch}
+              onLoadingChange={setLoading}
+            />
+          </TabsContent>
+          <TabsContent value='quality-metrics'>
+            <QualityMetricsReport
+              dateRange={dateRange}
+              searchText={searchText}
+              triggerFetch={triggerFetch}
+              onLoadingChange={setLoading}
+            />
+          </TabsContent>
         </div>
       </Tabs>
     </PageContainer>
