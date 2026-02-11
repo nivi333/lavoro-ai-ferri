@@ -34,6 +34,7 @@ model companies {
   updated_at             DateTime
   default_location       String?
   industry               IndustryType            @default(TEXTILE_MANUFACTURING)
+  currency               String                  @default("USD")
   stripe_customer_id     String?                 @unique
   stripe_subscription_id String?
   subscription_ends_at   DateTime?

@@ -221,6 +221,7 @@ class CompanyService {
               established_date: companyData.establishedDate,
               business_type: companyData.businessType,
               certifications: companyData.certifications || [],
+              currency: companyData.currency || 'USD',
               default_location: defaultLocation,
               is_active: companyData.isActive !== undefined ? companyData.isActive : true, // Default to true
               updated_at: new Date(),
@@ -351,6 +352,7 @@ class CompanyService {
             establishedDate: newCompany.established_date,
             businessType: newCompany.business_type,
             certifications: newCompany.certifications,
+            currency: newCompany.currency,
             defaultLocation: newCompany.default_location,
             role: ownerLink.role,
             joinedAt: ownerLink.created_at,
@@ -463,6 +465,7 @@ class CompanyService {
           establishedDate: company.established_date,
           businessType: company.business_type,
           certifications: company.certifications,
+          currency: company.currency,
           defaultLocation: company.default_location,
           isActive: company.is_active,
           role: uc.role,
@@ -494,6 +497,7 @@ class CompanyService {
         establishedDate: inv.established_date,
         businessType: inv.business_type,
         certifications: inv.certifications,
+        currency: inv.currency,
         defaultLocation: inv.default_location,
         isActive: inv.is_active,
         role: inv.role,
@@ -552,6 +556,7 @@ class CompanyService {
         establishedDate: company.established_date,
         businessType: company.business_type,
         certifications: company.certifications,
+        currency: company.currency,
         defaultLocation: company.default_location,
         role: userCompany.role,
         joinedAt: userCompany.created_at,
@@ -619,6 +624,7 @@ class CompanyService {
         data.business_type = (updateData as any).businessType;
       if ((updateData as any).certifications !== undefined)
         data.certifications = (updateData as any).certifications;
+      if (updateData.currency !== undefined) data.currency = updateData.currency;
       if ((updateData as any).defaultLocation !== undefined)
         data.default_location = (updateData as any).defaultLocation;
       if ((updateData as any).isActive !== undefined) data.is_active = (updateData as any).isActive;
@@ -650,6 +656,7 @@ class CompanyService {
         establishedDate: updatedCompany.established_date,
         businessType: updatedCompany.business_type,
         certifications: updatedCompany.certifications,
+        currency: updatedCompany.currency,
         defaultLocation: updatedCompany.default_location,
         isActive: updatedCompany.is_active,
         createdAt: updatedCompany.created_at,

@@ -18,6 +18,7 @@ export interface CreateCompanyRequest {
   businessType: string;
   certifications?: string[];
   contactInfo: string;
+  currency: string;
   website?: string;
   taxId?: string;
   isActive?: boolean; // Always true for company creation
@@ -40,6 +41,7 @@ export interface CompanyResponse {
   establishedDate?: string;
   businessType?: string;
   certifications?: string;
+  currency?: string;
   contactInfo?: string;
   website?: string;
   taxId?: string;
@@ -71,6 +73,7 @@ export interface UpdateCompanyRequest {
   contactInfo?: string;
   website?: string;
   taxId?: string;
+  currency?: string;
   isActive?: boolean;
 }
 

@@ -48,11 +48,14 @@ export default function CompaniesListPage() {
 
   const handleCompanyCreated = async () => {
     setSheetOpen(false);
+    setRefreshing(true);
     try {
       await refreshCompanies();
     } catch (error) {
       console.error('Error refreshing companies:', error);
       toast.warning('Company created but failed to refresh list. Please refresh the page.');
+    } finally {
+      setRefreshing(false);
     }
   };
 

@@ -81,6 +81,7 @@ const baseSchema = z.object({
   contactInfo: z.string().min(1, 'Contact information is required'),
   website: z.string().max(48).optional(),
   taxId: z.string().max(24).optional(),
+  currency: z.string().min(1, 'Currency is required'),
 });
 
 const createSchema = baseSchema.extend({
@@ -178,6 +179,7 @@ export function CompanyCreationSheet({
                   : '',
             website: company.website || '',
             taxId: company.taxId || '',
+            currency: company.currency || 'USD',
           });
 
           setOriginalSlug(company.slug);
@@ -366,6 +368,7 @@ export function CompanyCreationSheet({
           establishedDate: format(values.establishedDate, 'yyyy-MM-dd'),
           businessType: values.businessType,
           contactInfo: values.contactInfo,
+          currency: values.currency,
           ...(values.description && { description: values.description }),
           ...(logoFile?.url && { logoUrl: logoFile.url }),
           ...(values.addressLine2 && { addressLine2: values.addressLine2 }),
@@ -391,6 +394,7 @@ export function CompanyCreationSheet({
           establishedDate: format(values.establishedDate, 'yyyy-MM-dd'),
           businessType: values.businessType,
           contactInfo: values.contactInfo,
+          currency: values.currency,
           isActive: true,
           ...(values.description && { description: values.description }),
           ...(logoFile?.url && { logoUrl: logoFile.url }),
@@ -628,6 +632,32 @@ export function CompanyCreationSheet({
                             <SelectItem value='Turkey'>Turkey</SelectItem>
                             <SelectItem value='Italy'>Italy</SelectItem>
                             <SelectItem value='Germany'>Germany</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name='currency'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Currency</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid='currency-select'>
+                              <SelectValue placeholder='Select currency' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value='INR'>India (INR)</SelectItem>
+                            <SelectItem value='USD'>United States (USD)</SelectItem>
+                            <SelectItem value='GBP'>United Kingdom (GBP)</SelectItem>
+                            <SelectItem value='EUR'>Europe (EUR)</SelectItem>
+                            <SelectItem value='AED'>Arab (AED)</SelectItem>
+                            <SelectItem value='CNY'>China (CNY)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
